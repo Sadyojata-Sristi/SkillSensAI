@@ -5,6 +5,8 @@ import librosa
 import numpy as np
 import tempfile
 import os
+import subprocess
+import imageio_ffmpeg
 
 
 app = FastAPI(
@@ -13,8 +15,6 @@ app = FastAPI(
 )
 
 
-# Allow the frontend to communicate with the backend.
-# We will make this more restrictive after deployment if needed.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -31,72 +31,160 @@ def home():
     }
 
 
+def convert_to_wav(input_path):
+    """
+    Converts browser audio such as WebM/Opus into WAV
+    so librosa can reliably analyse it.
+    """
+
+    ffmpeg_path = imageio_ffmpeg.get_ffmpeg_exe()
+
+    output_file = tempfile.NamedTemporaryFile(
+        delete=False,
+        suffix=".wav"
+    )
+
+    output_path = output_file.name
+    output_file.close()
+
+    command = [
+        ffmpeg_path,
+        "-y",
+        "-i",
+        input_path,
+        "-vn",
+        "-ac",
+        "1",
+        "-ar",
+        "22050",
+        "-acodec",
+        "pcm_s16le",
+        output_path
+    ]
+
+    subprocess.run(
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=True
+    )
+
+    return output_path
+
+
+def detect_pitch(audio, sample_rate):
+    """
+    Detects fundamental frequency using librosa.pyin.
+    Returns only valid pitch values.
+    """
+
+    audio = np.asarray(audio, dtype=np.float32)
+
+    # Remove very quiet background noise
+    audio = librosa.util.normalize(audio)
+
+    f0, voiced_flag, voiced_prob = librosa.pyin(
+        audio,
+        fmin=librosa.note_to_hz("C2"),
+        fmax=librosa.note_to_hz("C7"),
+        sr=sample_rate,
+        frame_length=2048,
+        hop_length=256
+    )
+
+    valid_pitch = f0[
+        ~np.isnan(f0)
+    ]
+
+    # Keep only realistic human-voice frequencies
+    valid_pitch = valid_pitch[
+        (valid_pitch >= librosa.note_to_hz("C2")) &
+        (valid_pitch <= librosa.note_to_hz("C7"))
+    ]
+
+    return valid_pitch.tolist()
+
+
 @app.post("/analyze-song")
 async def analyze_song(file: UploadFile = File(...)):
 
-    suffix = os.path.splitext(file.filename or "")[1]
-
-    with tempfile.NamedTemporaryFile(
-        delete=False,
-        suffix=suffix
-    ) as temp_file:
-
-        content = await file.read()
-        temp_file.write(content)
-        temp_path = temp_file.name
+    original_path = None
+    wav_path = None
 
     try:
 
+        suffix = os.path.splitext(
+            file.filename or ""
+        )[1] or ".audio"
+
+        with tempfile.NamedTemporaryFile(
+            delete=False,
+            suffix=suffix
+        ) as temp_file:
+
+            content = await file.read()
+            temp_file.write(content)
+            original_path = temp_file.name
+
+        # Convert uploaded song to WAV
+        wav_path = convert_to_wav(original_path)
+
         audio, sample_rate = librosa.load(
-            temp_path,
+            wav_path,
             sr=None,
             mono=True
         )
 
-        # Detect pitch using YIN
-        pitches = librosa.yin(
+        pitches = detect_pitch(
             audio,
-            fmin=librosa.note_to_hz("C2"),
-            fmax=librosa.note_to_hz("C7"),
-            sr=sample_rate
+            sample_rate
         )
-
-        valid_pitches = [
-            float(p)
-            for p in pitches
-            if p > 0
-        ]
 
         notes = []
 
-        for pitch in valid_pitches:
+        for pitch in pitches:
 
-            midi_note = librosa.hz_to_midi(pitch)
+            midi_note = librosa.hz_to_midi(
+                pitch
+            )
 
             note_name = librosa.midi_to_note(
                 round(midi_note)
             )
 
             notes.append({
-                "frequency": round(pitch, 2),
+                "frequency": round(
+                    float(pitch),
+                    2
+                ),
                 "note": note_name
             })
 
-        # Keep the response reasonably small
         max_points = 300
 
         if len(notes) > max_points:
-            step = max(1, len(notes) // max_points)
-            sampled_notes = notes[::step][:max_points]
+
+            step = max(
+                1,
+                len(notes) // max_points
+            )
+
+            sampled_notes = notes[
+                ::step
+            ][:max_points]
+
         else:
+
             sampled_notes = notes
 
         return {
             "success": True,
             "filename": file.filename,
             "sample_rate": sample_rate,
-            "duration": float(len(audio) / sample_rate),
-            "total_pitch_points": len(valid_pitches),
+            "duration": float(
+                len(audio) / sample_rate
+            ),
+            "total_pitch_points": len(pitches),
             "pitch_data": sampled_notes
         }
 
@@ -109,70 +197,116 @@ async def analyze_song(file: UploadFile = File(...)):
 
     finally:
 
-        if os.path.exists(temp_path):
-            os.remove(temp_path)
+        if original_path and os.path.exists(
+            original_path
+        ):
+            os.remove(original_path)
+
+        if wav_path and os.path.exists(
+            wav_path
+        ):
+            os.remove(wav_path)
 
 
 @app.post("/analyze-voice")
 async def analyze_voice(file: UploadFile = File(...)):
 
-    suffix = os.path.splitext(file.filename or "")[1]
-
-    with tempfile.NamedTemporaryFile(
-        delete=False,
-        suffix=suffix
-    ) as temp_file:
-
-        content = await file.read()
-        temp_file.write(content)
-        temp_path = temp_file.name
+    original_path = None
+    wav_path = None
 
     try:
 
+        suffix = os.path.splitext(
+            file.filename or ""
+        )[1] or ".audio"
+
+        with tempfile.NamedTemporaryFile(
+            delete=False,
+            suffix=suffix
+        ) as temp_file:
+
+            content = await file.read()
+            temp_file.write(content)
+            original_path = temp_file.name
+
+        # Convert browser WebM/Opus to WAV
+        wav_path = convert_to_wav(
+            original_path
+        )
+
         audio, sample_rate = librosa.load(
-            temp_path,
+            wav_path,
             sr=None,
             mono=True
         )
 
-        # Detect the user's pitch
-        pitches = librosa.yin(
-            audio,
-            fmin=librosa.note_to_hz("C2"),
-            fmax=librosa.note_to_hz("C7"),
-            sr=sample_rate
+        # Check if audio actually contains sound
+        rms = librosa.feature.rms(
+            y=audio
         )
 
-        valid_pitches = [
-            float(p)
-            for p in pitches
-            if p > 0
-        ]
+        average_volume = float(
+            np.mean(rms)
+        )
+
+        if average_volume < 0.001:
+
+            return {
+                "success": False,
+                "error": "The recording is too quiet. Please speak or sing closer to the microphone."
+            }
+
+        pitch_values = detect_pitch(
+            audio,
+            sample_rate
+        )
+
+        if len(pitch_values) < 3:
+
+            return {
+                "success": False,
+                "error": "No clear pitch was detected. Please record your voice more clearly."
+            }
 
         max_points = 500
 
-        if len(valid_pitches) > max_points:
+        if len(pitch_values) > max_points:
 
             indices = np.linspace(
                 0,
-                len(valid_pitches) - 1,
+                len(pitch_values) - 1,
                 max_points
             ).astype(int)
 
             pitch_values = [
-                valid_pitches[i]
+                pitch_values[i]
                 for i in indices
             ]
-
-        else:
-
-            pitch_values = valid_pitches
 
         return {
             "success": True,
             "filename": file.filename,
-            "duration": float(len(audio) / sample_rate),
-            "pitch": pitch_values
+            "duration": float(
+                len(audio) / sample_rate
+            ),
+            "pitch": [
+                round(float(p), 2)
+                for p in pitch_values
+            ],
+            "pitch_points": len(
+                pitch_values
+            ),
+            "average_volume": round(
+                average_volume,
+                5
+            )
+        }
+
+    except subprocess.CalledProcessError as e:
+
+        return {
+            "success": False,
+            "error": "The uploaded recording could not be decoded. Please try recording again."
         }
 
     except Exception as e:
@@ -184,5 +318,12 @@ async def analyze_voice(file: UploadFile = File(...)):
 
     finally:
 
-        if os.path.exists(temp_path):
-            os.remove(temp_path)
+        if original_path and os.path.exists(
+            original_path
+        ):
+            os.remove(original_path)
+
+        if wav_path and os.path.exists(
+            wav_path
+        ):
+            os.remove(wav_path)
