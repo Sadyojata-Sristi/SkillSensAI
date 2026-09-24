@@ -1050,3 +1050,453 @@
   font-weight: 700;
 
   transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.analyze-button {
+  color: #ffffff;
+
+  background: rgba(90, 110, 255, 0.18);
+
+  border: 1px solid rgba(120, 140, 255, 0.3);
+}
+
+.reset-button {
+  color: #b9c4dc;
+
+  background: rgba(255, 255, 255, 0.04);
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.analyze-button:hover,
+.reset-button:hover {
+  transform: translateY(-2px);
+}
+
+.analyze-button:disabled,
+.reset-button:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
+
+  transform: none;
+}
+
+/* =========================================
+   LOADING
+========================================= */
+
+.spin {
+  animation: boxingSpin 1s linear infinite;
+}
+
+@keyframes boxingSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================
+   AI ANALYSIS RESULT
+========================================= */
+
+.ai-analysis-result {
+  margin-top: 28px;
+
+  padding: 24px;
+
+  border-radius: 18px;
+
+  background: rgba(255, 255, 255, 0.025);
+
+  border: 1px solid rgba(120, 140, 255, 0.15);
+}
+
+.analysis-result-header {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+}
+
+.analysis-success-icon {
+  width: 44px;
+  height: 44px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 12px;
+
+  background: rgba(80, 220, 150, 0.1);
+
+  color: #72e6a1;
+}
+
+.analysis-result-header span {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: #8493b5;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  letter-spacing: 1.4px;
+}
+
+.analysis-result-header h3 {
+  margin: 0;
+
+  font-size: 18px;
+}
+
+.analysis-score {
+  margin-left: auto;
+
+  font-size: 28px;
+
+  font-weight: 800;
+
+  color: #8fa4ff;
+}
+
+/* =========================================
+   FEEDBACK
+========================================= */
+
+.feedback-list {
+  margin-top: 26px;
+}
+
+.feedback-list h4,
+.technique-breakdown h4 {
+  margin: 0 0 14px;
+
+  font-size: 15px;
+}
+
+.feedback-item {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 10px;
+
+  padding: 11px 0;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+  color: #c2cce0;
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+.feedback-item svg {
+  flex-shrink: 0;
+
+  margin-top: 2px;
+
+  color: #72e6a1;
+}
+
+/* =========================================
+   TECHNIQUE BREAKDOWN
+========================================= */
+
+.technique-breakdown {
+  margin-top: 28px;
+}
+
+.technique-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 10px;
+}
+
+.technique-item {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding: 13px 15px;
+
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.035);
+
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.technique-item-left {
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+}
+
+.technique-item-left span {
+  font-size: 13px;
+}
+
+.technique-item strong {
+  font-size: 11px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.7px;
+}
+
+.technique-item.good {
+  border-color: rgba(90, 220, 150, 0.16);
+}
+
+.technique-item.good svg {
+  color: #72e6a1;
+}
+
+.technique-item.good strong {
+  color: #72e6a1;
+}
+
+.technique-item.improve {
+  border-color: rgba(255, 190, 80, 0.18);
+}
+
+.technique-item.improve svg {
+  color: #ffca70;
+}
+
+.technique-item.improve strong {
+  color: #ffca70;
+}
+
+/* =========================================
+   AI IMPROVEMENT SUMMARY
+========================================= */
+
+.ai-improvement-summary {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 12px;
+
+  margin-top: 20px;
+
+  padding: 16px;
+
+  border-radius: 14px;
+
+  background: rgba(100, 120, 255, 0.07);
+
+  border: 1px solid rgba(100, 120, 255, 0.14);
+}
+
+.ai-improvement-summary > svg {
+  flex-shrink: 0;
+
+  margin-top: 2px;
+
+  color: #9caeff;
+}
+
+.ai-improvement-summary strong {
+  display: block;
+
+  margin-bottom: 5px;
+
+  font-size: 13px;
+}
+
+.ai-improvement-summary p {
+  margin: 0;
+
+  color: #91a2c4;
+
+  font-size: 13px;
+
+  line-height: 1.6;
+}
+
+/* =========================================
+   PROTOTYPE NOTE
+========================================= */
+
+.analysis-note {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 10px;
+
+  margin-top: 16px;
+
+  padding: 13px;
+
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.025);
+
+  color: #7888aa;
+
+  font-size: 11px;
+
+  line-height: 1.5;
+}
+
+.analysis-note svg {
+  flex-shrink: 0;
+
+  margin-top: 1px;
+
+  color: #7d8eb5;
+}
+
+/* =========================================
+   ANALYSIS ERROR
+========================================= */
+
+.ai-preview-result {
+  margin-top: 20px;
+
+  padding: 16px;
+
+  border-radius: 12px;
+
+  background: rgba(255, 70, 70, 0.07);
+
+  border: 1px solid rgba(255, 70, 70, 0.15);
+
+  color: #ffaaaa;
+}
+
+.ai-preview-result strong {
+  display: block;
+
+  margin-bottom: 5px;
+}
+
+.ai-preview-result p {
+  margin: 0;
+
+  font-size: 12px;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1000px) {
+  .boxing-content {
+    grid-template-columns: 1fr;
+  }
+
+  .key-points-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 800px) {
+  .boxing-page {
+    padding: 24px 5% 60px;
+  }
+
+  .boxing-header {
+    margin-top: 55px;
+  }
+
+  .technique-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .boxing-header h1 {
+    font-size: 42px;
+
+    letter-spacing: -1.5px;
+  }
+
+  .boxing-header p {
+    font-size: 13px;
+  }
+
+  .boxing-lesson,
+  .boxing-video-card,
+  .live-practice,
+  .upload-box {
+    padding: 18px;
+  }
+
+  .key-points-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .camera-container {
+    min-height: 240px;
+  }
+
+  .camera-preview {
+    height: 240px;
+  }
+
+  .camera-placeholder {
+    min-height: 240px;
+  }
+
+  .recording-status {
+    top: 10px;
+    left: 10px;
+
+    padding: 8px 10px;
+
+    font-size: 10px;
+  }
+
+  .video-actions {
+    flex-direction: column;
+  }
+
+  .analyze-button,
+  .reset-button {
+    width: 100%;
+  }
+
+  .analysis-result-header {
+    align-items: flex-start;
+  }
+
+  .analysis-score {
+    font-size: 22px;
+  }
+
+  .practice-header {
+    align-items: flex-start;
+  }
+
+  .video-placeholder {
+    min-height: 300px;
+  }
+}
