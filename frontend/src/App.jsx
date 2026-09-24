@@ -376,6 +376,7 @@ function App() {
     <BrowserRouter>
 
       <Routes>
+        <Route path="/martial-arts/karate" element={<Karate />} />
 
         <Route
           path="/"
