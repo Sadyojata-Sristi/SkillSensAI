@@ -14,7 +14,6 @@ app = FastAPI(
     description="AI Powered Skill Learning Platform"
 )
 
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -26,17 +25,14 @@ app.add_middleware(
 
 @app.get("/")
 def home():
-    return {
-        "message": "SkillSensAI backend is running!"
-    }
+    return {"message": "SkillSensAI backend is running!"}
 
+
+# ---------------------------------------------------------
+# AUDIO CONVERSION
+# ---------------------------------------------------------
 
 def convert_to_wav(input_path):
-    """
-    Converts browser audio such as WebM/Opus into WAV
-    so librosa can reliably analyse it.
-    """
-
     ffmpeg_path = imageio_ffmpeg.get_ffmpeg_exe()
 
     output_file = tempfile.NamedTemporaryFile(
@@ -72,15 +68,17 @@ def convert_to_wav(input_path):
     return output_path
 
 
+# ---------------------------------------------------------
+# PITCH DETECTION
+# ---------------------------------------------------------
+
 def detect_pitch(audio, sample_rate):
-    """
-    Detects fundamental frequency using librosa.pyin.
-    Returns only valid pitch values.
-    """
 
     audio = np.asarray(audio, dtype=np.float32)
 
-    # Remove very quiet background noise
+    if len(audio) == 0:
+        return []
+
     audio = librosa.util.normalize(audio)
 
     f0, voiced_flag, voiced_prob = librosa.pyin(
@@ -92,18 +90,23 @@ def detect_pitch(audio, sample_rate):
         hop_length=256
     )
 
-    valid_pitch = f0[
-        ~np.isnan(f0)
-    ]
+    valid_pitch = []
 
-    # Keep only realistic human-voice frequencies
-    valid_pitch = valid_pitch[
-        (valid_pitch >= librosa.note_to_hz("C2")) &
-        (valid_pitch <= librosa.note_to_hz("C7"))
-    ]
+    for pitch, voiced in zip(f0, voiced_flag):
 
-    return valid_pitch.tolist()
+        if (
+            voiced
+            and not np.isnan(pitch)
+            and librosa.note_to_hz("C2") <= pitch <= librosa.note_to_hz("C7")
+        ):
+            valid_pitch.append(float(pitch))
 
+    return valid_pitch
+
+
+# ---------------------------------------------------------
+# ANALYZE SONG
+# ---------------------------------------------------------
 
 @app.post("/analyze-song")
 async def analyze_song(file: UploadFile = File(...)):
@@ -126,7 +129,6 @@ async def analyze_song(file: UploadFile = File(...)):
             temp_file.write(content)
             original_path = temp_file.name
 
-        # Convert uploaded song to WAV
         wav_path = convert_to_wav(original_path)
 
         audio, sample_rate = librosa.load(
@@ -144,48 +146,48 @@ async def analyze_song(file: UploadFile = File(...)):
 
         for pitch in pitches:
 
-            midi_note = librosa.hz_to_midi(
-                pitch
-            )
+            midi_note = librosa.hz_to_midi(pitch)
 
             note_name = librosa.midi_to_note(
                 round(midi_note)
             )
 
             notes.append({
-                "frequency": round(
-                    float(pitch),
-                    2
-                ),
+                "frequency": round(float(pitch), 2),
                 "note": note_name
             })
 
-        max_points = 300
+        max_points = 500
 
         if len(notes) > max_points:
 
-            step = max(
-                1,
-                len(notes) // max_points
-            )
+            indices = np.linspace(
+                0,
+                len(notes) - 1,
+                max_points
+            ).astype(int)
 
-            sampled_notes = notes[
-                ::step
-            ][:max_points]
-
-        else:
-
-            sampled_notes = notes
+            notes = [
+                notes[i]
+                for i in indices
+            ]
 
         return {
             "success": True,
             "filename": file.filename,
-            "sample_rate": sample_rate,
-            "duration": float(
-                len(audio) / sample_rate
+            "duration": round(
+                float(len(audio) / sample_rate),
+                2
             ),
             "total_pitch_points": len(pitches),
-            "pitch_data": sampled_notes
+            "pitch_data": notes
+        }
+
+    except subprocess.CalledProcessError:
+
+        return {
+            "success": False,
+            "error": "Unable to decode the uploaded song."
         }
 
     except Exception as e:
@@ -197,16 +199,16 @@ async def analyze_song(file: UploadFile = File(...)):
 
     finally:
 
-        if original_path and os.path.exists(
-            original_path
-        ):
+        if original_path and os.path.exists(original_path):
             os.remove(original_path)
 
-        if wav_path and os.path.exists(
-            wav_path
-        ):
+        if wav_path and os.path.exists(wav_path):
             os.remove(wav_path)
 
+
+# ---------------------------------------------------------
+# ANALYZE VOICE
+# ---------------------------------------------------------
 
 @app.post("/analyze-voice")
 async def analyze_voice(file: UploadFile = File(...)):
@@ -229,10 +231,7 @@ async def analyze_voice(file: UploadFile = File(...)):
             temp_file.write(content)
             original_path = temp_file.name
 
-        # Convert browser WebM/Opus to WAV
-        wav_path = convert_to_wav(
-            original_path
-        )
+        wav_path = convert_to_wav(original_path)
 
         audio, sample_rate = librosa.load(
             wav_path,
@@ -240,7 +239,6 @@ async def analyze_voice(file: UploadFile = File(...)):
             mono=True
         )
 
-        # Check if audio actually contains sound
         rms = librosa.feature.rms(
             y=audio
         )
@@ -265,7 +263,7 @@ async def analyze_voice(file: UploadFile = File(...)):
 
             return {
                 "success": False,
-                "error": "No clear pitch was detected. Please record your voice more clearly."
+                "error": "No clear pitch was detected. Please sing for a few seconds."
             }
 
         max_points = 500
@@ -286,27 +284,26 @@ async def analyze_voice(file: UploadFile = File(...)):
         return {
             "success": True,
             "filename": file.filename,
-            "duration": float(
-                len(audio) / sample_rate
+            "duration": round(
+                float(len(audio) / sample_rate),
+                2
             ),
             "pitch": [
                 round(float(p), 2)
                 for p in pitch_values
             ],
-            "pitch_points": len(
-                pitch_values
-            ),
+            "pitch_points": len(pitch_values),
             "average_volume": round(
                 average_volume,
                 5
             )
         }
 
-    except subprocess.CalledProcessError as e:
+    except subprocess.CalledProcessError:
 
         return {
             "success": False,
-            "error": "The uploaded recording could not be decoded. Please try recording again."
+            "error": "The recording could not be decoded."
         }
 
     except Exception as e:
@@ -318,12 +315,396 @@ async def analyze_voice(file: UploadFile = File(...)):
 
     finally:
 
-        if original_path and os.path.exists(
-            original_path
-        ):
+        if original_path and os.path.exists(original_path):
             os.remove(original_path)
 
-        if wav_path and os.path.exists(
-            wav_path
-        ):
+        if wav_path and os.path.exists(wav_path):
             os.remove(wav_path)
+
+
+# ---------------------------------------------------------
+# COMPARE SONG AND USER VOICE
+# ---------------------------------------------------------
+
+@app.post("/compare-song-voice")
+async def compare_song_voice(
+    song: UploadFile = File(...),
+    voice: UploadFile = File(...)
+):
+
+    song_path = None
+    song_wav = None
+
+    voice_path = None
+    voice_wav = None
+
+    try:
+
+        # -----------------------------
+        # SAVE SONG
+        # -----------------------------
+
+        song_suffix = os.path.splitext(
+            song.filename or ""
+        )[1] or ".audio"
+
+        with tempfile.NamedTemporaryFile(
+            delete=False,
+            suffix=song_suffix
+        ) as temp_file:
+
+            song_content = await song.read()
+            temp_file.write(song_content)
+            song_path = temp_file.name
+
+        # -----------------------------
+        # SAVE VOICE
+        # -----------------------------
+
+        voice_suffix = os.path.splitext(
+            voice.filename or ""
+        )[1] or ".audio"
+
+        with tempfile.NamedTemporaryFile(
+            delete=False,
+            suffix=voice_suffix
+        ) as temp_file:
+
+            voice_content = await voice.read()
+            temp_file.write(voice_content)
+            voice_path = temp_file.name
+
+        # -----------------------------
+        # CONVERT BOTH TO WAV
+        # -----------------------------
+
+        song_wav = convert_to_wav(song_path)
+        voice_wav = convert_to_wav(voice_path)
+
+        # -----------------------------
+        # LOAD AUDIO
+        # -----------------------------
+
+        song_audio, song_sr = librosa.load(
+            song_wav,
+            sr=None,
+            mono=True
+        )
+
+        voice_audio, voice_sr = librosa.load(
+            voice_wav,
+            sr=None,
+            mono=True
+        )
+
+        # -----------------------------
+        # DETECT PITCH
+        # -----------------------------
+
+        song_pitch = detect_pitch(
+            song_audio,
+            song_sr
+        )
+
+        voice_pitch = detect_pitch(
+            voice_audio,
+            voice_sr
+        )
+
+        if len(song_pitch) < 3:
+
+            return {
+                "success": False,
+                "error": "A clear vocal pitch could not be detected from the uploaded song."
+            }
+
+        if len(voice_pitch) < 3:
+
+            return {
+                "success": False,
+                "error": "A clear pitch could not be detected from your recording."
+            }
+
+        # -----------------------------
+        # ALIGN PITCH SEQUENCES
+        # -----------------------------
+
+        comparison_length = min(
+            len(song_pitch),
+            len(voice_pitch)
+        )
+
+        if comparison_length < 3:
+
+            return {
+                "success": False,
+                "error": "There was not enough matching pitch information to compare the performances."
+            }
+
+        song_indices = np.linspace(
+            0,
+            len(song_pitch) - 1,
+            comparison_length
+        ).astype(int)
+
+        voice_indices = np.linspace(
+            0,
+            len(voice_pitch) - 1,
+            comparison_length
+        ).astype(int)
+
+        reference = np.array([
+            song_pitch[i]
+            for i in song_indices
+        ])
+
+        user = np.array([
+            voice_pitch[i]
+            for i in voice_indices
+        ])
+
+        # -----------------------------
+        # PITCH DIFFERENCE IN CENTS
+        # -----------------------------
+
+        cents_difference = (
+            1200 *
+            np.log2(user / reference)
+        )
+
+        absolute_difference = np.abs(
+            cents_difference
+        )
+
+        # Ignore extreme outliers
+        absolute_difference = np.clip(
+            absolute_difference,
+            0,
+            600
+        )
+
+        average_error = float(
+            np.mean(absolute_difference)
+        )
+
+        # -----------------------------
+        # PITCH ACCURACY
+        # -----------------------------
+
+        pitch_accuracy = 100 - (
+            average_error / 6
+        )
+
+        pitch_accuracy = max(
+            0,
+            min(
+                100,
+                pitch_accuracy
+            )
+        )
+
+        # -----------------------------
+        # NOTE MATCH %
+        # -----------------------------
+
+        matched_notes = np.sum(
+            absolute_difference <= 50
+        )
+
+        note_match = (
+            matched_notes /
+            comparison_length
+        ) * 100
+
+        note_match = max(
+            0,
+            min(
+                100,
+                float(note_match)
+            )
+        )
+
+        # -----------------------------
+        # STABILITY
+        # -----------------------------
+
+        if len(voice_pitch) > 2:
+
+            user_log_pitch = np.log2(
+                np.array(voice_pitch)
+            )
+
+            frame_changes = np.abs(
+                np.diff(user_log_pitch)
+            ) * 1200
+
+            smooth_changes = np.clip(
+                frame_changes,
+                0,
+                300
+            )
+
+            average_change = float(
+                np.mean(smooth_changes)
+            )
+
+            stability = 100 - (
+                average_change * 0.35
+            )
+
+        else:
+
+            stability = 50
+
+        stability = max(
+            0,
+            min(
+                100,
+                stability
+            )
+        )
+
+        # -----------------------------
+        # OVERALL SCORE
+        # -----------------------------
+
+        overall = (
+            pitch_accuracy * 0.55
+            +
+            note_match * 0.30
+            +
+            stability * 0.15
+        )
+
+        overall = round(
+            max(
+                0,
+                min(
+                    100,
+                    overall
+                )
+            )
+        )
+
+        pitch_accuracy = round(
+            pitch_accuracy
+        )
+
+        note_match = round(
+            note_match
+        )
+
+        stability = round(
+            stability
+        )
+
+        # -----------------------------
+        # FEEDBACK
+        # -----------------------------
+
+        feedback = []
+
+        if pitch_accuracy >= 85:
+            feedback.append(
+                "Your pitch was closely matched to the reference."
+            )
+
+        elif pitch_accuracy >= 70:
+            feedback.append(
+                "Your pitch was fairly close to the reference, but some notes need adjustment."
+            )
+
+        else:
+            feedback.append(
+                "Several notes were noticeably different from the reference pitch."
+            )
+
+        if note_match >= 85:
+            feedback.append(
+                "Most of the detected notes were within a close pitch range."
+            )
+
+        elif note_match >= 60:
+            feedback.append(
+                "Try focusing on reaching the target notes more precisely."
+            )
+
+        else:
+            feedback.append(
+                "Practice the song slowly and focus on matching each note."
+            )
+
+        if stability >= 85:
+            feedback.append(
+                "Your pitch remained relatively stable during the recording."
+            )
+
+        elif stability >= 65:
+            feedback.append(
+                "Your pitch showed some variation. Try maintaining a steady voice."
+            )
+
+        else:
+            feedback.append(
+                "Your pitch varied significantly. Try slower and controlled singing."
+            )
+
+        return {
+            "success": True,
+
+            "overall_score": overall,
+
+            "pitch_accuracy": pitch_accuracy,
+
+            "note_match": note_match,
+
+            "stability": stability,
+
+            "average_pitch_error_cents": round(
+                average_error,
+                2
+            ),
+
+            "reference_pitch_points": len(
+                song_pitch
+            ),
+
+            "voice_pitch_points": len(
+                voice_pitch
+            ),
+
+            "feedback": feedback,
+
+            "prototype_note": (
+                "This comparison uses extracted pitch data. "
+                "Future SkillSensAI versions can use supervised learning, "
+                "vocal separation and time-aligned reference melody analysis "
+                "for more accurate singing assessment."
+            )
+        }
+
+    except subprocess.CalledProcessError:
+
+        return {
+            "success": False,
+            "error": "One of the audio files could not be decoded."
+        }
+
+    except Exception as e:
+
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+    finally:
+
+        for path in [
+            song_path,
+            song_wav,
+            voice_path,
+            voice_wav
+        ]:
+
+            if path and os.path.exists(path):
+                os.remove(path)
