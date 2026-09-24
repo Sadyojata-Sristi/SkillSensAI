@@ -6,7 +6,6 @@ import {
   Loader2,
   CheckCircle2,
   BarChart3,
-  Play,
   RotateCcw,
 } from "lucide-react";
 
@@ -16,9 +15,15 @@ import axios from "axios";
 
 import "./MusicSong.css";
 
+/*
+  IMPORTANT:
+  Render backend URL is used as the fallback.
+  This prevents the deployed Vercel website
+  from accidentally trying localhost.
+*/
 const API_URL =
   import.meta.env.VITE_API_URL ||
-  "http://127.0.0.1:8000";
+  "https://skillsensai-backend.onrender.com";
 
 function MusicSong() {
   const navigate = useNavigate();
@@ -29,6 +34,8 @@ function MusicSong() {
   const mediaRecorderRef = useRef(null);
   const streamRef = useRef(null);
   const chunksRef = useRef([]);
+
+  const timerRef = useRef(null);
 
   const [songFile, setSongFile] = useState(null);
   const [songAnalysis, setSongAnalysis] = useState(null);
@@ -47,8 +54,6 @@ function MusicSong() {
 
   const [error, setError] = useState("");
 
-  const timerRef = useRef(null);
-
   // --------------------------------------------------
   // SONG UPLOAD
   // --------------------------------------------------
@@ -61,6 +66,8 @@ function MusicSong() {
     setSongFile(file);
     setSongAnalysis(null);
     setComparison(null);
+    setVoiceFile(null);
+    setVoicePreview(null);
     setError("");
 
     await analyzeSong(file);
@@ -77,12 +84,7 @@ function MusicSong() {
 
       const response = await axios.post(
         `${API_URL}/analyze-song`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        formData
       );
 
       if (!response.data.success) {
@@ -93,19 +95,33 @@ function MusicSong() {
       }
 
       setSongAnalysis(response.data);
+
     } catch (err) {
-      setError(
-        err.response?.data?.error ||
+      console.error("SONG ANALYSIS ERROR:", err);
+
+      if (err.response) {
+        setError(
+          err.response.data?.error ||
+            `Backend error: ${err.response.status}`
+        );
+      } else if (err.request) {
+        setError(
+          "Cannot connect to the SkillSensAI backend. Please check the Render deployment."
+        );
+      } else {
+        setError(
           err.message ||
-          "Unable to analyze the song."
-      );
+            "Unable to analyze the song."
+        );
+      }
+
     } finally {
       setLoadingSong(false);
     }
   };
 
   // --------------------------------------------------
-  // VOICE FILE
+  // VOICE FILE UPLOAD
   // --------------------------------------------------
 
   const handleVoiceSelect = async (event) => {
@@ -117,55 +133,15 @@ function MusicSong() {
     setComparison(null);
     setError("");
 
-    const previewUrl = URL.createObjectURL(file);
+    const previewUrl =
+      URL.createObjectURL(file);
+
     setVoicePreview(previewUrl);
 
-    await analyzeVoice(file);
-  };
-
-  const analyzeVoice = async (file) => {
-    setLoadingVoice(true);
-    setError("");
-
-    try {
-      const formData = new FormData();
-
-      formData.append("file", file);
-
-      const response = await axios.post(
-        `${API_URL}/analyze-voice`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      if (!response.data.success) {
-        throw new Error(
-          response.data.error ||
-            "Voice analysis failed."
-        );
-      }
-
-      // We don't show a fake score here.
-      // Actual score comes from comparing
-      // the song and voice together.
-
-      await compareSongAndVoice(
-        songFile,
-        file
-      );
-    } catch (err) {
-      setError(
-        err.response?.data?.error ||
-          err.message ||
-          "Unable to analyze your recording."
-      );
-    } finally {
-      setLoadingVoice(false);
-    }
+    await compareSongAndVoice(
+      songFile,
+      file
+    );
   };
 
   // --------------------------------------------------
@@ -177,6 +153,16 @@ function MusicSong() {
     setComparison(null);
 
     try {
+      if (
+        !navigator.mediaDevices ||
+        !navigator.mediaDevices.getUserMedia
+      ) {
+        setError(
+          "Your browser does not support microphone recording."
+        );
+        return;
+      }
+
       const stream =
         await navigator.mediaDevices.getUserMedia({
           audio: true,
@@ -184,14 +170,43 @@ function MusicSong() {
 
       streamRef.current = stream;
 
-      const recorder = new MediaRecorder(
-        stream,
-        {
-          mimeType: "audio/webm",
-        }
-      );
+      /*
+        Use the browser's supported recording format.
+        This is safer than forcing audio/webm.
+      */
+      let recorder;
+
+      if (
+        MediaRecorder.isTypeSupported(
+          "audio/webm;codecs=opus"
+        )
+      ) {
+        recorder = new MediaRecorder(
+          stream,
+          {
+            mimeType:
+              "audio/webm;codecs=opus",
+          }
+        );
+      } else if (
+        MediaRecorder.isTypeSupported(
+          "audio/webm"
+        )
+      ) {
+        recorder = new MediaRecorder(
+          stream,
+          {
+            mimeType: "audio/webm",
+          }
+        );
+      } else {
+        recorder = new MediaRecorder(
+          stream
+        );
+      }
 
       mediaRecorderRef.current = recorder;
+
       chunksRef.current = [];
 
       recorder.ondataavailable = (event) => {
@@ -202,11 +217,21 @@ function MusicSong() {
         }
       };
 
+      recorder.onerror = () => {
+        setError(
+          "An error occurred while recording your voice."
+        );
+      };
+
       recorder.onstop = async () => {
+        const mimeType =
+          recorder.mimeType ||
+          "audio/webm";
+
         const audioBlob = new Blob(
           chunksRef.current,
           {
-            type: "audio/webm",
+            type: mimeType,
           }
         );
 
@@ -214,18 +239,21 @@ function MusicSong() {
           [audioBlob],
           "voice-recording.webm",
           {
-            type: "audio/webm",
+            type: mimeType,
           }
         );
 
         setVoiceFile(recordedFile);
 
         const previewUrl =
-          URL.createObjectURL(audioBlob);
+          URL.createObjectURL(
+            audioBlob
+          );
 
         setVoicePreview(previewUrl);
 
-        await analyzeVoice(
+        await compareSongAndVoice(
+          songFile,
           recordedFile
         );
       };
@@ -235,13 +263,20 @@ function MusicSong() {
       setIsRecording(true);
       setRecordingTime(0);
 
-      timerRef.current = setInterval(() => {
-        setRecordingTime(
-          (previous) => previous + 1
-        );
-      }, 1000);
+      timerRef.current =
+        setInterval(() => {
+          setRecordingTime(
+            (previous) =>
+              previous + 1
+          );
+        }, 1000);
 
     } catch (err) {
+      console.error(
+        "MICROPHONE ERROR:",
+        err
+      );
+
       setError(
         "Microphone permission was not granted. Please allow microphone access and try again."
       );
@@ -260,9 +295,9 @@ function MusicSong() {
     if (streamRef.current) {
       streamRef.current
         .getTracks()
-        .forEach((track) =>
-          track.stop()
-        );
+        .forEach((track) => {
+          track.stop();
+        });
     }
 
     clearInterval(timerRef.current);
@@ -271,17 +306,24 @@ function MusicSong() {
   };
 
   // --------------------------------------------------
-  // COMPARISON
+  // COMPARE SONG + VOICE
   // --------------------------------------------------
 
   const compareSongAndVoice = async (
     selectedSong,
     selectedVoice
   ) => {
-    if (!selectedSong || !selectedVoice) {
+    if (
+      !selectedSong ||
+      !selectedVoice
+    ) {
+      setError(
+        "Please choose a song before recording your voice."
+      );
       return;
     }
 
+    setLoadingVoice(true);
     setComparing(true);
     setError("");
 
@@ -298,15 +340,19 @@ function MusicSong() {
         selectedVoice
       );
 
+      console.log(
+        "Sending comparison request to:",
+        `${API_URL}/compare-song-voice`
+      );
+
       const response = await axios.post(
         `${API_URL}/compare-song-voice`,
-        formData,
-        {
-          headers: {
-            "Content-Type":
-              "multipart/form-data",
-          },
-        }
+        formData
+      );
+
+      console.log(
+        "Comparison response:",
+        response.data
       );
 
       if (!response.data.success) {
@@ -319,13 +365,31 @@ function MusicSong() {
       setComparison(
         response.data
       );
+
     } catch (err) {
-      setError(
-        err.response?.data?.error ||
-          err.message ||
-          "Unable to compare your voice with the song."
+      console.error(
+        "COMPARISON ERROR:",
+        err
       );
+
+      if (err.response) {
+        setError(
+          err.response.data?.error ||
+            `Backend error: ${err.response.status}`
+        );
+      } else if (err.request) {
+        setError(
+          "Cannot connect to the SkillSensAI backend. Please make sure the Render backend is running."
+        );
+      } else {
+        setError(
+          err.message ||
+            "Unable to compare your voice with the song."
+        );
+      }
+
     } finally {
+      setLoadingVoice(false);
       setComparing(false);
     }
   };
@@ -335,12 +399,21 @@ function MusicSong() {
   // --------------------------------------------------
 
   const resetPractice = () => {
+    if (voicePreview) {
+      URL.revokeObjectURL(
+        voicePreview
+      );
+    }
+
     setSongFile(null);
     setSongAnalysis(null);
+
     setVoiceFile(null);
     setVoicePreview(null);
+
     setComparison(null);
     setError("");
+
     setRecordingTime(0);
 
     if (songInputRef.current) {
@@ -352,6 +425,10 @@ function MusicSong() {
     }
   };
 
+  // --------------------------------------------------
+  // TIMER
+  // --------------------------------------------------
+
   const formatTime = (seconds) => {
     const minutes = Math.floor(
       seconds / 60
@@ -360,14 +437,16 @@ function MusicSong() {
     const remaining =
       seconds % 60;
 
-    return `${String(minutes).padStart(
-      2,
-      "0"
-    )}:${String(remaining).padStart(
-      2,
-      "0"
-    )}`;
+    return `${String(
+      minutes
+    ).padStart(2, "0")}:${String(
+      remaining
+    ).padStart(2, "0")}`;
   };
+
+  // --------------------------------------------------
+  // UI
+  // --------------------------------------------------
 
   return (
     <div className="music-song-page">
@@ -376,7 +455,9 @@ function MusicSong() {
 
       <button
         className="song-back-button"
-        onClick={() => navigate("/music")}
+        onClick={() =>
+          navigate("/music")
+        }
       >
         <ArrowLeft size={20} />
         Back to Music
@@ -399,9 +480,9 @@ function MusicSong() {
         </h1>
 
         <p>
-          Upload a song, practise singing it,
-          and compare your pitch with the
-          reference audio.
+          Upload a song, practise singing
+          it, and compare your pitch with
+          the reference audio.
         </p>
 
       </section>
@@ -411,6 +492,7 @@ function MusicSong() {
       <section className="song-section">
 
         <div className="song-step">
+
           <span>01</span>
 
           <div>
@@ -419,17 +501,20 @@ function MusicSong() {
             </h2>
 
             <p>
-              Upload the song you want to
-              practise.
+              Upload the song you want
+              to practise.
             </p>
           </div>
+
         </div>
 
         <input
           ref={songInputRef}
           type="file"
           accept="audio/*"
-          onChange={handleSongSelect}
+          onChange={
+            handleSongSelect
+          }
           hidden
         />
 
@@ -440,6 +525,7 @@ function MusicSong() {
           }
           disabled={loadingSong}
         >
+
           {loadingSong ? (
             <>
               <Loader2
@@ -456,13 +542,16 @@ function MusicSong() {
               Choose Song
             </>
           )}
+
         </button>
 
         {songFile && (
           <div className="selected-file">
+
             <CheckCircle2 size={20} />
 
             <div>
+
               <strong>
                 {songFile.name}
               </strong>
@@ -470,12 +559,16 @@ function MusicSong() {
               {songAnalysis && (
                 <span>
                   Pitch detected successfully
-                  •{" "}
-                  {songAnalysis.total_pitch_points}
-                  pitch points
+                  {" • "}
+                  {
+                    songAnalysis.total_pitch_points
+                  }
+                  {" "}pitch points
                 </span>
               )}
+
             </div>
+
           </div>
         )}
 
@@ -487,19 +580,23 @@ function MusicSong() {
         <section className="song-section">
 
           <div className="song-step">
+
             <span>02</span>
 
             <div>
+
               <h2>
                 Record Your Voice
               </h2>
 
               <p>
-                Sing the same part of the song
-                and let SkillSensAI compare
-                your pitch.
+                Sing the same part of the
+                song and let SkillSensAI
+                compare your pitch.
               </p>
+
             </div>
+
           </div>
 
           <div className="voice-choice-grid">
@@ -528,6 +625,7 @@ function MusicSong() {
               </div>
 
               <div>
+
                 <h3>
                   {isRecording
                     ? "Stop Recording"
@@ -541,6 +639,7 @@ function MusicSong() {
                       )}`
                     : "Record your singing live"}
                 </p>
+
               </div>
 
               {isRecording && (
@@ -549,13 +648,15 @@ function MusicSong() {
 
             </button>
 
-            {/* UPLOAD */}
+            {/* UPLOAD VOICE */}
 
             <input
               ref={voiceInputRef}
               type="file"
               accept="audio/*"
-              onChange={handleVoiceSelect}
+              onChange={
+                handleVoiceSelect
+              }
               hidden
             />
 
@@ -575,6 +676,7 @@ function MusicSong() {
               </div>
 
               <div>
+
                 <h3>
                   Choose Audio
                 </h3>
@@ -582,16 +684,20 @@ function MusicSong() {
                 <p>
                   Upload an existing recording
                 </p>
+
               </div>
 
             </button>
 
           </div>
 
+          {/* PREVIEW */}
+
           {voicePreview && (
             <div className="voice-preview">
 
               <div>
+
                 <strong>
                   Your Recording
                 </strong>
@@ -599,6 +705,7 @@ function MusicSong() {
                 <span>
                   {voiceFile?.name}
                 </span>
+
               </div>
 
               <audio
@@ -612,7 +719,7 @@ function MusicSong() {
         </section>
       )}
 
-      {/* ANALYSIS */}
+      {/* COMPARING */}
 
       {comparing && (
         <section className="analysis-loading">
@@ -627,8 +734,9 @@ function MusicSong() {
           </h3>
 
           <p>
-            SkillSensAI is comparing your
-            pitch with the reference song...
+            SkillSensAI is comparing
+            your pitch with the reference
+            song...
           </p>
 
         </section>
@@ -642,6 +750,7 @@ function MusicSong() {
           <div className="results-heading">
 
             <div>
+
               <span>
                 AI PERFORMANCE ANALYSIS
               </span>
@@ -655,12 +764,15 @@ function MusicSong() {
                 with the pitch extracted from
                 the uploaded song.
               </p>
+
             </div>
 
             <div className="overall-score">
 
               <div>
-                {comparison.overall_score}%
+                {
+                  comparison.overall_score
+                }%
               </div>
 
               <span>
@@ -670,6 +782,8 @@ function MusicSong() {
             </div>
 
           </div>
+
+          {/* SCORE CARDS */}
 
           <div className="score-grid">
 
@@ -684,15 +798,20 @@ function MusicSong() {
               </span>
 
               <strong>
-                {comparison.pitch_accuracy}%
+                {
+                  comparison.pitch_accuracy
+                }%
               </strong>
 
               <div className="score-bar">
+
                 <div
                   style={{
-                    width: `${comparison.pitch_accuracy}%`,
+                    width:
+                      `${comparison.pitch_accuracy}%`,
                   }}
                 />
+
               </div>
 
             </div>
@@ -708,15 +827,20 @@ function MusicSong() {
               </span>
 
               <strong>
-                {comparison.note_match}%
+                {
+                  comparison.note_match
+                }%
               </strong>
 
               <div className="score-bar">
+
                 <div
                   style={{
-                    width: `${comparison.note_match}%`,
+                    width:
+                      `${comparison.note_match}%`,
                   }}
                 />
+
               </div>
 
             </div>
@@ -732,29 +856,38 @@ function MusicSong() {
               </span>
 
               <strong>
-                {comparison.stability}%
+                {
+                  comparison.stability
+                }%
               </strong>
 
               <div className="score-bar">
+
                 <div
                   style={{
-                    width: `${comparison.stability}%`,
+                    width:
+                      `${comparison.stability}%`,
                   }}
                 />
+
               </div>
 
             </div>
 
           </div>
 
+          {/* FEEDBACK */}
+
           <div className="feedback-panel">
 
             <div className="feedback-title">
+
               <Music2 size={22} />
 
               <h3>
                 Personalized Feedback
               </h3>
+
             </div>
 
             {comparison.feedback?.map(
@@ -763,13 +896,20 @@ function MusicSong() {
                   className="feedback-item"
                   key={index}
                 >
+
                   <CheckCircle2 size={18} />
-                  <span>{item}</span>
+
+                  <span>
+                    {item}
+                  </span>
+
                 </div>
               )
             )}
 
           </div>
+
+          {/* PITCH DIFFERENCE */}
 
           <div className="comparison-info">
 
@@ -786,29 +926,43 @@ function MusicSong() {
             </span>
 
             <small>
-              A smaller pitch difference means
-              your detected pitch was closer to
-              the reference pitch.
+              A smaller pitch difference
+              means your detected pitch
+              was closer to the reference
+              pitch.
             </small>
 
           </div>
 
+          {/* PROTOTYPE NOTE */}
+
           <div className="prototype-note">
+
             <strong>
               Prototype AI Analysis
             </strong>
 
             <p>
-              {comparison.prototype_note}
+              {
+                comparison.prototype_note
+              }
             </p>
+
           </div>
+
+          {/* RESET */}
 
           <button
             className="practice-again-button"
-            onClick={resetPractice}
+            onClick={
+              resetPractice
+            }
           >
+
             <RotateCcw size={20} />
+
             Practice Another Song
+
           </button>
 
         </section>
