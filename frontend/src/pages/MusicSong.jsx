@@ -7,6 +7,8 @@ import {
   CheckCircle2,
   BarChart3,
   RotateCcw,
+  Play,
+  Square,
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
@@ -15,114 +17,71 @@ import axios from "axios";
 
 import "./MusicSong.css";
 
+
 const API_URL =
   import.meta.env.VITE_API_URL ||
   "https://skillsensai-backend.onrender.com";
 
 
-/* =====================================================
-   PITCH GRAPH COMPONENT
-===================================================== */
+// ============================================================
+// PITCH GRAPH
+// ============================================================
 
 function PitchGraph({
-  data = [],
+  data,
   title,
   subtitle,
   lineClass = "reference-line",
 }) {
-
-  if (!data || data.length < 2) {
+  if (!data || data.length === 0) {
     return (
       <div className="pitch-empty">
-        Pitch data is not available.
+        No pitch data available.
       </div>
     );
   }
 
-
-  const width = 900;
+  const width = 1000;
   const height = 300;
 
-  const paddingLeft = 55;
-  const paddingRight = 25;
+  const paddingLeft = 65;
+  const paddingRight = 20;
   const paddingTop = 25;
-  const paddingBottom = 40;
+  const paddingBottom = 35;
 
   const graphWidth =
-    width -
-    paddingLeft -
-    paddingRight;
+    width - paddingLeft - paddingRight;
 
   const graphHeight =
-    height -
-    paddingTop -
-    paddingBottom;
+    height - paddingTop - paddingBottom;
 
-
-  const minPitch =
-    Math.min(...data);
-
-  const maxPitch =
-    Math.max(...data);
-
+  const minPitch = Math.min(...data);
+  const maxPitch = Math.max(...data);
 
   const pitchRange =
-    Math.max(
-      maxPitch - minPitch,
-      1
-    );
+    maxPitch - minPitch || 1;
 
+  const points = data.map((value, index) => {
 
-  const points = data.map(
-    (pitch, index) => {
-
-      const x =
-        paddingLeft +
-        (
-          index /
-          Math.max(
-            data.length - 1,
-            1
-          )
-        ) *
+    const x =
+      paddingLeft +
+      (index / Math.max(data.length - 1, 1)) *
         graphWidth;
 
-
-      const normalized =
-        (
-          pitch -
-          minPitch
-        ) /
-        pitchRange;
-
-
-      const y =
-        paddingTop +
-        (
-          1 -
-          normalized
-        ) *
+    const y =
+      paddingTop +
+      graphHeight -
+      ((value - minPitch) / pitchRange) *
         graphHeight;
 
+    return `${x},${y}`;
+  });
 
-      return `${x},${y}`;
-    }
-  ).join(" ");
+  const polylinePoints =
+    points.join(" ");
 
-
-  const lowY =
-    paddingTop +
-    graphHeight;
-
-
-  const highY =
-    paddingTop;
-
-
-  const middleY =
-    paddingTop +
-    graphHeight / 2;
-
+  const midPitch =
+    (minPitch + maxPitch) / 2;
 
   return (
     <div className="pitch-graph-card">
@@ -130,25 +89,21 @@ function PitchGraph({
       <div className="pitch-graph-heading">
 
         <div>
-
-          <h3>
-            {title}
-          </h3>
+          <h3>{title}</h3>
 
           <p>
             {subtitle}
           </p>
-
         </div>
 
         <div className="pitch-range">
 
           <span>
-            High
+            High: {Math.round(maxPitch)} Hz
           </span>
 
           <span>
-            {Math.round(maxPitch)} Hz
+            Low: {Math.round(minPitch)} Hz
           </span>
 
         </div>
@@ -159,83 +114,83 @@ function PitchGraph({
       <div className="pitch-graph-wrapper">
 
         <svg
+          className="pitch-svg"
           viewBox={`0 0 ${width} ${height}`}
           preserveAspectRatio="none"
-          className="pitch-svg"
         >
 
-          {/* GRID */}
+          {/* Horizontal grid */}
 
           <line
             x1={paddingLeft}
-            y1={highY}
+            y1={paddingTop}
             x2={width - paddingRight}
-            y2={highY}
+            y2={paddingTop}
             className="pitch-grid-line"
           />
 
           <line
             x1={paddingLeft}
-            y1={middleY}
+            y1={height / 2}
             x2={width - paddingRight}
-            y2={middleY}
+            y2={height / 2}
             className="pitch-grid-line"
           />
 
           <line
             x1={paddingLeft}
-            y1={lowY}
+            y1={height - paddingBottom}
             x2={width - paddingRight}
-            y2={lowY}
+            y2={height - paddingBottom}
             className="pitch-grid-line"
           />
 
 
-          {/* Y AXIS */}
+          {/* Vertical axis */}
+
+          <line
+            x1={paddingLeft}
+            y1={paddingTop}
+            x2={paddingLeft}
+            y2={height - paddingBottom}
+            className="pitch-axis-line"
+          />
+
+
+          {/* Pitch line */}
+
+          <polyline
+            points={polylinePoints}
+            fill="none"
+            className={lineClass}
+          />
+
+
+          {/* Labels */}
 
           <text
-            x="10"
-            y={highY + 5}
+            x="12"
+            y={paddingTop + 5}
             className="pitch-axis-label"
           >
             High
           </text>
 
           <text
-            x="10"
-            y={middleY + 5}
+            x="20"
+            y={height / 2 + 4}
             className="pitch-axis-label"
           >
             Mid
           </text>
 
           <text
-            x="10"
-            y={lowY}
+            x="12"
+            y={height - paddingBottom}
             className="pitch-axis-label"
           >
             Low
           </text>
-
-
-          {/* PITCH LINE */}
-
-          <polyline
-            points={points}
-            className={lineClass}
-            fill="none"
-          />
-
-
-          {/* GRAPH BASELINE */}
-
-          <line
-            x1={paddingLeft}
-            y1={lowY}
-            x2={width - paddingRight}
-            y2={lowY}
-            className="pitch-axis-line"
-          />
 
         </svg>
 
@@ -245,15 +200,15 @@ function PitchGraph({
       <div className="pitch-graph-footer">
 
         <span>
-          Low pitch
+          Start
         </span>
 
         <span>
-          Pitch movement over time
+          Pitch changes over time
         </span>
 
         <span>
-          High pitch
+          End
         </span>
 
       </div>
@@ -263,104 +218,72 @@ function PitchGraph({
 }
 
 
-/* =====================================================
-   COMPARISON GRAPH
-===================================================== */
+// ============================================================
+// COMPARISON GRAPH
+// ============================================================
 
 function ComparisonGraph({
-  reference = [],
-  user = [],
+  reference,
+  user,
 }) {
-
   if (
-    reference.length < 2 ||
-    user.length < 2
+    !reference ||
+    !user ||
+    reference.length === 0 ||
+    user.length === 0
   ) {
     return null;
   }
 
-
-  const width = 900;
+  const width = 1000;
   const height = 340;
 
-  const paddingLeft = 55;
-  const paddingRight = 25;
+  const paddingLeft = 65;
+  const paddingRight = 20;
   const paddingTop = 30;
-  const paddingBottom = 45;
-
+  const paddingBottom = 35;
 
   const graphWidth =
-    width -
-    paddingLeft -
-    paddingRight;
+    width - paddingLeft - paddingRight;
 
   const graphHeight =
-    height -
-    paddingTop -
-    paddingBottom;
+    height - paddingTop - paddingBottom;
 
 
-  const allValues = [
+  const combined = [
     ...reference,
     ...user,
   ];
 
-
   const minPitch =
-    Math.min(...allValues);
+    Math.min(...combined);
 
   const maxPitch =
-    Math.max(...allValues);
-
+    Math.max(...combined);
 
   const pitchRange =
-    Math.max(
-      maxPitch - minPitch,
-      1
-    );
+    maxPitch - minPitch || 1;
 
 
-  const createPoints = (
-    values
-  ) => {
+  const createPoints = (data) => {
 
-    return values
-      .map(
-        (pitch, index) => {
+    return data.map((value, index) => {
 
-          const x =
-            paddingLeft +
-            (
-              index /
-              Math.max(
-                values.length - 1,
-                1
-              )
-            ) *
-            graphWidth;
+      const x =
+        paddingLeft +
+        (index /
+          Math.max(data.length - 1, 1)) *
+          graphWidth;
 
+      const y =
+        paddingTop +
+        graphHeight -
+        ((value - minPitch) /
+          pitchRange) *
+          graphHeight;
 
-          const normalized =
-            (
-              pitch -
-              minPitch
-            ) /
-            pitchRange;
-
-
-          const y =
-            paddingTop +
-            (
-              1 -
-              normalized
-            ) *
-            graphHeight;
-
-
-          return `${x},${y}`;
-        }
-      )
-      .join(" ");
+      return `${x},${y}`;
+    }).join(" ");
   };
 
 
@@ -371,18 +294,6 @@ function ComparisonGraph({
     createPoints(user);
 
 
-  const highY =
-    paddingTop;
-
-  const lowY =
-    paddingTop +
-    graphHeight;
-
-  const middleY =
-    paddingTop +
-    graphHeight / 2;
-
-
   return (
     <div className="comparison-graph-card">
 
@@ -391,7 +302,7 @@ function ComparisonGraph({
         <div>
 
           <span className="graph-label">
-            AI PITCH COMPARISON
+            AI COMPARISON
           </span>
 
           <h2>
@@ -399,9 +310,9 @@ function ComparisonGraph({
           </h2>
 
           <p>
-            Follow the reference line and
-            compare how closely your voice
-            follows the original melody.
+            The blue line represents the
+            original song. The red line
+            represents your detected pitch.
           </p>
 
         </div>
@@ -412,12 +323,12 @@ function ComparisonGraph({
       <div className="graph-legend">
 
         <div>
-          <span className="legend-line reference-legend" />
+          <span className="legend-line reference-legend"></span>
           Reference Song
         </div>
 
         <div>
-          <span className="legend-line user-legend" />
+          <span className="legend-line user-legend"></span>
           Your Voice
         </div>
 
@@ -427,90 +338,90 @@ function ComparisonGraph({
       <div className="pitch-graph-wrapper comparison-wrapper">
 
         <svg
+          className="pitch-svg"
           viewBox={`0 0 ${width} ${height}`}
           preserveAspectRatio="none"
-          className="pitch-svg"
         >
 
-          {/* GRID */}
+          {/* Grid */}
 
           <line
             x1={paddingLeft}
-            y1={highY}
+            y1={paddingTop}
             x2={width - paddingRight}
-            y2={highY}
+            y2={paddingTop}
             className="pitch-grid-line"
           />
 
           <line
             x1={paddingLeft}
-            y1={middleY}
+            y1={height / 2}
             x2={width - paddingRight}
-            y2={middleY}
+            y2={height / 2}
             className="pitch-grid-line"
           />
 
           <line
             x1={paddingLeft}
-            y1={lowY}
+            y1={height - paddingBottom}
             x2={width - paddingRight}
-            y2={lowY}
+            y2={height - paddingBottom}
             className="pitch-grid-line"
+          />
+
+
+          {/* Axis */}
+
+          <line
+            x1={paddingLeft}
+            y1={paddingTop}
+            x2={paddingLeft}
+            y2={height - paddingBottom}
+            className="pitch-axis-line"
+          />
+
+
+          {/* Reference */}
+
+          <polyline
+            points={referencePoints}
+            fill="none"
+            className="comparison-reference-line"
+          />
+
+
+          {/* User */}
+
+          <polyline
+            points={userPoints}
+            fill="none"
+            className="comparison-user-line"
           />
 
 
           <text
-            x="10"
-            y={highY + 5}
+            x="12"
+            y={paddingTop + 5}
             className="pitch-axis-label"
           >
             High
           </text>
 
           <text
-            x="10"
-            y={middleY + 5}
+            x="20"
+            y={height / 2 + 4}
             className="pitch-axis-label"
           >
             Mid
           </text>
 
           <text
-            x="10"
-            y={lowY}
+            x="12"
+            y={height - paddingBottom}
             className="pitch-axis-label"
           >
             Low
           </text>
-
-
-          {/* REFERENCE */}
-
-          <polyline
-            points={referencePoints}
-            className="comparison-reference-line"
-            fill="none"
-          />
-
-
-          {/* USER */}
-
-          <polyline
-            points={userPoints}
-            className="comparison-user-line"
-            fill="none"
-          />
-
-
-          {/* AXIS */}
-
-          <line
-            x1={paddingLeft}
-            y1={lowY}
-            x2={width - paddingRight}
-            y2={lowY}
-            className="pitch-axis-line"
-          />
 
         </svg>
 
@@ -519,21 +430,17 @@ function ComparisonGraph({
 
       <div className="comparison-explanation">
 
-        <div>
+        <strong>
+          How to read this graph
+        </strong>
 
-          <strong>
-            How to read this graph
-          </strong>
-
-          <p>
-            When your line follows the
-            reference line closely, your
-            pitch is closer to the original.
-            Larger gaps indicate pitch
-            differences.
-          </p>
-
-        </div>
+        <p>
+          When your red line stays close to
+          the blue reference line, your pitch
+          is closer to the original melody.
+          Larger vertical differences indicate
+          pitch differences.
+        </p>
 
       </div>
 
@@ -542,48 +449,32 @@ function ComparisonGraph({
 }
 
 
-/* =====================================================
-   MAIN COMPONENT
-===================================================== */
+// ============================================================
+// MAIN COMPONENT
+// ============================================================
 
 function MusicSong() {
 
   const navigate = useNavigate();
 
 
-  const songInputRef =
-    useRef(null);
+  // ----------------------------------------------------------
+  // SONG
+  // ----------------------------------------------------------
 
-  const voiceInputRef =
-    useRef(null);
-
-  const mediaRecorderRef =
-    useRef(null);
-
-  const streamRef =
-    useRef(null);
-
-  const chunksRef =
-    useRef([]);
-
-
-  const timerRef =
-    useRef(null);
-
-
-  const [songFile, setSongFile] =
+  const [selectedSong, setSelectedSong] =
     useState(null);
 
   const [songAnalysis, setSongAnalysis] =
     useState(null);
 
+  const [songLoading, setSongLoading] =
+    useState(false);
 
-  const [voiceFile, setVoiceFile] =
-    useState(null);
 
-  const [voicePreview, setVoicePreview] =
-    useState(null);
-
+  // ----------------------------------------------------------
+  // VOICE
+  // ----------------------------------------------------------
 
   const [isRecording, setIsRecording] =
     useState(false);
@@ -591,616 +482,621 @@ function MusicSong() {
   const [recordingTime, setRecordingTime] =
     useState(0);
 
+  const [voiceFile, setVoiceFile] =
+    useState(null);
 
-  const [loadingSong, setLoadingSong] =
+  const [voicePreview, setVoicePreview] =
+    useState(null);
+
+  const [voiceLoading, setVoiceLoading] =
     useState(false);
-
-  const [loadingVoice, setLoadingVoice] =
-    useState(false);
-
-  const [comparing, setComparing] =
-    useState(false);
-
 
   const [comparison, setComparison] =
     useState(null);
 
 
+  // ----------------------------------------------------------
+  // ERROR
+  // ----------------------------------------------------------
+
   const [error, setError] =
     useState("");
 
 
-  /* =====================================================
-     SONG
-  ===================================================== */
+  // ----------------------------------------------------------
+  // REFS
+  // ----------------------------------------------------------
 
-  const handleSongSelect =
-    async (event) => {
+  const mediaRecorderRef =
+    useRef(null);
 
-      const file =
-        event.target.files?.[0];
+  const mediaStreamRef =
+    useRef(null);
 
-      if (!file) return;
+  const audioChunksRef =
+    useRef([]);
 
-
-      setSongFile(file);
-
-      setSongAnalysis(null);
-
-      setComparison(null);
-
-      setVoiceFile(null);
-
-      setVoicePreview(null);
-
-      setError("");
+  const timerRef =
+    useRef(null);
 
 
-      await analyzeSong(file);
-    };
+  // ==========================================================
+  // SONG UPLOAD
+  // ==========================================================
+
+  const handleSongUpload = async (event) => {
+
+    const file =
+      event.target.files?.[0];
+
+    if (!file) return;
 
 
-  const analyzeSong =
-    async (file) => {
+    setSelectedSong(file);
+    setSongAnalysis(null);
+    setComparison(null);
+    setVoiceFile(null);
+    setVoicePreview(null);
+    setError("");
+    setSongLoading(true);
 
-      setLoadingSong(true);
 
-      setError("");
+    const formData =
+      new FormData();
+
+    formData.append(
+      "file",
+      file
+    );
 
 
-      try {
+    try {
 
-        const formData =
-          new FormData();
-
-        formData.append(
-          "file",
-          file
+      const response =
+        await axios.post(
+          `${API_URL}/analyze-song`,
+          formData,
+          {
+            headers: {
+              "Content-Type":
+                "multipart/form-data",
+            },
+            timeout: 120000,
+          }
         );
 
 
-        const response =
-          await axios.post(
-            `${API_URL}/analyze-song`,
-            formData
-          );
-
-
-        if (
-          !response.data.success
-        ) {
-
-          throw new Error(
-            response.data.error ||
-            "Song analysis failed."
-          );
-
-        }
-
+      if (
+        response.data &&
+        response.data.success
+      ) {
 
         setSongAnalysis(
           response.data
         );
 
+      } else {
 
-      } catch (err) {
-
-        console.error(
-          "SONG ANALYSIS ERROR:",
-          err
+        throw new Error(
+          "Song analysis failed."
         );
 
+      }
 
-        if (err.response) {
+    } catch (err) {
 
-          setError(
-            err.response.data?.error ||
-            `Backend error: ${err.response.status}`
-          );
+      console.error(
+        "Song upload error:",
+        err
+      );
 
-        } else if (err.request) {
 
-          setError(
-            "Cannot connect to the SkillSensAI backend. Please check the Render deployment."
-          );
+      if (err.response) {
 
-        } else {
+        setError(
+          err.response.data?.detail ||
+          "The backend could not analyse the song."
+        );
 
-          setError(
-            err.message ||
-            "Unable to analyze the song."
-          );
+      } else if (err.request) {
 
-        }
+        setError(
+          "Cannot connect to the SkillSensAI backend. Please check the Render deployment."
+        );
 
-      } finally {
+      } else {
 
-        setLoadingSong(false);
+        setError(
+          err.message ||
+          "Something went wrong while analysing the song."
+        );
 
       }
-    };
+
+    } finally {
+
+      setSongLoading(false);
+
+    }
+  };
 
 
-  /* =====================================================
-     VOICE UPLOAD
-  ===================================================== */
+  // ==========================================================
+  // VOICE FILE SELECT
+  // ==========================================================
 
-  const handleVoiceSelect =
-    async (event) => {
+  const handleVoiceFile = (
+    event
+  ) => {
 
-      const file =
-        event.target.files?.[0];
+    const file =
+      event.target.files?.[0];
 
-      if (!file) return;
-
-
-      setVoiceFile(file);
-
-      setComparison(null);
-
-      setError("");
+    if (!file) return;
 
 
-      const previewUrl =
-        URL.createObjectURL(file);
+    setVoiceFile(file);
+    setComparison(null);
+    setError("");
 
 
-      setVoicePreview(
-        previewUrl
-      );
+    const previewUrl =
+      URL.createObjectURL(file);
+
+    setVoicePreview(
+      previewUrl
+    );
+  };
 
 
-      await compareSongAndVoice(
-        songFile,
-        file
-      );
-    };
+  // ==========================================================
+  // RECORDING
+  // ==========================================================
+
+  const startRecording = async () => {
+
+    setError("");
+    setComparison(null);
 
 
-  /* =====================================================
-     RECORD
-  ===================================================== */
+    try {
 
-  const startRecording =
-    async () => {
-
-      setError("");
-
-      setComparison(null);
+      const stream =
+        await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
 
 
-      try {
-
-        if (
-          !navigator.mediaDevices ||
-          !navigator.mediaDevices.getUserMedia
-        ) {
-
-          setError(
-            "Your browser does not support microphone recording."
-          );
-
-          return;
-        }
+      mediaStreamRef.current =
+        stream;
 
 
-        const stream =
-          await navigator.mediaDevices.getUserMedia({
-            audio: true,
-          });
+      audioChunksRef.current =
+        [];
 
 
-        streamRef.current =
-          stream;
+      let mimeType = "";
 
 
-        let recorder;
+      if (
+        MediaRecorder.isTypeSupported(
+          "audio/webm;codecs=opus"
+        )
+      ) {
+
+        mimeType =
+          "audio/webm;codecs=opus";
+
+      } else if (
+        MediaRecorder.isTypeSupported(
+          "audio/webm"
+        )
+      ) {
+
+        mimeType =
+          "audio/webm";
+
+      } else if (
+        MediaRecorder.isTypeSupported(
+          "audio/mp4"
+        )
+      ) {
+
+        mimeType =
+          "audio/mp4";
+
+      }
 
 
-        if (
-          MediaRecorder.isTypeSupported(
-            "audio/webm;codecs=opus"
-          )
-        ) {
-
-          recorder =
-            new MediaRecorder(
+      const recorder =
+        mimeType
+          ? new MediaRecorder(
               stream,
-              {
-                mimeType:
-                  "audio/webm;codecs=opus",
-              }
-            );
-
-        } else if (
-          MediaRecorder.isTypeSupported(
-            "audio/webm"
-          )
-        ) {
-
-          recorder =
-            new MediaRecorder(
-              stream,
-              {
-                mimeType:
-                  "audio/webm",
-              }
-            );
-
-        } else {
-
-          recorder =
-            new MediaRecorder(
+              { mimeType }
+            )
+          : new MediaRecorder(
               stream
             );
 
+
+      mediaRecorderRef.current =
+        recorder;
+
+
+      recorder.ondataavailable = (
+        event
+      ) => {
+
+        if (
+          event.data &&
+          event.data.size > 0
+        ) {
+
+          audioChunksRef.current.push(
+            event.data
+          );
+
+        }
+      };
+
+
+      recorder.onstop = () => {
+
+        const actualType =
+          recorder.mimeType ||
+          mimeType ||
+          "audio/webm";
+
+
+        const blob =
+          new Blob(
+            audioChunksRef.current,
+            {
+              type: actualType,
+            }
+          );
+
+
+        const extension =
+          actualType.includes("mp4")
+            ? "m4a"
+            : "webm";
+
+
+        const file =
+          new File(
+            [blob],
+            `voice-recording.${extension}`,
+            {
+              type: actualType,
+            }
+          );
+
+
+        setVoiceFile(file);
+
+
+        const previewUrl =
+          URL.createObjectURL(blob);
+
+        setVoicePreview(
+          previewUrl
+        );
+
+
+        if (
+          mediaStreamRef.current
+        ) {
+
+          mediaStreamRef.current
+            .getTracks()
+            .forEach(
+              (track) =>
+                track.stop()
+            );
+
         }
 
-
-        mediaRecorderRef.current =
-          recorder;
+      };
 
 
-        chunksRef.current = [];
+      recorder.start();
+
+      setIsRecording(true);
+      setRecordingTime(0);
 
 
-        recorder.ondataavailable =
-          (event) => {
+      timerRef.current =
+        setInterval(() => {
 
-            if (
-              event.data.size > 0
-            ) {
-
-              chunksRef.current.push(
-                event.data
-              );
-
-            }
-          };
-
-
-        recorder.onerror =
-          () => {
-
-            setError(
-              "An error occurred while recording your voice."
-            );
-
-          };
-
-
-        recorder.onstop =
-          async () => {
-
-            const mimeType =
-              recorder.mimeType ||
-              "audio/webm";
-
-
-            const audioBlob =
-              new Blob(
-                chunksRef.current,
-                {
-                  type: mimeType,
-                }
-              );
-
-
-            const recordedFile =
-              new File(
-                [audioBlob],
-                "voice-recording.webm",
-                {
-                  type: mimeType,
-                }
-              );
-
-
-            setVoiceFile(
-              recordedFile
-            );
-
-
-            const previewUrl =
-              URL.createObjectURL(
-                audioBlob
-              );
-
-
-            setVoicePreview(
-              previewUrl
-            );
-
-
-            await compareSongAndVoice(
-              songFile,
-              recordedFile
-            );
-
-          };
-
-
-        recorder.start();
-
-
-        setIsRecording(true);
-
-        setRecordingTime(0);
-
-
-        timerRef.current =
-          setInterval(
-            () => {
-
-              setRecordingTime(
-                (previous) =>
-                  previous + 1
-              );
-
-            },
-            1000
+          setRecordingTime(
+            (previous) =>
+              previous + 1
           );
 
-      } catch (err) {
+        }, 1000);
 
-        console.error(
-          "MICROPHONE ERROR:",
-          err
-        );
+    } catch (err) {
 
+      console.error(
+        "Recording error:",
+        err
+      );
 
-        setError(
-          "Microphone permission was not granted. Please allow microphone access and try again."
-        );
+      setError(
+        "Microphone access was denied or is unavailable. Please allow microphone access and try again."
+      );
 
-      }
-    };
-
-
-  /* =====================================================
-     STOP RECORDING
-  ===================================================== */
-
-  const stopRecording =
-    () => {
-
-      if (
-        mediaRecorderRef.current &&
-        mediaRecorderRef.current.state !==
-          "inactive"
-      ) {
-
-        mediaRecorderRef.current.stop();
-
-      }
+    }
+  };
 
 
-      if (
-        streamRef.current
-      ) {
+  // ==========================================================
+  // STOP RECORDING
+  // ==========================================================
 
-        streamRef.current
-          .getTracks()
-          .forEach(
-            (track) => {
-              track.stop();
-            }
-          );
+  const stopRecording = () => {
 
-      }
+    if (
+      mediaRecorderRef.current &&
+      mediaRecorderRef.current.state !==
+        "inactive"
+    ) {
 
+      mediaRecorderRef.current.stop();
+
+    }
+
+
+    setIsRecording(false);
+
+
+    if (timerRef.current) {
 
       clearInterval(
         timerRef.current
       );
 
+      timerRef.current =
+        null;
 
-      setIsRecording(false);
+    }
 
-    };
+  };
 
 
-  /* =====================================================
-     COMPARE
-  ===================================================== */
+  // ==========================================================
+  // FORMAT TIME
+  // ==========================================================
 
-  const compareSongAndVoice =
-    async (
-      selectedSong,
-      selectedVoice
-    ) => {
+  const formatTime = (
+    seconds
+  ) => {
+
+    const minutes =
+      Math.floor(
+        seconds / 60
+      );
+
+    const remaining =
+      seconds % 60;
+
+
+    return `${String(minutes).padStart(
+      2,
+      "0"
+    )}:${String(
+      remaining
+    ).padStart(2, "0")}`;
+
+  };
+
+
+  // ==========================================================
+  // COMPARE VOICE WITH SONG
+  // ==========================================================
+
+  const analyzeVoice = async () => {
+
+    if (!selectedSong) {
+
+      setError(
+        "Please upload a song first."
+      );
+
+      return;
+
+    }
+
+
+    if (!voiceFile) {
+
+      setError(
+        "Please record your voice or choose an audio file first."
+      );
+
+      return;
+
+    }
+
+
+    setError("");
+    setComparison(null);
+    setVoiceLoading(true);
+
+
+    const formData =
+      new FormData();
+
+
+    formData.append(
+      "song",
+      selectedSong
+    );
+
+
+    formData.append(
+      "voice",
+      voiceFile
+    );
+
+
+    try {
+
+      const response =
+        await axios.post(
+          `${API_URL}/compare-song-voice`,
+          formData,
+          {
+            headers: {
+              "Content-Type":
+                "multipart/form-data",
+            },
+
+            timeout: 120000,
+          }
+        );
+
 
       if (
-        !selectedSong ||
-        !selectedVoice
+        response.data &&
+        response.data.success
       ) {
-
-        setError(
-          "Please choose a song before recording your voice."
-        );
-
-        return;
-      }
-
-
-      setLoadingVoice(true);
-
-      setComparing(true);
-
-      setError("");
-
-
-      try {
-
-        const formData =
-          new FormData();
-
-
-        formData.append(
-          "song",
-          selectedSong
-        );
-
-
-        formData.append(
-          "voice",
-          selectedVoice
-        );
-
-
-        const response =
-          await axios.post(
-            `${API_URL}/compare-song-voice`,
-            formData
-          );
-
-
-        if (
-          !response.data.success
-        ) {
-
-          throw new Error(
-            response.data.error ||
-            "Unable to compare the performances."
-          );
-
-        }
-
 
         setComparison(
           response.data
         );
 
+      } else {
 
-      } catch (err) {
-
-        console.error(
-          "COMPARISON ERROR:",
-          err
-        );
-
-
-        if (err.response) {
-
-          setError(
-            err.response.data?.error ||
-            `Backend error: ${err.response.status}`
-          );
-
-        } else if (err.request) {
-
-          setError(
-            "Cannot connect to the SkillSensAI backend. Please check the Render deployment."
-          );
-
-        } else {
-
-          setError(
-            err.message ||
-            "Unable to compare your voice with the song."
-          );
-
-        }
-
-      } finally {
-
-        setLoadingVoice(false);
-
-        setComparing(false);
-
-      }
-    };
-
-
-  /* =====================================================
-     RESET
-  ===================================================== */
-
-  const resetPractice =
-    () => {
-
-      if (voicePreview) {
-
-        URL.revokeObjectURL(
-          voicePreview
+        throw new Error(
+          "Voice comparison failed."
         );
 
       }
 
+    } catch (err) {
 
-      setSongFile(null);
-
-      setSongAnalysis(null);
-
-      setVoiceFile(null);
-
-      setVoicePreview(null);
-
-      setComparison(null);
-
-      setError("");
-
-      setRecordingTime(0);
+      console.error(
+        "Voice comparison error:",
+        err
+      );
 
 
-      if (
-        songInputRef.current
-      ) {
+      if (err.response) {
 
-        songInputRef.current.value =
-          "";
-
-      }
-
-
-      if (
-        voiceInputRef.current
-      ) {
-
-        voiceInputRef.current.value =
-          "";
-
-      }
-
-    };
-
-
-  /* =====================================================
-     TIME
-  ===================================================== */
-
-  const formatTime =
-    (seconds) => {
-
-      const minutes =
-        Math.floor(
-          seconds / 60
+        setError(
+          err.response.data?.detail ||
+          "The backend could not compare your voice with the song."
         );
 
+      } else if (err.request) {
 
-      const remaining =
-        seconds % 60;
+        setError(
+          "Cannot connect to the SkillSensAI backend. Please check the Render deployment."
+        );
+
+      } else {
+
+        setError(
+          err.message ||
+          "Something went wrong while analysing your voice."
+        );
+
+      }
+
+    } finally {
+
+      setVoiceLoading(false);
+
+    }
+  };
 
 
-      return `${String(
-        minutes
-      ).padStart(2, "0")}:${String(
-        remaining
-      ).padStart(2, "0")}`;
+  // ==========================================================
+  // RESET
+  // ==========================================================
 
-    };
+  const resetPage = () => {
+
+    if (
+      mediaRecorderRef.current &&
+      mediaRecorderRef.current.state !==
+        "inactive"
+    ) {
+
+      mediaRecorderRef.current.stop();
+
+    }
 
 
-  /* =====================================================
-     UI
-  ===================================================== */
+    if (
+      mediaStreamRef.current
+    ) {
+
+      mediaStreamRef.current
+        .getTracks()
+        .forEach(
+          (track) =>
+            track.stop()
+        );
+
+    }
+
+
+    if (timerRef.current) {
+
+      clearInterval(
+        timerRef.current
+      );
+
+      timerRef.current =
+        null;
+
+    }
+
+
+    if (voicePreview) {
+
+      URL.revokeObjectURL(
+        voicePreview
+      );
+
+    }
+
+
+    setSelectedSong(null);
+    setSongAnalysis(null);
+
+    setIsRecording(false);
+    setRecordingTime(0);
+
+    setVoiceFile(null);
+    setVoicePreview(null);
+
+    setVoiceLoading(false);
+
+    setComparison(null);
+
+    setError("");
+
+  };
+
+
+  // ==========================================================
+  // UI
+  // ==========================================================
 
   return (
-
     <div className="music-song-page">
 
+
+      {/* =====================================================
+          BACK BUTTON
+      ===================================================== */}
+
       <button
-        className="song-back-button"
+        className="music-song-back"
         onClick={() =>
           navigate("/music")
         }
@@ -1213,660 +1109,753 @@ function MusicSong() {
       </button>
 
 
-      <section className="song-header">
+      {/* =====================================================
+          HEADER
+      ===================================================== */}
 
-        <div className="song-header-icon">
+      <section className="music-song-header">
+
+        <div className="music-song-icon">
 
           <Music2 size={38} />
 
         </div>
 
 
-        <span className="song-label">
+        <span className="music-song-label">
           AI SONG PRACTICE
         </span>
 
 
         <h1>
-          Upload a <span>Song</span>
+          Sing With
+          <span> AI Feedback</span>
         </h1>
 
 
         <p>
-          Upload a song, visualize its
-          melody, then compare your own
-          singing with the reference pitch.
+          Upload a song, analyse its pitch,
+          then record your voice and compare
+          your performance with the original.
         </p>
 
       </section>
 
 
-      {/* =================================================
-          STEP 1
-      ================================================= */}
+      {/* =====================================================
+          MAIN CONTENT
+      ===================================================== */}
 
-      <section className="song-section">
+      <main className="music-song-container">
 
-        <div className="song-step">
 
-          <span>01</span>
+        {/* ===================================================
+            STEP 1 — SONG UPLOAD
+        =================================================== */}
 
-          <div>
+        <section className="music-step-card">
+
+          <div className="step-number">
+            01
+          </div>
+
+
+          <div className="step-content">
+
+            <span className="step-label">
+              STEP 1
+            </span>
 
             <h2>
-              Choose Your Song
+              Upload Your Song
             </h2>
 
             <p>
-              Upload the song you want
-              to practise.
+              Choose the song you want
+              to practise. SkillSensAI will
+              extract its pitch pattern.
             </p>
+
+
+            <label className="upload-song-button">
+
+              <Upload size={21} />
+
+              <span>
+                Choose Song
+              </span>
+
+              <input
+                type="file"
+                accept="audio/*,.mp3,.wav,.m4a,.webm"
+                onChange={
+                  handleSongUpload
+                }
+                hidden
+              />
+
+            </label>
+
+
+            {selectedSong && (
+
+              <div className="selected-file">
+
+                <div className="selected-file-icon">
+
+                  <Music2 size={20} />
+
+                </div>
+
+
+                <div className="selected-file-info">
+
+                  <strong>
+                    {selectedSong.name}
+                  </strong>
+
+                  <span>
+                    {(
+                      selectedSong.size /
+                      (1024 * 1024)
+                    ).toFixed(2)}{" "}
+                    MB
+                  </span>
+
+                </div>
+
+
+                {songAnalysis && (
+
+                  <CheckCircle2
+                    size={23}
+                    className="success-icon"
+                  />
+
+                )}
+
+              </div>
+
+            )}
+
+
+            {songLoading && (
+
+              <div className="loading-box">
+
+                <Loader2
+                  size={22}
+                  className="spin"
+                />
+
+                <div>
+
+                  <strong>
+                    Analysing your song...
+                  </strong>
+
+                  <span>
+                    Extracting pitch information
+                  </span>
+
+                </div>
+
+              </div>
+
+            )}
 
           </div>
 
-        </div>
+        </section>
 
 
-        <input
-          ref={songInputRef}
-          type="file"
-          accept="audio/*"
-          onChange={
-            handleSongSelect
-          }
-          hidden
-        />
+        {/* ===================================================
+            ERROR
+        =================================================== */}
 
+        {error && (
 
-        <button
-          className="choose-song-button"
-          onClick={() =>
-            songInputRef.current?.click()
-          }
-          disabled={loadingSong}
-        >
+          <div className="music-song-error">
 
-          {loadingSong ? (
+            <strong>
+              Something went wrong
+            </strong>
 
-            <>
-
-              <Loader2
-                size={22}
-                className="spin"
-              />
-
-              Analyzing Song...
-
-            </>
-
-          ) : (
-
-            <>
-
-              <Upload size={22} />
-
-              Choose Song
-
-            </>
-
-          )}
-
-        </button>
-
-
-        {songFile && (
-
-          <div className="selected-file">
-
-            <CheckCircle2 size={20} />
-
-            <div>
-
-              <strong>
-                {songFile.name}
-              </strong>
-
-
-              {songAnalysis && (
-
-                <span>
-
-                  Pitch detected successfully
-                  {" • "}
-                  {
-                    songAnalysis.total_pitch_points
-                  }
-                  {" "}pitch points
-
-                </span>
-
-              )}
-
-            </div>
+            <p>
+              {error}
+            </p>
 
           </div>
 
         )}
 
-      </section>
 
+        {/* ===================================================
+            SONG ANALYSIS
+        =================================================== */}
 
-      {/* =================================================
-          REFERENCE GRAPH
-      ================================================= */}
+        {songAnalysis && (
 
-      {songAnalysis?.pitch_data?.length > 1 && (
+          <section className="analysis-result-card">
 
-        <section className="graph-section">
+            <div className="analysis-success">
 
-          <PitchGraph
-            data={
-              songAnalysis.pitch_data.map(
-                (item) =>
-                  item.frequency
-              )
-            }
-
-            title="Reference Song Pitch"
-
-            subtitle="The melody extracted from your uploaded song. Higher points represent higher notes."
-
-            lineClass="reference-line"
-          />
-
-        </section>
-
-      )}
-
-
-      {/* =================================================
-          STEP 2
-      ================================================= */}
-
-      {songAnalysis && (
-
-        <section className="song-section">
-
-          <div className="song-step">
-
-            <span>02</span>
-
-            <div>
-
-              <h2>
-                Record Your Voice
-              </h2>
-
-              <p>
-                Sing the same part of the
-                song and compare your pitch
-                with the reference.
-              </p>
-
-            </div>
-
-          </div>
-
-
-          <div className="voice-choice-grid">
-
-            <button
-              className={
-                isRecording
-                  ? "voice-choice recording"
-                  : "voice-choice"
-              }
-
-              onClick={
-                isRecording
-                  ? stopRecording
-                  : startRecording
-              }
-
-              disabled={
-                loadingVoice ||
-                comparing
-              }
-            >
-
-              <div className="voice-choice-icon">
-
-                <Mic2 size={30} />
-
-              </div>
-
-
-              <div>
-
-                <h3>
-
-                  {isRecording
-                    ? "Stop Recording"
-                    : "Start Recording"}
-
-                </h3>
-
-
-                <p>
-
-                  {isRecording
-                    ? `Recording ${formatTime(
-                        recordingTime
-                      )}`
-                    : "Record your singing live"}
-
-                </p>
-
-              </div>
-
-
-              {isRecording && (
-                <span className="recording-dot" />
-              )}
-
-            </button>
-
-
-            <input
-              ref={voiceInputRef}
-              type="file"
-              accept="audio/*"
-              onChange={
-                handleVoiceSelect
-              }
-              hidden
-            />
-
-
-            <button
-              className="voice-choice"
-
-              onClick={() =>
-                voiceInputRef.current?.click()
-              }
-
-              disabled={
-                loadingVoice ||
-                comparing
-              }
-            >
-
-              <div className="voice-choice-icon upload">
-
-                <Upload size={30} />
-
-              </div>
-
-
-              <div>
-
-                <h3>
-                  Choose Audio
-                </h3>
-
-                <p>
-                  Upload an existing recording
-                </p>
-
-              </div>
-
-            </button>
-
-          </div>
-
-
-          {voicePreview && (
-
-            <div className="voice-preview">
+              <CheckCircle2 size={23} />
 
               <div>
 
                 <strong>
-                  Your Recording
+                  Song Analysis Complete
                 </strong>
 
                 <span>
-                  {voiceFile?.name}
+                  {songAnalysis.duration}s analysed
+                  {" • "}
+                  {songAnalysis.total_pitch_points}
+                  {" "}pitch points detected
                 </span>
 
               </div>
 
-
-              <audio
-                controls
-                src={voicePreview}
-              />
-
             </div>
 
-          )}
 
-        </section>
+            <PitchGraph
+              data={
+                songAnalysis.pitch_data?.map(
+                  (item) =>
+                    item.frequency
+                ) || []
+              }
+              title="Reference Song Pitch"
+              subtitle="The melody extracted from your uploaded song. Higher points represent higher notes."
+              lineClass="reference-line"
+            />
 
-      )}
+          </section>
 
-
-      {/* =================================================
-          YOUR VOICE GRAPH
-      ================================================= */}
-
-      {comparison?.user_pitch?.length > 1 && (
-
-        <section className="graph-section">
-
-          <PitchGraph
-
-            data={
-              comparison.user_pitch
-            }
-
-            title="Your Voice Pitch"
-
-            subtitle="Your detected singing pitch across the recording."
-
-            lineClass="user-line"
-
-          />
-
-        </section>
-
-      )}
+        )}
 
 
-      {/* =================================================
-          COMPARISON LOADING
-      ================================================= */}
+        {/* ===================================================
+            STEP 2 — VOICE
+        =================================================== */}
 
-      {comparing && (
+        {songAnalysis && (
 
-        <section className="analysis-loading">
+          <section className="music-step-card voice-step">
 
-          <Loader2
-            size={35}
-            className="spin"
-          />
-
-          <h3>
-            Comparing Your Performance
-          </h3>
-
-          <p>
-            SkillSensAI is comparing
-            your pitch with the reference
-            melody...
-          </p>
-
-        </section>
-
-      )}
+            <div className="step-number">
+              02
+            </div>
 
 
-      {/* =================================================
-          COMPARISON GRAPH
-      ================================================= */}
+            <div className="step-content">
 
-      {comparison &&
-        comparison.reference_pitch &&
-        comparison.user_pitch && (
-
-        <section className="graph-section">
-
-          <ComparisonGraph
-
-            reference={
-              comparison.reference_pitch
-            }
-
-            user={
-              comparison.user_pitch
-            }
-
-          />
-
-        </section>
-
-      )}
-
-
-      {/* =================================================
-          RESULTS
-      ================================================= */}
-
-      {comparison && (
-
-        <section className="comparison-results">
-
-          <div className="results-heading">
-
-            <div>
-
-              <span>
-                AI PERFORMANCE ANALYSIS
+              <span className="step-label">
+                STEP 2
               </span>
 
               <h2>
-                Your Singing Analysis
+                Sing the Song
               </h2>
 
               <p>
-                Your recording was compared
-                with the pitch extracted from
-                the uploaded song.
+                Record your voice live or
+                upload an existing recording.
               </p>
 
-            </div>
+
+              <div className="voice-options">
 
 
-            <div className="overall-score">
+                {/* -------------------------------------------
+                    RECORD
+                ------------------------------------------- */}
 
-              <div>
-                {
-                  comparison.overall_score
-                }%
-              </div>
+                {!isRecording ? (
 
-              <span>
-                Overall
-              </span>
+                  <button
+                    className="record-button"
+                    onClick={
+                      startRecording
+                    }
+                  >
 
-            </div>
+                    <Mic2 size={23} />
 
-          </div>
+                    <span>
+                      Start Recording
+                    </span>
 
+                  </button>
 
-          <div className="score-grid">
+                ) : (
 
-            <div className="score-card">
+                  <button
+                    className="stop-recording-button"
+                    onClick={
+                      stopRecording
+                    }
+                  >
 
-              <div className="score-card-icon">
-                <Music2 size={22} />
-              </div>
+                    <Square
+                      size={19}
+                      fill="currentColor"
+                    />
 
-              <span>
-                Pitch Accuracy
-              </span>
+                    <span>
+                      Stop Recording
+                    </span>
 
-              <strong>
-                {
-                  comparison.pitch_accuracy
-                }%
-              </strong>
+                  </button>
 
-              <div className="score-bar">
-
-                <div
-                  style={{
-                    width:
-                      `${comparison.pitch_accuracy}%`,
-                  }}
-                />
-
-              </div>
-
-            </div>
+                )}
 
 
-            <div className="score-card">
+                {/* -------------------------------------------
+                    UPLOAD
+                ------------------------------------------- */}
 
-              <div className="score-card-icon">
-                <CheckCircle2 size={22} />
-              </div>
+                <label className="voice-upload-button">
 
-              <span>
-                Notes Matched
-              </span>
-
-              <strong>
-                {
-                  comparison.note_match
-                }%
-              </strong>
-
-              <div className="score-bar">
-
-                <div
-                  style={{
-                    width:
-                      `${comparison.note_match}%`,
-                  }}
-                />
-
-              </div>
-
-            </div>
-
-
-            <div className="score-card">
-
-              <div className="score-card-icon">
-                <BarChart3 size={22} />
-              </div>
-
-              <span>
-                Pitch Stability
-              </span>
-
-              <strong>
-                {
-                  comparison.stability
-                }%
-              </strong>
-
-              <div className="score-bar">
-
-                <div
-                  style={{
-                    width:
-                      `${comparison.stability}%`,
-                  }}
-                />
-
-              </div>
-
-            </div>
-
-          </div>
-
-
-          <div className="feedback-panel">
-
-            <div className="feedback-title">
-
-              <Music2 size={22} />
-
-              <h3>
-                Personalized Feedback
-              </h3>
-
-            </div>
-
-
-            {comparison.feedback?.map(
-              (item, index) => (
-
-                <div
-                  className="feedback-item"
-                  key={index}
-                >
-
-                  <CheckCircle2 size={18} />
+                  <Upload size={22} />
 
                   <span>
-                    {item}
+                    Choose Audio
                   </span>
+
+                  <input
+                    type="file"
+                    accept="audio/*,.mp3,.wav,.m4a,.webm"
+                    onChange={
+                      handleVoiceFile
+                    }
+                    hidden
+                  />
+
+                </label>
+
+              </div>
+
+
+              {/* -------------------------------------------
+                  RECORDING TIMER
+              ------------------------------------------- */}
+
+              {isRecording && (
+
+                <div className="recording-status">
+
+                  <span className="recording-dot"></span>
+
+                  Recording
+
+                  <strong>
+                    {formatTime(
+                      recordingTime
+                    )}
+                  </strong>
 
                 </div>
 
-              )
+              )}
+
+
+              {/* -------------------------------------------
+                  VOICE FILE
+              ------------------------------------------- */}
+
+              {voiceFile && (
+
+                <div className="voice-file-box">
+
+                  <div className="voice-file-icon">
+
+                    <Mic2 size={21} />
+
+                  </div>
+
+
+                  <div className="voice-file-info">
+
+                    <strong>
+                      {voiceFile.name}
+                    </strong>
+
+                    <span>
+                      Your recording is ready
+                    </span>
+
+                  </div>
+
+
+                  <CheckCircle2
+                    size={22}
+                    className="success-icon"
+                  />
+
+                </div>
+
+              )}
+
+
+              {/* -------------------------------------------
+                  AUDIO PREVIEW
+              ------------------------------------------- */}
+
+              {voicePreview && (
+
+                <div className="audio-preview-box">
+
+                  <span>
+                    Preview Recording
+                  </span>
+
+                  <audio
+                    src={voicePreview}
+                    controls
+                  />
+
+                </div>
+
+              )}
+
+
+              {/* -------------------------------------------
+                  ANALYZE BUTTON
+              ------------------------------------------- */}
+
+              {voiceFile && !isRecording && (
+
+                <button
+                  className="analyze-voice-button"
+                  onClick={
+                    analyzeVoice
+                  }
+                  disabled={voiceLoading}
+                >
+
+                  {voiceLoading ? (
+
+                    <>
+                      <Loader2
+                        size={21}
+                        className="spin"
+                      />
+
+                      Analysing Your Voice...
+
+                    </>
+
+                  ) : (
+
+                    <>
+                      <BarChart3
+                        size={21}
+                      />
+
+                      Compare My Voice
+
+                    </>
+
+                  )}
+
+                </button>
+
+              )}
+
+            </div>
+
+          </section>
+
+        )}
+
+
+        {/* ===================================================
+            COMPARISON RESULTS
+        =================================================== */}
+
+        {comparison && (
+
+          <section className="comparison-results">
+
+
+            {/* -----------------------------------------------
+                SCORE
+            ----------------------------------------------- */}
+
+            <div className="score-card">
+
+              <div className="score-icon">
+
+                <BarChart3 size={30} />
+
+              </div>
+
+
+              <div className="score-content">
+
+                <span>
+                  YOUR PERFORMANCE
+                </span>
+
+                <strong>
+                  {Math.round(
+                    comparison.overall_score
+                  )}
+                  <small>
+                    /100
+                  </small>
+                </strong>
+
+                <p>
+                  Overall pitch matching score
+                </p>
+
+              </div>
+
+            </div>
+
+
+            {/* -----------------------------------------------
+                METRICS
+            ----------------------------------------------- */}
+
+            <div className="metrics-grid">
+
+              <div className="metric-card">
+
+                <span>
+                  PITCH ACCURACY
+                </span>
+
+                <strong>
+                  {Math.round(
+                    comparison.pitch_accuracy
+                  )}%
+                </strong>
+
+                <div className="metric-bar">
+
+                  <div
+                    style={{
+                      width: `${Math.min(
+                        comparison.pitch_accuracy,
+                        100
+                      )}%`,
+                    }}
+                  />
+
+                </div>
+
+              </div>
+
+
+              <div className="metric-card">
+
+                <span>
+                  NOTE MATCH
+                </span>
+
+                <strong>
+                  {Math.round(
+                    comparison.note_match
+                  )}%
+                </strong>
+
+                <div className="metric-bar">
+
+                  <div
+                    style={{
+                      width: `${Math.min(
+                        comparison.note_match,
+                        100
+                      )}%`,
+                    }}
+                  />
+
+                </div>
+
+              </div>
+
+
+              <div className="metric-card">
+
+                <span>
+                  STABILITY
+                </span>
+
+                <strong>
+                  {Math.round(
+                    comparison.stability
+                  )}%
+                </strong>
+
+                <div className="metric-bar">
+
+                  <div
+                    style={{
+                      width: `${Math.min(
+                        comparison.stability,
+                        100
+                      )}%`,
+                    }}
+                  />
+
+                </div>
+
+              </div>
+
+
+              <div className="metric-card">
+
+                <span>
+                  AVG. PITCH ERROR
+                </span>
+
+                <strong>
+                  {Math.round(
+                    comparison.average_pitch_error_cents
+                  )}
+
+                  <small>
+                    cents
+                  </small>
+
+                </strong>
+
+              </div>
+
+            </div>
+
+
+            {/* -----------------------------------------------
+                USER PITCH GRAPH
+            ----------------------------------------------- */}
+
+            <PitchGraph
+              data={
+                comparison.user_pitch || []
+              }
+              title="Your Voice Pitch"
+              subtitle="Your detected singing pitch across the recording."
+              lineClass="user-line"
+            />
+
+
+            {/* -----------------------------------------------
+                COMPARISON
+            ----------------------------------------------- */}
+
+            <ComparisonGraph
+              reference={
+                comparison.reference_pitch || []
+              }
+              user={
+                comparison.user_pitch || []
+              }
+            />
+
+
+            {/* -----------------------------------------------
+                FEEDBACK
+            ----------------------------------------------- */}
+
+            <div className="feedback-card">
+
+              <div className="feedback-header">
+
+                <div className="feedback-icon">
+
+                  <Music2 size={22} />
+
+                </div>
+
+                <div>
+
+                  <span>
+                    AI MUSIC COACH
+                  </span>
+
+                  <h3>
+                    Performance Feedback
+                  </h3>
+
+                </div>
+
+              </div>
+
+
+              <div className="feedback-list">
+
+                {comparison.feedback?.map(
+                  (item, index) => (
+
+                    <div
+                      className="feedback-item"
+                      key={index}
+                    >
+
+                      <CheckCircle2 size={19} />
+
+                      <p>
+                        {item}
+                      </p>
+
+                    </div>
+
+                  )
+                )}
+
+              </div>
+
+            </div>
+
+
+            {/* -----------------------------------------------
+                PROTOTYPE NOTE
+            ----------------------------------------------- */}
+
+            {comparison.prototype_note && (
+
+              <div className="prototype-note">
+
+                <strong>
+                  Prototype Note
+                </strong>
+
+                <p>
+                  {comparison.prototype_note}
+                </p>
+
+              </div>
+
             )}
 
-          </div>
 
+            {/* -----------------------------------------------
+                RESET
+            ----------------------------------------------- */}
 
-          <div className="comparison-info">
-
-            <strong>
-              Pitch Difference
-            </strong>
-
-            <span>
-              Average deviation:{" "}
-              {
-                comparison.average_pitch_error_cents
-              }{" "}
-              cents
-            </span>
-
-            <small>
-              A smaller pitch difference
-              means your detected pitch
-              was closer to the reference
-              pitch.
-            </small>
-
-          </div>
-
-
-          <div className="prototype-note">
-
-            <strong>
-              Prototype AI Analysis
-            </strong>
-
-            <p>
-              {
-                comparison.prototype_note
+            <button
+              className="reset-button"
+              onClick={
+                resetPage
               }
-            </p>
+            >
 
-          </div>
+              <RotateCcw size={19} />
 
+              Start Another Song
 
-          <button
-            className="practice-again-button"
-            onClick={
-              resetPractice
-            }
-          >
+            </button>
 
-            <RotateCcw size={20} />
+          </section>
 
-            Practice Another Song
+        )}
 
-          </button>
-
-        </section>
-
-      )}
-
-
-      {error && (
-
-        <div className="song-error">
-          {error}
-        </div>
-
-      )}
+      </main>
 
     </div>
   );
