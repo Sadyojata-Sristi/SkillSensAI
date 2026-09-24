@@ -1278,3 +1278,106 @@
     width: 100%;
   }
 }
+/* =========================================
+   BOXING LESSON SELECTOR
+========================================= */
+
+.boxing-lessons-selector {
+  max-width: 1100px;
+  margin: 45px auto 0;
+}
+
+.boxing-selector-header {
+  margin-bottom: 22px;
+}
+
+.boxing-selector-header span {
+  color: #7e91d0;
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+
+.boxing-selector-header h2 {
+  margin: 7px 0;
+  font-size: 30px;
+}
+
+.boxing-selector-header p {
+  margin: 0;
+  color: #8195ba;
+}
+
+.boxing-lessons-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+
+.boxing-lesson-select {
+  min-height: 120px;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(130, 150, 200, 0.15);
+  background: rgba(8, 16, 30, 0.75);
+  color: white;
+  cursor: pointer;
+  text-align: left;
+  transition: 0.2s;
+  position: relative;
+}
+
+.boxing-lesson-select:hover {
+  border-color: rgba(130, 150, 255, 0.45);
+  transform: translateY(-2px);
+}
+
+.boxing-lesson-select.active {
+  border-color: #7188ff;
+  background: rgba(100, 120, 255, 0.12);
+}
+
+.boxing-lesson-number {
+  display: inline-flex;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background: rgba(100, 120, 255, 0.15);
+  color: #a5b4ff;
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.boxing-lesson-select strong {
+  display: block;
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+
+.boxing-lesson-select small {
+  display: block;
+  color: #8195ba;
+  line-height: 1.4;
+  font-size: 12px;
+}
+
+.boxing-lesson-select > svg {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  color: #79e5a5;
+}
+
+@media (max-width: 950px) {
+  .boxing-lessons-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .boxing-lessons-grid {
+    grid-template-columns: 1fr;
+  }
+}
