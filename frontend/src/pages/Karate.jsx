@@ -1,4 +1,3 @@
-```jsx
 import {
   ArrowLeft,
   Shield,
@@ -798,4 +797,3 @@ function Karate() {
 }
 
 export default Karate;
-```
