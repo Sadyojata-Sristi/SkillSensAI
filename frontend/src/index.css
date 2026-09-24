@@ -1,0 +1,869 @@
+@import "tailwindcss";
+
+/* =========================================
+   GLOBAL
+========================================= */
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+  background: #020202;
+}
+
+body {
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  color: white;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+
+/* =========================================
+   MUSIC - PRACTICE OPTIONS
+========================================= */
+
+.practice-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 30px;
+}
+
+.practice-card {
+  padding: 22px;
+  border-radius: 18px;
+  border: 1px solid rgba(130, 150, 200, 0.15);
+  background: rgba(10, 18, 35, 0.7);
+
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.practice-card-icon {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+
+  border-radius: 13px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #9eafff;
+  background: rgba(100, 120, 255, 0.12);
+}
+
+.practice-card h3 {
+  margin: 0 0 5px;
+  color: white;
+}
+
+.practice-card p {
+  margin: 0;
+  color: #8195ba;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+
+/* =========================================
+   PRACTICE BUTTONS
+========================================= */
+
+.practice-button,
+.voice-upload-button {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 11px 17px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #7188ff;
+  color: white;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.practice-button:hover,
+.voice-upload-button:hover {
+  background: #8498ff;
+  transform: translateY(-2px);
+}
+
+.recording-button {
+  background: #e84c5f;
+}
+
+.recording-button:hover {
+  background: #f05c6d;
+}
+
+
+/* =========================================
+   RECORDING STATUS
+========================================= */
+
+.recording-status {
+  max-width: 1000px;
+
+  margin: 25px auto;
+
+  padding: 18px 22px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 15px;
+
+  border-radius: 15px;
+
+  background: rgba(100, 30, 45, 0.25);
+
+  border: 1px solid rgba(230, 80, 100, 0.25);
+}
+
+.recording-pulse {
+  width: 13px;
+  height: 13px;
+
+  border-radius: 50%;
+
+  background: #ff5268;
+
+  box-shadow:
+    0 0 0 7px rgba(255, 82, 104, 0.12);
+}
+
+.recording-status strong {
+  display: block;
+  color: white;
+}
+
+.recording-status span {
+  display: block;
+
+  margin-top: 3px;
+
+  color: #a17c87;
+
+  font-size: 13px;
+}
+
+
+/* =========================================
+   VOICE RESULT
+========================================= */
+
+.voice-result {
+  max-width: 1000px;
+
+  margin: 30px auto;
+
+  padding: 25px;
+
+  display: flex;
+
+  gap: 18px;
+
+  border-radius: 18px;
+
+  background: rgba(20, 50, 45, 0.35);
+
+  border: 1px solid rgba(80, 190, 150, 0.18);
+}
+
+.voice-result-icon {
+  width: 50px;
+  height: 50px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+
+  color: #70e0b4;
+
+  background: rgba(70, 200, 150, 0.12);
+}
+
+.voice-result span {
+  color: #67d7ac;
+
+  font-size: 11px;
+
+  letter-spacing: 2px;
+}
+
+.voice-result h2 {
+  margin: 6px 0;
+
+  color: white;
+}
+
+.voice-result p {
+  margin: 0;
+
+  color: #8195ba;
+
+  line-height: 1.6;
+}
+
+
+/* =========================================
+   COMPARISON SECTION
+========================================= */
+
+.comparison-section {
+  max-width: 1000px;
+
+  margin: 40px auto;
+
+  padding: 30px;
+
+  border-radius: 22px;
+
+  background: rgba(8, 16, 30, 0.75);
+
+  border: 1px solid rgba(130, 150, 200, 0.15);
+}
+
+.comparison-header {
+  display: flex;
+
+  gap: 15px;
+
+  align-items: center;
+}
+
+.comparison-icon {
+  width: 52px;
+  height: 52px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+
+  color: #9daeff;
+
+  background: rgba(100, 120, 255, 0.12);
+}
+
+.comparison-header span {
+  color: #7f92d2;
+
+  font-size: 11px;
+
+  letter-spacing: 2px;
+}
+
+.comparison-header h2 {
+  margin: 5px 0;
+
+  color: white;
+}
+
+.comparison-header p {
+  margin: 0;
+
+  color: #8195ba;
+}
+
+
+/* =========================================
+   ACCURACY CARD
+========================================= */
+
+.accuracy-card {
+  margin: 25px 0;
+
+  padding: 25px;
+
+  text-align: center;
+
+  border-radius: 17px;
+
+  background: rgba(100, 120, 255, 0.07);
+
+  border: 1px solid rgba(120, 140, 255, 0.15);
+}
+
+.accuracy-card span {
+  display: block;
+
+  color: #8194d3;
+
+  font-size: 11px;
+
+  letter-spacing: 2px;
+}
+
+.accuracy-card strong {
+  display: block;
+
+  margin: 8px 0;
+
+  font-size: 52px;
+
+  color: #9eafff;
+}
+
+.accuracy-card p {
+  margin: 0;
+
+  color: #8195ba;
+}
+
+
+/* =========================================
+   COMPARISON GRAPH
+========================================= */
+
+.comparison-graph-container {
+  position: relative;
+
+  width: 100%;
+
+  margin-top: 25px;
+}
+
+.comparison-graph {
+  width: 100%;
+
+  height: auto;
+
+  display: block;
+}
+
+.comparison-legend {
+  display: flex;
+
+  gap: 25px;
+
+  margin-bottom: 15px;
+
+  color: #8799ba;
+
+  font-size: 13px;
+}
+
+.comparison-legend div {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+}
+
+.legend-dot {
+  width: 9px;
+  height: 9px;
+
+  display: inline-block;
+
+  border-radius: 50%;
+}
+
+.original-dot {
+  background: #8fa3ff;
+}
+
+.voice-dot {
+  background: #ff6b91;
+}
+
+.original-pitch-line {
+  fill: none;
+
+  stroke: #8fa3ff;
+
+  stroke-width: 4;
+
+  stroke-linejoin: round;
+
+  stroke-linecap: round;
+}
+
+.voice-pitch-line {
+  fill: none;
+
+  stroke: #ff6b91;
+
+  stroke-width: 4;
+
+  stroke-linejoin: round;
+
+  stroke-linecap: round;
+}
+
+.comparison-label-high,
+.comparison-label-low {
+  position: absolute;
+
+  left: 5px;
+
+  color: #7185aa;
+
+  font-size: 12px;
+}
+
+.comparison-label-high {
+  top: 45px;
+}
+
+.comparison-label-low {
+  bottom: 25px;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 800px) {
+
+  .practice-options {
+    grid-template-columns: 1fr;
+  }
+
+  .comparison-section {
+    padding: 20px;
+  }
+
+  .practice-card {
+    flex-direction: column;
+
+    align-items: flex-start;
+  }
+
+}
+
+
+/* =========================================
+   GENERAL AUDIO / UPLOAD HELPERS
+========================================= */
+
+.upload-label {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 8px;
+
+  cursor: pointer;
+}
+
+.no-pitch {
+  width: 100%;
+
+  padding: 40px;
+
+  text-align: center;
+
+  color: #8195ba;
+
+  background: rgba(10, 18, 35, 0.6);
+
+  border-radius: 16px;
+}
+
+.analysis-status {
+  max-width: 1000px;
+
+  margin: 25px auto;
+
+  padding: 18px 22px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  color: #a9b8dc;
+
+  background: rgba(10, 18, 35, 0.7);
+
+  border-radius: 14px;
+}
+
+.loading-icon {
+  animation: music-spin 1s linear infinite;
+}
+
+@keyframes music-spin {
+
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+
+}
+
+
+/* =========================================
+   ERROR
+========================================= */
+
+.analysis-error {
+  max-width: 1000px;
+
+  margin: 20px auto;
+
+  padding: 15px 20px;
+
+  border-radius: 12px;
+
+  color: #ff9aa8;
+
+  background: rgba(150, 30, 50, 0.15);
+
+  border: 1px solid rgba(255, 80, 100, 0.2);
+}
+
+
+/* =========================================
+   SELECTED SONG
+========================================= */
+
+.selected-song {
+  max-width: 1000px;
+
+  margin: 20px auto;
+
+  padding: 16px 20px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  border-radius: 14px;
+
+  background: rgba(10, 18, 35, 0.7);
+
+  border: 1px solid rgba(130, 150, 200, 0.15);
+
+  color: #a9b8dc;
+}
+
+.selected-song div {
+  flex: 1;
+}
+
+.selected-song strong {
+  display: block;
+
+  color: white;
+}
+
+.selected-song small {
+  display: block;
+
+  margin-top: 3px;
+
+  color: #7185aa;
+}
+
+.success-icon {
+  color: #63d9a7;
+}
+
+
+/* =========================================
+   PITCH ANALYSIS
+========================================= */
+
+.pitch-analysis {
+  max-width: 1000px;
+
+  margin: 35px auto;
+
+  padding: 30px;
+
+  border-radius: 22px;
+
+  background: rgba(8, 16, 30, 0.75);
+
+  border: 1px solid rgba(130, 150, 200, 0.15);
+}
+
+.pitch-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 20px;
+}
+
+.pitch-header span {
+  color: #7f92d2;
+
+  font-size: 11px;
+
+  letter-spacing: 2px;
+}
+
+.pitch-header h2 {
+  margin: 5px 0;
+
+  color: white;
+}
+
+.song-duration {
+  text-align: right;
+}
+
+.song-duration small {
+  display: block;
+
+  color: #7185aa;
+}
+
+.song-duration strong {
+  color: white;
+}
+
+
+/* =========================================
+   PITCH GRAPH
+========================================= */
+
+.pitch-graph-container {
+  position: relative;
+
+  width: 100%;
+
+  margin-top: 25px;
+
+  overflow: hidden;
+
+  border-radius: 14px;
+
+  background: rgba(3, 8, 18, 0.7);
+}
+
+.pitch-graph {
+  width: 100%;
+
+  height: auto;
+
+  display: block;
+}
+
+.graph-axis {
+  stroke: #53617c;
+
+  stroke-width: 1.5;
+}
+
+.graph-grid {
+  stroke: rgba(100, 120, 160, 0.2);
+
+  stroke-width: 1;
+}
+
+.pitch-line {
+  fill: none;
+
+  stroke: #8fa3ff;
+
+  stroke-width: 4;
+
+  stroke-linejoin: round;
+
+  stroke-linecap: round;
+}
+
+.pitch-label-high,
+.pitch-label-low {
+  position: absolute;
+
+  left: 10px;
+
+  color: #7185aa;
+
+  font-size: 12px;
+}
+
+.pitch-label-high {
+  top: 15px;
+}
+
+.pitch-label-low {
+  bottom: 15px;
+}
+
+.pitch-info {
+  margin-top: 15px;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  color: #8799ba;
+
+  font-size: 13px;
+}
+
+.pitch-info > div {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+}
+
+.pitch-dot {
+  width: 9px;
+  height: 9px;
+
+  display: inline-block;
+
+  border-radius: 50%;
+
+  background: #8fa3ff;
+}
+
+.pitch-info p {
+  margin: 0;
+}
+
+
+/* =========================================
+   AI INFO
+========================================= */
+
+.music-ai-info {
+  max-width: 1000px;
+
+  margin: 40px auto;
+
+  padding: 25px;
+
+  display: flex;
+
+  gap: 18px;
+
+  border-radius: 18px;
+
+  background: rgba(10, 18, 35, 0.7);
+
+  border: 1px solid rgba(130, 150, 200, 0.15);
+}
+
+.ai-info-icon {
+  width: 48px;
+  height: 48px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 13px;
+
+  color: #9eafff;
+
+  background: rgba(100, 120, 255, 0.12);
+}
+
+.music-ai-info h3 {
+  margin: 0 0 7px;
+
+  color: white;
+}
+
+.music-ai-info p {
+  margin: 0;
+
+  color: #8195ba;
+
+  line-height: 1.6;
+}
+
+
+/* =========================================
+   MOBILE MUSIC LAYOUT
+========================================= */
+
+@media (max-width: 600px) {
+
+  .pitch-analysis,
+  .comparison-section,
+  .music-ai-info {
+    margin-left: 15px;
+    margin-right: 15px;
+    padding: 20px;
+  }
+
+  .pitch-header {
+    flex-direction: column;
+
+    align-items: flex-start;
+  }
+
+  .song-duration {
+    text-align: left;
+  }
+
+  .pitch-info {
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 8px;
+  }
+
+  .comparison-header {
+    align-items: flex-start;
+  }
+
+  .voice-result {
+    margin-left: 15px;
+    margin-right: 15px;
+  }
+
+}

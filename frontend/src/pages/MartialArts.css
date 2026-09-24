@@ -1,0 +1,533 @@
+/* =========================================
+   MARTIAL ARTS PAGE
+========================================= */
+
+.martial-page {
+
+  min-height: 100vh;
+
+  background:
+    radial-gradient(
+      circle at 15% 10%,
+      rgba(70, 100, 220, 0.12),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 85% 30%,
+      rgba(80, 70, 200, 0.10),
+      transparent 30%
+    ),
+    #020712;
+
+  color: #f5f7ff;
+
+  padding: 35px 7% 80px;
+
+  box-sizing: border-box;
+
+}
+
+
+/* =========================================
+   BACK BUTTON
+========================================= */
+
+.martial-back-button {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  background: transparent;
+
+  border: none;
+
+  color: #9caeea;
+
+  font-size: 16px;
+
+  cursor: pointer;
+
+  margin-bottom: 55px;
+
+  transition: 0.25s;
+
+}
+
+.martial-back-button:hover {
+
+  color: white;
+
+  transform: translateX(-4px);
+
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.martial-header {
+
+  text-align: center;
+
+  max-width: 850px;
+
+  margin: 0 auto 65px;
+
+}
+
+
+.martial-header-icon {
+
+  width: 80px;
+
+  height: 80px;
+
+  margin: 0 auto 20px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 22px;
+
+  color: #a4b5ff;
+
+  background:
+    rgba(100, 120, 255, 0.10);
+
+  border:
+    1px solid rgba(130, 150, 255, 0.25);
+
+  box-shadow:
+    0 0 40px rgba(90, 110, 255, 0.13);
+
+}
+
+
+.martial-label {
+
+  font-size: 13px;
+
+  letter-spacing: 3px;
+
+  color: #7f91d8;
+
+}
+
+
+.martial-header h1 {
+
+  margin: 10px 0 15px;
+
+  font-size: clamp(42px, 6vw, 70px);
+
+  font-weight: 700;
+
+  letter-spacing: -2px;
+
+}
+
+
+.martial-header h1 span {
+
+  color: #8da4ff;
+
+}
+
+
+.martial-header p {
+
+  max-width: 700px;
+
+  margin: auto;
+
+  color: #8ea3c9;
+
+  font-size: 18px;
+
+  line-height: 1.7;
+
+}
+
+
+/* =========================================
+   SELECTION
+========================================= */
+
+.martial-selection {
+
+  max-width: 1200px;
+
+  margin: auto;
+
+}
+
+
+.selection-heading {
+
+  margin-bottom: 28px;
+
+}
+
+
+.selection-heading h2 {
+
+  font-size: 30px;
+
+  margin: 0 0 8px;
+
+}
+
+
+.selection-heading p {
+
+  margin: 0;
+
+  color: #7185aa;
+
+}
+
+
+/* =========================================
+   GRID
+========================================= */
+
+.martial-grid {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  gap: 20px;
+
+}
+
+
+/* =========================================
+   MARTIAL CARD
+========================================= */
+
+.martial-card {
+
+  min-height: 230px;
+
+  padding: 25px;
+
+  box-sizing: border-box;
+
+  border-radius: 20px;
+
+  border:
+    1px solid rgba(130, 150, 200, 0.16);
+
+  background:
+    rgba(9, 17, 32, 0.82);
+
+  color: white;
+
+  cursor: pointer;
+
+  text-align: left;
+
+  display: flex;
+
+  flex-direction: column;
+
+  transition:
+    transform 0.25s,
+    border-color 0.25s,
+    box-shadow 0.25s;
+
+}
+
+
+.martial-card:hover {
+
+  transform: translateY(-7px);
+
+  border-color:
+    rgba(140, 160, 255, 0.55);
+
+  box-shadow:
+    0 15px 40px rgba(0, 0, 0, 0.35);
+
+}
+
+
+/* =========================================
+   ICON
+========================================= */
+
+.martial-card-icon {
+
+  width: 58px;
+
+  height: 58px;
+
+  border-radius: 16px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  margin-bottom: 20px;
+
+}
+
+
+/* =========================================
+   CARD COLORS
+========================================= */
+
+.boxing .martial-card-icon {
+
+  color: #ff6b6b;
+
+  background:
+    rgba(255, 80, 80, 0.12);
+
+}
+
+
+.karate .martial-card-icon {
+
+  color: #8da4ff;
+
+  background:
+    rgba(90, 110, 255, 0.12);
+
+}
+
+
+.kungfu .martial-card-icon {
+
+  color: #c084fc;
+
+  background:
+    rgba(180, 80, 255, 0.12);
+
+}
+
+
+.kickboxing .martial-card-icon {
+
+  color: #ffb347;
+
+  background:
+    rgba(255, 170, 50, 0.12);
+
+}
+
+
+.muaythai .martial-card-icon {
+
+  color: #ff6f61;
+
+  background:
+    rgba(255, 90, 70, 0.12);
+
+}
+
+
+.taekwondo .martial-card-icon {
+
+  color: #5ee7df;
+
+  background:
+    rgba(60, 210, 200, 0.12);
+
+}
+
+
+.judo .martial-card-icon {
+
+  color: #72a7ff;
+
+  background:
+    rgba(70, 130, 255, 0.12);
+
+}
+
+
+.mma .martial-card-icon {
+
+  color: #a8b5ff;
+
+  background:
+    rgba(120, 130, 255, 0.12);
+
+}
+
+
+/* =========================================
+   CARD CONTENT
+========================================= */
+
+.martial-card-content h3 {
+
+  font-size: 24px;
+
+  margin: 0 0 10px;
+
+}
+
+
+.martial-card-content p {
+
+  color: #8298bf;
+
+  line-height: 1.6;
+
+  font-size: 14px;
+
+  margin: 0;
+
+}
+
+
+/* =========================================
+   CARD FOOTER
+========================================= */
+
+.martial-card-footer {
+
+  margin-top: auto;
+
+  padding-top: 20px;
+
+}
+
+
+.martial-card-footer span {
+
+  color: #9daeff;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  letter-spacing: 1px;
+
+}
+
+
+/* =========================================
+   AI INFORMATION
+========================================= */
+
+.martial-ai-info {
+
+  max-width: 1200px;
+
+  margin: 70px auto 0;
+
+  padding: 25px;
+
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 18px;
+
+  border-radius: 18px;
+
+  background:
+    rgba(20, 30, 55, 0.45);
+
+  border:
+    1px solid rgba(120, 140, 200, 0.15);
+
+}
+
+
+.ai-info-icon {
+
+  min-width: 48px;
+
+  height: 48px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 14px;
+
+  color: #9daeff;
+
+  background:
+    rgba(100, 120, 255, 0.12);
+
+}
+
+
+.martial-ai-info h3 {
+
+  margin: 0 0 8px;
+
+  font-size: 18px;
+
+}
+
+
+.martial-ai-info p {
+
+  margin: 0;
+
+  color: #8195ba;
+
+  line-height: 1.7;
+
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1000px) {
+
+  .martial-grid {
+
+    grid-template-columns:
+      repeat(2, 1fr);
+
+  }
+
+}
+
+
+@media (max-width: 600px) {
+
+  .martial-page {
+
+    padding:
+      25px 20px 60px;
+
+  }
+
+
+  .martial-grid {
+
+    grid-template-columns: 1fr;
+
+  }
+
+
+  .martial-header h1 {
+
+    font-size: 42px;
+
+  }
+
+}
