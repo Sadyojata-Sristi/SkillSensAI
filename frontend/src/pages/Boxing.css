@@ -1,615 +1,951 @@
-/* =========================================================
-   SKILLSENSAI — BOXING PAGE
-   Clean reset version
-   Works with the current Boxing.jsx
-   ========================================================= */
+/* =========================================
+   SKILLSENSAI - BOXING
+   LIGHT PREMIUM RED THEME
+========================================= */
 
 .boxing-page {
+  --boxing-color: #df5555;
+  --boxing-dark: #c53d3d;
+  --boxing-light: #fff1f1;
+  --boxing-lighter: #fff8f8;
+  --boxing-border: #f0d1d1;
+  --boxing-glow: rgba(223, 85, 85, 0.16);
+
   min-height: 100vh;
-  width: 100%;
-  box-sizing: border-box;
-  padding: 32px 24px 80px;
+  padding: 30px 7% 60px;
+
   background:
-    radial-gradient(circle at 50% 0%, rgba(130, 20, 30, 0.16), transparent 35%),
-    #05070b;
-  color: #f5f7fb;
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
-}
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(223, 85, 85, 0.07),
+      transparent 38%
+    ),
+    #f7f9fc;
 
-.boxing-page *,
-.boxing-page *::before,
-.boxing-page *::after {
+  color: #18202a;
   box-sizing: border-box;
 }
 
-/* =========================================================
+/* =========================================
    BACK BUTTON
-   ========================================================= */
+========================================= */
 
 .boxing-back {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.04);
-  color: #d9dee8;
+
+  padding: 10px 17px;
+
+  border: 1px solid #e1e7ef;
+  border-radius: 12px;
+
+  background: #ffffff;
+  color: #4b5563;
+
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 650;
+
   cursor: pointer;
-  transition: 0.2s ease;
+
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .boxing-back:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.18);
-  transform: translateX(-2px);
+  transform: translateX(-3px);
+
+  color: var(--boxing-dark);
+
+  border-color: var(--boxing-border);
+
+  box-shadow:
+    0 8px 22px rgba(30, 50, 80, 0.08);
 }
 
-/* =========================================================
+/* =========================================
    HEADER
-   ========================================================= */
+========================================= */
 
 .boxing-header {
-  width: min(1150px, 100%);
-  margin: 48px auto 42px;
+  max-width: 850px;
+
+  margin: 55px auto 50px;
+
   text-align: center;
 }
 
 .boxing-header > span {
   display: inline-block;
-  margin-bottom: 12px;
-  color: #d34b55;
+
+  margin-bottom: 13px;
+
+  color: var(--boxing-dark);
+
   font-size: 12px;
   font-weight: 800;
-  letter-spacing: 2px;
+  letter-spacing: 2.4px;
 }
 
 .boxing-header h1 {
   margin: 0;
-  font-size: clamp(34px, 5vw, 56px);
+
+  font-size: clamp(42px, 5vw, 65px);
+
   line-height: 1.05;
+
+  letter-spacing: -2px;
+
+  color: #18202a;
   font-weight: 800;
-  letter-spacing: -1.5px;
 }
 
 .boxing-header p {
-  max-width: 700px;
-  margin: 18px auto 0;
-  color: #9da6b5;
-  font-size: 16px;
+  max-width: 720px;
+
+  margin: 20px auto 0;
+
+  color: #697586;
+
+  font-size: 17px;
   line-height: 1.7;
 }
 
-/* =========================================================
+/* =========================================
    LESSON SELECTOR
-   ========================================================= */
+========================================= */
 
 .boxing-lessons-selector {
-  width: min(1150px, 100%);
-  margin: 0 auto 34px;
-  padding: 26px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.025);
+  max-width: 1180px;
+
+  margin: 0 auto 28px;
+
+  padding: 30px;
+
+  border: 1px solid #e4e9f0;
+  border-radius: 24px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 10px 35px rgba(30, 50, 80, 0.055);
 }
 
 .boxing-selector-header {
-  margin-bottom: 22px;
+  margin-bottom: 23px;
 }
 
 .boxing-selector-header > span {
   display: block;
-  margin-bottom: 6px;
-  color: #777f8f;
+
+  margin-bottom: 7px;
+
+  color: var(--boxing-dark);
+
   font-size: 11px;
   font-weight: 800;
+
   letter-spacing: 1.8px;
 }
 
 .boxing-selector-header h2 {
-  margin: 0;
-  font-size: 24px;
+  margin: 0 0 6px;
+
+  color: #202a36;
+
+  font-size: 27px;
   font-weight: 750;
 }
 
 .boxing-selector-header p {
-  margin: 7px 0 0;
-  color: #8e97a7;
+  margin: 0;
+
+  color: #7b8492;
+
   font-size: 14px;
 }
 
+/* =========================================
+   LESSON GRID
+========================================= */
+
 .boxing-lessons-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+
+  grid-template-columns: repeat(5, 1fr);
+
   gap: 12px;
 }
 
 .boxing-lesson-select {
-  min-width: 0;
-  padding: 17px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  border-radius: 13px;
-  background: rgba(255, 255, 255, 0.035);
-  color: #dce1e9;
+  position: relative;
+
+  min-height: 120px;
+
+  padding: 17px;
+
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+
   text-align: left;
+
+  border: 1px solid #e3e8ef;
+  border-radius: 16px;
+
+  background: #fbfcfe;
+
+  color: #27313d;
+
   cursor: pointer;
-  transition: 0.2s ease;
+
+  transition:
+    transform 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease,
+    background 0.22s ease;
 }
 
 .boxing-lesson-select:hover {
-  border-color: rgba(255, 80, 90, 0.35);
-  background: rgba(255, 255, 255, 0.06);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+
+  border-color: #efcaca;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 10px 25px rgba(50, 60, 80, 0.07);
 }
 
 .boxing-lesson-select.active {
-  border-color: rgba(220, 55, 65, 0.75);
+  border-color: var(--boxing-color);
+
   background:
     linear-gradient(
       145deg,
-      rgba(155, 25, 35, 0.24),
-      rgba(255, 255, 255, 0.035)
+      #ffffff,
+      var(--boxing-lighter)
     );
-  box-shadow: 0 0 0 1px rgba(210, 50, 60, 0.12);
+
+  box-shadow:
+    0 8px 25px var(--boxing-glow);
 }
 
 .boxing-lesson-number {
-  display: block;
-  margin-bottom: 9px;
-  color: #8e96a5;
-  font-size: 11px;
+  flex-shrink: 0;
+
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: #f0f2f5;
+
+  color: #6d7684;
+
+  font-size: 12px;
   font-weight: 800;
-  letter-spacing: 1px;
 }
 
 .boxing-lesson-select.active .boxing-lesson-number {
-  color: #ef5962;
+  background: var(--boxing-light);
+
+  color: var(--boxing-dark);
 }
 
 .boxing-lesson-select strong {
   display: block;
-  font-size: 15px;
-  line-height: 1.3;
+
+  margin-bottom: 5px;
+
+  font-size: 14px;
+  font-weight: 750;
+
+  color: #26313d;
 }
 
-/* =========================================================
-   MAIN LESSON + VIDEO
-   ========================================================= */
+.boxing-lesson-select small {
+  display: block;
+
+  color: #808a98;
+
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.boxing-lesson-select > svg {
+  position: absolute;
+
+  top: 13px;
+  right: 13px;
+
+  color: var(--boxing-color);
+}
+
+/* =========================================
+   MAIN CONTENT
+========================================= */
 
 .boxing-content {
-  width: min(1150px, 100%);
+  max-width: 1180px;
+
   margin: 0 auto;
+
   display: grid;
+
   grid-template-columns: 1fr 1fr;
+
   gap: 22px;
-  align-items: stretch;
 }
 
-/* =========================================================
+/* =========================================
    LESSON CARD
-   ========================================================= */
+========================================= */
 
 .boxing-lesson {
-  min-width: 0;
-  padding: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
-  background: #0b0e14;
+  padding: 30px;
+
+  border: 1px solid #e4e9f0;
+  border-radius: 24px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 10px 35px rgba(30, 50, 80, 0.05);
 }
 
 .lesson-title {
   display: flex;
   align-items: flex-start;
-  gap: 15px;
-  margin-bottom: 25px;
+
+  gap: 16px;
+
+  margin-bottom: 30px;
 }
 
 .lesson-icon {
-  flex: 0 0 auto;
-  width: 48px;
-  height: 48px;
-  display: grid;
-  place-items: center;
-  border-radius: 12px;
-  background: rgba(190, 35, 45, 0.13);
-  color: #e04c56;
+  flex-shrink: 0;
+
+  width: 58px;
+  height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 16px;
+
+  background: var(--boxing-light);
+
+  color: var(--boxing-color);
+
+  border: 1px solid var(--boxing-border);
 }
 
 .lesson-title span {
   display: block;
+
   margin-bottom: 5px;
-  color: #7d8594;
+
+  color: var(--boxing-dark);
+
   font-size: 10px;
   font-weight: 800;
+
   letter-spacing: 1.5px;
 }
 
 .lesson-title h2 {
-  margin: 0;
-  font-size: 26px;
-  line-height: 1.15;
+  margin: 0 0 5px;
+
+  color: #202a36;
+
+  font-size: 28px;
+  font-weight: 780;
 }
 
 .lesson-title p {
-  margin: 7px 0 0;
-  color: #9099a8;
+  margin: 0;
+
+  color: #788392;
+
   font-size: 14px;
   line-height: 1.5;
 }
 
-/* =========================================================
+/* =========================================
    INSTRUCTIONS
-   ========================================================= */
+========================================= */
 
 .jab-instructions {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+
+  gap: 0;
 }
 
 .instruction {
   display: flex;
-  align-items: flex-start;
-  gap: 13px;
-  padding: 14px;
-  border-radius: 11px;
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(255, 255, 255, 0.055);
+  gap: 15px;
+
+  padding: 17px 0;
+
+  border-bottom: 1px solid #edf0f4;
 }
 
-.instruction > span:first-child {
-  flex: 0 0 auto;
-  width: 27px;
-  height: 27px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: rgba(205, 45, 55, 0.16);
-  color: #ed5a63;
+.instruction:first-child {
+  padding-top: 0;
+}
+
+.instruction:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.instruction > span {
+  flex-shrink: 0;
+
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: var(--boxing-light);
+
+  color: var(--boxing-dark);
+
   font-size: 11px;
   font-weight: 800;
 }
 
-.instruction h4 {
-  margin: 0 0 4px;
-  color: #e8ebf1;
+.instruction h3 {
+  margin: 1px 0 5px;
+
+  color: #27313d;
+
   font-size: 14px;
+  font-weight: 750;
 }
 
 .instruction p {
   margin: 0;
-  color: #8f98a7;
+
+  color: #7a8492;
+
   font-size: 13px;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
-/* =========================================================
+/* =========================================
    VIDEO CARD
-   ========================================================= */
+========================================= */
 
 .boxing-video-card {
-  min-width: 0;
-  padding: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
-  background: #0b0e14;
+  padding: 30px;
+
+  border: 1px solid #e4e9f0;
+  border-radius: 24px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 10px 35px rgba(30, 50, 80, 0.05);
 }
 
 .video-heading {
   display: flex;
   align-items: center;
-  gap: 13px;
-  margin-bottom: 20px;
+
+  gap: 14px;
+
+  margin-bottom: 22px;
 }
 
 .video-heading-icon {
-  width: 45px;
-  height: 45px;
-  display: grid;
-  place-items: center;
-  border-radius: 11px;
-  background: rgba(65, 100, 180, 0.13);
-  color: #7fa1e9;
+  width: 50px;
+  height: 50px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+
+  background: var(--boxing-light);
+
+  color: var(--boxing-color);
+
+  border: 1px solid var(--boxing-border);
 }
 
 .video-heading span {
   display: block;
+
   margin-bottom: 4px;
-  color: #7d8594;
+
+  color: var(--boxing-dark);
+
   font-size: 10px;
   font-weight: 800;
+
   letter-spacing: 1.5px;
 }
 
 .video-heading h3 {
   margin: 0;
+
+  color: #26313d;
+
   font-size: 18px;
+  font-weight: 750;
 }
 
-/* =========================================================
+/* =========================================
    VIDEO PLACEHOLDER
-   ========================================================= */
+========================================= */
 
 .video-placeholder {
-  min-height: 330px;
-  padding: 30px 20px;
+  min-height: 340px;
+
+  padding: 35px 25px;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
   text-align: center;
-  border: 1px dashed rgba(255, 255, 255, 0.13);
-  border-radius: 14px;
+
+  border: 1px dashed #e5caca;
+  border-radius: 18px;
+
   background:
-    radial-gradient(circle at center, rgba(90, 100, 130, 0.08), transparent 55%),
-    #080b10;
+    radial-gradient(
+      circle at center,
+      rgba(223, 85, 85, 0.06),
+      transparent 65%
+    ),
+    #fffafa;
 }
 
 .video-placeholder-icon {
-  width: 62px;
-  height: 62px;
-  display: grid;
-  place-items: center;
-  margin-bottom: 16px;
+  width: 74px;
+  height: 74px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 17px;
+
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.06);
-  color: #9ca8bc;
+
+  background: var(--boxing-light);
+
+  color: var(--boxing-color);
+
+  border: 1px solid var(--boxing-border);
+
+  box-shadow:
+    0 10px 30px var(--boxing-glow);
 }
 
 .video-placeholder h3 {
-  margin: 0;
-  font-size: 19px;
+  margin: 0 0 8px;
+
+  color: #27313d;
+
+  font-size: 20px;
 }
 
 .video-placeholder p {
-  margin: 12px 0 6px;
-  color: #858e9e;
+  margin: 0 0 8px;
+
+  color: #7e8795;
+
   font-size: 13px;
 }
 
 .video-placeholder code {
   max-width: 100%;
-  padding: 7px 10px;
-  overflow-wrap: anywhere;
-  border-radius: 7px;
-  background: rgba(255, 255, 255, 0.055);
-  color: #b7c0cf;
+
+  padding: 8px 11px;
+
+  overflow-x: auto;
+
+  border-radius: 8px;
+
+  background: #f4f5f7;
+
+  color: #697586;
+
   font-size: 11px;
 }
 
 .video-coming {
-  margin-top: 18px;
-  color: #666f7f;
-  font-size: 10px;
+  margin-top: 15px;
+
+  padding: 6px 10px;
+
+  border-radius: 20px;
+
+  background: var(--boxing-light);
+
+  color: var(--boxing-dark);
+
+  font-size: 9px;
   font-weight: 800;
-  letter-spacing: 1.5px;
+
+  letter-spacing: 1.2px;
 }
 
 .video-tip {
   display: flex;
-  align-items: flex-start;
-  gap: 9px;
-  margin-top: 14px;
-  color: #7e8796;
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 15px;
+
+  padding: 13px 15px;
+
+  border-radius: 12px;
+
+  background: #fafbfc;
+
+  color: #707b8b;
+
   font-size: 12px;
   line-height: 1.5;
 }
 
 .video-tip svg {
-  flex: 0 0 auto;
-  margin-top: 1px;
-  color: #7788ac;
+  flex-shrink: 0;
+
+  color: var(--boxing-color);
 }
 
-/* =========================================================
+/* =========================================
    KEY POINTS
-   ========================================================= */
+========================================= */
 
 .key-points {
-  width: min(1150px, 100%);
-  margin: 34px auto 0;
-  padding: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
-  background: #0b0e14;
+  max-width: 1180px;
+
+  margin: 25px auto 0;
+
+  padding: 30px;
+
+  border: 1px solid #e4e9f0;
+  border-radius: 24px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 10px 35px rgba(30, 50, 80, 0.05);
 }
 
 .key-points-header {
   margin-bottom: 22px;
 }
 
-.key-points-header span {
+.key-points-header > span {
   display: block;
-  margin-bottom: 6px;
-  color: #7d8594;
+
+  margin-bottom: 5px;
+
+  color: var(--boxing-dark);
+
   font-size: 10px;
   font-weight: 800;
-  letter-spacing: 1.6px;
+
+  letter-spacing: 1.7px;
 }
 
 .key-points-header h2 {
   margin: 0;
-  font-size: 24px;
+
+  color: #202a36;
+
+  font-size: 25px;
 }
 
 .key-points-grid {
   display: grid;
+
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+
+  gap: 14px;
 }
 
 .key-point {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  padding: 17px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.025);
+
+  gap: 13px;
+
+  padding: 18px;
+
+  border: 1px solid #e7ebf0;
+  border-radius: 16px;
+
+  background: #fbfcfe;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.key-point svg {
-  flex: 0 0 auto;
-  color: #d9535c;
+.key-point:hover {
+  transform: translateY(-3px);
+
+  border-color: var(--boxing-border);
+
+  box-shadow:
+    0 8px 20px rgba(40, 50, 70, 0.06);
+}
+
+.key-point > svg {
+  flex-shrink: 0;
+
+  color: var(--boxing-color);
 }
 
 .key-point h3 {
   margin: 0 0 5px;
+
+  color: #293440;
+
   font-size: 14px;
 }
 
 .key-point p {
   margin: 0;
-  color: #858e9e;
+
+  color: #7c8694;
+
   font-size: 12px;
-  line-height: 1.45;
+
+  line-height: 1.5;
 }
 
-/* =========================================================
-   PRACTICE SECTION
-   ========================================================= */
+/* =========================================
+   AI PRACTICE
+========================================= */
 
 .practice-section {
-  width: min(1150px, 100%);
-  margin: 34px auto 0;
+  max-width: 1180px;
+
+  margin: 25px auto 0;
+
   padding: 30px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
+
+  border: 1px solid var(--boxing-border);
+  border-radius: 24px;
+
   background:
     linear-gradient(
-      145deg,
-      rgba(100, 30, 45, 0.08),
-      rgba(255, 255, 255, 0.02)
-    ),
-    #0b0e14;
+      135deg,
+      #ffffff,
+      var(--boxing-lighter)
+    );
+
+  box-shadow:
+    0 12px 40px rgba(50, 45, 55, 0.06);
 }
 
 .practice-header {
   display: flex;
-  align-items: flex-start;
-  gap: 15px;
-  margin-bottom: 25px;
+  align-items: center;
+
+  gap: 16px;
+
+  margin-bottom: 28px;
 }
 
 .practice-icon {
-  flex: 0 0 auto;
-  width: 48px;
-  height: 48px;
-  display: grid;
-  place-items: center;
-  border-radius: 12px;
-  background: rgba(105, 80, 210, 0.14);
-  color: #a494e8;
+  flex-shrink: 0;
+
+  width: 60px;
+  height: 60px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 17px;
+
+  background: var(--boxing-light);
+
+  color: var(--boxing-color);
+
+  border: 1px solid var(--boxing-border);
+
+  box-shadow:
+    0 8px 25px var(--boxing-glow);
 }
 
-.practice-header > div:last-child > span {
+.practice-header span {
   display: block;
+
   margin-bottom: 5px;
-  color: #897bc4;
+
+  color: var(--boxing-dark);
+
   font-size: 10px;
   font-weight: 800;
+
   letter-spacing: 1.6px;
 }
 
 .practice-header h2 {
-  margin: 0;
-  font-size: 26px;
+  margin: 0 0 5px;
+
+  color: #202a36;
+
+  font-size: 28px;
 }
 
 .practice-header p {
-  margin: 7px 0 0;
-  color: #8d96a6;
+  margin: 0;
+
+  color: #748091;
+
   font-size: 14px;
 }
 
-/* =========================================================
+/* =========================================
    LIVE PRACTICE
-   ========================================================= */
+========================================= */
 
 .live-practice {
-  padding: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 15px;
-  background: rgba(255, 255, 255, 0.025);
+  padding: 23px;
+
+  border: 1px solid #e5e9ef;
+  border-radius: 20px;
+
+  background: #ffffff;
 }
 
 .practice-option-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 17px;
+
+  gap: 13px;
+
+  margin-bottom: 18px;
 }
 
 .practice-option-header > svg {
-  color: #d85a62;
+  color: var(--boxing-color);
 }
 
 .practice-option-header h3 {
-  margin: 0;
+  margin: 0 0 4px;
+
+  color: #293440;
+
   font-size: 17px;
 }
 
 .practice-option-header p {
-  margin: 4px 0 0;
-  color: #818b9b;
+  margin: 0;
+
+  color: #7d8795;
+
   font-size: 12px;
 }
 
+/* =========================================
+   CAMERA
+========================================= */
+
 .camera-container {
-  position: relative;
-  width: 100%;
-  height: 390px;
+  min-height: 340px;
+
   overflow: hidden;
-  border-radius: 12px;
-  background: #05070a;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 17px;
+
+  border: 1px solid #e3e8ef;
+
+  background: #f4f6f8;
 }
 
 .camera-preview {
   width: 100%;
-  height: 100%;
-  display: block;
+  max-height: 500px;
+
   object-fit: cover;
-  transform: scaleX(-1);
+
+  border-radius: 16px;
 }
 
 .camera-placeholder {
-  width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  color: #6f7888;
+
+  gap: 12px;
+
+  color: #9aa3af;
+
+  text-align: center;
 }
 
 .camera-placeholder svg {
-  margin-bottom: 12px;
-  opacity: 0.7;
+  color: var(--boxing-color);
+
+  opacity: 0.75;
 }
 
 .camera-placeholder p {
   margin: 0;
+
   font-size: 13px;
 }
 
 .camera-error {
   margin-top: 12px;
-  padding: 11px 13px;
-  border: 1px solid rgba(220, 70, 80, 0.2);
-  border-radius: 9px;
-  background: rgba(220, 70, 80, 0.08);
-  color: #e78990;
+
+  padding: 12px 14px;
+
+  border-radius: 11px;
+
+  background: #fff0f0;
+
+  border: 1px solid #f1cccc;
+
+  color: #c53d3d;
+
   font-size: 12px;
 }
+
+/* =========================================
+   RECORD CONTROLS
+========================================= */
 
 .record-controls {
   display: flex;
   justify-content: center;
-  margin-top: 17px;
+
+  margin-top: 18px;
 }
 
 .record-button,
@@ -617,131 +953,208 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  min-width: 170px;
+
+  gap: 9px;
+
+  min-width: 180px;
+
   padding: 12px 20px;
-  border: 0;
-  border-radius: 10px;
-  color: white;
-  font-family: inherit;
+
+  border: none;
+  border-radius: 12px;
+
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 750;
+
   cursor: pointer;
-  transition: 0.2s ease;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .record-button {
-  background: #b93440;
+  background: var(--boxing-color);
+  color: #ffffff;
+
+  box-shadow:
+    0 8px 22px rgba(223, 85, 85, 0.22);
 }
 
 .record-button:hover {
-  background: #cb3d49;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 12px 28px rgba(223, 85, 85, 0.28);
 }
 
 .stop-record-button {
-  background: #8f2630;
+  background: #2f3640;
+  color: #ffffff;
 }
 
 .stop-record-button:hover {
-  background: #a82d38;
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 10px 22px rgba(30, 35, 40, 0.18);
 }
 
-/* =========================================================
-   UPLOAD BOX
-   ========================================================= */
+/* =========================================
+   UPLOAD
+========================================= */
 
 .upload-box {
-  margin-top: 16px;
-  padding: 25px;
+  margin-top: 18px;
+
+  padding: 28px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
   text-align: center;
-  border: 1px dashed rgba(255, 255, 255, 0.12);
-  border-radius: 15px;
-  background: rgba(255, 255, 255, 0.02);
+
+  border: 1px dashed #e5caca;
+  border-radius: 20px;
+
+  background: #fffafa;
 }
 
 .upload-icon {
-  width: 48px;
-  height: 48px;
-  display: grid;
-  place-items: center;
-  margin: 0 auto 13px;
-  border-radius: 12px;
-  background: rgba(100, 120, 180, 0.1);
-  color: #8ea4d8;
+  width: 65px;
+  height: 65px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 15px;
+
+  border-radius: 17px;
+
+  background: var(--boxing-light);
+
+  color: var(--boxing-color);
+
+  border: 1px solid var(--boxing-border);
 }
 
 .upload-box h3 {
-  margin: 0;
-  font-size: 17px;
+  margin: 0 0 6px;
+
+  color: #293440;
+
+  font-size: 18px;
 }
 
 .upload-box p {
-  margin: 7px 0 17px;
-  color: #818a99;
-  font-size: 12px;
+  max-width: 500px;
+
+  margin: 0 0 18px;
+
+  color: #7c8694;
+
+  font-size: 13px;
 }
 
 .upload-jab-button {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: 8px;
+
   padding: 11px 18px;
-  border-radius: 9px;
-  background: #202938;
-  color: #e3e8f0;
+
+  border-radius: 11px;
+
+  background: #ffffff;
+
+  border: 1px solid var(--boxing-border);
+
+  color: var(--boxing-dark);
+
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 750;
+
   cursor: pointer;
-  transition: 0.2s ease;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .upload-jab-button:hover {
-  background: #2a3547;
+  transform: translateY(-2px);
+
+  background: var(--boxing-light);
+
+  box-shadow:
+    0 8px 20px var(--boxing-glow);
 }
 
-/* =========================================================
+/* =========================================
    PRACTICE VIDEO RESULT
-   ========================================================= */
+========================================= */
 
 .practice-video-result {
-  margin-top: 18px;
-  padding: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 15px;
-  background: rgba(255, 255, 255, 0.025);
+  margin-top: 20px;
+
+  padding: 23px;
+
+  border: 1px solid #e4e9f0;
+  border-radius: 20px;
+
+  background: #ffffff;
 }
 
 .result-heading {
-  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  margin-bottom: 17px;
+}
+
+.result-heading > svg {
+  color: var(--boxing-color);
 }
 
 .result-heading h3 {
-  margin: 0;
+  margin: 0 0 3px;
+
+  color: #293440;
+
   font-size: 17px;
 }
 
 .result-heading p {
-  margin: 5px 0 0;
-  color: #808998;
+  margin: 0;
+
+  color: #7c8694;
+
   font-size: 12px;
 }
 
 .uploaded-video-preview {
-  width: 100%;
-  max-height: 480px;
   display: block;
-  border-radius: 11px;
-  background: #000;
+
+  width: 100%;
+  max-height: 520px;
+
+  object-fit: contain;
+
+  border-radius: 15px;
+
+  background: #111820;
 }
 
 .video-actions {
   display: flex;
-  justify-content: center;
   gap: 10px;
-  margin-top: 15px;
-  flex-wrap: wrap;
+
+  margin-top: 17px;
 }
 
 .analyze-button,
@@ -749,199 +1162,261 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   gap: 8px;
-  padding: 11px 18px;
-  border-radius: 9px;
-  font-family: inherit;
+
+  padding: 12px 18px;
+
+  border-radius: 11px;
+
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 750;
+
   cursor: pointer;
-  transition: 0.2s ease;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .analyze-button {
-  border: 0;
-  background: #b93440;
-  color: white;
+  border: none;
+
+  background: var(--boxing-color);
+
+  color: #ffffff;
+
+  box-shadow:
+    0 7px 20px rgba(223, 85, 85, 0.2);
 }
 
-.analyze-button:hover {
-  background: #ca3d48;
+.analyze-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 11px 25px rgba(223, 85, 85, 0.27);
 }
 
 .reset-button {
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: transparent;
-  color: #b8c0cc;
+  border: 1px solid #e1e6ed;
+
+  background: #ffffff;
+
+  color: #667085;
 }
 
-.reset-button:hover {
-  background: rgba(255, 255, 255, 0.05);
+.reset-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+
+  border-color: #d7dde5;
 }
 
-/* =========================================================
-   LOADING
-   ========================================================= */
+.analyze-button:disabled,
+.reset-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
 
 .spin {
-  animation: boxing-spin 1s linear infinite;
+  animation: boxingSpin 1s linear infinite;
 }
 
-@keyframes boxing-spin {
+@keyframes boxingSpin {
   to {
     transform: rotate(360deg);
   }
 }
 
-/* =========================================================
-   AI ANALYSIS
-   ========================================================= */
+/* =========================================
+   AI RESULT
+========================================= */
 
 .ai-analysis-result {
-  margin-top: 18px;
+  margin-top: 20px;
+
   padding: 25px;
-  border: 1px solid rgba(120, 95, 220, 0.2);
-  border-radius: 15px;
+
+  border: 1px solid #e7cccc;
+  border-radius: 20px;
+
   background:
     linear-gradient(
       145deg,
-      rgba(90, 70, 180, 0.09),
-      rgba(255, 255, 255, 0.02)
+      #ffffff,
+      #fff8f8
     );
 }
 
 .analysis-result-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
+
+  gap: 13px;
+
+  padding-bottom: 20px;
+
+  border-bottom: 1px solid #f0e0e0;
 }
 
 .analysis-success-icon {
-  width: 42px;
-  height: 42px;
-  display: grid;
-  place-items: center;
-  border-radius: 11px;
-  background: rgba(70, 180, 120, 0.12);
-  color: #6fd49c;
+  width: 50px;
+  height: 50px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 15px;
+
+  background: var(--boxing-light);
+
+  color: var(--boxing-color);
 }
 
 .analysis-result-header span {
   display: block;
-  margin-bottom: 3px;
-  color: #8b84bd;
-  font-size: 10px;
+
+  margin-bottom: 4px;
+
+  color: var(--boxing-dark);
+
+  font-size: 9px;
   font-weight: 800;
+
   letter-spacing: 1.5px;
 }
 
 .analysis-result-header h3 {
   margin: 0;
+
+  color: #293440;
+
   font-size: 18px;
 }
 
 .analysis-score {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  min-height: 110px;
-  margin-bottom: 20px;
-  border-radius: 13px;
-  background: rgba(255, 255, 255, 0.035);
-  color: #f1f4f8;
-  font-size: 48px;
-  font-weight: 800;
+  margin-left: auto;
+
+  font-size: 34px;
+  font-weight: 850;
+
+  color: var(--boxing-color);
 }
 
+/* =========================================
+   FEEDBACK
+========================================= */
+
 .feedback-list {
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
+  padding-top: 20px;
+}
+
+.feedback-list h4 {
+  margin: 0 0 12px;
+
+  color: #303a46;
+
+  font-size: 14px;
 }
 
 .feedback-item {
   display: flex;
   align-items: flex-start;
+
   gap: 9px;
-  padding: 11px 13px;
-  border-radius: 9px;
-  background: rgba(255, 255, 255, 0.035);
-  color: #aab2c0;
+
+  padding: 10px 0;
+
+  color: #697586;
+
   font-size: 13px;
-  line-height: 1.45;
-}
-
-.feedback-item svg {
-  flex: 0 0 auto;
-  margin-top: 2px;
-  color: #69c997;
-}
-
-.analysis-note {
-  margin-top: 15px;
-  padding: 11px 13px;
-  border-radius: 9px;
-  background: rgba(255, 190, 80, 0.06);
-  color: #aaa18b;
-  font-size: 11px;
   line-height: 1.5;
 }
 
-/* =========================================================
+.feedback-item svg {
+  flex-shrink: 0;
+
+  margin-top: 2px;
+
+  color: var(--boxing-color);
+}
+
+/* =========================================
+   ANALYSIS NOTE
+========================================= */
+
+.analysis-note {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 9px;
+
+  margin-top: 15px;
+
+  padding: 13px 15px;
+
+  border-radius: 12px;
+
+  background: var(--boxing-light);
+
+  color: #7b6570;
+
+  font-size: 11px;
+
+  line-height: 1.5;
+}
+
+.analysis-note svg {
+  flex-shrink: 0;
+
+  color: var(--boxing-color);
+}
+
+/* =========================================
    ERROR RESULT
-   ========================================================= */
+========================================= */
 
 .ai-preview-result {
-  margin-top: 18px;
-  padding: 18px;
-  border: 1px solid rgba(220, 70, 80, 0.2);
-  border-radius: 12px;
-  background: rgba(220, 70, 80, 0.06);
-  color: #e48a91;
-  font-size: 13px;
-}
-
-/* =========================================================
-   UNUSED / FUTURE ANALYSIS CLASSES
-   Kept for compatibility with future JSX
-   ========================================================= */
-
-.technique-breakdown {
   margin-top: 20px;
+
+  padding: 20px;
+
+  border-radius: 16px;
+
+  background: #fff1f1;
+
+  border: 1px solid #f0cece;
+
+  color: #c53d3d;
 }
 
-.technique-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+.ai-preview-result strong {
+  display: block;
+
+  margin-bottom: 5px;
+
+  font-size: 14px;
 }
 
-.technique-item {
-  padding: 12px;
-  border-radius: 9px;
-  background: rgba(255, 255, 255, 0.035);
+.ai-preview-result p {
+  margin: 0;
+
+  font-size: 13px;
+
+  color: #8c6262;
 }
 
-.technique-left {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-}
+/* =========================================
+   TABLET
+========================================= */
 
-.ai-improvement-summary {
-  margin-top: 15px;
-  padding: 15px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.035);
-}
+@media (max-width: 1050px) {
+  .boxing-page {
+    padding-left: 5%;
+    padding-right: 5%;
+  }
 
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
-
-@media (max-width: 1000px) {
   .boxing-lessons-grid {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -955,22 +1430,26 @@
   }
 }
 
-@media (max-width: 700px) {
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 650px) {
   .boxing-page {
-    padding: 22px 14px 60px;
+    padding: 22px 18px 45px;
   }
 
   .boxing-header {
-    margin-top: 35px;
-    margin-bottom: 30px;
+    margin: 45px auto 40px;
   }
 
   .boxing-header h1 {
-    font-size: 36px;
+    font-size: 40px;
+    letter-spacing: -1.5px;
   }
 
   .boxing-header p {
-    font-size: 14px;
+    font-size: 15px;
   }
 
   .boxing-lessons-selector,
@@ -978,11 +1457,24 @@
   .boxing-video-card,
   .key-points,
   .practice-section {
-    padding: 20px;
+    padding: 21px;
+    border-radius: 20px;
   }
 
   .boxing-lessons-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
+  }
+
+  .boxing-lesson-select {
+    min-height: auto;
+  }
+
+  .boxing-content {
+    gap: 16px;
+  }
+
+  .video-placeholder {
+    min-height: 280px;
   }
 
   .key-points-grid {
@@ -990,33 +1482,16 @@
   }
 
   .camera-container {
-    height: 300px;
+    min-height: 260px;
   }
 
-  .lesson-title h2 {
-    font-size: 22px;
+  .practice-header {
+    align-items: flex-start;
   }
 
-  .practice-header h2 {
-    font-size: 23px;
-  }
-}
-
-@media (max-width: 450px) {
-  .boxing-lessons-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .boxing-lesson-select {
-    padding: 14px;
-  }
-
-  .boxing-content {
-    gap: 15px;
-  }
-
-  .camera-container {
-    height: 250px;
+  .practice-icon {
+    width: 52px;
+    height: 52px;
   }
 
   .video-actions {
@@ -1028,13 +1503,33 @@
     width: 100%;
   }
 
-  .record-button,
-  .stop-record-button {
-    width: 100%;
+  .analysis-result-header {
+    align-items: flex-start;
   }
 
   .analysis-score {
-    min-height: 90px;
-    font-size: 40px;
+    font-size: 28px;
+  }
+}
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 400px) {
+  .boxing-header h1 {
+    font-size: 34px;
+  }
+
+  .lesson-title h2 {
+    font-size: 24px;
+  }
+
+  .practice-header h2 {
+    font-size: 24px;
+  }
+
+  .analysis-score {
+    font-size: 24px;
   }
 }
