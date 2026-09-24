@@ -1,281 +1,1297 @@
+/* ============================================================
+   MUSIC LEARN PAGE
+============================================================ */
+
 .music-learn-page {
   min-height: 100vh;
-  padding: 40px 7%;
-  background: #02050b;
+  background: #05070b;
   color: white;
+  padding: 35px 7% 80px;
 }
 
-.music-learn-page .music-header {
-  text-align: center;
-  max-width: 800px;
-  margin: 40px auto 50px;
-}
 
-.music-progress-bar {
-  width: 100%;
-  height: 9px;
-  background: rgba(255,255,255,0.08);
-  border-radius: 20px;
-  overflow: hidden;
-  margin-top: 20px;
-}
+/* ============================================================
+   BACK BUTTON
+============================================================ */
 
-.music-progress-bar div {
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    #7188ff,
-    #9eafff
-  );
-  border-radius: 20px;
-  transition: width 0.4s ease;
-}
-
-.music-lessons-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-  margin-top: 25px;
-}
-
-.music-lesson-card {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  text-align: left;
-  padding: 20px;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.08);
-  background: rgba(255,255,255,0.035);
-  color: white;
-  cursor: pointer;
-  transition: 0.25s ease;
-}
-
-.music-lesson-card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(130,150,255,0.5);
-}
-
-.music-lesson-selected {
-  border-color: #7188ff;
-  background: rgba(113,136,255,0.1);
-}
-
-.music-lesson-number {
-  flex-shrink: 0;
-  color: #899cff;
-}
-
-.music-lesson-content {
-  flex: 1;
-}
-
-.music-lesson-content h3 {
-  margin: 0 0 7px;
-}
-
-.music-lesson-content p {
-  margin: 0 0 8px;
-  color: #929bad;
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-.music-lesson-content small {
-  color: #6f7890;
-}
-
-.music-learning-video {
-  width: 100%;
-  display: block;
-  margin-top: 25px;
-  border-radius: 16px;
-  background: #000;
-  max-height: 550px;
-}
-
-.music-topics {
-  margin: 25px 0;
-}
-
-.music-topics h3 {
-  margin-bottom: 15px;
-}
-
-.music-topics > div {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.music-topics span {
-  padding: 9px 13px;
-  border-radius: 20px;
-  background: rgba(113,136,255,0.1);
-  color: #aebaff;
-  font-size: 13px;
-}
-
-.music-practice-option {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  padding: 20px;
-  margin-top: 16px;
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 16px;
-  background: rgba(255,255,255,0.03);
-}
-
-.music-practice-icon {
-  width: 50px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 14px;
-  background: rgba(113,136,255,0.12);
-  color: #8d9cff;
-  flex-shrink: 0;
-}
-
-.music-practice-info {
-  flex: 1;
-}
-
-.music-practice-info h3 {
-  margin: 0 0 5px;
-}
-
-.music-practice-info p {
-  margin: 0;
-  color: #8d96a8;
-  font-size: 13px;
-}
-
-.music-practice-info small {
-  display: block;
-  margin-top: 8px;
-  color: #70e0b4;
-}
-
-.music-recording-status {
+.music-learn-back {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 12px;
-  color: #ff7373;
-  font-size: 13px;
+
+  border: none;
+  background: transparent;
+
+  color: #aeb8c7;
+
+  font-size: 15px;
+
+  cursor: pointer;
+
+  margin-bottom: 40px;
+
+  transition: 0.2s ease;
 }
 
-.music-recording-status span {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #ff4f4f;
-  animation: musicPulse 1s infinite;
+.music-learn-back:hover {
+  color: white;
+  transform: translateX(-3px);
 }
 
-.music-feedback-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
-  margin-top: 20px;
+
+/* ============================================================
+   HEADER
+============================================================ */
+
+.music-learn-header {
+  max-width: 850px;
+
+  margin: 0 auto 45px;
+
+  text-align: center;
 }
 
-.music-feedback-card {
-  padding: 22px;
-  border-radius: 16px;
-  background: rgba(255,255,255,0.035);
-  border: 1px solid rgba(255,255,255,0.08);
-}
+.music-learn-icon {
+  width: 78px;
+  height: 78px;
 
-.music-feedback-card svg {
-  color: #899cff;
-  margin-bottom: 15px;
-}
+  margin: 0 auto 20px;
 
-.music-feedback-card span {
-  display: block;
-  color: #7e889c;
-  font-size: 11px;
-  letter-spacing: 1px;
-}
-
-.music-feedback-card strong {
-  display: block;
-  font-size: 30px;
-  margin: 7px 0;
-}
-
-.music-feedback-card p {
-  margin: 0;
-  color: #8e97a9;
-  font-size: 13px;
-}
-
-.music-feedback-list {
-  margin-top: 25px;
-}
-
-.music-feedback-list h3 {
-  margin-bottom: 15px;
-}
-
-.music-feedback-item {
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 13px;
-  margin-bottom: 10px;
-  border-radius: 12px;
-  background: rgba(255,255,255,0.035);
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: rgba(100, 170, 255, 0.12);
+
+  color: #6caeff;
 }
 
-.music-feedback-item svg {
-  color: #70e0b4;
-  flex-shrink: 0;
+.music-learn-label {
+  display: block;
+
+  color: #6caeff;
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+  letter-spacing: 2px;
+
+  margin-bottom: 12px;
 }
 
-.music-feedback-item span {
-  color: #b5bdca;
+.music-learn-header h1 {
+  margin: 0 0 15px;
+
+  font-size: 46px;
+
+  line-height: 1.15;
+}
+
+.music-learn-header h1 span {
+  color: #e63946;
+}
+
+.music-learn-header p {
+  max-width: 720px;
+
+  margin: 0 auto;
+
+  color: #9ba5b5;
+
+  font-size: 17px;
+
+  line-height: 1.7;
+}
+
+
+/* ============================================================
+   MAIN CONTAINER
+============================================================ */
+
+.music-learn-container {
+  max-width: 1100px;
+
+  margin: 0 auto;
+}
+
+
+/* ============================================================
+   LESSON SECTION
+============================================================ */
+
+.lesson-section {
+  margin-bottom: 28px;
+}
+
+.section-heading {
+  margin-bottom: 16px;
+}
+
+.section-heading span {
+  display: block;
+
+  color: #6caeff;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.7px;
+
+  margin-bottom: 6px;
+}
+
+.section-heading h2 {
+  margin: 0;
+
+  font-size: 25px;
+}
+
+
+/* ============================================================
+   LESSON CARDS
+============================================================ */
+
+.lesson-list {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 15px;
+}
+
+.lesson-card {
+  position: relative;
+
+  padding: 21px;
+
+  border: 1px solid #202938;
+
+  border-radius: 17px;
+
+  background: #0b0f16;
+
+  color: white;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition: 0.25s ease;
+}
+
+.lesson-card:hover {
+  transform: translateY(-4px);
+
+  border-color: #496b91;
+
+  background: #0e141d;
+
+  box-shadow:
+    0 12px 35px rgba(80, 150, 255, 0.08);
+}
+
+.lesson-card.active {
+  border-color: #5caeff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #0d1723,
+      #0b0f16
+    );
+
+  box-shadow:
+    0 10px 35px rgba(92, 174, 255, 0.1);
+}
+
+.lesson-number {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 34px;
+  height: 34px;
+
+  margin-bottom: 15px;
+
+  border-radius: 10px;
+
+  background: rgba(92, 174, 255, 0.1);
+
+  color: #6caeff;
+
+  font-size: 12px;
+
+  font-weight: 800;
+}
+
+.lesson-card.active .lesson-number {
+  background: #5caeff;
+
+  color: #06101c;
+}
+
+.lesson-card h3 {
+  margin: 0 0 8px;
+
+  font-size: 17px;
+}
+
+.lesson-card p {
+  margin: 0;
+
+  color: #7f8a9b;
+
   font-size: 13px;
+
   line-height: 1.5;
 }
 
-@keyframes musicPulse {
-  50% {
-    opacity: 0.35;
-    transform: scale(0.7);
-  }
+.lesson-active-dot {
+  position: absolute;
+
+  top: 18px;
+  right: 18px;
+
+  width: 8px;
+  height: 8px;
+
+  border-radius: 50%;
+
+  background: #4ade80;
+
+  box-shadow:
+    0 0 10px rgba(74, 222, 128, 0.55);
 }
+
+
+/* ============================================================
+   SELECTED LESSON
+============================================================ */
+
+.selected-lesson-card {
+  margin-bottom: 28px;
+
+  border: 1px solid #202938;
+
+  border-radius: 22px;
+
+  overflow: hidden;
+
+  background: #090d14;
+}
+
+.selected-lesson-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 23px 27px;
+
+  border-bottom: 1px solid #1b2431;
+}
+
+.selected-lesson-title {
+  display: flex;
+
+  align-items: center;
+
+  gap: 13px;
+}
+
+.selected-lesson-title-icon {
+  width: 43px;
+  height: 43px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 11px;
+
+  background: rgba(230, 57, 70, 0.1);
+
+  color: #e63946;
+}
+
+.selected-lesson-title span {
+  display: block;
+
+  color: #758196;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.3px;
+
+  margin-bottom: 4px;
+}
+
+.selected-lesson-title h2 {
+  margin: 0;
+
+  font-size: 21px;
+}
+
+.lesson-progress-label {
+  color: #697688;
+
+  font-size: 12px;
+}
+
+
+/* ============================================================
+   VIDEO
+============================================================ */
+
+.lesson-video-container {
+  width: 100%;
+
+  background: #030508;
+}
+
+.lesson-video {
+  display: block;
+
+  width: 100%;
+
+  max-height: 550px;
+
+  object-fit: contain;
+
+  background: #030508;
+}
+
+
+/* ============================================================
+   LESSON DESCRIPTION
+============================================================ */
+
+.lesson-description {
+  padding: 22px 27px;
+
+  border-top: 1px solid #1b2431;
+}
+
+.lesson-description h3 {
+  margin: 0 0 8px;
+
+  font-size: 17px;
+}
+
+.lesson-description p {
+  margin: 0;
+
+  color: #8995a5;
+
+  line-height: 1.65;
+
+  font-size: 14px;
+}
+
+
+/* ============================================================
+   PRACTICE SECTION
+============================================================ */
+
+.practice-section {
+  margin-top: 30px;
+}
+
+.practice-card {
+  padding: 28px;
+
+  border: 1px solid #202938;
+
+  border-radius: 22px;
+
+  background: #0b0f16;
+}
+
+.practice-header {
+  margin-bottom: 22px;
+}
+
+.practice-header span {
+  display: block;
+
+  color: #b18cff;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.5px;
+
+  margin-bottom: 7px;
+}
+
+.practice-header h2 {
+  margin: 0 0 8px;
+
+  font-size: 25px;
+}
+
+.practice-header p {
+  margin: 0;
+
+  color: #8b96a6;
+
+  line-height: 1.6;
+}
+
+
+/* ============================================================
+   PRACTICE OPTIONS
+============================================================ */
+
+.practice-options {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, 1fr);
+
+  gap: 15px;
+
+  margin-bottom: 20px;
+}
+
+.practice-option {
+  display: flex;
+
+  align-items: center;
+
+  gap: 15px;
+
+  padding: 19px;
+
+  border: 1px solid #293445;
+
+  border-radius: 15px;
+
+  background: #080c12;
+
+  cursor: pointer;
+
+  transition: 0.25s ease;
+}
+
+.practice-option:hover {
+  border-color: #5caeff;
+
+  background: #0c131d;
+
+  transform: translateY(-2px);
+}
+
+.practice-option-icon {
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 12px;
+
+  background: rgba(92, 174, 255, 0.1);
+
+  color: #5caeff;
+}
+
+.practice-option-content {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.practice-option-content strong {
+  color: #e0e6ef;
+
+  font-size: 14px;
+}
+
+.practice-option-content span {
+  color: #727e90;
+
+  font-size: 12px;
+}
+
+
+/* ============================================================
+   RECORD BUTTON
+============================================================ */
+
+.learn-record-button {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  width: 100%;
+
+  padding: 15px 20px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background: #e63946;
+
+  color: white;
+
+  font-size: 14px;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition: 0.25s ease;
+}
+
+.learn-record-button:hover {
+  background: #c92f3b;
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 10px 25px rgba(230, 57, 70, 0.18);
+}
+
+.learn-stop-button {
+  background: #2b3442;
+}
+
+.learn-stop-button:hover {
+  background: #384454;
+
+  box-shadow: none;
+}
+
+
+/* ============================================================
+   UPLOAD INPUT
+============================================================ */
+
+.learn-upload-label {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  width: 100%;
+
+  padding: 15px 20px;
+
+  border: 1px solid #344052;
+
+  border-radius: 12px;
+
+  background: #101620;
+
+  color: #dce3ec;
+
+  font-size: 14px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.25s ease;
+}
+
+.learn-upload-label:hover {
+  border-color: #5caeff;
+
+  background: #151d29;
+
+  transform: translateY(-2px);
+}
+
+.learn-upload-label svg {
+  color: #5caeff;
+}
+
+
+/* ============================================================
+   RECORDING STATUS
+============================================================ */
+
+.learn-recording-status {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 9px;
+
+  margin-top: 17px;
+
+  padding: 11px;
+
+  border-radius: 11px;
+
+  background: rgba(230, 57, 70, 0.08);
+
+  border: 1px solid rgba(230, 57, 70, 0.15);
+
+  color: #c4a2a7;
+
+  font-size: 13px;
+}
+
+.learn-recording-status strong {
+  color: white;
+
+  font-family: monospace;
+}
+
+.learn-recording-dot {
+  width: 9px;
+  height: 9px;
+
+  border-radius: 50%;
+
+  background: #e63946;
+
+  animation: learnRecordingPulse 1s infinite;
+}
+
+@keyframes learnRecordingPulse {
+
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.4;
+    transform: scale(0.75);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+}
+
+
+/* ============================================================
+   AUDIO PREVIEW
+============================================================ */
+
+.learn-audio-preview {
+  margin-top: 20px;
+
+  padding: 17px;
+
+  border: 1px solid #222d3d;
+
+  border-radius: 14px;
+
+  background: #080c12;
+}
+
+.learn-audio-preview span {
+  display: block;
+
+  color: #8d98a8;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  margin-bottom: 10px;
+}
+
+.learn-audio-preview audio {
+  width: 100%;
+
+  height: 42px;
+}
+
+
+/* ============================================================
+   ANALYZE BUTTON
+============================================================ */
+
+.learn-analyze-button {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  width: 100%;
+
+  margin-top: 20px;
+
+  padding: 15px 20px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #5caeff,
+      #7564ff
+    );
+
+  color: white;
+
+  font-size: 14px;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition: 0.25s ease;
+}
+
+.learn-analyze-button:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 12px 30px rgba(92, 174, 255, 0.18);
+}
+
+.learn-analyze-button:disabled {
+  opacity: 0.55;
+
+  cursor: not-allowed;
+
+  transform: none;
+
+  box-shadow: none;
+}
+
+
+/* ============================================================
+   ANALYSIS RESULT
+============================================================ */
+
+.learn-analysis-result {
+  margin-top: 28px;
+
+  padding: 28px;
+
+  border: 1px solid #202938;
+
+  border-radius: 22px;
+
+  background: #090d14;
+}
+
+.learn-result-header {
+  display: flex;
+
+  align-items: center;
+
+  gap: 13px;
+
+  margin-bottom: 25px;
+}
+
+.learn-result-icon {
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 13px;
+
+  background: rgba(74, 222, 128, 0.08);
+
+  color: #4ade80;
+}
+
+.learn-result-header span {
+  display: block;
+
+  color: #4ade80;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.5px;
+
+  margin-bottom: 4px;
+}
+
+.learn-result-header h3 {
+  margin: 0;
+
+  font-size: 21px;
+}
+
+
+/* ============================================================
+   SCORE
+============================================================ */
+
+.learn-score-section {
+  display: flex;
+
+  align-items: center;
+
+  gap: 25px;
+
+  margin-bottom: 25px;
+
+  padding: 23px;
+
+  border-radius: 17px;
+
+  background: #070b11;
+
+  border: 1px solid #1b2431;
+}
+
+.learn-score-circle {
+  width: 110px;
+  height: 110px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  border: 5px solid #5caeff;
+
+  background: #0b111a;
+
+  box-shadow:
+    0 0 25px rgba(92, 174, 255, 0.1);
+}
+
+.learn-score-circle strong {
+  font-size: 31px;
+
+  line-height: 1;
+}
+
+.learn-score-circle span {
+  color: #687487;
+
+  font-size: 11px;
+
+  margin-top: 4px;
+}
+
+.learn-score-info {
+  flex: 1;
+}
+
+.learn-score-info span {
+  display: block;
+
+  color: #778397;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.4px;
+
+  margin-bottom: 7px;
+}
+
+.learn-score-info h4 {
+  margin: 0 0 8px;
+
+  font-size: 21px;
+}
+
+.learn-score-info p {
+  margin: 0;
+
+  color: #8995a5;
+
+  font-size: 13px;
+
+  line-height: 1.55;
+}
+
+
+/* ============================================================
+   PITCH STATISTICS
+============================================================ */
+
+.learn-stats-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 13px;
+
+  margin-bottom: 25px;
+}
+
+.learn-stat {
+  padding: 17px;
+
+  border: 1px solid #202938;
+
+  border-radius: 14px;
+
+  background: #080c12;
+}
+
+.learn-stat span {
+  display: block;
+
+  color: #6e7a8c;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: 1px;
+
+  margin-bottom: 8px;
+}
+
+.learn-stat strong {
+  color: #e0e6ef;
+
+  font-size: 22px;
+}
+
+.learn-stat strong small {
+  color: #727e90;
+
+  font-size: 11px;
+
+  margin-left: 3px;
+}
+
+
+/* ============================================================
+   FEEDBACK
+============================================================ */
+
+.learn-feedback {
+  padding: 20px;
+
+  border-radius: 15px;
+
+  background: #070b11;
+
+  border: 1px solid #1b2431;
+}
+
+.learn-feedback-title {
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  color: #b18cff;
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+  letter-spacing: 1px;
+
+  margin-bottom: 15px;
+}
+
+.learn-feedback-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+.learn-feedback-item {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 9px;
+
+  color: #a5afbd;
+
+  font-size: 13px;
+
+  line-height: 1.55;
+}
+
+.learn-feedback-item svg {
+  flex-shrink: 0;
+
+  color: #4ade80;
+
+  margin-top: 2px;
+}
+
+
+/* ============================================================
+   ERROR
+============================================================ */
+
+.music-learn-error {
+  margin-top: 20px;
+
+  padding: 16px 18px;
+
+  border: 1px solid rgba(230, 57, 70, 0.35);
+
+  border-radius: 13px;
+
+  background: rgba(230, 57, 70, 0.08);
+
+  color: #d0a8ad;
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+.music-learn-error strong {
+  display: block;
+
+  color: #ff6975;
+
+  margin-bottom: 5px;
+}
+
+
+/* ============================================================
+   RESET BUTTON
+============================================================ */
+
+.learn-reset-button {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 9px;
+
+  margin: 22px auto 0;
+
+  padding: 12px 19px;
+
+  border: 1px solid #303b4b;
+
+  border-radius: 11px;
+
+  background: transparent;
+
+  color: #aeb8c7;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.25s ease;
+}
+
+.learn-reset-button:hover {
+  border-color: #5caeff;
+
+  background: #0b111a;
+
+  color: white;
+
+  transform: translateY(-2px);
+}
+
+
+/* ============================================================
+   LEARNING TIP
+============================================================ */
+
+.learning-tip {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 14px;
+
+  margin-top: 28px;
+
+  padding: 20px;
+
+  border: 1px solid #202938;
+
+  border-radius: 17px;
+
+  background: #090d14;
+}
+
+.learning-tip-icon {
+  color: #b18cff;
+
+  flex-shrink: 0;
+}
+
+.learning-tip h3 {
+  margin: 0 0 5px;
+
+  font-size: 15px;
+}
+
+.learning-tip p {
+  margin: 0;
+
+  color: #7f8a9b;
+
+  font-size: 13px;
+
+  line-height: 1.6;
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
 
 @media (max-width: 900px) {
-  .music-lessons-grid {
-    grid-template-columns: 1fr;
+
+  .music-learn-page {
+    padding-left: 5%;
+    padding-right: 5%;
   }
 
-  .music-feedback-grid {
-    grid-template-columns: 1fr;
+  .lesson-list {
+    grid-template-columns:
+      repeat(2, 1fr);
   }
 
-  .music-practice-option {
-    align-items: flex-start;
-    flex-wrap: wrap;
-  }
 }
 
-@media (max-width: 600px) {
+
+@media (max-width: 700px) {
+
   .music-learn-page {
-    padding: 25px 18px;
+    padding-top: 25px;
   }
 
-  .music-practice-option {
+  .music-learn-header {
+    margin-bottom: 35px;
+  }
+
+  .music-learn-header h1 {
+    font-size: 35px;
+  }
+
+  .music-learn-header p {
+    font-size: 15px;
+  }
+
+  .lesson-list {
+    grid-template-columns: 1fr;
+  }
+
+  .selected-lesson-header {
     flex-direction: column;
+
+    align-items: flex-start;
+
+    padding: 20px;
   }
 
-  .music-practice-option .practice-button {
+  .lesson-description {
+    padding: 20px;
+  }
+
+  .practice-card {
+    padding: 21px;
+  }
+
+  .practice-options {
+    grid-template-columns: 1fr;
+  }
+
+  .learn-score-section {
+    flex-direction: column;
+
+    text-align: center;
+  }
+
+  .learn-score-info {
     width: 100%;
   }
+
+  .learn-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+@media (max-width: 500px) {
+
+  .music-learn-header h1 {
+    font-size: 30px;
+  }
+
+  .music-learn-icon {
+    width: 68px;
+    height: 68px;
+  }
+
+  .selected-lesson-card {
+    border-radius: 17px;
+  }
+
+  .learn-analysis-result {
+    padding: 20px;
+
+    border-radius: 17px;
+  }
+
+  .learn-score-circle {
+    width: 95px;
+    height: 95px;
+  }
+
+  .learn-score-circle strong {
+    font-size: 27px;
+  }
+
 }
