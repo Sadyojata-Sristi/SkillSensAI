@@ -1,533 +1,604 @@
 /* =========================================
-   MARTIAL ARTS PAGE
+   SKILLSENSAI - MARTIAL ARTS
+   LIGHT BLUE PREMIUM THEME
 ========================================= */
 
 .martial-page {
+  --skill-color: #5b8def;
+  --skill-dark: #3f6fd8;
+  --skill-light: #eef5ff;
+  --skill-lighter: #f7faff;
+  --skill-border: #d8e6ff;
+  --skill-glow: rgba(91, 141, 239, 0.18);
 
   min-height: 100vh;
-
+  padding: 32px 7%;
   background:
     radial-gradient(
-      circle at 15% 10%,
-      rgba(70, 100, 220, 0.12),
-      transparent 30%
+      circle at 50% 0%,
+      rgba(91, 141, 239, 0.08),
+      transparent 38%
     ),
-    radial-gradient(
-      circle at 85% 30%,
-      rgba(80, 70, 200, 0.10),
-      transparent 30%
-    ),
-    #020712;
-
-  color: #f5f7ff;
-
-  padding: 35px 7% 80px;
-
+    #f7f9fc;
+  color: #18202a;
   box-sizing: border-box;
-
 }
-
 
 /* =========================================
    BACK BUTTON
 ========================================= */
 
 .martial-back-button {
-
-  display: flex;
-
+  display: inline-flex;
   align-items: center;
-
   gap: 8px;
 
-  background: transparent;
+  border: 1px solid #e1e7ef;
+  background: #ffffff;
+  color: #4b5563;
 
-  border: none;
+  padding: 10px 17px;
+  border-radius: 12px;
 
-  color: #9caeea;
-
-  font-size: 16px;
+  font-size: 14px;
+  font-weight: 600;
 
   cursor: pointer;
 
-  margin-bottom: 55px;
-
-  transition: 0.25s;
-
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .martial-back-button:hover {
+  transform: translateX(-3px);
+  color: var(--skill-dark);
+  border-color: var(--skill-border);
 
-  color: white;
-
-  transform: translateX(-4px);
-
+  box-shadow: 0 8px 22px rgba(25, 45, 80, 0.08);
 }
-
 
 /* =========================================
    HEADER
 ========================================= */
 
 .martial-header {
-
+  max-width: 820px;
+  margin: 58px auto 55px;
   text-align: center;
-
-  max-width: 850px;
-
-  margin: 0 auto 65px;
-
 }
 
-
 .martial-header-icon {
+  width: 78px;
+  height: 78px;
 
-  width: 80px;
-
-  height: 80px;
-
-  margin: 0 auto 20px;
+  margin: 0 auto 22px;
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 
   border-radius: 22px;
 
-  color: #a4b5ff;
+  background: linear-gradient(
+    145deg,
+    #ffffff,
+    var(--skill-light)
+  );
 
-  background:
-    rgba(100, 120, 255, 0.10);
+  color: var(--skill-color);
 
-  border:
-    1px solid rgba(130, 150, 255, 0.25);
+  border: 1px solid var(--skill-border);
 
   box-shadow:
-    0 0 40px rgba(90, 110, 255, 0.13);
-
+    0 15px 40px rgba(35, 70, 130, 0.08),
+    0 0 35px var(--skill-glow);
 }
-
 
 .martial-label {
+  display: inline-block;
 
-  font-size: 13px;
+  margin-bottom: 13px;
 
-  letter-spacing: 3px;
+  color: var(--skill-dark);
 
-  color: #7f91d8;
-
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2.5px;
 }
-
 
 .martial-header h1 {
+  margin: 0;
 
-  margin: 10px 0 15px;
+  font-size: clamp(42px, 5vw, 68px);
+  line-height: 1.05;
 
-  font-size: clamp(42px, 6vw, 70px);
-
-  font-weight: 700;
-
+  font-weight: 800;
   letter-spacing: -2px;
 
+  color: #18202a;
 }
-
 
 .martial-header h1 span {
-
-  color: #8da4ff;
-
+  color: var(--skill-color);
 }
-
 
 .martial-header p {
-
   max-width: 700px;
 
-  margin: auto;
+  margin: 20px auto 0;
 
-  color: #8ea3c9;
+  color: #667085;
 
-  font-size: 18px;
-
+  font-size: 17px;
   line-height: 1.7;
-
 }
 
-
 /* =========================================
-   SELECTION
+   SELECTION SECTION
 ========================================= */
 
 .martial-selection {
-
-  max-width: 1200px;
-
-  margin: auto;
-
+  max-width: 1180px;
+  margin: 0 auto;
 }
-
 
 .selection-heading {
-
-  margin-bottom: 28px;
-
+  text-align: center;
+  margin-bottom: 30px;
 }
-
 
 .selection-heading h2 {
-
-  font-size: 30px;
-
   margin: 0 0 8px;
 
+  font-size: 28px;
+  color: #18202a;
+  font-weight: 750;
 }
-
 
 .selection-heading p {
-
   margin: 0;
 
-  color: #7185aa;
-
+  color: #7a8494;
+  font-size: 15px;
 }
 
-
 /* =========================================
-   GRID
+   MARTIAL ARTS GRID
 ========================================= */
 
 .martial-grid {
-
   display: grid;
 
-  grid-template-columns:
-    repeat(4, 1fr);
+  grid-template-columns: repeat(4, 1fr);
 
-  gap: 20px;
-
+  gap: 18px;
 }
 
-
 /* =========================================
-   MARTIAL CARD
+   CARD
 ========================================= */
 
 .martial-card {
+  position: relative;
 
-  min-height: 230px;
+  min-height: 255px;
 
   padding: 25px;
 
-  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
 
   border-radius: 20px;
 
-  border:
-    1px solid rgba(130, 150, 200, 0.16);
+  border: 1px solid #e2e8f0;
 
-  background:
-    rgba(9, 17, 32, 0.82);
+  background: #ffffff;
 
-  color: white;
+  color: #18202a;
 
   cursor: pointer;
 
-  text-align: left;
-
-  display: flex;
-
-  flex-direction: column;
-
-  transition:
-    transform 0.25s,
-    border-color 0.25s,
-    box-shadow 0.25s;
-
-}
-
-
-.martial-card:hover {
-
-  transform: translateY(-7px);
-
-  border-color:
-    rgba(140, 160, 255, 0.55);
+  overflow: hidden;
 
   box-shadow:
-    0 15px 40px rgba(0, 0, 0, 0.35);
+    0 7px 25px rgba(30, 50, 80, 0.05);
 
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
 }
 
+.martial-card::before {
+  content: "";
+
+  position: absolute;
+
+  width: 150px;
+  height: 150px;
+
+  right: -65px;
+  top: -65px;
+
+  border-radius: 50%;
+
+  background: var(--card-accent, #edf3ff);
+
+  opacity: 0.65;
+
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
+}
+
+.martial-card:hover {
+  transform: translateY(-7px);
+
+  border-color: var(--card-border, #d8e6ff);
+
+  box-shadow:
+    0 18px 42px rgba(30, 55, 95, 0.11);
+}
+
+.martial-card:hover::before {
+  transform: scale(1.35);
+  opacity: 0.9;
+}
 
 /* =========================================
-   ICON
+   ACTIVE CARD COLORS
+========================================= */
+
+/* Boxing */
+
+.martial-card.boxing {
+  --card-color: #df5555;
+  --card-dark: #c53d3d;
+  --card-accent: #fff0f0;
+  --card-border: #f1cccc;
+}
+
+.martial-card.boxing .martial-card-icon {
+  color: #df5555;
+  background: #fff1f1;
+  border-color: #f3d2d2;
+}
+
+/* Karate */
+
+.martial-card.karate {
+  --card-color: #d69b2c;
+  --card-dark: #b67c14;
+  --card-accent: #fff7e4;
+  --card-border: #f0ddb1;
+}
+
+.martial-card.karate .martial-card-icon {
+  color: #d69b2c;
+  background: #fff7e5;
+  border-color: #f0ddb1;
+}
+
+/* =========================================
+   COMING SOON CARD COLORS
+========================================= */
+
+.martial-card.kungfu {
+  --card-color: #7c6ac7;
+  --card-accent: #f1effc;
+  --card-border: #ddd8f5;
+}
+
+.martial-card.kickboxing {
+  --card-color: #4f8ecf;
+  --card-accent: #edf5ff;
+  --card-border: #d7e7f8;
+}
+
+.martial-card.muaythai {
+  --card-color: #e27b45;
+  --card-accent: #fff1e9;
+  --card-border: #f2d6c5;
+}
+
+.martial-card.taekwondo {
+  --card-color: #5aa99b;
+  --card-accent: #ebf8f5;
+  --card-border: #d0eae5;
+}
+
+.martial-card.judo {
+  --card-color: #71809b;
+  --card-accent: #f0f3f8;
+  --card-border: #dce2eb;
+}
+
+.martial-card.mma {
+  --card-color: #8a6da8;
+  --card-accent: #f4eff8;
+  --card-border: #e2d8e9;
+}
+
+/* =========================================
+   CARD ICON
 ========================================= */
 
 .martial-card-icon {
+  position: relative;
+  z-index: 2;
 
-  width: 58px;
-
-  height: 58px;
-
-  border-radius: 16px;
+  width: 64px;
+  height: 64px;
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 
+  border-radius: 17px;
+
+  border: 1px solid var(--card-border, #d8e6ff);
+
+  background: var(--card-accent, #edf3ff);
+
+  color: var(--card-color, var(--skill-color));
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
+.martial-card:hover .martial-card-icon {
+  transform: scale(1.06);
 
-/* =========================================
-   CARD COLORS
-========================================= */
-
-.boxing .martial-card-icon {
-
-  color: #ff6b6b;
-
-  background:
-    rgba(255, 80, 80, 0.12);
-
+  box-shadow:
+    0 8px 22px rgba(40, 70, 110, 0.08);
 }
-
-
-.karate .martial-card-icon {
-
-  color: #8da4ff;
-
-  background:
-    rgba(90, 110, 255, 0.12);
-
-}
-
-
-.kungfu .martial-card-icon {
-
-  color: #c084fc;
-
-  background:
-    rgba(180, 80, 255, 0.12);
-
-}
-
-
-.kickboxing .martial-card-icon {
-
-  color: #ffb347;
-
-  background:
-    rgba(255, 170, 50, 0.12);
-
-}
-
-
-.muaythai .martial-card-icon {
-
-  color: #ff6f61;
-
-  background:
-    rgba(255, 90, 70, 0.12);
-
-}
-
-
-.taekwondo .martial-card-icon {
-
-  color: #5ee7df;
-
-  background:
-    rgba(60, 210, 200, 0.12);
-
-}
-
-
-.judo .martial-card-icon {
-
-  color: #72a7ff;
-
-  background:
-    rgba(70, 130, 255, 0.12);
-
-}
-
-
-.mma .martial-card-icon {
-
-  color: #a8b5ff;
-
-  background:
-    rgba(120, 130, 255, 0.12);
-
-}
-
 
 /* =========================================
    CARD CONTENT
 ========================================= */
 
-.martial-card-content h3 {
-
-  font-size: 24px;
-
-  margin: 0 0 10px;
-
+.martial-card-content {
+  position: relative;
+  z-index: 2;
 }
 
+.martial-card-content h3 {
+  margin: 0 0 9px;
+
+  font-size: 21px;
+  font-weight: 750;
+
+  color: #1d2733;
+}
 
 .martial-card-content p {
-
-  color: #8298bf;
-
-  line-height: 1.6;
-
-  font-size: 14px;
-
   margin: 0;
 
-}
+  color: #707b8c;
 
+  font-size: 14px;
+  line-height: 1.6;
+}
 
 /* =========================================
    CARD FOOTER
 ========================================= */
 
 .martial-card-footer {
+  position: relative;
+  z-index: 2;
 
   margin-top: auto;
+  padding-top: 22px;
 
-  padding-top: 20px;
-
+  width: 100%;
 }
-
 
 .martial-card-footer span {
-
-  color: #9daeff;
+  color: var(--card-dark, var(--skill-dark));
 
   font-size: 11px;
+  font-weight: 800;
 
-  font-weight: 700;
-
-  letter-spacing: 1px;
-
+  letter-spacing: 1.2px;
 }
 
+/* =========================================
+   COMING SOON
+========================================= */
+
+.coming-soon-card {
+  cursor: pointer;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #fbfcfe
+    );
+}
+
+.coming-soon-card .martial-card-content h3 {
+  color: #4c5665;
+}
+
+.coming-soon-card .martial-card-content p {
+  color: #8b94a2;
+}
+
+.coming-soon-card .martial-card-footer span {
+  color: #98a1ae;
+}
 
 /* =========================================
-   AI INFORMATION
+   AI INFO SECTION
 ========================================= */
 
 .martial-ai-info {
+  max-width: 920px;
 
-  max-width: 1200px;
+  margin: 55px auto 20px;
 
-  margin: 70px auto 0;
-
-  padding: 25px;
+  padding: 25px 28px;
 
   display: flex;
-
   align-items: flex-start;
-
   gap: 18px;
 
-  border-radius: 18px;
+  border: 1px solid var(--skill-border);
+
+  border-radius: 20px;
 
   background:
-    rgba(20, 30, 55, 0.45);
+    linear-gradient(
+      135deg,
+      #ffffff,
+      var(--skill-lighter)
+    );
 
-  border:
-    1px solid rgba(120, 140, 200, 0.15);
-
+  box-shadow:
+    0 12px 35px rgba(30, 55, 95, 0.06);
 }
-
 
 .ai-info-icon {
+  flex-shrink: 0;
 
-  min-width: 48px;
-
-  height: 48px;
+  width: 52px;
+  height: 52px;
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 
-  border-radius: 14px;
+  border-radius: 15px;
 
-  color: #9daeff;
+  color: var(--skill-color);
 
-  background:
-    rgba(100, 120, 255, 0.12);
+  background: var(--skill-light);
 
+  border: 1px solid var(--skill-border);
 }
-
 
 .martial-ai-info h3 {
+  margin: 2px 0 7px;
 
-  margin: 0 0 8px;
+  color: #202a36;
 
   font-size: 18px;
-
+  font-weight: 750;
 }
-
 
 .martial-ai-info p {
-
   margin: 0;
 
-  color: #8195ba;
+  color: #6d7787;
 
+  font-size: 14px;
   line-height: 1.7;
-
 }
-
 
 /* =========================================
-   RESPONSIVE
+   TABLET
 ========================================= */
 
-@media (max-width: 1000px) {
-
-  .martial-grid {
-
-    grid-template-columns:
-      repeat(2, 1fr);
-
+@media (max-width: 1050px) {
+  .martial-page {
+    padding: 28px 5%;
   }
 
+  .martial-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
+/* =========================================
+   MOBILE
+========================================= */
 
-@media (max-width: 600px) {
-
+@media (max-width: 650px) {
   .martial-page {
-
-    padding:
-      25px 20px 60px;
-
+    padding: 22px 18px 40px;
   }
 
-
-  .martial-grid {
-
-    grid-template-columns: 1fr;
-
+  .martial-header {
+    margin: 45px auto 40px;
   }
 
+  .martial-header-icon {
+    width: 68px;
+    height: 68px;
+    border-radius: 19px;
+  }
 
   .martial-header h1 {
-
-    font-size: 42px;
-
+    font-size: 40px;
+    letter-spacing: -1.5px;
   }
 
+  .martial-header p {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .selection-heading h2 {
+    font-size: 24px;
+  }
+
+  .selection-heading p {
+    line-height: 1.5;
+  }
+
+  .martial-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .martial-card {
+    min-height: 225px;
+    padding: 22px;
+  }
+
+  .martial-card-icon {
+    width: 58px;
+    height: 58px;
+    margin-bottom: 18px;
+  }
+
+  .martial-ai-info {
+    margin-top: 40px;
+    padding: 21px;
+
+    flex-direction: column;
+  }
+
+  .ai-info-icon {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 400px) {
+  .martial-header h1 {
+    font-size: 34px;
+  }
+
+  .martial-header p {
+    font-size: 14px;
+  }
+
+  .martial-card {
+    min-height: 215px;
+  }
 }
