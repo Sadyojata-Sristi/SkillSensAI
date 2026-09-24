@@ -1,279 +1,1565 @@
-/* =====================================================
-   PITCH GRAPH
-===================================================== */
+/* ============================================================
+   MUSIC SONG PAGE
+============================================================ */
 
-.graph-section {
-  max-width: 1100px;
-  margin: 30px auto;
+.music-song-page {
+  min-height: 100vh;
+  background: #05070b;
+  color: white;
+  padding: 35px 7% 80px;
 }
 
+
+/* ============================================================
+   BACK BUTTON
+============================================================ */
+
+.music-song-back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  border: none;
+  background: transparent;
+
+  color: #aeb8c7;
+
+  font-size: 15px;
+
+  cursor: pointer;
+
+  margin-bottom: 45px;
+
+  transition: 0.2s ease;
+}
+
+.music-song-back:hover {
+  color: white;
+  transform: translateX(-3px);
+}
+
+
+/* ============================================================
+   HEADER
+============================================================ */
+
+.music-song-header {
+  max-width: 850px;
+
+  margin: 0 auto 55px;
+
+  text-align: center;
+}
+
+.music-song-icon {
+  width: 82px;
+  height: 82px;
+
+  margin: 0 auto 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: rgba(230, 57, 70, 0.12);
+
+  color: #e63946;
+}
+
+.music-song-label {
+  display: block;
+
+  color: #e63946;
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+  letter-spacing: 2px;
+
+  margin-bottom: 12px;
+}
+
+.music-song-header h1 {
+  margin: 0 0 15px;
+
+  font-size: 48px;
+
+  line-height: 1.15;
+}
+
+.music-song-header h1 span {
+  color: #e63946;
+}
+
+.music-song-header p {
+  max-width: 700px;
+
+  margin: 0 auto;
+
+  color: #9ba5b5;
+
+  font-size: 17px;
+
+  line-height: 1.7;
+}
+
+
+/* ============================================================
+   MAIN CONTAINER
+============================================================ */
+
+.music-song-container {
+  max-width: 1100px;
+
+  margin: 0 auto;
+}
+
+
+/* ============================================================
+   STEP CARD
+============================================================ */
+
+.music-step-card {
+  display: flex;
+
+  gap: 25px;
+
+  padding: 32px;
+
+  margin-bottom: 28px;
+
+  border: 1px solid #202734;
+
+  border-radius: 22px;
+
+  background: #0b0f16;
+
+  box-shadow:
+    0 15px 45px rgba(0, 0, 0, 0.18);
+}
+
+.step-number {
+  flex-shrink: 0;
+
+  width: 58px;
+  height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 16px;
+
+  background: rgba(230, 57, 70, 0.12);
+
+  color: #e63946;
+
+  font-size: 17px;
+
+  font-weight: 800;
+}
+
+.step-content {
+  flex: 1;
+}
+
+.step-label {
+  display: block;
+
+  color: #7d899b;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.7px;
+
+  margin-bottom: 7px;
+}
+
+.step-content h2 {
+  margin: 0 0 10px;
+
+  font-size: 28px;
+}
+
+.step-content > p {
+  color: #919baa;
+
+  line-height: 1.65;
+
+  margin: 0 0 22px;
+}
+
+
+/* ============================================================
+   SONG UPLOAD BUTTON
+============================================================ */
+
+.upload-song-button {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 14px 21px;
+
+  border: 1px solid #334155;
+
+  border-radius: 12px;
+
+  background: #111722;
+
+  color: white;
+
+  font-size: 15px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.25s ease;
+}
+
+.upload-song-button:hover {
+  background: #161d2a;
+
+  border-color: #e63946;
+
+  transform: translateY(-2px);
+}
+
+.upload-song-button svg {
+  color: #e63946;
+}
+
+
+/* ============================================================
+   SELECTED FILE
+============================================================ */
+
+.selected-file {
+  display: flex;
+
+  align-items: center;
+
+  gap: 13px;
+
+  margin-top: 18px;
+
+  padding: 14px 16px;
+
+  border: 1px solid #263142;
+
+  border-radius: 13px;
+
+  background: #080c12;
+}
+
+.selected-file-icon {
+  width: 40px;
+  height: 40px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: rgba(230, 57, 70, 0.12);
+
+  color: #e63946;
+}
+
+.selected-file-info {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 3px;
+
+  flex: 1;
+
+  min-width: 0;
+}
+
+.selected-file-info strong {
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+
+  color: #e6ebf2;
+
+  font-size: 14px;
+}
+
+.selected-file-info span {
+  color: #6f7b8d;
+
+  font-size: 12px;
+}
+
+.success-icon {
+  color: #4ade80;
+
+  flex-shrink: 0;
+}
+
+
+/* ============================================================
+   LOADING
+============================================================ */
+
+.loading-box {
+  display: flex;
+
+  align-items: center;
+
+  gap: 13px;
+
+  margin-top: 18px;
+
+  padding: 16px;
+
+  border-radius: 13px;
+
+  background: #080c12;
+
+  border: 1px solid #222d3d;
+}
+
+.loading-box svg {
+  color: #6caeff;
+
+  flex-shrink: 0;
+}
+
+.loading-box div {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.loading-box strong {
+  color: #dbe3ee;
+
+  font-size: 14px;
+}
+
+.loading-box span {
+  color: #727e90;
+
+  font-size: 12px;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* ============================================================
+   ERROR
+============================================================ */
+
+.music-song-error {
+  margin: 20px 0;
+
+  padding: 18px 20px;
+
+  border: 1px solid rgba(230, 57, 70, 0.35);
+
+  border-radius: 14px;
+
+  background: rgba(230, 57, 70, 0.08);
+}
+
+.music-song-error strong {
+  display: block;
+
+  color: #ff6975;
+
+  margin-bottom: 6px;
+}
+
+.music-song-error p {
+  margin: 0;
+
+  color: #c0a2a6;
+
+  line-height: 1.5;
+}
+
+
+/* ============================================================
+   ANALYSIS RESULT
+============================================================ */
+
+.analysis-result-card {
+  margin-bottom: 28px;
+}
+
+.analysis-success {
+  display: flex;
+
+  align-items: center;
+
+  gap: 13px;
+
+  margin-bottom: 20px;
+
+  padding: 17px 20px;
+
+  border-radius: 15px;
+
+  background: rgba(74, 222, 128, 0.06);
+
+  border: 1px solid rgba(74, 222, 128, 0.18);
+}
+
+.analysis-success > svg {
+  color: #4ade80;
+
+  flex-shrink: 0;
+}
+
+.analysis-success div {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.analysis-success strong {
+  color: #dcefe3;
+
+  font-size: 15px;
+}
+
+.analysis-success span {
+  color: #7d9084;
+
+  font-size: 12px;
+}
+
+
+/* ============================================================
+   VOICE OPTIONS
+============================================================ */
+
+.voice-options {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 13px;
+
+  margin-top: 5px;
+}
+
+.record-button,
+.voice-upload-button,
+.stop-recording-button {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  min-width: 175px;
+
+  padding: 14px 20px;
+
+  border-radius: 12px;
+
+  font-size: 14px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.25s ease;
+}
+
+.record-button {
+  border: 1px solid #e63946;
+
+  background: #e63946;
+
+  color: white;
+}
+
+.record-button:hover {
+  background: #c92f3b;
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 10px 25px rgba(230, 57, 70, 0.18);
+}
+
+.voice-upload-button {
+  border: 1px solid #334155;
+
+  background: #111722;
+
+  color: #dce3ec;
+}
+
+.voice-upload-button:hover {
+  border-color: #5caeff;
+
+  background: #151d29;
+
+  transform: translateY(-2px);
+}
+
+.voice-upload-button svg {
+  color: #5caeff;
+}
+
+.stop-recording-button {
+  border: 1px solid #ff6975;
+
+  background: rgba(230, 57, 70, 0.12);
+
+  color: #ff6975;
+}
+
+.stop-recording-button:hover {
+  background: rgba(230, 57, 70, 0.2);
+}
+
+
+/* ============================================================
+   RECORDING STATUS
+============================================================ */
+
+.recording-status {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  margin-top: 17px;
+
+  padding: 10px 14px;
+
+  border-radius: 10px;
+
+  background: rgba(230, 57, 70, 0.08);
+
+  color: #c7a1a5;
+
+  font-size: 13px;
+}
+
+.recording-status strong {
+  color: white;
+
+  font-family: monospace;
+
+  font-size: 14px;
+}
+
+.recording-dot {
+  width: 9px;
+  height: 9px;
+
+  border-radius: 50%;
+
+  background: #e63946;
+
+  animation: recordingPulse 1s infinite;
+}
+
+@keyframes recordingPulse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.4;
+    transform: scale(0.75);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
+/* ============================================================
+   VOICE FILE
+============================================================ */
+
+.voice-file-box {
+  display: flex;
+
+  align-items: center;
+
+  gap: 13px;
+
+  margin-top: 18px;
+
+  padding: 14px 16px;
+
+  border: 1px solid #263142;
+
+  border-radius: 13px;
+
+  background: #080c12;
+}
+
+.voice-file-icon {
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 10px;
+
+  background: rgba(92, 174, 255, 0.1);
+
+  color: #5caeff;
+}
+
+.voice-file-info {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+
+  flex: 1;
+
+  min-width: 0;
+}
+
+.voice-file-info strong {
+  color: #dce3ec;
+
+  font-size: 14px;
+
+  overflow: hidden;
+
+  white-space: nowrap;
+
+  text-overflow: ellipsis;
+}
+
+.voice-file-info span {
+  color: #697688;
+
+  font-size: 12px;
+}
+
+
+/* ============================================================
+   AUDIO PREVIEW
+============================================================ */
+
+.audio-preview-box {
+  margin-top: 18px;
+
+  padding: 16px;
+
+  border: 1px solid #222c3b;
+
+  border-radius: 14px;
+
+  background: #080c12;
+}
+
+.audio-preview-box > span {
+  display: block;
+
+  color: #8e99a9;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  margin-bottom: 10px;
+}
+
+.audio-preview-box audio {
+  width: 100%;
+
+  height: 42px;
+}
+
+
+/* ============================================================
+   ANALYZE VOICE BUTTON
+============================================================ */
+
+.analyze-voice-button {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  margin-top: 20px;
+
+  padding: 15px 23px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background: linear-gradient(
+    135deg,
+    #5caeff,
+    #7c65ff
+  );
+
+  color: white;
+
+  font-size: 14px;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition: 0.25s ease;
+}
+
+.analyze-voice-button:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 12px 30px rgba(92, 174, 255, 0.18);
+}
+
+.analyze-voice-button:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+
+  transform: none;
+
+  box-shadow: none;
+}
+
+
+/* ============================================================
+   PITCH GRAPH
+============================================================ */
 
 .pitch-graph-card,
 .comparison-graph-card {
   background: #090d14;
+
   border: 1px solid #202938;
+
   border-radius: 22px;
+
   padding: 28px;
+
   overflow: hidden;
 }
-
 
 .pitch-graph-heading,
 .comparison-heading {
   display: flex;
+
   justify-content: space-between;
+
   align-items: flex-start;
+
   gap: 20px;
+
   margin-bottom: 20px;
 }
-
 
 .pitch-graph-heading h3,
 .comparison-heading h2 {
   margin: 0 0 8px;
+
   color: white;
 }
-
 
 .pitch-graph-heading p,
 .comparison-heading p {
   margin: 0;
+
   color: #8e99a9;
+
   line-height: 1.6;
 }
 
-
 .pitch-range {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
-  color: #65b5ff;
-  font-size: 13px;
-}
 
+  flex-direction: column;
+
+  align-items: flex-end;
+
+  gap: 4px;
+
+  color: #65b5ff;
+
+  font-size: 13px;
+
+  white-space: nowrap;
+}
 
 .pitch-graph-wrapper {
   width: 100%;
+
   height: 300px;
+
   background: #05080d;
+
   border: 1px solid #18202d;
+
   border-radius: 15px;
+
   overflow: hidden;
 }
 
-
 .pitch-svg {
   width: 100%;
+
   height: 100%;
+
   display: block;
 }
 
-
 .pitch-grid-line {
   stroke: #1b2634;
+
   stroke-width: 1;
+
   stroke-dasharray: 5 6;
 }
 
-
 .pitch-axis-line {
   stroke: #354354;
+
   stroke-width: 1;
 }
 
-
 .pitch-axis-label {
   fill: #657286;
+
   font-size: 12px;
 }
-
 
 .reference-line {
   stroke: #5caeff;
-  stroke-width: 3;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  filter: drop-shadow(
-    0 0 5px rgba(92, 174, 255, 0.45)
-  );
-}
 
+  stroke-width: 3;
+
+  stroke-linecap: round;
+
+  stroke-linejoin: round;
+
+  filter:
+    drop-shadow(
+      0 0 5px rgba(92, 174, 255, 0.45)
+    );
+}
 
 .user-line {
   stroke: #e63946;
-  stroke-width: 3;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  filter: drop-shadow(
-    0 0 5px rgba(230, 57, 70, 0.45)
-  );
-}
 
+  stroke-width: 3;
+
+  stroke-linecap: round;
+
+  stroke-linejoin: round;
+
+  filter:
+    drop-shadow(
+      0 0 5px rgba(230, 57, 70, 0.45)
+    );
+}
 
 .pitch-graph-footer {
   display: flex;
+
   justify-content: space-between;
+
   margin-top: 10px;
+
   color: #657286;
+
   font-size: 12px;
 }
 
-
 .pitch-empty {
   padding: 30px;
+
   text-align: center;
+
   color: #7c8798;
 }
 
 
-/* =====================================================
+/* ============================================================
    COMPARISON GRAPH
-===================================================== */
+============================================================ */
 
 .graph-label {
   display: block;
+
   color: #b18cff;
+
   font-size: 12px;
+
   font-weight: 700;
+
   letter-spacing: 1.5px;
+
   margin-bottom: 8px;
 }
-
 
 .comparison-wrapper {
   height: 340px;
 }
 
-
 .graph-legend {
   display: flex;
+
   gap: 25px;
+
   margin-bottom: 15px;
+
   color: #b8c1ce;
+
   font-size: 13px;
 }
 
-
 .graph-legend div {
   display: flex;
+
   align-items: center;
+
   gap: 8px;
 }
 
-
 .legend-line {
   display: inline-block;
+
   width: 30px;
+
   height: 3px;
+
   border-radius: 5px;
 }
 
-
 .reference-legend {
   background: #5caeff;
+
   box-shadow:
     0 0 8px rgba(92, 174, 255, 0.5);
 }
 
-
 .user-legend {
   background: #e63946;
+
   box-shadow:
     0 0 8px rgba(230, 57, 70, 0.5);
 }
 
-
 .comparison-reference-line {
   stroke: #5caeff;
-  stroke-width: 3;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  filter: drop-shadow(
-    0 0 5px rgba(92, 174, 255, 0.45)
-  );
-}
 
+  stroke-width: 3;
+
+  stroke-linecap: round;
+
+  stroke-linejoin: round;
+
+  filter:
+    drop-shadow(
+      0 0 5px rgba(92, 174, 255, 0.45)
+    );
+}
 
 .comparison-user-line {
   stroke: #e63946;
-  stroke-width: 3;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  filter: drop-shadow(
-    0 0 5px rgba(230, 57, 70, 0.45)
-  );
-}
 
+  stroke-width: 3;
+
+  stroke-linecap: round;
+
+  stroke-linejoin: round;
+
+  filter:
+    drop-shadow(
+      0 0 5px rgba(230, 57, 70, 0.45)
+    );
+}
 
 .comparison-explanation {
   margin-top: 18px;
+
   padding: 18px 20px;
+
   border-radius: 14px;
+
   background: #070b11;
+
   border: 1px solid #1b2431;
 }
-
 
 .comparison-explanation strong {
   color: white;
 }
 
-
 .comparison-explanation p {
   margin: 7px 0 0;
+
   color: #8995a5;
+
   line-height: 1.6;
 }
 
 
-/* =====================================================
+/* ============================================================
+   RESULTS
+============================================================ */
+
+.comparison-results {
+  margin-top: 35px;
+}
+
+
+/* ============================================================
+   SCORE CARD
+============================================================ */
+
+.score-card {
+  display: flex;
+
+  align-items: center;
+
+  gap: 20px;
+
+  padding: 28px;
+
+  margin-bottom: 20px;
+
+  border: 1px solid #2b3545;
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #0d131d,
+      #0a0e15
+    );
+}
+
+.score-icon {
+  width: 65px;
+  height: 65px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 17px;
+
+  background: rgba(92, 174, 255, 0.1);
+
+  color: #5caeff;
+}
+
+.score-content {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.score-content > span {
+  color: #758196;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.5px;
+}
+
+.score-content strong {
+  color: white;
+
+  font-size: 42px;
+
+  line-height: 1;
+}
+
+.score-content strong small {
+  color: #687487;
+
+  font-size: 17px;
+
+  margin-left: 3px;
+}
+
+.score-content p {
+  margin: 0;
+
+  color: #7e8999;
+
+  font-size: 13px;
+}
+
+
+/* ============================================================
+   METRICS
+============================================================ */
+
+.metrics-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  gap: 15px;
+
+  margin-bottom: 25px;
+}
+
+.metric-card {
+  padding: 20px;
+
+  border: 1px solid #202938;
+
+  border-radius: 16px;
+
+  background: #090d14;
+}
+
+.metric-card > span {
+  display: block;
+
+  color: #717d90;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: 1px;
+
+  margin-bottom: 10px;
+}
+
+.metric-card strong {
+  display: block;
+
+  color: #e7ecf3;
+
+  font-size: 26px;
+
+  margin-bottom: 12px;
+}
+
+.metric-card strong small {
+  color: #7c8798;
+
+  font-size: 12px;
+
+  margin-left: 3px;
+}
+
+.metric-bar {
+  width: 100%;
+
+  height: 5px;
+
+  border-radius: 10px;
+
+  overflow: hidden;
+
+  background: #18202d;
+}
+
+.metric-bar div {
+  height: 100%;
+
+  border-radius: inherit;
+
+  background: #5caeff;
+
+  transition: width 0.6s ease;
+}
+
+
+/* ============================================================
+   FEEDBACK
+============================================================ */
+
+.feedback-card {
+  margin-top: 25px;
+
+  padding: 27px;
+
+  border: 1px solid #202938;
+
+  border-radius: 20px;
+
+  background: #090d14;
+}
+
+.feedback-header {
+  display: flex;
+
+  align-items: center;
+
+  gap: 13px;
+
+  margin-bottom: 22px;
+}
+
+.feedback-icon {
+  width: 45px;
+  height: 45px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background: rgba(177, 140, 255, 0.1);
+
+  color: #b18cff;
+}
+
+.feedback-header span {
+  display: block;
+
+  color: #b18cff;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.5px;
+
+  margin-bottom: 4px;
+}
+
+.feedback-header h3 {
+  margin: 0;
+
+  font-size: 21px;
+}
+
+.feedback-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 12px;
+}
+
+.feedback-item {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 11px;
+
+  padding: 13px 15px;
+
+  border-radius: 11px;
+
+  background: #070b11;
+
+  border: 1px solid #171f2c;
+}
+
+.feedback-item svg {
+  color: #4ade80;
+
+  flex-shrink: 0;
+
+  margin-top: 2px;
+}
+
+.feedback-item p {
+  margin: 0;
+
+  color: #a4adba;
+
+  line-height: 1.55;
+
+  font-size: 14px;
+}
+
+
+/* ============================================================
+   PROTOTYPE NOTE
+============================================================ */
+
+.prototype-note {
+  margin-top: 18px;
+
+  padding: 17px 19px;
+
+  border-radius: 13px;
+
+  border: 1px solid #1b2431;
+
+  background: #070b11;
+}
+
+.prototype-note strong {
+  color: #9ba7b8;
+
+  font-size: 12px;
+}
+
+.prototype-note p {
+  margin: 6px 0 0;
+
+  color: #6f7b8d;
+
+  font-size: 12px;
+
+  line-height: 1.5;
+}
+
+
+/* ============================================================
+   RESET
+============================================================ */
+
+.reset-button {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 9px;
+
+  margin: 25px auto 0;
+
+  padding: 13px 20px;
+
+  border: 1px solid #303b4b;
+
+  border-radius: 11px;
+
+  background: transparent;
+
+  color: #aeb8c7;
+
+  font-size: 14px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.25s ease;
+}
+
+.reset-button:hover {
+  color: white;
+
+  border-color: #5caeff;
+
+  background: #0b111a;
+
+  transform: translateY(-2px);
+}
+
+
+/* ============================================================
    MOBILE
-===================================================== */
+============================================================ */
+
+@media (max-width: 850px) {
+
+  .music-song-page {
+    padding-left: 5%;
+    padding-right: 5%;
+  }
+
+  .music-song-header h1 {
+    font-size: 40px;
+  }
+
+  .metrics-grid {
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+}
+
 
 @media (max-width: 700px) {
 
-  .graph-section {
-    margin: 20px 5%;
+  .music-song-page {
+    padding-top: 25px;
   }
 
+  .music-song-back {
+    margin-bottom: 35px;
+  }
+
+  .music-song-header {
+    margin-bottom: 40px;
+  }
+
+  .music-song-header h1 {
+    font-size: 34px;
+  }
+
+  .music-song-header p {
+    font-size: 15px;
+  }
+
+  .music-step-card {
+    flex-direction: column;
+
+    padding: 23px;
+
+    gap: 18px;
+  }
+
+  .step-number {
+    width: 48px;
+    height: 48px;
+
+    border-radius: 13px;
+
+    font-size: 14px;
+  }
+
+  .step-content h2 {
+    font-size: 24px;
+  }
 
   .pitch-graph-card,
   .comparison-graph-card {
     padding: 18px;
+
     border-radius: 17px;
   }
-
 
   .pitch-graph-wrapper {
     height: 230px;
   }
 
-
   .comparison-wrapper {
     height: 260px;
   }
-
 
   .pitch-graph-heading,
   .comparison-heading {
     flex-direction: column;
   }
 
-
   .pitch-range {
     align-items: flex-start;
   }
-
 
   .pitch-graph-footer {
     font-size: 10px;
   }
 
-
   .graph-legend {
     flex-wrap: wrap;
+
     gap: 12px;
+  }
+
+  .score-card {
+    padding: 22px;
+  }
+
+  .score-content strong {
+    font-size: 36px;
+  }
+
+}
+
+
+@media (max-width: 500px) {
+
+  .music-song-header h1 {
+    font-size: 30px;
+  }
+
+  .music-song-icon {
+    width: 70px;
+    height: 70px;
+  }
+
+  .voice-options {
+    flex-direction: column;
+  }
+
+  .record-button,
+  .voice-upload-button,
+  .stop-recording-button {
+    width: 100%;
+  }
+
+  .analyze-voice-button {
+    width: 100%;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .score-card {
+    gap: 14px;
+  }
+
+  .score-icon {
+    width: 53px;
+    height: 53px;
+  }
+
+  .score-content strong {
+    font-size: 32px;
   }
 
 }
