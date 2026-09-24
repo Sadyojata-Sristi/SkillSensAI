@@ -1,15 +1,13 @@
-```jsx
 import {
   BrowserRouter,
   Routes,
   Route,
-  useNavigate
+  useNavigate,
 } from "react-router-dom";
 
 import Music from "./pages/Music";
 import MartialArts from "./pages/MartialArts";
 import Boxing from "./pages/Boxing";
-import Karate from "./pages/Karate";
 
 import {
   Music2,
@@ -25,15 +23,11 @@ import {
   Flame,
   Trophy,
   Target,
-  BarChart3
+  BarChart3,
 } from "lucide-react";
 
 import "./App.css";
 
-
-/* =================================================
-   AVAILABLE SKILLS
-================================================= */
 
 const skills = [
   {
@@ -42,135 +36,92 @@ const skills = [
     icon: Music2,
     color: "#ff2d91",
     position: "music",
-    active: true
+    active: true,
   },
-
   {
     name: "Martial Arts",
     description: "Boxing & Karate",
     icon: Swords,
     color: "#ff6b18",
     position: "martial",
-    active: true
+    active: true,
   },
-
   {
     name: "Dance",
     description: "Express, Move & Inspire",
     icon: PersonStanding,
     color: "#b84cff",
     position: "dance",
-    active: false
+    active: false,
   },
-
   {
     name: "Instruments",
     description: "Play Your Passion",
     icon: Guitar,
     color: "#ffc928",
     position: "instruments",
-    active: false
+    active: false,
   },
-
   {
     name: "Yoga",
     description: "Balance Body & Soul",
     icon: Flower2,
     color: "#72e51d",
     position: "yoga",
-    active: false
+    active: false,
   },
-
   {
     name: "Coding",
     description: "Build, Code & Innovate",
     icon: Code2,
     color: "#00cfff",
     position: "coding",
-    active: false
+    active: false,
   },
-
   {
     name: "Art & Creativity",
     description: "Draw, Paint & Create",
     icon: Palette,
     color: "#9d4dff",
     position: "art",
-    active: false
+    active: false,
   },
-
   {
     name: "More Skills",
     description: "Coming Soon",
     icon: Sparkles,
     color: "#3caeff",
     position: "more",
-    active: false
-  }
+    active: false,
+  },
 ];
 
 
-/* =================================================
-   HOME PAGE
-================================================= */
-
 function Home() {
-
   const navigate = useNavigate();
 
-
-  /* -----------------------------------------------
-     HANDLE SKILL CLICK
-  ------------------------------------------------ */
-
   const handleSkillClick = (skill) => {
-
-    /*
-      Any skill which is not currently developed
-      will show Coming Soon.
-    */
-
     if (!skill.active) {
-
-      alert(
-        `${skill.name} will be available soon!`
-      );
-
+      alert(`${skill.name} will be available soon!`);
       return;
     }
-
-
-    /* MUSIC */
 
     if (skill.name === "Music") {
-
       navigate("/music");
-
       return;
     }
-
-
-    /* MARTIAL ARTS */
 
     if (skill.name === "Martial Arts") {
-
       navigate("/martial-arts");
-
       return;
     }
-
   };
 
 
   return (
-
     <div className="app">
 
-
-      {/* =========================================
-          NAVBAR
-      ========================================= */}
-
+      {/* NAVBAR */}
       <header className="navbar">
 
         <div className="brand">
@@ -180,7 +131,6 @@ function Home() {
           </div>
 
           <div>
-
             <h1>
               SkillSens<span>AI</span>
             </h1>
@@ -188,14 +138,12 @@ function Home() {
             <p>
               Learn. Train. Master.
             </p>
-
           </div>
 
         </div>
 
 
         <nav>
-
           <a className="active-link">
             Home
           </a>
@@ -215,48 +163,31 @@ function Home() {
           <a>
             About Us
           </a>
-
         </nav>
 
 
         <button className="login-button">
-
           <UserRound size={18} />
-
           Login
-
         </button>
 
       </header>
 
 
-      {/* =========================================
-          HERO
-      ========================================= */}
-
+      {/* HERO */}
       <main className="hero">
 
         <div className="skill-orbit">
 
-
-          {/* ORBIT */}
-
           <div className="orbit-ring"></div>
 
-
-          {/* GLOWING DOTS */}
-
           <div className="orbit-dot dot-1"></div>
-
           <div className="orbit-dot dot-2"></div>
-
           <div className="orbit-dot dot-3"></div>
-
           <div className="orbit-dot dot-4"></div>
 
 
           {/* SAMURAI */}
-
           <div className="samurai-container">
 
             <div className="samurai-glow"></div>
@@ -271,117 +202,72 @@ function Home() {
 
 
           {/* SKILLS */}
-
           {skills.map((skill) => {
 
             const Icon = skill.icon;
 
             return (
-
               <button
                 key={skill.name}
                 className={`skill-button ${
                   skill.position
-                } ${
-                  !skill.active
-                    ? "coming-soon-skill"
-                    : ""
-                }`}
+                } ${!skill.active ? "coming-soon-skill" : ""}`}
                 style={{
-                  "--skill-color":
-                    skill.color
+                  "--skill-color": skill.color,
                 }}
-                onClick={() =>
-                  handleSkillClick(skill)
-                }
+                onClick={() => handleSkillClick(skill)}
               >
 
                 <div className="skill-icon">
-
                   <Icon
                     size={34}
                     strokeWidth={1.8}
                   />
-
                 </div>
-
 
                 <div className="skill-name">
-
                   {skill.name}
-
                 </div>
-
 
                 <div className="skill-description">
-
                   {skill.description}
-
                 </div>
 
-
                 <div className="skill-arrow">
-
                   <ArrowRight size={16} />
-
                 </div>
 
               </button>
-
             );
-
           })}
 
         </div>
 
 
-        {/* =========================================
-            HERO TEXT
-        ========================================= */}
-
+        {/* HERO TEXT */}
         <section className="hero-text">
 
           <h2>
-
-            Unleash Your{" "}
-
-            <span>
-              Potential
-            </span>
-
+            Unleash Your <span>Potential</span>
           </h2>
 
-
           <p>
-
-            AI-powered learning.
-            Personalized for you.
-
+            AI-powered learning. Personalized for you.
           </p>
-
 
           <button
             className="journey-button"
-            onClick={() =>
-              navigate("/martial-arts")
-            }
+            onClick={() => navigate("/martial-arts")}
           >
-
             Start Your Journey
-
             <ArrowRight size={21} />
-
           </button>
 
         </section>
 
 
-        {/* =========================================
-            STATS
-        ========================================= */}
-
+        {/* STATS */}
         <section className="stats">
-
 
           <div className="stat">
 
@@ -390,7 +276,6 @@ function Home() {
             </div>
 
             <div>
-
               <small>
                 Daily Streak
               </small>
@@ -402,7 +287,6 @@ function Home() {
               <p>
                 Keep it up!
               </p>
-
             </div>
 
           </div>
@@ -415,7 +299,6 @@ function Home() {
             </div>
 
             <div>
-
               <small>
                 Skills Explored
               </small>
@@ -427,7 +310,6 @@ function Home() {
               <p>
                 Keep exploring!
               </p>
-
             </div>
 
           </div>
@@ -440,7 +322,6 @@ function Home() {
             </div>
 
             <div>
-
               <small>
                 Lessons Completed
               </small>
@@ -452,7 +333,6 @@ function Home() {
               <p>
                 You're doing great!
               </p>
-
             </div>
 
           </div>
@@ -465,7 +345,6 @@ function Home() {
             </div>
 
             <div>
-
               <small>
                 Accuracy
               </small>
@@ -477,84 +356,51 @@ function Home() {
               <p>
                 Excellent!
               </p>
-
             </div>
 
           </div>
-
 
         </section>
 
       </main>
 
     </div>
-
   );
-
 }
 
-
-/* =================================================
-   MAIN APPLICATION
-================================================= */
 
 function App() {
 
   return (
-
     <BrowserRouter>
 
       <Routes>
-
-
-        {/* HOME */}
 
         <Route
           path="/"
           element={<Home />}
         />
 
-
-        {/* MUSIC */}
-
         <Route
           path="/music"
           element={<Music />}
         />
-
-
-        {/* MARTIAL ARTS */}
 
         <Route
           path="/martial-arts"
           element={<MartialArts />}
         />
 
-
-        {/* BOXING */}
-
         <Route
           path="/martial-arts/boxing"
           element={<Boxing />}
         />
 
-
-        {/* KARATE */}
-
-        <Route
-          path="/martial-arts/karate"
-          element={<Karate />}
-        />
-
-
       </Routes>
 
     </BrowserRouter>
-
   );
-
 }
 
 
 export default App;
-```
