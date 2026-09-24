@@ -376,7 +376,7 @@ function App() {
     <BrowserRouter>
 
       <Routes>
-        <Route path="/martial-arts/karate" element={<Karate />} />
+        
 
         <Route
           path="/"
@@ -397,6 +397,11 @@ function App() {
           path="/martial-arts/boxing"
           element={<Boxing />}
         />
+
+        <Route
+          path="/martial-arts/karate"
+          element={<Karate />}
+          />
 
       </Routes>
 
