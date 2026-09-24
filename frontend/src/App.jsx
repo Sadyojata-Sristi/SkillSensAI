@@ -405,6 +405,21 @@ function App() {
           element={<Karate />}
           />
 
+        <Route
+          Path="/music"
+          element={<Music />}
+          />
+
+        <Route
+          path="/music/learn"
+          element={<MusicLearn />}
+          />
+
+        <Route
+          path="/music/song"
+          element={<MusicSong />}
+          />
+
       </Routes>
 
     </BrowserRouter>
