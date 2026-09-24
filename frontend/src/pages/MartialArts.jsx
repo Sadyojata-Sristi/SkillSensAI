@@ -26,7 +26,6 @@ function MartialArts() {
       color: "boxing",
       active: true,
     },
-
     {
       name: "Karate",
       description:
@@ -35,7 +34,6 @@ function MartialArts() {
       color: "karate",
       active: true,
     },
-
     {
       name: "Kung Fu",
       description:
@@ -44,7 +42,6 @@ function MartialArts() {
       color: "kungfu",
       active: false,
     },
-
     {
       name: "Kickboxing",
       description:
@@ -53,7 +50,6 @@ function MartialArts() {
       color: "kickboxing",
       active: false,
     },
-
     {
       name: "Muay Thai",
       description:
@@ -62,7 +58,6 @@ function MartialArts() {
       color: "muaythai",
       active: false,
     },
-
     {
       name: "Taekwondo",
       description:
@@ -71,7 +66,6 @@ function MartialArts() {
       color: "taekwondo",
       active: false,
     },
-
     {
       name: "Judo",
       description:
@@ -80,7 +74,6 @@ function MartialArts() {
       color: "judo",
       active: false,
     },
-
     {
       name: "MMA",
       description:
@@ -92,9 +85,8 @@ function MartialArts() {
   ];
 
   const handleSelect = (art) => {
-    // Only Boxing and Karate are currently available
     if (!art.active) {
-      alert(`${art.name} is coming soon!`);
+      alert(art.name + " is coming soon!");
       return;
     }
 
@@ -111,8 +103,6 @@ function MartialArts() {
 
   return (
     <div className="martial-page">
-
-      {/* BACK BUTTON */}
       <button
         className="martial-back-button"
         onClick={() => navigate("/")}
@@ -121,9 +111,7 @@ function MartialArts() {
         Back to Home
       </button>
 
-      {/* HEADER */}
       <section className="martial-header">
-
         <div className="martial-header-icon">
           <Swords size={42} />
         </div>
@@ -137,33 +125,23 @@ function MartialArts() {
         </h1>
 
         <p>
-          Choose your discipline and learn through
-          structured lessons, visual demonstrations
-          and AI-powered practice.
+          Choose your discipline and learn through structured
+          lessons, visual demonstrations and AI-powered practice.
         </p>
-
       </section>
 
-      {/* MARTIAL ARTS OPTIONS */}
       <section className="martial-selection">
-
         <div className="selection-heading">
-
-          <h2>
-            Choose Your Martial Art
-          </h2>
+          <h2>Choose Your Martial Art</h2>
 
           <p>
             Boxing and Karate are currently available.
             More disciplines are coming soon.
           </p>
-
         </div>
 
         <div className="martial-grid">
-
           {martialArts.map((art) => {
-
             const Icon = art.icon;
 
             return (
@@ -174,67 +152,45 @@ function MartialArts() {
                 }`}
                 onClick={() => handleSelect(art)}
               >
-
                 <div className="martial-card-icon">
                   <Icon size={34} />
                 </div>
 
                 <div className="martial-card-content">
+                  <h3>{art.name}</h3>
 
-                  <h3>
-                    {art.name}
-                  </h3>
-
-                  <p>
-                    {art.description}
-                  </p>
-
+                  <p>{art.description}</p>
                 </div>
 
                 <div className="martial-card-footer">
-
                   <span>
                     {art.active
                       ? "START TRAINING →"
                       : "COMING SOON"}
                   </span>
-
                 </div>
-
               </button>
             );
-
           })}
-
         </div>
-
       </section>
 
-      {/* AI INFORMATION */}
       <section className="martial-ai-info">
-
         <div className="ai-info-icon">
           <Zap size={25} />
         </div>
 
         <div>
-
-          <h3>
-            AI-Powered Training
-          </h3>
+          <h3>AI-Powered Training</h3>
 
           <p>
-            Learn a technique, practise it yourself
-            and upload your performance. SkillSensAI
-            will analyse your movement and provide
-            personalised feedback to help improve
-            your technique.
+            Learn a technique, practise it yourself and upload
+            your performance. SkillSensAI will analyse your
+            movement and provide personalised feedback to help
+            improve your technique.
           </p>
-
         </div>
-
       </section>
-
     </div>
   );
 }
