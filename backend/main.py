@@ -84,32 +84,24 @@ def detect_pitch(audio, sample_rate):
     if len(audio) == 0:
         return []
 
-    # Normalize audio
     audio = librosa.util.normalize(audio)
 
-    # Faster pitch detection configuration
-    f0, voiced_flag, voiced_prob = librosa.pyin(
+    # Faster pitch detection for prototype
+    pitch = librosa.yin(
         audio,
         fmin=librosa.note_to_hz("C2"),
         fmax=librosa.note_to_hz("C7"),
         sr=sample_rate,
         frame_length=1024,
-        hop_length=512
+        hop_length=1024
     )
 
     valid_pitch = []
 
-    for pitch, voiced in zip(
-        f0,
-        voiced_flag
-    ):
-
-        if (
-            voiced
-            and not np.isnan(pitch)
-        ):
+    for value in pitch:
+        if not np.isnan(value):
             valid_pitch.append(
-                float(pitch)
+                float(value)
             )
 
     return valid_pitch
