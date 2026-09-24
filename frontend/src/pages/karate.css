@@ -1,0 +1,249 @@
+.karate-page {
+  min-height: 100vh;
+  padding: 35px 6%;
+  background: #05070d;
+  color: white;
+}
+
+.karate-back-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  color: #b9c7d9;
+  cursor: pointer;
+  font-size: 15px;
+  margin-bottom: 45px;
+}
+
+.karate-back-button:hover {
+  color: white;
+}
+
+.karate-header {
+  text-align: center;
+  max-width: 850px;
+  margin: 0 auto 60px;
+}
+
+.karate-header-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 70, 70, 0.12);
+  color: #ff5050;
+  border: 1px solid rgba(255, 80, 80, 0.3);
+}
+
+.karate-label {
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: #ff5050;
+}
+
+.karate-header h1 {
+  font-size: clamp(42px, 6vw, 70px);
+  margin: 12px 0;
+}
+
+.karate-header h1 span {
+  color: #ff5050;
+}
+
+.karate-header p {
+  color: #aeb9c9;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.karate-lessons,
+.karate-video-section,
+.karate-practice {
+  max-width: 1100px;
+  margin: 0 auto 55px;
+}
+
+.karate-section-title {
+  margin-bottom: 25px;
+}
+
+.karate-section-title h2 {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.karate-section-title p {
+  color: #8f9bad;
+}
+
+.karate-lesson-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.karate-lesson-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  text-align: left;
+  padding: 22px;
+  border: 1px solid #202838;
+  border-radius: 16px;
+  background: #0b0f18;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.karate-lesson-card:hover,
+.karate-lesson-card.selected {
+  border-color: #ff5050;
+  transform: translateY(-2px);
+}
+
+.karate-lesson-number {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 80, 80, 0.12);
+  color: #ff5050;
+  font-weight: bold;
+}
+
+.karate-lesson-content {
+  flex: 1;
+}
+
+.karate-lesson-content h3 {
+  margin: 0 0 7px;
+  font-size: 18px;
+}
+
+.karate-lesson-content p {
+  margin: 0;
+  color: #8f9bad;
+  line-height: 1.5;
+}
+
+.karate-video-container {
+  background: #090c13;
+  border: 1px solid #202838;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.karate-lesson-video {
+  width: 100%;
+  max-height: 600px;
+  display: block;
+  background: black;
+}
+
+.karate-practice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.karate-practice-card {
+  padding: 30px;
+  border: 1px solid #202838;
+  border-radius: 18px;
+  background: #0b0f18;
+}
+
+.karate-practice-icon {
+  color: #ff5050;
+  margin-bottom: 15px;
+}
+
+.karate-practice-card h3 {
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+.karate-practice-card p {
+  color: #8f9bad;
+  line-height: 1.6;
+  margin-bottom: 22px;
+}
+
+.karate-action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: none;
+  background: #ff5050;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.karate-action-button:hover {
+  opacity: 0.9;
+}
+
+.karate-action-button.recording {
+  background: #c92d2d;
+}
+
+.karate-upload-success {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 15px;
+  color: #72e51d;
+  word-break: break-word;
+}
+
+.karate-ai-section {
+  max-width: 1100px;
+  margin: 0 auto 40px;
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 25px;
+  border-radius: 18px;
+  background: rgba(255, 80, 80, 0.07);
+  border: 1px solid rgba(255, 80, 80, 0.2);
+  color: #ff5050;
+}
+
+.karate-ai-section h3 {
+  margin: 0 0 8px;
+  color: white;
+}
+
+.karate-ai-section p {
+  margin: 0;
+  color: #9ca8b8;
+  line-height: 1.6;
+}
+
+@media (max-width: 750px) {
+  .karate-page {
+    padding: 25px 5%;
+  }
+
+  .karate-lesson-grid,
+  .karate-practice-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .karate-header h1 {
+    font-size: 42px;
+  }
+}
