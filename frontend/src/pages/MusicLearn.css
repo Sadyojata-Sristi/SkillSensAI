@@ -1,51 +1,69 @@
-/* ================================
-   MUSIC LEARN PAGE
-================================ */
+/* =========================================
+   SKILLSENSAI — MUSIC LEARN
+   LIGHT LAVENDER THEME
+========================================= */
 
 .music-learn-page {
+  --skill-color: #7c5cfc;
+  --skill-dark: #6245d8;
+  --skill-light: #f1eeff;
+  --skill-lighter: #f8f7ff;
+  --skill-border: #ddd6ff;
+  --skill-glow: rgba(124, 92, 252, 0.18);
+
   min-height: 100vh;
   background:
     radial-gradient(
       circle at 50% 0%,
-      rgba(40, 90, 140, 0.16),
+      rgba(124, 92, 252, 0.10),
       transparent 35%
     ),
-    #05070a;
-  color: #f5f7fa;
+    #f7f9fc;
+
+  color: #18202a;
   padding: 30px 6%;
   box-sizing: border-box;
 }
 
-/* ================================
+/* =========================================
    BACK BUTTON
-================================ */
+========================================= */
 
 .music-learn-back {
   display: inline-flex;
   align-items: center;
   gap: 9px;
 
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.04);
-  color: #d8e2ec;
+  border: 1px solid #e2e6ec;
+  background: #ffffff;
+  color: #4d5968;
 
   padding: 11px 17px;
   border-radius: 10px;
 
   font-size: 14px;
+  font-weight: 600;
+
   cursor: pointer;
+
+  box-shadow: 0 3px 12px rgba(30, 45, 65, 0.05);
 
   transition: 0.25s ease;
 }
 
 .music-learn-back:hover {
-  background: rgba(255, 255, 255, 0.09);
+  color: var(--skill-color);
+  border-color: var(--skill-border);
+
   transform: translateX(-3px);
+
+  box-shadow:
+    0 5px 18px var(--skill-glow);
 }
 
-/* ================================
+/* =========================================
    HEADER
-================================ */
+========================================= */
 
 .music-learn-header {
   max-width: 850px;
@@ -65,13 +83,14 @@
 
   border-radius: 20px;
 
-  background: rgba(65, 130, 190, 0.12);
-  border: 1px solid rgba(100, 170, 230, 0.25);
+  background: var(--skill-light);
 
-  color: #8bc7ff;
+  border: 1px solid var(--skill-border);
+
+  color: var(--skill-color);
 
   box-shadow:
-    0 0 40px rgba(50, 130, 210, 0.12);
+    0 10px 30px var(--skill-glow);
 }
 
 .music-learn-label {
@@ -79,9 +98,10 @@
 
   font-size: 12px;
   font-weight: 800;
+
   letter-spacing: 3px;
 
-  color: #7db5e8;
+  color: var(--skill-color);
 
   margin-bottom: 12px;
 }
@@ -90,14 +110,18 @@
   margin: 0;
 
   font-size: clamp(38px, 6vw, 64px);
+
   line-height: 1.05;
 
   font-weight: 800;
+
   letter-spacing: -2px;
+
+  color: #17202a;
 }
 
 .music-learn-header h1 span {
-  color: #e33a3a;
+  color: var(--skill-color);
 }
 
 .music-learn-header p {
@@ -105,24 +129,25 @@
 
   margin: 20px auto 0;
 
-  color: #aeb9c6;
+  color: #697586;
 
   font-size: 16px;
+
   line-height: 1.7;
 }
 
-/* ================================
+/* =========================================
    MAIN
-================================ */
+========================================= */
 
 .music-learn-container {
   max-width: 1150px;
   margin: 0 auto;
 }
 
-/* ================================
+/* =========================================
    SECTION HEADING
-================================ */
+========================================= */
 
 .section-heading {
   display: flex;
@@ -131,7 +156,7 @@
 
   margin-bottom: 22px;
 
-  color: #7fb9ed;
+  color: var(--skill-color);
 }
 
 .section-heading span,
@@ -140,11 +165,12 @@
   display: block;
 
   font-size: 11px;
+
   font-weight: 800;
 
   letter-spacing: 2px;
 
-  color: #728397;
+  color: #8792a2;
 
   margin-bottom: 6px;
 }
@@ -154,16 +180,19 @@
   margin: 0;
 
   font-size: 28px;
-  color: #f4f6f8;
+
+  color: #18202a;
 }
 
-/* ================================
+/* =========================================
    LESSON LIST
-================================ */
+========================================= */
 
 .lesson-list {
   display: grid;
+
   grid-template-columns: repeat(3, 1fr);
+
   gap: 15px;
 }
 
@@ -181,45 +210,45 @@
 
   border-radius: 16px;
 
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid #e4e8ee;
 
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.055),
-      rgba(255, 255, 255, 0.018)
-    );
+  background: #ffffff;
 
-  color: white;
+  color: #18202a;
 
   cursor: pointer;
+
+  box-shadow:
+    0 5px 20px rgba(30, 45, 65, 0.045);
 
   transition:
     transform 0.25s ease,
     border-color 0.25s ease,
+    box-shadow 0.25s ease,
     background 0.25s ease;
 }
 
 .lesson-card:hover {
   transform: translateY(-3px);
 
-  border-color: rgba(120, 180, 230, 0.35);
+  border-color: var(--skill-border);
 
-  background: rgba(255, 255, 255, 0.07);
+  box-shadow:
+    0 12px 28px var(--skill-glow);
 }
 
 .selected-lesson-card {
-  border-color: rgba(100, 175, 235, 0.55);
+  border-color: var(--skill-color);
 
   background:
     linear-gradient(
       145deg,
-      rgba(50, 115, 175, 0.18),
-      rgba(255, 255, 255, 0.035)
+      var(--skill-lighter),
+      #ffffff
     );
 
   box-shadow:
-    0 12px 35px rgba(0, 0, 0, 0.2);
+    0 10px 30px var(--skill-glow);
 }
 
 .lesson-number {
@@ -234,11 +263,12 @@
 
   border-radius: 11px;
 
-  background: rgba(255, 255, 255, 0.07);
+  background: var(--skill-light);
 
-  color: #91c8f3;
+  color: var(--skill-color);
 
   font-size: 16px;
+
   font-weight: 800;
 }
 
@@ -248,24 +278,29 @@
 
 .lesson-card-content > span {
   font-size: 10px;
+
   letter-spacing: 1.5px;
+
   font-weight: 800;
 
-  color: #6d91b0;
+  color: #8b96a5;
 }
 
 .lesson-card-content h3 {
   margin: 5px 0 7px;
 
   font-size: 18px;
+
+  color: #1b2530;
 }
 
 .lesson-card-content p {
   margin: 0;
 
-  color: #9ca8b5;
+  color: #748091;
 
   font-size: 13px;
+
   line-height: 1.5;
 }
 
@@ -280,15 +315,15 @@
 
   border-radius: 50%;
 
-  background: #5fb2f3;
+  background: var(--skill-color);
 
   box-shadow:
-    0 0 12px rgba(95, 178, 243, 0.8);
+    0 0 12px var(--skill-glow);
 }
 
-/* ================================
+/* =========================================
    SELECTED LESSON
-================================ */
+========================================= */
 
 .selected-lesson-section {
   margin-top: 55px;
@@ -297,14 +332,19 @@
 
   border-radius: 20px;
 
-  background: rgba(255, 255, 255, 0.025);
+  background: #ffffff;
 
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid #e4e8ee;
+
+  box-shadow:
+    0 8px 30px rgba(30, 45, 65, 0.05);
 }
 
 .selected-lesson-header {
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
 
   margin-bottom: 20px;
@@ -314,6 +354,8 @@
   margin: 0;
 
   font-size: 30px;
+
+  color: #18202a;
 }
 
 .lesson-progress-label {
@@ -321,18 +363,20 @@
 
   border-radius: 8px;
 
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--skill-light);
 
-  color: #8aa0b5;
+  color: var(--skill-color);
 
   font-size: 11px;
+
   font-weight: 800;
+
   letter-spacing: 1px;
 }
 
-/* ================================
+/* =========================================
    VIDEO
-================================ */
+========================================= */
 
 .lesson-video-container {
   width: 100%;
@@ -343,9 +387,12 @@
 
   border-radius: 16px;
 
-  background: #000;
+  background: #eceff3;
 
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid #e1e5eb;
+
+  box-shadow:
+    0 8px 25px rgba(30, 45, 65, 0.08);
 }
 
 .lesson-video {
@@ -365,19 +412,21 @@
   margin: 0 0 8px;
 
   font-size: 17px;
+
+  color: #1b2530;
 }
 
 .lesson-description p {
   margin: 0;
 
-  color: #9ba8b5;
+  color: #748091;
 
   line-height: 1.7;
 }
 
-/* ================================
+/* =========================================
    PRACTICE
-================================ */
+========================================= */
 
 .practice-section {
   margin-top: 55px;
@@ -385,12 +434,14 @@
 
 .practice-header {
   display: flex;
+
   justify-content: space-between;
+
   align-items: flex-start;
 
   margin-bottom: 22px;
 
-  color: #8bc8f5;
+  color: var(--skill-color);
 }
 
 .practice-header p {
@@ -398,7 +449,7 @@
 
   margin: 10px 0 0;
 
-  color: #98a6b4;
+  color: #748091;
 
   line-height: 1.6;
 }
@@ -408,22 +459,21 @@
 
   border-radius: 20px;
 
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.045),
-      rgba(255, 255, 255, 0.018)
-    );
+  background: #ffffff;
 
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid #e4e8ee;
+
+  box-shadow:
+    0 8px 30px rgba(30, 45, 65, 0.05);
 }
 
-/* ================================
+/* =========================================
    PRACTICE OPTIONS
-================================ */
+========================================= */
 
 .practice-options {
   display: grid;
+
   grid-template-columns: 1fr 1fr;
 
   gap: 15px;
@@ -433,6 +483,7 @@
   position: relative;
 
   display: flex;
+
   align-items: center;
 
   width: 100%;
@@ -441,11 +492,11 @@
 
   border-radius: 15px;
 
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid #e2e6ec;
 
-  background: rgba(255, 255, 255, 0.035);
+  background: #fafbfc;
 
-  color: white;
+  color: #18202a;
 
   text-align: left;
 
@@ -459,9 +510,12 @@
 .practice-option:hover {
   transform: translateY(-2px);
 
-  background: rgba(255, 255, 255, 0.07);
+  background: var(--skill-lighter);
 
-  border-color: rgba(120, 180, 230, 0.35);
+  border-color: var(--skill-border);
+
+  box-shadow:
+    0 8px 22px var(--skill-glow);
 }
 
 .practice-option-icon {
@@ -473,68 +527,75 @@
   margin-right: 17px;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
 
   border-radius: 13px;
 
-  background: rgba(75, 145, 205, 0.12);
+  background: var(--skill-light);
 
-  color: #82c2f5;
+  color: var(--skill-color);
 }
 
 .practice-option-content h3 {
   margin: 0 0 6px;
 
   font-size: 17px;
+
+  color: #1c2631;
 }
 
 .practice-option-content p {
   margin: 0;
 
-  color: #929fac;
+  color: #7a8695;
 
   font-size: 13px;
 
   line-height: 1.5;
 }
 
-/* Remove default file input */
+/* File input */
 
 .learn-upload-label input {
   display: none;
 }
 
-/* Recording */
+/* =========================================
+   RECORDING
+========================================= */
 
 .learn-stop-button {
-  border-color: rgba(220, 70, 70, 0.35);
+  border-color: #f0caca;
+  background: #fff7f7;
 }
 
 .learn-stop-button .practice-option-icon {
-  background: rgba(220, 60, 60, 0.12);
-  color: #ef6c6c;
-}
+  background: #ffeaea;
 
-/* ================================
-   RECORDING STATUS
-================================ */
+  color: #dc4d4d;
+}
 
 .learn-recording-status {
   display: flex;
+
   align-items: center;
+
   gap: 10px;
 
   margin-top: 18px;
+
   padding: 13px 16px;
 
   border-radius: 10px;
 
-  background: rgba(220, 60, 60, 0.08);
+  background: #fff5f5;
 
-  border: 1px solid rgba(220, 60, 60, 0.18);
+  border: 1px solid #f3d1d1;
 
-  color: #d6dde5;
+  color: #667281;
 
   font-size: 13px;
 }
@@ -542,7 +603,7 @@
 .learn-recording-status strong {
   margin-left: auto;
 
-  color: #f17474;
+  color: #d34d4d;
 }
 
 .learn-recording-dot {
@@ -551,10 +612,10 @@
 
   border-radius: 50%;
 
-  background: #ed5b5b;
+  background: #df5151;
 
   box-shadow:
-    0 0 12px rgba(237, 91, 91, 0.8);
+    0 0 10px rgba(223, 81, 81, 0.35);
 
   animation: recordingPulse 1s infinite;
 }
@@ -566,13 +627,13 @@
   }
 
   50% {
-    opacity: 0.3;
+    opacity: 0.35;
   }
 }
 
-/* ================================
-   AUDIO PREVIEW
-================================ */
+/* =========================================
+   AUDIO
+========================================= */
 
 .learn-audio-preview {
   margin-top: 18px;
@@ -581,14 +642,16 @@
 
   border-radius: 13px;
 
-  background: rgba(255, 255, 255, 0.035);
+  background: var(--skill-lighter);
 
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--skill-border);
 }
 
 .learn-audio-preview > div {
   display: flex;
+
   justify-content: space-between;
+
   align-items: center;
 
   margin-bottom: 12px;
@@ -597,7 +660,7 @@
 .learn-audio-preview span {
   font-size: 10px;
 
-  color: #73869a;
+  color: #8792a2;
 
   font-weight: 800;
 
@@ -607,12 +670,14 @@
 .learn-audio-preview strong {
   font-size: 13px;
 
-  color: #dce3e9;
+  color: #424d5a;
 
   max-width: 55%;
 
   overflow: hidden;
+
   text-overflow: ellipsis;
+
   white-space: nowrap;
 }
 
@@ -620,9 +685,9 @@
   width: 100%;
 }
 
-/* ================================
+/* =========================================
    ANALYZE BUTTON
-================================ */
+========================================= */
 
 .learn-analyze-button {
   width: 100%;
@@ -632,30 +697,40 @@
   padding: 15px 20px;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
 
   gap: 9px;
 
   border: none;
+
   border-radius: 11px;
 
-  background: #b92d35;
+  background: var(--skill-color);
 
-  color: white;
+  color: #ffffff;
 
   font-size: 14px;
+
   font-weight: 800;
 
   cursor: pointer;
+
+  box-shadow:
+    0 8px 20px var(--skill-glow);
 
   transition: 0.25s ease;
 }
 
 .learn-analyze-button:hover {
-  background: #d3363f;
+  background: var(--skill-dark);
 
   transform: translateY(-2px);
+
+  box-shadow:
+    0 12px 25px var(--skill-glow);
 }
 
 .learn-analyze-button:disabled {
@@ -676,9 +751,9 @@
   }
 }
 
-/* ================================
+/* =========================================
    ERROR
-================================ */
+========================================= */
 
 .music-learn-error {
   margin-top: 18px;
@@ -687,18 +762,18 @@
 
   border-radius: 10px;
 
-  background: rgba(220, 60, 60, 0.08);
+  background: #fff5f5;
 
-  border: 1px solid rgba(220, 60, 60, 0.2);
+  border: 1px solid #f0d0d0;
 
-  color: #ef8989;
+  color: #d14d4d;
 
   font-size: 13px;
 }
 
-/* ================================
+/* =========================================
    ANALYSIS RESULT
-================================ */
+========================================= */
 
 .learn-analysis-result {
   margin-top: 25px;
@@ -710,22 +785,26 @@
   background:
     linear-gradient(
       145deg,
-      rgba(55, 120, 180, 0.09),
-      rgba(255, 255, 255, 0.025)
+      var(--skill-lighter),
+      #ffffff
     );
 
-  border: 1px solid rgba(90, 160, 220, 0.18);
+  border: 1px solid var(--skill-border);
+
+  box-shadow:
+    0 8px 25px var(--skill-glow);
 }
 
 .learn-result-header {
   display: flex;
+
   align-items: center;
 
   gap: 12px;
 
   padding-bottom: 20px;
 
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  border-bottom: 1px solid #e8ebf0;
 }
 
 .learn-result-icon {
@@ -733,14 +812,16 @@
   height: 45px;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
 
   border-radius: 12px;
 
-  background: rgba(65, 180, 125, 0.1);
+  background: #edf9f2;
 
-  color: #63d69d;
+  color: #43a875;
 }
 
 .learn-result-header span {
@@ -752,21 +833,24 @@
 
   letter-spacing: 1.5px;
 
-  color: #708294;
+  color: #8a95a3;
 }
 
 .learn-result-header h3 {
   margin: 0;
 
   font-size: 19px;
+
+  color: #202a35;
 }
 
-/* ================================
+/* =========================================
    SCORE
-================================ */
+========================================= */
 
 .learn-score-section {
   display: flex;
+
   align-items: center;
 
   gap: 25px;
@@ -783,29 +867,34 @@
   border-radius: 50%;
 
   display: flex;
+
   flex-direction: column;
+
   align-items: center;
+
   justify-content: center;
 
   background:
     radial-gradient(
       circle,
-      rgba(75, 145, 205, 0.13),
-      rgba(75, 145, 205, 0.025)
+      #ffffff,
+      var(--skill-light)
     );
 
-  border: 3px solid rgba(90, 165, 220, 0.45);
+  border: 4px solid var(--skill-color);
 
   box-shadow:
-    0 0 30px rgba(65, 145, 210, 0.1);
+    0 0 30px var(--skill-glow);
 }
 
 .learn-score-circle strong {
   font-size: 32px;
+
+  color: var(--skill-dark);
 }
 
 .learn-score-circle span {
-  color: #8193a5;
+  color: #84909e;
 
   font-size: 11px;
 
@@ -816,19 +905,21 @@
   margin: 0 0 8px;
 
   font-size: 22px;
+
+  color: #202a35;
 }
 
 .learn-score-info p {
   margin: 0;
 
-  color: #9ba8b5;
+  color: #748091;
 
   line-height: 1.6;
 }
 
-/* ================================
+/* =========================================
    STATS
-================================ */
+========================================= */
 
 .learn-stats-grid {
   display: grid;
@@ -843,9 +934,9 @@
 
   border-radius: 11px;
 
-  background: rgba(255, 255, 255, 0.035);
+  background: #ffffff;
 
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid #e4e8ee;
 }
 
 .learn-stat span {
@@ -853,7 +944,7 @@
 
   margin-bottom: 8px;
 
-  color: #788a9d;
+  color: #8792a2;
 
   font-size: 11px;
 }
@@ -861,12 +952,12 @@
 .learn-stat strong {
   font-size: 15px;
 
-  color: #dce5ec;
+  color: #303b47;
 }
 
-/* ================================
+/* =========================================
    FEEDBACK
-================================ */
+========================================= */
 
 .learn-feedback {
   margin-top: 18px;
@@ -875,18 +966,21 @@
 
   border-radius: 12px;
 
-  background: rgba(255, 255, 255, 0.025);
+  background: #ffffff;
+
+  border: 1px solid #e5e9ef;
 }
 
 .learn-feedback-title {
   display: flex;
+
   align-items: center;
 
   gap: 8px;
 
   margin-bottom: 13px;
 
-  color: #a9d6f7;
+  color: var(--skill-color);
 
   font-weight: 800;
 }
@@ -895,6 +989,7 @@
   list-style: none;
 
   padding: 0;
+
   margin: 0;
 
   display: grid;
@@ -907,7 +1002,7 @@
 
   padding-left: 18px;
 
-  color: #9ca9b6;
+  color: #707d8c;
 
   font-size: 13px;
 
@@ -921,20 +1016,22 @@
 
   left: 0;
 
-  color: #67c69a;
+  color: #55ae7d;
 
   font-weight: bold;
 }
 
-/* ================================
+/* =========================================
    RESET
-================================ */
+========================================= */
 
 .learn-reset-button {
   margin-top: 18px;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
 
   gap: 8px;
@@ -945,27 +1042,32 @@
 
   border-radius: 10px;
 
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--skill-border);
 
-  background: rgba(255, 255, 255, 0.035);
+  background: var(--skill-light);
 
-  color: #d1dbe3;
+  color: var(--skill-dark);
 
   cursor: pointer;
+
+  font-weight: 700;
 
   transition: 0.25s ease;
 }
 
 .learn-reset-button:hover {
-  background: rgba(255, 255, 255, 0.07);
+  background: var(--skill-color);
+
+  color: #ffffff;
 }
 
-/* ================================
-   TIP
-================================ */
+/* =========================================
+   LEARNING TIP
+========================================= */
 
 .learning-tip {
   display: flex;
+
   align-items: flex-start;
 
   gap: 13px;
@@ -976,11 +1078,11 @@
 
   border-radius: 13px;
 
-  background: rgba(90, 150, 205, 0.06);
+  background: var(--skill-light);
 
-  border: 1px solid rgba(90, 150, 205, 0.13);
+  border: 1px solid var(--skill-border);
 
-  color: #8ec5ed;
+  color: var(--skill-color);
 }
 
 .learning-tip strong {
@@ -988,22 +1090,22 @@
 
   margin-bottom: 5px;
 
-  color: #b7d9f2;
+  color: var(--skill-dark);
 }
 
 .learning-tip p {
   margin: 0;
 
-  color: #8798a9;
+  color: #748091;
 
   font-size: 13px;
 
   line-height: 1.5;
 }
 
-/* ================================
+/* =========================================
    RESPONSIVE
-================================ */
+========================================= */
 
 @media (max-width: 900px) {
   .lesson-list {
@@ -1038,6 +1140,7 @@
 
   .selected-lesson-header {
     align-items: flex-start;
+
     gap: 15px;
   }
 
@@ -1055,6 +1158,7 @@
 
   .learn-score-section {
     flex-direction: column;
+
     align-items: flex-start;
   }
 
@@ -1064,7 +1168,9 @@
 
   .learn-audio-preview > div {
     flex-direction: column;
+
     align-items: flex-start;
+
     gap: 7px;
   }
 
