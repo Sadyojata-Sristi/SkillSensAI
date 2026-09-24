@@ -9,6 +9,8 @@ import Music from "./pages/Music";
 import MartialArts from "./pages/MartialArts";
 import Boxing from "./pages/Boxing";
 import Karate from "./pages/Karate";
+import MusicLearn from "./pages/MusicLearn";
+import MusicSong from "./pages/MusicSong";
 
 import {
   Music2,
