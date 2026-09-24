@@ -1,59 +1,61 @@
-/* ============================================================
+/* ================================
    MUSIC LEARN PAGE
-============================================================ */
+================================ */
 
 .music-learn-page {
   min-height: 100vh;
-  background: #05070b;
-  color: white;
-  padding: 35px 7% 80px;
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(40, 90, 140, 0.16),
+      transparent 35%
+    ),
+    #05070a;
+  color: #f5f7fa;
+  padding: 30px 6%;
+  box-sizing: border-box;
 }
 
-
-/* ============================================================
+/* ================================
    BACK BUTTON
-============================================================ */
+================================ */
 
 .music-learn-back {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
 
-  border: none;
-  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: #d8e2ec;
 
-  color: #aeb8c7;
+  padding: 11px 17px;
+  border-radius: 10px;
 
-  font-size: 15px;
-
+  font-size: 14px;
   cursor: pointer;
 
-  margin-bottom: 40px;
-
-  transition: 0.2s ease;
+  transition: 0.25s ease;
 }
 
 .music-learn-back:hover {
-  color: white;
+  background: rgba(255, 255, 255, 0.09);
   transform: translateX(-3px);
 }
 
-
-/* ============================================================
+/* ================================
    HEADER
-============================================================ */
+================================ */
 
 .music-learn-header {
   max-width: 850px;
-
-  margin: 0 auto 45px;
-
+  margin: 55px auto 50px;
   text-align: center;
 }
 
 .music-learn-icon {
-  width: 78px;
-  height: 78px;
+  width: 72px;
+  height: 72px;
 
   margin: 0 auto 20px;
 
@@ -61,327 +63,302 @@
   align-items: center;
   justify-content: center;
 
-  border-radius: 50%;
+  border-radius: 20px;
 
-  background: rgba(100, 170, 255, 0.12);
+  background: rgba(65, 130, 190, 0.12);
+  border: 1px solid rgba(100, 170, 230, 0.25);
 
-  color: #6caeff;
+  color: #8bc7ff;
+
+  box-shadow:
+    0 0 40px rgba(50, 130, 210, 0.12);
 }
 
 .music-learn-label {
   display: block;
 
-  color: #6caeff;
-
   font-size: 12px;
-
   font-weight: 800;
+  letter-spacing: 3px;
 
-  letter-spacing: 2px;
+  color: #7db5e8;
 
   margin-bottom: 12px;
 }
 
 .music-learn-header h1 {
-  margin: 0 0 15px;
+  margin: 0;
 
-  font-size: 46px;
+  font-size: clamp(38px, 6vw, 64px);
+  line-height: 1.05;
 
-  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: -2px;
 }
 
 .music-learn-header h1 span {
-  color: #e63946;
+  color: #e33a3a;
 }
 
 .music-learn-header p {
-  max-width: 720px;
+  max-width: 650px;
 
-  margin: 0 auto;
+  margin: 20px auto 0;
 
-  color: #9ba5b5;
+  color: #aeb9c6;
 
-  font-size: 17px;
-
+  font-size: 16px;
   line-height: 1.7;
 }
 
-
-/* ============================================================
-   MAIN CONTAINER
-============================================================ */
+/* ================================
+   MAIN
+================================ */
 
 .music-learn-container {
-  max-width: 1100px;
-
+  max-width: 1150px;
   margin: 0 auto;
 }
 
-
-/* ============================================================
-   LESSON SECTION
-============================================================ */
-
-.lesson-section {
-  margin-bottom: 28px;
-}
+/* ================================
+   SECTION HEADING
+================================ */
 
 .section-heading {
-  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 22px;
+
+  color: #7fb9ed;
 }
 
-.section-heading span {
+.section-heading span,
+.selected-lesson-header span,
+.practice-header > div > span {
   display: block;
 
-  color: #6caeff;
-
   font-size: 11px;
-
   font-weight: 800;
 
-  letter-spacing: 1.7px;
+  letter-spacing: 2px;
+
+  color: #728397;
 
   margin-bottom: 6px;
 }
 
-.section-heading h2 {
+.section-heading h2,
+.practice-header h2 {
   margin: 0;
 
-  font-size: 25px;
+  font-size: 28px;
+  color: #f4f6f8;
 }
 
-
-/* ============================================================
-   LESSON CARDS
-============================================================ */
+/* ================================
+   LESSON LIST
+================================ */
 
 .lesson-list {
   display: grid;
-
-  grid-template-columns:
-    repeat(3, 1fr);
-
+  grid-template-columns: repeat(3, 1fr);
   gap: 15px;
 }
 
 .lesson-card {
   position: relative;
 
-  padding: 21px;
-
-  border: 1px solid #202938;
-
-  border-radius: 17px;
-
-  background: #0b0f16;
-
-  color: white;
+  display: flex;
+  align-items: flex-start;
 
   text-align: left;
 
-  cursor: pointer;
+  min-height: 145px;
 
-  transition: 0.25s ease;
-}
+  padding: 20px;
 
-.lesson-card:hover {
-  transform: translateY(-4px);
+  border-radius: 16px;
 
-  border-color: #496b91;
-
-  background: #0e141d;
-
-  box-shadow:
-    0 12px 35px rgba(80, 150, 255, 0.08);
-}
-
-.lesson-card.active {
-  border-color: #5caeff;
+  border: 1px solid rgba(255, 255, 255, 0.09);
 
   background:
     linear-gradient(
-      135deg,
-      #0d1723,
-      #0b0f16
+      145deg,
+      rgba(255, 255, 255, 0.055),
+      rgba(255, 255, 255, 0.018)
+    );
+
+  color: white;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+.lesson-card:hover {
+  transform: translateY(-3px);
+
+  border-color: rgba(120, 180, 230, 0.35);
+
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.selected-lesson-card {
+  border-color: rgba(100, 175, 235, 0.55);
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(50, 115, 175, 0.18),
+      rgba(255, 255, 255, 0.035)
     );
 
   box-shadow:
-    0 10px 35px rgba(92, 174, 255, 0.1);
+    0 12px 35px rgba(0, 0, 0, 0.2);
 }
 
 .lesson-number {
-  display: inline-flex;
+  min-width: 40px;
+  height: 40px;
 
+  display: flex;
   align-items: center;
   justify-content: center;
 
-  width: 34px;
-  height: 34px;
+  margin-right: 14px;
 
-  margin-bottom: 15px;
+  border-radius: 11px;
 
-  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.07);
 
-  background: rgba(92, 174, 255, 0.1);
+  color: #91c8f3;
 
-  color: #6caeff;
-
-  font-size: 12px;
-
+  font-size: 16px;
   font-weight: 800;
 }
 
-.lesson-card.active .lesson-number {
-  background: #5caeff;
-
-  color: #06101c;
+.lesson-card-content {
+  flex: 1;
 }
 
-.lesson-card h3 {
-  margin: 0 0 8px;
+.lesson-card-content > span {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  font-weight: 800;
 
-  font-size: 17px;
+  color: #6d91b0;
 }
 
-.lesson-card p {
+.lesson-card-content h3 {
+  margin: 5px 0 7px;
+
+  font-size: 18px;
+}
+
+.lesson-card-content p {
   margin: 0;
 
-  color: #7f8a9b;
+  color: #9ca8b5;
 
   font-size: 13px;
-
   line-height: 1.5;
 }
 
 .lesson-active-dot {
   position: absolute;
 
-  top: 18px;
-  right: 18px;
+  right: 15px;
+  top: 15px;
 
   width: 8px;
   height: 8px;
 
   border-radius: 50%;
 
-  background: #4ade80;
+  background: #5fb2f3;
 
   box-shadow:
-    0 0 10px rgba(74, 222, 128, 0.55);
+    0 0 12px rgba(95, 178, 243, 0.8);
 }
 
-
-/* ============================================================
+/* ================================
    SELECTED LESSON
-============================================================ */
+================================ */
 
-.selected-lesson-card {
-  margin-bottom: 28px;
+.selected-lesson-section {
+  margin-top: 55px;
 
-  border: 1px solid #202938;
+  padding: 28px;
 
-  border-radius: 22px;
+  border-radius: 20px;
 
-  overflow: hidden;
+  background: rgba(255, 255, 255, 0.025);
 
-  background: #090d14;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .selected-lesson-header {
   display: flex;
-
   align-items: center;
-
   justify-content: space-between;
 
-  gap: 20px;
-
-  padding: 23px 27px;
-
-  border-bottom: 1px solid #1b2431;
+  margin-bottom: 20px;
 }
 
-.selected-lesson-title {
-  display: flex;
-
-  align-items: center;
-
-  gap: 13px;
-}
-
-.selected-lesson-title-icon {
-  width: 43px;
-  height: 43px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 11px;
-
-  background: rgba(230, 57, 70, 0.1);
-
-  color: #e63946;
-}
-
-.selected-lesson-title span {
-  display: block;
-
-  color: #758196;
-
-  font-size: 10px;
-
-  font-weight: 800;
-
-  letter-spacing: 1.3px;
-
-  margin-bottom: 4px;
-}
-
-.selected-lesson-title h2 {
+.selected-lesson-header h2 {
   margin: 0;
 
-  font-size: 21px;
+  font-size: 30px;
 }
 
 .lesson-progress-label {
-  color: #697688;
+  padding: 9px 13px;
 
-  font-size: 12px;
+  border-radius: 8px;
+
+  background: rgba(255, 255, 255, 0.05);
+
+  color: #8aa0b5;
+
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
 }
 
-
-/* ============================================================
+/* ================================
    VIDEO
-============================================================ */
+================================ */
 
 .lesson-video-container {
   width: 100%;
 
-  background: #030508;
+  aspect-ratio: 16 / 9;
+
+  overflow: hidden;
+
+  border-radius: 16px;
+
+  background: #000;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .lesson-video {
+  width: 100%;
+  height: 100%;
+
   display: block;
 
-  width: 100%;
-
-  max-height: 550px;
-
-  object-fit: contain;
-
-  background: #030508;
+  object-fit: cover;
 }
 
-
-/* ============================================================
-   LESSON DESCRIPTION
-============================================================ */
-
 .lesson-description {
-  padding: 22px 27px;
-
-  border-top: 1px solid #1b2431;
+  margin-top: 22px;
 }
 
 .lesson-description h3 {
@@ -393,279 +370,179 @@
 .lesson-description p {
   margin: 0;
 
-  color: #8995a5;
+  color: #9ba8b5;
 
-  line-height: 1.65;
-
-  font-size: 14px;
+  line-height: 1.7;
 }
 
-
-/* ============================================================
-   PRACTICE SECTION
-============================================================ */
+/* ================================
+   PRACTICE
+================================ */
 
 .practice-section {
-  margin-top: 30px;
-}
-
-.practice-card {
-  padding: 28px;
-
-  border: 1px solid #202938;
-
-  border-radius: 22px;
-
-  background: #0b0f16;
+  margin-top: 55px;
 }
 
 .practice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
   margin-bottom: 22px;
-}
 
-.practice-header span {
-  display: block;
-
-  color: #b18cff;
-
-  font-size: 11px;
-
-  font-weight: 800;
-
-  letter-spacing: 1.5px;
-
-  margin-bottom: 7px;
-}
-
-.practice-header h2 {
-  margin: 0 0 8px;
-
-  font-size: 25px;
+  color: #8bc8f5;
 }
 
 .practice-header p {
-  margin: 0;
+  max-width: 650px;
 
-  color: #8b96a6;
+  margin: 10px 0 0;
+
+  color: #98a6b4;
 
   line-height: 1.6;
 }
 
+.practice-card {
+  padding: 25px;
 
-/* ============================================================
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.045),
+      rgba(255, 255, 255, 0.018)
+    );
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ================================
    PRACTICE OPTIONS
-============================================================ */
+================================ */
 
 .practice-options {
   display: grid;
-
-  grid-template-columns:
-    repeat(2, 1fr);
+  grid-template-columns: 1fr 1fr;
 
   gap: 15px;
-
-  margin-bottom: 20px;
 }
 
 .practice-option {
-  display: flex;
+  position: relative;
 
+  display: flex;
   align-items: center;
 
-  gap: 15px;
+  width: 100%;
 
-  padding: 19px;
-
-  border: 1px solid #293445;
+  padding: 22px;
 
   border-radius: 15px;
 
-  background: #080c12;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 
-  cursor: pointer;
-
-  transition: 0.25s ease;
-}
-
-.practice-option:hover {
-  border-color: #5caeff;
-
-  background: #0c131d;
-
-  transform: translateY(-2px);
-}
-
-.practice-option-icon {
-  width: 48px;
-  height: 48px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  flex-shrink: 0;
-
-  border-radius: 12px;
-
-  background: rgba(92, 174, 255, 0.1);
-
-  color: #5caeff;
-}
-
-.practice-option-content {
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 4px;
-}
-
-.practice-option-content strong {
-  color: #e0e6ef;
-
-  font-size: 14px;
-}
-
-.practice-option-content span {
-  color: #727e90;
-
-  font-size: 12px;
-}
-
-
-/* ============================================================
-   RECORD BUTTON
-============================================================ */
-
-.learn-record-button {
-  display: inline-flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  gap: 10px;
-
-  width: 100%;
-
-  padding: 15px 20px;
-
-  border: none;
-
-  border-radius: 12px;
-
-  background: #e63946;
+  background: rgba(255, 255, 255, 0.035);
 
   color: white;
 
-  font-size: 14px;
-
-  font-weight: 800;
+  text-align: left;
 
   cursor: pointer;
 
   transition: 0.25s ease;
+
+  box-sizing: border-box;
 }
 
-.learn-record-button:hover {
-  background: #c92f3b;
-
+.practice-option:hover {
   transform: translateY(-2px);
 
-  box-shadow:
-    0 10px 25px rgba(230, 57, 70, 0.18);
+  background: rgba(255, 255, 255, 0.07);
+
+  border-color: rgba(120, 180, 230, 0.35);
 }
 
-.learn-stop-button {
-  background: #2b3442;
-}
+.practice-option-icon {
+  width: 52px;
+  height: 52px;
 
-.learn-stop-button:hover {
-  background: #384454;
+  flex-shrink: 0;
 
-  box-shadow: none;
-}
+  margin-right: 17px;
 
-
-/* ============================================================
-   UPLOAD INPUT
-============================================================ */
-
-.learn-upload-label {
-  display: inline-flex;
-
+  display: flex;
   align-items: center;
-
   justify-content: center;
 
-  gap: 10px;
+  border-radius: 13px;
 
-  width: 100%;
+  background: rgba(75, 145, 205, 0.12);
 
-  padding: 15px 20px;
-
-  border: 1px solid #344052;
-
-  border-radius: 12px;
-
-  background: #101620;
-
-  color: #dce3ec;
-
-  font-size: 14px;
-
-  font-weight: 700;
-
-  cursor: pointer;
-
-  transition: 0.25s ease;
+  color: #82c2f5;
 }
 
-.learn-upload-label:hover {
-  border-color: #5caeff;
+.practice-option-content h3 {
+  margin: 0 0 6px;
 
-  background: #151d29;
-
-  transform: translateY(-2px);
+  font-size: 17px;
 }
 
-.learn-upload-label svg {
-  color: #5caeff;
+.practice-option-content p {
+  margin: 0;
+
+  color: #929fac;
+
+  font-size: 13px;
+
+  line-height: 1.5;
 }
 
+/* Remove default file input */
 
-/* ============================================================
+.learn-upload-label input {
+  display: none;
+}
+
+/* Recording */
+
+.learn-stop-button {
+  border-color: rgba(220, 70, 70, 0.35);
+}
+
+.learn-stop-button .practice-option-icon {
+  background: rgba(220, 60, 60, 0.12);
+  color: #ef6c6c;
+}
+
+/* ================================
    RECORDING STATUS
-============================================================ */
+================================ */
 
 .learn-recording-status {
   display: flex;
-
   align-items: center;
+  gap: 10px;
 
-  justify-content: center;
+  margin-top: 18px;
+  padding: 13px 16px;
 
-  gap: 9px;
+  border-radius: 10px;
 
-  margin-top: 17px;
+  background: rgba(220, 60, 60, 0.08);
 
-  padding: 11px;
+  border: 1px solid rgba(220, 60, 60, 0.18);
 
-  border-radius: 11px;
-
-  background: rgba(230, 57, 70, 0.08);
-
-  border: 1px solid rgba(230, 57, 70, 0.15);
-
-  color: #c4a2a7;
+  color: #d6dde5;
 
   font-size: 13px;
 }
 
 .learn-recording-status strong {
-  color: white;
+  margin-left: auto;
 
-  font-family: monospace;
+  color: #f17474;
 }
 
 .learn-recording-dot {
@@ -674,100 +551,100 @@
 
   border-radius: 50%;
 
-  background: #e63946;
+  background: #ed5b5b;
 
-  animation: learnRecordingPulse 1s infinite;
+  box-shadow:
+    0 0 12px rgba(237, 91, 91, 0.8);
+
+  animation: recordingPulse 1s infinite;
 }
 
-@keyframes learnRecordingPulse {
-
-  0% {
+@keyframes recordingPulse {
+  0%,
+  100% {
     opacity: 1;
-    transform: scale(1);
   }
 
   50% {
-    opacity: 0.4;
-    transform: scale(0.75);
+    opacity: 0.3;
   }
-
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-
 }
 
-
-/* ============================================================
+/* ================================
    AUDIO PREVIEW
-============================================================ */
+================================ */
 
 .learn-audio-preview {
-  margin-top: 20px;
+  margin-top: 18px;
 
-  padding: 17px;
+  padding: 18px;
 
-  border: 1px solid #222d3d;
+  border-radius: 13px;
 
-  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.035);
 
-  background: #080c12;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.learn-audio-preview > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 12px;
 }
 
 .learn-audio-preview span {
-  display: block;
+  font-size: 10px;
 
-  color: #8d98a8;
+  color: #73869a;
 
-  font-size: 12px;
+  font-weight: 800;
 
-  font-weight: 700;
+  letter-spacing: 1.5px;
+}
 
-  margin-bottom: 10px;
+.learn-audio-preview strong {
+  font-size: 13px;
+
+  color: #dce3e9;
+
+  max-width: 55%;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .learn-audio-preview audio {
   width: 100%;
-
-  height: 42px;
 }
 
-
-/* ============================================================
+/* ================================
    ANALYZE BUTTON
-============================================================ */
+================================ */
 
 .learn-analyze-button {
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  gap: 10px;
-
   width: 100%;
 
-  margin-top: 20px;
+  margin-top: 18px;
 
   padding: 15px 20px;
 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 9px;
+
   border: none;
+  border-radius: 11px;
 
-  border-radius: 12px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #5caeff,
-      #7564ff
-    );
+  background: #b92d35;
 
   color: white;
 
   font-size: 14px;
-
   font-weight: 800;
 
   cursor: pointer;
@@ -776,354 +653,303 @@
 }
 
 .learn-analyze-button:hover {
-  transform: translateY(-2px);
+  background: #d3363f;
 
-  box-shadow:
-    0 12px 30px rgba(92, 174, 255, 0.18);
+  transform: translateY(-2px);
 }
 
 .learn-analyze-button:disabled {
-  opacity: 0.55;
+  opacity: 0.6;
 
   cursor: not-allowed;
 
   transform: none;
-
-  box-shadow: none;
 }
 
+.spin {
+  animation: spin 1s linear infinite;
+}
 
-/* ============================================================
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ================================
+   ERROR
+================================ */
+
+.music-learn-error {
+  margin-top: 18px;
+
+  padding: 14px 16px;
+
+  border-radius: 10px;
+
+  background: rgba(220, 60, 60, 0.08);
+
+  border: 1px solid rgba(220, 60, 60, 0.2);
+
+  color: #ef8989;
+
+  font-size: 13px;
+}
+
+/* ================================
    ANALYSIS RESULT
-============================================================ */
+================================ */
 
 .learn-analysis-result {
-  margin-top: 28px;
+  margin-top: 25px;
 
-  padding: 28px;
+  padding: 24px;
 
-  border: 1px solid #202938;
+  border-radius: 17px;
 
-  border-radius: 22px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(55, 120, 180, 0.09),
+      rgba(255, 255, 255, 0.025)
+    );
 
-  background: #090d14;
+  border: 1px solid rgba(90, 160, 220, 0.18);
 }
 
 .learn-result-header {
   display: flex;
-
   align-items: center;
 
-  gap: 13px;
+  gap: 12px;
 
-  margin-bottom: 25px;
+  padding-bottom: 20px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .learn-result-icon {
-  width: 48px;
-  height: 48px;
+  width: 45px;
+  height: 45px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  border-radius: 13px;
+  border-radius: 12px;
 
-  background: rgba(74, 222, 128, 0.08);
+  background: rgba(65, 180, 125, 0.1);
 
-  color: #4ade80;
+  color: #63d69d;
 }
 
 .learn-result-header span {
   display: block;
 
-  color: #4ade80;
+  margin-bottom: 3px;
 
   font-size: 10px;
 
-  font-weight: 800;
-
   letter-spacing: 1.5px;
 
-  margin-bottom: 4px;
+  color: #708294;
 }
 
 .learn-result-header h3 {
   margin: 0;
 
-  font-size: 21px;
+  font-size: 19px;
 }
 
-
-/* ============================================================
+/* ================================
    SCORE
-============================================================ */
+================================ */
 
 .learn-score-section {
   display: flex;
-
   align-items: center;
 
   gap: 25px;
 
-  margin-bottom: 25px;
-
-  padding: 23px;
-
-  border-radius: 17px;
-
-  background: #070b11;
-
-  border: 1px solid #1b2431;
+  padding: 25px 0;
 }
 
 .learn-score-circle {
-  width: 110px;
-  height: 110px;
+  width: 130px;
+  height: 130px;
 
   flex-shrink: 0;
 
+  border-radius: 50%;
+
   display: flex;
   flex-direction: column;
-
   align-items: center;
   justify-content: center;
 
-  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle,
+      rgba(75, 145, 205, 0.13),
+      rgba(75, 145, 205, 0.025)
+    );
 
-  border: 5px solid #5caeff;
-
-  background: #0b111a;
+  border: 3px solid rgba(90, 165, 220, 0.45);
 
   box-shadow:
-    0 0 25px rgba(92, 174, 255, 0.1);
+    0 0 30px rgba(65, 145, 210, 0.1);
 }
 
 .learn-score-circle strong {
-  font-size: 31px;
-
-  line-height: 1;
+  font-size: 32px;
 }
 
 .learn-score-circle span {
-  color: #687487;
+  color: #8193a5;
 
   font-size: 11px;
 
-  margin-top: 4px;
+  text-transform: uppercase;
 }
 
-.learn-score-info {
-  flex: 1;
-}
-
-.learn-score-info span {
-  display: block;
-
-  color: #778397;
-
-  font-size: 10px;
-
-  font-weight: 800;
-
-  letter-spacing: 1.4px;
-
-  margin-bottom: 7px;
-}
-
-.learn-score-info h4 {
+.learn-score-info h3 {
   margin: 0 0 8px;
 
-  font-size: 21px;
+  font-size: 22px;
 }
 
 .learn-score-info p {
   margin: 0;
 
-  color: #8995a5;
+  color: #9ba8b5;
 
-  font-size: 13px;
-
-  line-height: 1.55;
+  line-height: 1.6;
 }
 
-
-/* ============================================================
-   PITCH STATISTICS
-============================================================ */
+/* ================================
+   STATS
+================================ */
 
 .learn-stats-grid {
   display: grid;
 
-  grid-template-columns:
-    repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
 
-  gap: 13px;
-
-  margin-bottom: 25px;
+  gap: 10px;
 }
 
 .learn-stat {
-  padding: 17px;
+  padding: 16px;
 
-  border: 1px solid #202938;
+  border-radius: 11px;
 
-  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.035);
 
-  background: #080c12;
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .learn-stat span {
   display: block;
 
-  color: #6e7a8c;
-
-  font-size: 10px;
-
-  font-weight: 800;
-
-  letter-spacing: 1px;
-
   margin-bottom: 8px;
+
+  color: #788a9d;
+
+  font-size: 11px;
 }
 
 .learn-stat strong {
-  color: #e0e6ef;
+  font-size: 15px;
 
-  font-size: 22px;
+  color: #dce5ec;
 }
 
-.learn-stat strong small {
-  color: #727e90;
-
-  font-size: 11px;
-
-  margin-left: 3px;
-}
-
-
-/* ============================================================
+/* ================================
    FEEDBACK
-============================================================ */
+================================ */
 
 .learn-feedback {
-  padding: 20px;
+  margin-top: 18px;
 
-  border-radius: 15px;
+  padding: 18px;
 
-  background: #070b11;
+  border-radius: 12px;
 
-  border: 1px solid #1b2431;
+  background: rgba(255, 255, 255, 0.025);
 }
 
 .learn-feedback-title {
   display: flex;
-
   align-items: center;
 
-  gap: 9px;
+  gap: 8px;
 
-  color: #b18cff;
+  margin-bottom: 13px;
 
-  font-size: 12px;
+  color: #a9d6f7;
 
   font-weight: 800;
-
-  letter-spacing: 1px;
-
-  margin-bottom: 15px;
 }
 
 .learn-feedback-list {
-  display: flex;
+  list-style: none;
 
-  flex-direction: column;
+  padding: 0;
+  margin: 0;
 
-  gap: 10px;
+  display: grid;
+
+  gap: 9px;
 }
 
 .learn-feedback-item {
-  display: flex;
+  position: relative;
 
-  align-items: flex-start;
+  padding-left: 18px;
 
-  gap: 9px;
-
-  color: #a5afbd;
-
-  font-size: 13px;
-
-  line-height: 1.55;
-}
-
-.learn-feedback-item svg {
-  flex-shrink: 0;
-
-  color: #4ade80;
-
-  margin-top: 2px;
-}
-
-
-/* ============================================================
-   ERROR
-============================================================ */
-
-.music-learn-error {
-  margin-top: 20px;
-
-  padding: 16px 18px;
-
-  border: 1px solid rgba(230, 57, 70, 0.35);
-
-  border-radius: 13px;
-
-  background: rgba(230, 57, 70, 0.08);
-
-  color: #d0a8ad;
+  color: #9ca9b6;
 
   font-size: 13px;
 
   line-height: 1.5;
 }
 
-.music-learn-error strong {
-  display: block;
+.learn-feedback-item::before {
+  content: "✓";
 
-  color: #ff6975;
+  position: absolute;
 
-  margin-bottom: 5px;
+  left: 0;
+
+  color: #67c69a;
+
+  font-weight: bold;
 }
 
-
-/* ============================================================
-   RESET BUTTON
-============================================================ */
+/* ================================
+   RESET
+================================ */
 
 .learn-reset-button {
+  margin-top: 18px;
+
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 
-  gap: 9px;
+  gap: 8px;
 
-  margin: 22px auto 0;
+  width: 100%;
 
-  padding: 12px 19px;
+  padding: 13px;
 
-  border: 1px solid #303b4b;
+  border-radius: 10px;
 
-  border-radius: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 
-  background: transparent;
+  background: rgba(255, 255, 255, 0.035);
 
-  color: #aeb8c7;
-
-  font-size: 13px;
-
-  font-weight: 700;
+  color: #d1dbe3;
 
   cursor: pointer;
 
@@ -1131,167 +957,132 @@
 }
 
 .learn-reset-button:hover {
-  border-color: #5caeff;
-
-  background: #0b111a;
-
-  color: white;
-
-  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.07);
 }
 
-
-/* ============================================================
-   LEARNING TIP
-============================================================ */
+/* ================================
+   TIP
+================================ */
 
 .learning-tip {
   display: flex;
-
   align-items: flex-start;
 
-  gap: 14px;
+  gap: 13px;
 
-  margin-top: 28px;
+  margin: 35px 0 50px;
 
-  padding: 20px;
+  padding: 18px 20px;
 
-  border: 1px solid #202938;
+  border-radius: 13px;
 
-  border-radius: 17px;
+  background: rgba(90, 150, 205, 0.06);
 
-  background: #090d14;
+  border: 1px solid rgba(90, 150, 205, 0.13);
+
+  color: #8ec5ed;
 }
 
-.learning-tip-icon {
-  color: #b18cff;
+.learning-tip strong {
+  display: block;
 
-  flex-shrink: 0;
-}
+  margin-bottom: 5px;
 
-.learning-tip h3 {
-  margin: 0 0 5px;
-
-  font-size: 15px;
+  color: #b7d9f2;
 }
 
 .learning-tip p {
   margin: 0;
 
-  color: #7f8a9b;
+  color: #8798a9;
 
   font-size: 13px;
 
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
-
-/* ============================================================
-   MOBILE
-============================================================ */
+/* ================================
+   RESPONSIVE
+================================ */
 
 @media (max-width: 900px) {
-
-  .music-learn-page {
-    padding-left: 5%;
-    padding-right: 5%;
-  }
-
-  .lesson-list {
-    grid-template-columns:
-      repeat(2, 1fr);
-  }
-
-}
-
-
-@media (max-width: 700px) {
-
-  .music-learn-page {
-    padding-top: 25px;
-  }
-
-  .music-learn-header {
-    margin-bottom: 35px;
-  }
-
-  .music-learn-header h1 {
-    font-size: 35px;
-  }
-
-  .music-learn-header p {
-    font-size: 15px;
-  }
-
   .lesson-list {
     grid-template-columns: 1fr;
-  }
-
-  .selected-lesson-header {
-    flex-direction: column;
-
-    align-items: flex-start;
-
-    padding: 20px;
-  }
-
-  .lesson-description {
-    padding: 20px;
-  }
-
-  .practice-card {
-    padding: 21px;
   }
 
   .practice-options {
     grid-template-columns: 1fr;
   }
 
+  .learn-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 650px) {
+  .music-learn-page {
+    padding: 20px 16px;
+  }
+
+  .music-learn-header {
+    margin-top: 40px;
+  }
+
+  .music-learn-header h1 {
+    font-size: 40px;
+  }
+
+  .selected-lesson-section {
+    padding: 18px;
+  }
+
+  .selected-lesson-header {
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .selected-lesson-header h2 {
+    font-size: 24px;
+  }
+
+  .lesson-progress-label {
+    display: none;
+  }
+
+  .practice-card {
+    padding: 17px;
+  }
+
   .learn-score-section {
     flex-direction: column;
-
-    text-align: center;
+    align-items: flex-start;
   }
 
-  .learn-score-info {
-    width: 100%;
+  .learn-stats-grid {
+    grid-template-columns: 1fr 1fr;
   }
 
+  .learn-audio-preview > div {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 7px;
+  }
+
+  .learn-audio-preview strong {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 430px) {
   .learn-stats-grid {
     grid-template-columns: 1fr;
   }
 
-}
-
-
-@media (max-width: 500px) {
-
-  .music-learn-header h1 {
-    font-size: 30px;
+  .lesson-card {
+    padding: 16px;
   }
 
-  .music-learn-icon {
-    width: 68px;
-    height: 68px;
+  .practice-option {
+    padding: 17px;
   }
-
-  .selected-lesson-card {
-    border-radius: 17px;
-  }
-
-  .learn-analysis-result {
-    padding: 20px;
-
-    border-radius: 17px;
-  }
-
-  .learn-score-circle {
-    width: 95px;
-    height: 95px;
-  }
-
-  .learn-score-circle strong {
-    font-size: 27px;
-  }
-
 }
