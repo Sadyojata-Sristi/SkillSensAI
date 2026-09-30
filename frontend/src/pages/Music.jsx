@@ -31,7 +31,7 @@ const lessons = [
     duration: "5 min",
     icon: "🎵",
     color: "purple",
-    video: "/lessons/music/pitch-basics.mp4",
+    video: "",
     question: "What happens when the frequency of a sound increases?",
     options: [
       "The pitch becomes higher",
@@ -49,7 +49,7 @@ const lessons = [
     duration: "7 min",
     icon: "🎤",
     color: "blue",
-    video: "/lessons/music/voice-control.mp4",
+    video: "",
     question:
       "Which helps you maintain better control while singing?",
     options: [
@@ -81,7 +81,7 @@ const lessons = [
     duration: "8 min",
     icon: "🥁",
     color: "orange",
-    video: "/lessons/music/rhythm-basics.mp4",
+    video: "",
     question: "What does rhythm mainly describe?",
     options: [
       "The timing of sounds",
@@ -150,6 +150,72 @@ function getSavedProgress() {
   }
 }
 
+function extractPitchValues(data) {
+  const raw =
+    Array.isArray(data?.pitch_data)
+      ? data.pitch_data
+      : Array.isArray(data?.pitch)
+      ? data.pitch
+      : Array.isArray(data)
+      ? data
+      : [];
+
+  return raw
+    .map((item) => {
+      if (typeof item === "number") {
+        return item;
+      }
+
+      if (typeof item === "string") {
+        return Number(item);
+      }
+
+      if (item && typeof item === "object") {
+        return Number(
+          item.frequency ??
+            item.pitch ??
+            item.value ??
+            item.hz ??
+            0
+        );
+      }
+
+      return 0;
+    })
+    .filter((value) => Number.isFinite(value) && value > 0);
+}
+
+function buildPitchPoints(values) {
+  if (!values.length) return "";
+
+  const width = 920;
+  const height = 270;
+  const startX = 50;
+  const startY = 310;
+
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+
+  const range = Math.max(1, max - min);
+
+  return values
+    .map((value, index) => {
+      const x =
+        startX +
+        (index / Math.max(1, values.length - 1)) *
+          width;
+
+      const normalized = (value - min) / range;
+
+      const y =
+        startY -
+        normalized * height;
+
+      return `${x},${y}`;
+    })
+    .join(" ");
+}
+
 function Music() {
   const [screen, setScreen] = useState("home");
 
@@ -180,6 +246,9 @@ function Music() {
   const [recording, setRecording] =
     useState(false);
 
+  const [recordingContext, setRecordingContext] =
+    useState(null);
+
   const [loading, setLoading] =
     useState(false);
 
@@ -187,6 +256,9 @@ function Music() {
     useState("");
 
   const mediaRecorderRef =
+    useRef(null);
+
+  const mediaStreamRef =
     useRef(null);
 
   const audioChunksRef =
@@ -202,6 +274,29 @@ function Music() {
       // Ignore localStorage errors.
     }
   }, [completedLessons]);
+
+  useEffect(() => {
+    return () => {
+      if (mediaRecorderRef.current) {
+        try {
+          if (
+            mediaRecorderRef.current.state !==
+            "inactive"
+          ) {
+            mediaRecorderRef.current.stop();
+          }
+        } catch {
+          // Ignore recorder cleanup errors.
+        }
+      }
+
+      if (mediaStreamRef.current) {
+        mediaStreamRef.current
+          .getTracks()
+          .forEach((track) => track.stop());
+      }
+    };
+  }, []);
 
   const progress = useMemo(() => {
     return Math.round(
@@ -222,6 +317,22 @@ function Music() {
           lesson.id === selectedLesson
       )
     : null;
+
+  const songPitchValues = useMemo(() => {
+    return extractPitchValues(songAnalysis);
+  }, [songAnalysis]);
+
+  const voicePitchValues = useMemo(() => {
+    return extractPitchValues(voiceAnalysis);
+  }, [voiceAnalysis]);
+
+  const songPitchPoints = useMemo(() => {
+    return buildPitchPoints(songPitchValues);
+  }, [songPitchValues]);
+
+  const voicePitchPoints = useMemo(() => {
+    return buildPitchPoints(voicePitchValues);
+  }, [voicePitchValues]);
 
   function isLessonUnlocked(lessonId) {
     return lessonId <= completedLessons + 1;
@@ -259,12 +370,13 @@ function Music() {
       correct ? "correct" : "wrong"
     );
 
-    if (correct) {
-      setCompletedLessons((previous) =>
-        Math.max(
-          previous,
-          currentLesson.id
-        )
+    if (
+      correct &&
+      currentLesson.id ===
+        completedLessons + 1
+    ) {
+      setCompletedLessons(
+        currentLesson.id
       );
     }
   }
@@ -289,6 +401,8 @@ function Music() {
 
     setSongFile(file);
     setSongAnalysis(null);
+    setVoiceFile(null);
+    setVoiceAnalysis(null);
     setError("");
     setLoading(true);
 
@@ -315,8 +429,8 @@ function Music() {
       setSongAnalysis({
         ...data,
         pitch:
-          data.pitch ||
           data.pitch_data ||
+          data.pitch ||
           [],
       });
     } catch (err) {
@@ -359,23 +473,22 @@ function Music() {
       const data = await response.json();
 
       const pitchData =
-        data.pitch ||
         data.pitch_data ||
+        data.pitch ||
         [];
 
-      const calculatedAccuracy =
-        data.accuracy !== undefined
+      const accuracy =
+        data.accuracy !== undefined &&
+        data.accuracy !== null
           ? Number(data.accuracy)
           : null;
 
       setVoiceAnalysis({
         ...data,
-        pitch:
-          Array.isArray(pitchData)
-            ? pitchData
-            : [],
-        accuracy:
-          calculatedAccuracy,
+        pitch: Array.isArray(pitchData)
+          ? pitchData
+          : [],
+        accuracy,
         message:
           data.message ||
           data.feedback ||
@@ -392,6 +505,106 @@ function Music() {
     }
   }
 
+  async function compareSongVoice(
+    song,
+    voice
+  ) {
+    if (!song || !voice) {
+      return;
+    }
+
+    setVoiceFile(voice);
+    setVoiceAnalysis(null);
+    setError("");
+    setLoading(true);
+
+    try {
+      const formData = new FormData();
+
+      formData.append("song", song);
+      formData.append("voice", voice);
+
+      const response = await fetch(
+        `${API_URL}/compare-song-voice`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `Server returned ${response.status}`
+        );
+      }
+
+      const data = await response.json();
+
+      const referencePitch =
+        data.reference_pitch ||
+        data.original_pitch ||
+        data.song_pitch ||
+        [];
+
+      const userPitch =
+        data.user_pitch ||
+        data.voice_pitch ||
+        data.pitch ||
+        data.pitch_data ||
+        [];
+
+      const accuracy =
+        data.accuracy !== undefined &&
+        data.accuracy !== null
+          ? Number(data.accuracy)
+          : data.score !== undefined &&
+            data.score !== null
+          ? Number(data.score)
+          : null;
+
+      setVoiceAnalysis({
+        ...data,
+        pitch: Array.isArray(userPitch)
+          ? userPitch
+          : [],
+        referencePitch: Array.isArray(
+          referencePitch
+        )
+          ? referencePitch
+          : [],
+        accuracy,
+        message:
+          data.feedback ||
+          data.message ||
+          "Your performance has been compared with the reference song.",
+      });
+    } catch (err) {
+      console.error(err);
+
+      setError(
+        "Unable to compare your recording with the song. Make sure the SkillSensAI backend is running."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function processRecordedFile(file) {
+    if (
+      recordingContext === "song" &&
+      songFile
+    ) {
+      await compareSongVoice(
+        songFile,
+        file
+      );
+    } else {
+      await analyzeVoice(file);
+    }
+
+    setRecordingContext(null);
+  }
+
   async function startRecording() {
     setError("");
 
@@ -406,20 +619,30 @@ function Music() {
 
     try {
       const stream =
-        await navigator.mediaDevices.getUserMedia({
-          audio: true,
-        });
+        await navigator.mediaDevices.getUserMedia(
+          {
+            audio: true,
+          }
+        );
 
+      mediaStreamRef.current = stream;
       audioChunksRef.current = [];
 
-      let mimeType = "audio/webm";
+      let mimeType = "";
 
       if (
-        !MediaRecorder.isTypeSupported(
+        MediaRecorder.isTypeSupported(
+          "audio/webm;codecs=opus"
+        )
+      ) {
+        mimeType =
+          "audio/webm;codecs=opus";
+      } else if (
+        MediaRecorder.isTypeSupported(
           "audio/webm"
         )
       ) {
-        mimeType = "";
+        mimeType = "audio/webm";
       }
 
       const recorder = mimeType
@@ -430,6 +653,12 @@ function Music() {
 
       mediaRecorderRef.current =
         recorder;
+
+      setRecordingContext(
+        screen === "song"
+          ? "song"
+          : "scratch"
+      );
 
       recorder.ondataavailable = (
         event
@@ -442,12 +671,6 @@ function Music() {
       };
 
       recorder.onstop = async () => {
-        stream
-          .getTracks()
-          .forEach((track) =>
-            track.stop()
-          );
-
         const blob = new Blob(
           audioChunksRef.current,
           {
@@ -467,7 +690,18 @@ function Music() {
           }
         );
 
-        await analyzeVoice(file);
+        if (mediaStreamRef.current) {
+          mediaStreamRef.current
+            .getTracks()
+            .forEach((track) =>
+              track.stop()
+            );
+
+          mediaStreamRef.current =
+            null;
+        }
+
+        await processRecordedFile(file);
       };
 
       recorder.start();
@@ -492,6 +726,22 @@ function Music() {
     }
 
     setRecording(false);
+  }
+
+  async function handleVoiceUpload(file) {
+    if (!file) return;
+
+    if (
+      screen === "song" &&
+      songFile
+    ) {
+      await compareSongVoice(
+        songFile,
+        file
+      );
+    } else {
+      await analyzeVoice(file);
+    }
   }
 
   function goToLearnFromScratch() {
@@ -916,9 +1166,8 @@ function Music() {
                     accept="audio/*"
                     hidden
                     onChange={(event) =>
-                      analyzeVoice(
-                        event.target
-                          .files?.[0]
+                      handleVoiceUpload(
+                        event.target.files?.[0]
                       )
                     }
                   />
@@ -988,7 +1237,7 @@ function Music() {
 
                 <h2>
                   {voiceAnalysis.accuracy !==
-                  null &&
+                    null &&
                   voiceAnalysis.accuracy !==
                     undefined
                     ? `${Math.round(
@@ -1142,11 +1391,7 @@ function Music() {
                 </div>
               </div>
 
-              {songAnalysis.pitch &&
-              Array.isArray(
-                songAnalysis.pitch
-              ) &&
-              songAnalysis.pitch.length > 0 ? (
+              {songPitchValues.length > 0 ? (
                 <div className="pitch-graph-container">
                   <svg
                     className="pitch-graph"
@@ -1184,44 +1429,9 @@ function Music() {
 
                     <polyline
                       className="pitch-line"
-                      points={songAnalysis.pitch
-                        .map(
-                          (
-                            value,
-                            index
-                          ) => {
-                            const x =
-                              50 +
-                              (index /
-                                Math.max(
-                                  1,
-                                  songAnalysis
-                                    .pitch
-                                    .length -
-                                    1
-                                )) *
-                                920;
-
-                            const numeric =
-                              Number(
-                                value
-                              ) || 0;
-
-                            const y =
-                              310 -
-                              Math.min(
-                                270,
-                                Math.max(
-                                  0,
-                                  numeric *
-                                    2
-                                )
-                              );
-
-                            return `${x},${y}`;
-                          }
-                        )
-                        .join(" ")}
+                      points={
+                        songPitchPoints
+                      }
                     />
                   </svg>
 
@@ -1235,8 +1445,8 @@ function Music() {
                 </div>
               ) : (
                 <div className="no-pitch">
-                  Pitch data was returned without a
-                  graphable pitch sequence.
+                  Pitch data was returned without
+                  a graphable pitch sequence.
                 </div>
               )}
 
@@ -1282,7 +1492,7 @@ function Music() {
 
                   <p>
                     Sing into your microphone and
-                    let AI analyse your pitch.
+                    let AI compare your pitch.
                   </p>
                 </div>
 
@@ -1292,6 +1502,7 @@ function Music() {
                     onClick={
                       startRecording
                     }
+                    disabled={!songFile}
                   >
                     <Mic size={16} />
                     Record Live
@@ -1325,7 +1536,13 @@ function Music() {
                   </p>
                 </div>
 
-                <label className="practice-button upload-label">
+                <label
+                  className={`practice-button upload-label ${
+                    !songFile
+                      ? "disabled"
+                      : ""
+                  }`}
+                >
                   <Upload size={16} />
                   Upload Recording
 
@@ -1333,10 +1550,10 @@ function Music() {
                     type="file"
                     accept="audio/*"
                     hidden
+                    disabled={!songFile}
                     onChange={(event) =>
-                      analyzeVoice(
-                        event.target
-                          .files?.[0]
+                      handleVoiceUpload(
+                        event.target.files?.[0]
                       )
                     }
                   />
@@ -1428,73 +1645,86 @@ function Music() {
                 </p>
               </div>
 
-              {voiceAnalysis.pitch &&
-              voiceAnalysis.pitch.length > 0 ? (
-                <div className="comparison-graph-container">
-                  <div className="comparison-legend">
-                    <div>
-                      <span className="legend-dot voice-dot" />
-                      Your voice
+              {voiceAnalysis.referencePitch &&
+                voiceAnalysis.referencePitch
+                  .length > 0 && (
+                  <div className="comparison-graph-container">
+                    <div className="comparison-legend">
+                      <div>
+                        <span className="legend-dot voice-dot" />
+                        Your voice
+                      </div>
+
+                      <div>
+                        <span className="legend-dot reference-dot" />
+                        Reference
+                      </div>
                     </div>
+
+                    <svg
+                      className="comparison-graph"
+                      viewBox="0 0 1000 350"
+                      preserveAspectRatio="none"
+                    >
+                      <polyline
+                        className="reference-pitch-line"
+                        points={buildPitchPoints(
+                          extractPitchValues(
+                            voiceAnalysis.referencePitch
+                          )
+                        )}
+                      />
+
+                      <polyline
+                        className="voice-pitch-line"
+                        points={
+                          voicePitchPoints
+                        }
+                      />
+                    </svg>
+
+                    <span className="comparison-label-high">
+                      High
+                    </span>
+
+                    <span className="comparison-label-low">
+                      Low
+                    </span>
                   </div>
+                )}
 
-                  <svg
-                    className="comparison-graph"
-                    viewBox="0 0 1000 350"
-                    preserveAspectRatio="none"
-                  >
-                    <polyline
-                      className="voice-pitch-line"
-                      points={voiceAnalysis.pitch
-                        .map(
-                          (
-                            value,
-                            index
-                          ) => {
-                            const x =
-                              (index /
-                                Math.max(
-                                  1,
-                                  voiceAnalysis
-                                    .pitch
-                                    .length -
-                                    1
-                                )) *
-                                980 +
-                              10;
+              {!voiceAnalysis.referencePitch?.length &&
+                voicePitchValues.length > 0 && (
+                  <div className="comparison-graph-container">
+                    <div className="comparison-legend">
+                      <div>
+                        <span className="legend-dot voice-dot" />
+                        Your voice
+                      </div>
+                    </div>
 
-                            const numeric =
-                              Number(
-                                value
-                              ) || 0;
+                    <svg
+                      className="comparison-graph"
+                      viewBox="0 0 1000 350"
+                      preserveAspectRatio="none"
+                    >
+                      <polyline
+                        className="voice-pitch-line"
+                        points={
+                          voicePitchPoints
+                        }
+                      />
+                    </svg>
 
-                            const y =
-                              320 -
-                              Math.min(
-                                280,
-                                Math.max(
-                                  0,
-                                  numeric *
-                                    2
-                                )
-                              );
+                    <span className="comparison-label-high">
+                      High
+                    </span>
 
-                            return `${x},${y}`;
-                          }
-                        )
-                        .join(" ")}
-                    />
-                  </svg>
-
-                  <span className="comparison-label-high">
-                    High
-                  </span>
-
-                  <span className="comparison-label-low">
-                    Low
-                  </span>
-                </div>
-              ) : null}
+                    <span className="comparison-label-low">
+                      Low
+                    </span>
+                  </div>
+                )}
             </section>
           )}
 
@@ -1577,8 +1807,8 @@ function Music() {
                   </strong>
 
                   <span>
-                    The lesson content can be
-                    uploaded here later.
+                    Upload your lesson video later
+                    and add its path to this lesson.
                   </span>
                 </div>
               )}
@@ -1660,8 +1890,9 @@ function Music() {
               <div className="quiz-feedback correct">
                 <Check size={18} />
 
-                Correct! Your musician is
-                becoming more complete.
+                {currentLesson.id === 6
+                  ? "Amazing! You completed the entire music journey. Your musician is fully awakened."
+                  : "Correct! Your musician is becoming more complete."}
               </div>
             )}
 
