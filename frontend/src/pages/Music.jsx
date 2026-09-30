@@ -6,6 +6,7 @@ import {
   ChevronRight,
   CircleHelp,
   FileAudio,
+  Lock,
   Mic,
   Music2,
   Play,
@@ -30,8 +31,8 @@ const lessons = [
     duration: "5 min",
     icon: "🎵",
     color: "purple",
-    question:
-      "What happens when the frequency of a sound increases?",
+    video: "/lessons/music/pitch-basics.mp4",
+    question: "What happens when the frequency of a sound increases?",
     options: [
       "The pitch becomes higher",
       "The pitch becomes lower",
@@ -48,6 +49,7 @@ const lessons = [
     duration: "7 min",
     icon: "🎤",
     color: "blue",
+    video: "/lessons/music/voice-control.mp4",
     question:
       "Which helps you maintain better control while singing?",
     options: [
@@ -66,8 +68,8 @@ const lessons = [
     duration: "6 min",
     icon: "🎼",
     color: "pink",
-    question:
-      "Which of these is a musical note?",
+    video: "",
+    question: "Which of these is a musical note?",
     options: ["C", "X", "Z", "Q"],
     answer: 0,
   },
@@ -79,8 +81,8 @@ const lessons = [
     duration: "8 min",
     icon: "🥁",
     color: "orange",
-    question:
-      "What does rhythm mainly describe?",
+    video: "/lessons/music/rhythm-basics.mp4",
+    question: "What does rhythm mainly describe?",
     options: [
       "The timing of sounds",
       "The color of an instrument",
@@ -97,8 +99,8 @@ const lessons = [
     duration: "8 min",
     icon: "🎯",
     color: "green",
-    question:
-      "What is pitch matching?",
+    video: "",
+    question: "What is pitch matching?",
     options: [
       "Matching your voice to a target note",
       "Making your voice louder",
@@ -115,8 +117,8 @@ const lessons = [
     duration: "10 min",
     icon: "🌟",
     color: "gold",
-    question:
-      "What is the most important part of practice?",
+    video: "",
+    question: "What is the most important part of practice?",
     options: [
       "Practicing consistently",
       "Never making mistakes",
@@ -129,7 +131,9 @@ const lessons = [
 
 function getSavedProgress() {
   try {
-    const saved = localStorage.getItem("skillsensai_music_progress");
+    const saved = localStorage.getItem(
+      "skillsensai_music_progress"
+    );
 
     if (!saved) return 0;
 
@@ -137,7 +141,10 @@ function getSavedProgress() {
 
     if (Number.isNaN(parsed)) return 0;
 
-    return Math.max(0, Math.min(parsed, lessons.length));
+    return Math.max(
+      0,
+      Math.min(Math.floor(parsed), lessons.length)
+    );
   } catch {
     return 0;
   }
@@ -149,29 +156,41 @@ function Music() {
   const [completedLessons, setCompletedLessons] =
     useState(getSavedProgress);
 
-  const [selectedLesson, setSelectedLesson] = useState(null);
+  const [selectedLesson, setSelectedLesson] =
+    useState(null);
 
-  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [selectedAnswer, setSelectedAnswer] =
+    useState(null);
 
-  const [quizResult, setQuizResult] = useState(null);
+  const [quizResult, setQuizResult] =
+    useState(null);
 
-  const [songFile, setSongFile] = useState(null);
+  const [songFile, setSongFile] =
+    useState(null);
 
-  const [songAnalysis, setSongAnalysis] = useState(null);
+  const [songAnalysis, setSongAnalysis] =
+    useState(null);
 
-  const [voiceFile, setVoiceFile] = useState(null);
+  const [voiceFile, setVoiceFile] =
+    useState(null);
 
-  const [voiceAnalysis, setVoiceAnalysis] = useState(null);
+  const [voiceAnalysis, setVoiceAnalysis] =
+    useState(null);
 
-  const [recording, setRecording] = useState(false);
+  const [recording, setRecording] =
+    useState(false);
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] =
+    useState(false);
 
-  const [error, setError] = useState("");
+  const [error, setError] =
+    useState("");
 
-  const mediaRecorderRef = useRef(null);
+  const mediaRecorderRef =
+    useRef(null);
 
-  const audioChunksRef = useRef([]);
+  const audioChunksRef =
+    useRef([]);
 
   useEffect(() => {
     try {
@@ -198,13 +217,25 @@ function Music() {
   }, [completedLessons]);
 
   const currentLesson = selectedLesson
-    ? lessons.find((lesson) => lesson.id === selectedLesson)
+    ? lessons.find(
+        (lesson) =>
+          lesson.id === selectedLesson
+      )
     : null;
 
+  function isLessonUnlocked(lessonId) {
+    return lessonId <= completedLessons + 1;
+  }
+
   function openLesson(lesson) {
+    if (!isLessonUnlocked(lesson.id)) {
+      return;
+    }
+
     setSelectedLesson(lesson.id);
     setSelectedAnswer(null);
     setQuizResult(null);
+    setError("");
   }
 
   function closeLesson() {
@@ -214,27 +245,35 @@ function Music() {
   }
 
   function checkAnswer() {
-    if (!currentLesson || selectedAnswer === null) {
+    if (
+      !currentLesson ||
+      selectedAnswer === null
+    ) {
       return;
     }
 
     const correct =
       selectedAnswer === currentLesson.answer;
 
-    setQuizResult(correct ? "correct" : "wrong");
+    setQuizResult(
+      correct ? "correct" : "wrong"
+    );
 
-    if (
-      correct &&
-      currentLesson.id > completedLessons
-    ) {
+    if (correct) {
       setCompletedLessons((previous) =>
-        Math.max(previous, currentLesson.id)
+        Math.max(
+          previous,
+          currentLesson.id
+        )
       );
     }
   }
 
   function resetProgress() {
     setCompletedLessons(0);
+    setSelectedLesson(null);
+    setSelectedAnswer(null);
+    setQuizResult(null);
 
     try {
       localStorage.removeItem(
@@ -273,7 +312,13 @@ function Music() {
 
       const data = await response.json();
 
-      setSongAnalysis(data);
+      setSongAnalysis({
+        ...data,
+        pitch:
+          data.pitch ||
+          data.pitch_data ||
+          [],
+      });
     } catch (err) {
       console.error(err);
 
@@ -313,7 +358,29 @@ function Music() {
 
       const data = await response.json();
 
-      setVoiceAnalysis(data);
+      const pitchData =
+        data.pitch ||
+        data.pitch_data ||
+        [];
+
+      const calculatedAccuracy =
+        data.accuracy !== undefined
+          ? Number(data.accuracy)
+          : null;
+
+      setVoiceAnalysis({
+        ...data,
+        pitch:
+          Array.isArray(pitchData)
+            ? pitchData
+            : [],
+        accuracy:
+          calculatedAccuracy,
+        message:
+          data.message ||
+          data.feedback ||
+          "Your recording has been analysed. Keep practising to improve your pitch consistency.",
+      });
     } catch (err) {
       console.error(err);
 
@@ -328,7 +395,9 @@ function Music() {
   async function startRecording() {
     setError("");
 
-    if (!navigator.mediaDevices?.getUserMedia) {
+    if (
+      !navigator.mediaDevices?.getUserMedia
+    ) {
       setError(
         "Live recording is not supported by this browser."
       );
@@ -343,25 +412,48 @@ function Music() {
 
       audioChunksRef.current = [];
 
-      const recorder = new MediaRecorder(stream);
+      let mimeType = "audio/webm";
 
-      mediaRecorderRef.current = recorder;
+      if (
+        !MediaRecorder.isTypeSupported(
+          "audio/webm"
+        )
+      ) {
+        mimeType = "";
+      }
 
-      recorder.ondataavailable = (event) => {
+      const recorder = mimeType
+        ? new MediaRecorder(stream, {
+            mimeType,
+          })
+        : new MediaRecorder(stream);
+
+      mediaRecorderRef.current =
+        recorder;
+
+      recorder.ondataavailable = (
+        event
+      ) => {
         if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
+          audioChunksRef.current.push(
+            event.data
+          );
         }
       };
 
       recorder.onstop = async () => {
         stream
           .getTracks()
-          .forEach((track) => track.stop());
+          .forEach((track) =>
+            track.stop()
+          );
 
         const blob = new Blob(
           audioChunksRef.current,
           {
-            type: "audio/webm",
+            type:
+              mimeType ||
+              "audio/webm",
           }
         );
 
@@ -369,7 +461,9 @@ function Music() {
           [blob],
           "skillsensai-recording.webm",
           {
-            type: "audio/webm",
+            type:
+              mimeType ||
+              "audio/webm",
           }
         );
 
@@ -391,7 +485,8 @@ function Music() {
   function stopRecording() {
     if (
       mediaRecorderRef.current &&
-      mediaRecorderRef.current.state !== "inactive"
+      mediaRecorderRef.current.state !==
+        "inactive"
     ) {
       mediaRecorderRef.current.stop();
     }
@@ -414,6 +509,10 @@ function Music() {
     setError("");
   }
 
+  function getVideoSource(lesson) {
+    return lesson.video || "";
+  }
+
   return (
     <div className="music-page">
       <header className="music-navbar">
@@ -430,13 +529,16 @@ function Music() {
               Skill<span>SensAI</span>
             </strong>
 
-            <small>Learn music your way</small>
+            <small>
+              Learn music your way
+            </small>
           </span>
         </button>
 
         <div className="music-progress-mini">
           <span>
-            {completedLessons}/{lessons.length} lessons
+            {completedLessons}/
+            {lessons.length} lessons
           </span>
 
           <div className="mini-progress">
@@ -465,9 +567,10 @@ function Music() {
               </h1>
 
               <p>
-                Learn music from the beginning, practise
-                your voice, analyse your performance and
-                build your skills at your own pace.
+                Learn music from the beginning,
+                practise your voice, analyse your
+                performance and build your skills
+                at your own pace.
               </p>
             </div>
 
@@ -511,7 +614,9 @@ function Music() {
             <div className="music-choice-grid">
               <button
                 className="music-choice-card scratch"
-                onClick={goToLearnFromScratch}
+                onClick={
+                  goToLearnFromScratch
+                }
               >
                 <div className="choice-icon">
                   <Brain size={27} />
@@ -522,11 +627,14 @@ function Music() {
                     START HERE
                   </span>
 
-                  <h2>Learn From Scratch</h2>
+                  <h2>
+                    Learn From Scratch
+                  </h2>
 
                   <p>
-                    Build your musical foundation through
-                    guided lessons, quizzes and practice.
+                    Build your musical foundation
+                    through guided lessons, quizzes
+                    and practice.
                   </p>
                 </div>
 
@@ -546,11 +654,13 @@ function Music() {
                     PRACTICE
                   </span>
 
-                  <h2>Learn a Song</h2>
+                  <h2>
+                    Learn a Song
+                  </h2>
 
                   <p>
-                    Upload a song and use AI feedback to
-                    practise your pitch and voice.
+                    Upload a song and use AI feedback
+                    to practise your pitch and voice.
                   </p>
                 </div>
 
@@ -561,13 +671,23 @@ function Music() {
 
           <section className="music-stats">
             <div>
-              <strong>{completedLessons}</strong>
-              <span>Lessons completed</span>
+              <strong>
+                {completedLessons}
+              </strong>
+
+              <span>
+                Lessons completed
+              </span>
             </div>
 
             <div>
-              <strong>{progress}%</strong>
-              <span>Learning progress</span>
+              <strong>
+                {progress}%
+              </strong>
+
+              <span>
+                Learning progress
+              </span>
             </div>
 
             <div>
@@ -576,7 +696,10 @@ function Music() {
                   ? "Awakened"
                   : "Learning"}
               </strong>
-              <span>Musician status</span>
+
+              <span>
+                Musician status
+              </span>
             </div>
           </section>
 
@@ -613,19 +736,22 @@ function Music() {
             </h1>
 
             <p>
-              Complete lessons to bring your musician
-              to life.
+              Complete lessons to bring your
+              musician to life.
             </p>
           </section>
 
           <section className="progress-panel">
             <div className="progress-panel-top">
               <div>
-                <strong>Your journey</strong>
+                <strong>
+                  Your journey
+                </strong>
 
                 <span>
-                  {completedLessons} of {lessons.length}{" "}
-                  lessons completed
+                  {completedLessons} of{" "}
+                  {lessons.length} lessons
+                  completed
                 </span>
               </div>
 
@@ -644,19 +770,38 @@ function Music() {
           <section className="lesson-grid">
             {lessons.map((lesson) => {
               const completed =
-                lesson.id <= completedLessons;
+                lesson.id <=
+                completedLessons;
+
+              const unlocked =
+                isLessonUnlocked(
+                  lesson.id
+                );
 
               return (
                 <button
                   key={lesson.id}
-                  className={`lesson-card ${completed ? "completed" : ""}`}
-                  onClick={() => openLesson(lesson)}
+                  className={`lesson-card ${
+                    completed
+                      ? "completed"
+                      : ""
+                  } ${
+                    !unlocked
+                      ? "locked"
+                      : ""
+                  }`}
+                  onClick={() =>
+                    openLesson(lesson)
+                  }
+                  disabled={!unlocked}
                 >
                   <div
                     className={`lesson-number ${lesson.color}`}
                   >
                     {completed ? (
                       <Check size={21} />
+                    ) : !unlocked ? (
+                      <Lock size={18} />
                     ) : (
                       lesson.id
                     )}
@@ -671,16 +816,24 @@ function Music() {
                       LESSON {lesson.id}
                     </span>
 
-                    <h3>{lesson.title}</h3>
+                    <h3>
+                      {lesson.title}
+                    </h3>
 
-                    <p>{lesson.description}</p>
+                    <p>
+                      {lesson.description}
+                    </p>
 
                     <small>
                       {lesson.duration}
                     </small>
                   </div>
 
-                  <ChevronRight className="lesson-arrow" />
+                  {unlocked ? (
+                    <ChevronRight className="lesson-arrow" />
+                  ) : (
+                    <Lock className="lesson-arrow" />
+                  )}
                 </button>
               );
             })}
@@ -705,18 +858,22 @@ function Music() {
                 </div>
 
                 <div className="practice-card-copy">
-                  <h3>Record Live</h3>
+                  <h3>
+                    Record Live
+                  </h3>
 
                   <p>
-                    Record yourself singing and receive
-                    AI-powered feedback.
+                    Record yourself singing and
+                    receive AI-powered feedback.
                   </p>
                 </div>
 
                 {!recording ? (
                   <button
                     className="practice-button recording-button"
-                    onClick={startRecording}
+                    onClick={
+                      startRecording
+                    }
                   >
                     <Mic size={16} />
                     Record Live
@@ -724,7 +881,9 @@ function Music() {
                 ) : (
                   <button
                     className="practice-button recording-button"
-                    onClick={stopRecording}
+                    onClick={
+                      stopRecording
+                    }
                   >
                     <X size={16} />
                     Stop Recording
@@ -738,7 +897,9 @@ function Music() {
                 </div>
 
                 <div className="practice-card-copy">
-                  <h3>Upload Recording</h3>
+                  <h3>
+                    Upload Recording
+                  </h3>
 
                   <p>
                     Upload an existing recording for
@@ -756,7 +917,8 @@ function Music() {
                     hidden
                     onChange={(event) =>
                       analyzeVoice(
-                        event.target.files?.[0]
+                        event.target
+                          .files?.[0]
                       )
                     }
                   />
@@ -775,9 +937,22 @@ function Music() {
                 </strong>
 
                 <span>
-                  Sing naturally, then press stop.
+                  Sing naturally, then press
+                  stop.
                 </span>
               </div>
+            </div>
+          )}
+
+          {loading && (
+            <div className="analysis-status">
+              <Sparkles
+                size={18}
+                className="loading-icon"
+              />
+
+              Analysing your recording with
+              AI...
             </div>
           )}
 
@@ -791,7 +966,8 @@ function Music() {
                 </strong>
 
                 <small>
-                  Recording selected for analysis
+                  Recording selected for
+                  analysis
                 </small>
               </div>
 
@@ -806,11 +982,15 @@ function Music() {
               </div>
 
               <div>
-                <span>AI FEEDBACK</span>
+                <span>
+                  AI FEEDBACK
+                </span>
 
                 <h2>
                   {voiceAnalysis.accuracy !==
-                  undefined
+                  null &&
+                  voiceAnalysis.accuracy !==
+                    undefined
                     ? `${Math.round(
                         Number(
                           voiceAnalysis.accuracy
@@ -826,6 +1006,12 @@ function Music() {
                 </p>
               </div>
             </section>
+          )}
+
+          {error && (
+            <div className="analysis-error">
+              {error}
+            </div>
           )}
         </main>
       )}
@@ -851,8 +1037,8 @@ function Music() {
             </h1>
 
             <p>
-              Upload a song, study its pitch and compare
-              your performance.
+              Upload a song, study its pitch and
+              compare your performance.
             </p>
           </section>
 
@@ -861,11 +1047,14 @@ function Music() {
               <FileAudio size={30} />
             </div>
 
-            <h2>Choose a song</h2>
+            <h2>
+              Choose a song
+            </h2>
 
             <p>
-              Upload an audio file and SkillSensAI will
-              analyse its musical characteristics.
+              Upload an audio file and SkillSensAI
+              will analyse its musical
+              characteristics.
             </p>
 
             <label className="primary-upload-button">
@@ -885,8 +1074,8 @@ function Music() {
             </label>
 
             <small>
-              MP3, WAV, M4A and other supported audio
-              formats
+              MP3, WAV, M4A and other supported
+              audio formats
             </small>
           </section>
 
@@ -939,7 +1128,9 @@ function Music() {
                 </div>
 
                 <div className="song-duration">
-                  <small>Duration</small>
+                  <small>
+                    Duration
+                  </small>
 
                   <strong>
                     {songAnalysis.duration
@@ -952,7 +1143,9 @@ function Music() {
               </div>
 
               {songAnalysis.pitch &&
-              Array.isArray(songAnalysis.pitch) &&
+              Array.isArray(
+                songAnalysis.pitch
+              ) &&
               songAnalysis.pitch.length > 0 ? (
                 <div className="pitch-graph-container">
                   <svg
@@ -993,7 +1186,10 @@ function Music() {
                       className="pitch-line"
                       points={songAnalysis.pitch
                         .map(
-                          (value, index) => {
+                          (
+                            value,
+                            index
+                          ) => {
                             const x =
                               50 +
                               (index /
@@ -1007,7 +1203,9 @@ function Music() {
                                 920;
 
                             const numeric =
-                              Number(value) || 0;
+                              Number(
+                                value
+                              ) || 0;
 
                             const y =
                               310 -
@@ -1015,7 +1213,8 @@ function Music() {
                                 270,
                                 Math.max(
                                   0,
-                                  numeric * 2
+                                  numeric *
+                                    2
                                 )
                               );
 
@@ -1044,6 +1243,7 @@ function Music() {
               <div className="pitch-info">
                 <div>
                   <span className="pitch-dot" />
+
                   <p>
                     Detected pitch over time
                   </p>
@@ -1064,7 +1264,8 @@ function Music() {
               </span>
 
               <h2>
-                Sing along and compare your voice.
+                Sing along and compare your
+                voice.
               </h2>
             </div>
 
@@ -1075,18 +1276,22 @@ function Music() {
                 </div>
 
                 <div className="practice-card-copy">
-                  <h3>Record Live</h3>
+                  <h3>
+                    Record Live
+                  </h3>
 
                   <p>
-                    Sing into your microphone and let
-                    AI analyse your pitch.
+                    Sing into your microphone and
+                    let AI analyse your pitch.
                   </p>
                 </div>
 
                 {!recording ? (
                   <button
                     className="practice-button recording-button"
-                    onClick={startRecording}
+                    onClick={
+                      startRecording
+                    }
                   >
                     <Mic size={16} />
                     Record Live
@@ -1094,7 +1299,9 @@ function Music() {
                 ) : (
                   <button
                     className="practice-button recording-button"
-                    onClick={stopRecording}
+                    onClick={
+                      stopRecording
+                    }
                   >
                     <X size={16} />
                     Stop Recording
@@ -1108,10 +1315,13 @@ function Music() {
                 </div>
 
                 <div className="practice-card-copy">
-                  <h3>Upload Recording</h3>
+                  <h3>
+                    Upload Recording
+                  </h3>
 
                   <p>
-                    Use an existing recording instead.
+                    Use an existing recording
+                    instead.
                   </p>
                 </div>
 
@@ -1125,7 +1335,8 @@ function Music() {
                     hidden
                     onChange={(event) =>
                       analyzeVoice(
-                        event.target.files?.[0]
+                        event.target
+                          .files?.[0]
                       )
                     }
                   />
@@ -1144,7 +1355,8 @@ function Music() {
                 </strong>
 
                 <span>
-                  Sing naturally, then press stop.
+                  Sing naturally, then press
+                  stop.
                 </span>
               </div>
             </div>
@@ -1185,8 +1397,8 @@ function Music() {
                   </h2>
 
                   <p>
-                    Compare your recording with the
-                    target performance.
+                    Your recording has been
+                    analysed by SkillSensAI.
                   </p>
                 </div>
               </div>
@@ -1198,7 +1410,9 @@ function Music() {
 
                 <strong>
                   {voiceAnalysis.accuracy !==
-                  undefined
+                    null &&
+                  voiceAnalysis.accuracy !==
+                    undefined
                     ? `${Math.round(
                         Number(
                           voiceAnalysis.accuracy
@@ -1214,15 +1428,10 @@ function Music() {
                 </p>
               </div>
 
-              {voiceAnalysis.original_pitch &&
-              voiceAnalysis.voice_pitch ? (
+              {voiceAnalysis.pitch &&
+              voiceAnalysis.pitch.length > 0 ? (
                 <div className="comparison-graph-container">
                   <div className="comparison-legend">
-                    <div>
-                      <span className="legend-dot original-dot" />
-                      Original
-                    </div>
-
                     <div>
                       <span className="legend-dot voice-dot" />
                       Your voice
@@ -1235,52 +1444,19 @@ function Music() {
                     preserveAspectRatio="none"
                   >
                     <polyline
-                      className="original-pitch-line"
-                      points={voiceAnalysis.original_pitch
-                        .map(
-                          (value, index) => {
-                            const x =
-                              (index /
-                                Math.max(
-                                  1,
-                                  voiceAnalysis
-                                    .original_pitch
-                                    .length -
-                                    1
-                                )) *
-                                980 +
-                              10;
-
-                            const numeric =
-                              Number(value) || 0;
-
-                            const y =
-                              320 -
-                              Math.min(
-                                280,
-                                Math.max(
-                                  0,
-                                  numeric * 2
-                                )
-                              );
-
-                            return `${x},${y}`;
-                          }
-                        )
-                        .join(" ")}
-                    />
-
-                    <polyline
                       className="voice-pitch-line"
-                      points={voiceAnalysis.voice_pitch
+                      points={voiceAnalysis.pitch
                         .map(
-                          (value, index) => {
+                          (
+                            value,
+                            index
+                          ) => {
                             const x =
                               (index /
                                 Math.max(
                                   1,
                                   voiceAnalysis
-                                    .voice_pitch
+                                    .pitch
                                     .length -
                                     1
                                 )) *
@@ -1288,7 +1464,9 @@ function Music() {
                               10;
 
                             const numeric =
-                              Number(value) || 0;
+                              Number(
+                                value
+                              ) || 0;
 
                             const y =
                               320 -
@@ -1296,7 +1474,8 @@ function Music() {
                                 280,
                                 Math.max(
                                   0,
-                                  numeric * 2
+                                  numeric *
+                                    2
                                 )
                               );
 
@@ -1330,11 +1509,11 @@ function Music() {
               </h3>
 
               <p>
-                SkillSensAI analyses audio characteristics
-                such as pitch and compares your performance
-                with the reference. The goal is to give
-                practical feedback that helps you improve
-                through repeated practice.
+                SkillSensAI analyses audio
+                characteristics such as pitch and
+                provides practical feedback that
+                helps you improve through repeated
+                practice.
               </p>
             </div>
           </section>
@@ -1359,18 +1538,58 @@ function Music() {
               LESSON {currentLesson.id}
             </span>
 
-            <h2>{currentLesson.title}</h2>
+            <h2>
+              {currentLesson.title}
+            </h2>
 
             <p>
               {currentLesson.description}
             </p>
 
+            <div className="lesson-video-section">
+              {getVideoSource(
+                currentLesson
+              ) ? (
+                <>
+                  <video
+                    className="lesson-video"
+                    src={getVideoSource(
+                      currentLesson
+                    )}
+                    controls
+                    preload="metadata"
+                  >
+                    Your browser does not support
+                    video playback.
+                  </video>
+
+                  <small>
+                    Watch the lesson before
+                    answering the quiz.
+                  </small>
+                </>
+              ) : (
+                <div className="lesson-video-placeholder">
+                  <Play size={30} />
+
+                  <strong>
+                    Lesson video coming soon
+                  </strong>
+
+                  <span>
+                    The lesson content can be
+                    uploaded here later.
+                  </span>
+                </div>
+              )}
+            </div>
+
             <div className="lesson-tip">
               <CircleHelp size={18} />
 
               <span>
-                Take your time and answer the question
-                below.
+                Take your time and answer the
+                question below.
               </span>
             </div>
 
@@ -1381,30 +1600,45 @@ function Music() {
 
               <div className="quiz-options">
                 {currentLesson.options.map(
-                  (option, index) => {
+                  (
+                    option,
+                    index
+                  ) => {
                     const selected =
-                      selectedAnswer === index;
+                      selectedAnswer ===
+                      index;
 
                     const isCorrect =
-                      quizResult === "correct" &&
-                      index === currentLesson.answer;
+                      quizResult ===
+                        "correct" &&
+                      index ===
+                        currentLesson.answer;
 
                     const isWrong =
-                      quizResult === "wrong" &&
+                      quizResult ===
+                        "wrong" &&
                       selected;
 
                     return (
                       <button
                         key={option}
                         className={`quiz-option ${
-                          selected ? "selected" : ""
+                          selected
+                            ? "selected"
+                            : ""
                         } ${
-                          isCorrect ? "correct" : ""
+                          isCorrect
+                            ? "correct"
+                            : ""
                         } ${
-                          isWrong ? "wrong" : ""
+                          isWrong
+                            ? "wrong"
+                            : ""
                         }`}
                         onClick={() =>
-                          setSelectedAnswer(index)
+                          setSelectedAnswer(
+                            index
+                          )
                         }
                       >
                         <span>
@@ -1421,19 +1655,20 @@ function Music() {
               </div>
             </div>
 
-            {quizResult === "correct" && (
+            {quizResult ===
+              "correct" && (
               <div className="quiz-feedback correct">
                 <Check size={18} />
 
-                Correct! Your musician is becoming
-                more complete.
+                Correct! Your musician is
+                becoming more complete.
               </div>
             )}
 
             {quizResult === "wrong" && (
               <div className="quiz-feedback wrong">
-                Not quite. Try again and review the
-                lesson concept.
+                Not quite. Try again and review
+                the lesson concept.
               </div>
             )}
 
@@ -1448,7 +1683,9 @@ function Music() {
               <button
                 className="primary-button"
                 onClick={checkAnswer}
-                disabled={selectedAnswer === null}
+                disabled={
+                  selectedAnswer === null
+                }
               >
                 Check Answer
                 <ChevronRight size={17} />
