@@ -619,10 +619,16 @@
 /* Top */
 
 .skill-button.music {
-  top: 18px;
+  top: -12px;
   left: 50%;
 
   transform: translateX(-50%);
+}
+
+.skill-button.music:hover {
+  transform:
+    translateX(-50%)
+    scale(1.08);
 }
 
 .skill-button.music:hover {
