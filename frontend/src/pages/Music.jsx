@@ -1,144 +1,208 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import {
+  ArrowLeft,
+  Brain,
+  Check,
+  ChevronRight,
+  CircleHelp,
+  FileAudio,
+  Mic,
+  Music2,
+  Play,
+  RotateCcw,
+  Sparkles,
+  Upload,
+  Volume2,
+  X,
+} from "lucide-react";
+
 import "./music.css";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+const API_URL =
+  import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 const lessons = [
   {
     id: 1,
     title: "Understanding Pitch",
-    description: "Learn what pitch is and how high and low notes work.",
+    description:
+      "Learn what pitch means and how your voice moves between high and low notes.",
     duration: "5 min",
-    part: "head",
-    question: "Which describes pitch?",
+    icon: "🎵",
+    color: "purple",
+    question:
+      "What happens when the frequency of a sound increases?",
     options: [
-      "How high or low a sound is",
-      "How loud a sound is",
-      "How long a song is",
-      "How fast you clap",
+      "The pitch becomes higher",
+      "The pitch becomes lower",
+      "The sound disappears",
+      "Nothing changes",
     ],
     answer: 0,
   },
   {
     id: 2,
-    title: "Breathing Basics",
-    description: "Learn basic breathing control for singing.",
-    duration: "6 min",
-    part: "chest",
-    question: "Why is controlled breathing useful while singing?",
+    title: "Voice Control",
+    description:
+      "Learn simple breathing and voice-control techniques for singing.",
+    duration: "7 min",
+    icon: "🎤",
+    color: "blue",
+    question:
+      "Which helps you maintain better control while singing?",
     options: [
-      "It improves voice control",
-      "It makes the song shorter",
-      "It removes rhythm",
-      "It changes the lyrics",
+      "Holding your breath",
+      "Controlled breathing",
+      "Speaking as loudly as possible",
+      "Avoiding warm-ups",
     ],
-    answer: 0,
+    answer: 1,
   },
   {
     id: 3,
-    title: "Voice Control",
-    description: "Practice keeping your voice stable and controlled.",
-    duration: "7 min",
-    part: "left-arm",
-    question: "What helps maintain a steady note?",
-    options: [
-      "Controlled airflow",
-      "Random breathing",
-      "Speaking faster",
-      "Stopping airflow",
-    ],
+    title: "Musical Notes",
+    description:
+      "Understand the basic notes and how they are arranged.",
+    duration: "6 min",
+    icon: "🎼",
+    color: "pink",
+    question:
+      "Which of these is a musical note?",
+    options: ["C", "X", "Z", "Q"],
     answer: 0,
   },
   {
     id: 4,
-    title: "Rhythm",
-    description: "Understand timing, beats and musical patterns.",
-    duration: "5 min",
-    part: "right-arm",
-    question: "What does rhythm mainly describe?",
+    title: "Rhythm Basics",
+    description:
+      "Discover beats, timing and the foundation of musical rhythm.",
+    duration: "8 min",
+    icon: "🥁",
+    color: "orange",
+    question:
+      "What does rhythm mainly describe?",
     options: [
-      "The timing and pattern of sounds",
-      "Only the volume",
-      "Only the pitch",
-      "The microphone quality",
+      "The timing of sounds",
+      "The color of an instrument",
+      "The size of a speaker",
+      "The volume of a microphone",
     ],
     answer: 0,
   },
   {
     id: 5,
-    title: "Singing Practice",
-    description: "Combine pitch, breathing and rhythm.",
+    title: "Pitch Matching",
+    description:
+      "Practice matching your voice to a reference note.",
     duration: "8 min",
-    part: "left-leg",
-    question: "What should you focus on during practice?",
+    icon: "🎯",
+    color: "green",
+    question:
+      "What is pitch matching?",
     options: [
-      "Pitch, rhythm and voice control",
-      "Only volume",
-      "Only speed",
-      "Only lyrics",
+      "Matching your voice to a target note",
+      "Making your voice louder",
+      "Changing the song speed",
+      "Adding background music",
     ],
     answer: 0,
   },
   {
     id: 6,
-    title: "Become a Musician",
-    description: "Complete your first learning journey.",
+    title: "Your First Performance",
+    description:
+      "Put everything together and perform a short musical exercise.",
     duration: "10 min",
-    part: "right-leg",
-    question: "What is the most important part of learning a skill?",
+    icon: "🌟",
+    color: "gold",
+    question:
+      "What is the most important part of practice?",
     options: [
-      "Consistent practice",
-      "Never practicing",
-      "Only watching videos",
-      "Giving up quickly",
+      "Practicing consistently",
+      "Never making mistakes",
+      "Only practicing once",
+      "Avoiding difficult exercises",
     ],
     answer: 0,
   },
 ];
 
-function Music() {
-  const [mode, setMode] = useState("home");
+function getSavedProgress() {
+  try {
+    const saved = localStorage.getItem("skillsensai_music_progress");
 
-  const [completedLessons, setCompletedLessons] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("skillsensai_completed_lessons")) || [];
-    } catch {
-      return [];
-    }
-  });
+    if (!saved) return 0;
+
+    const parsed = Number(saved);
+
+    if (Number.isNaN(parsed)) return 0;
+
+    return Math.max(0, Math.min(parsed, lessons.length));
+  } catch {
+    return 0;
+  }
+}
+
+function Music() {
+  const [screen, setScreen] = useState("home");
+
+  const [completedLessons, setCompletedLessons] =
+    useState(getSavedProgress);
 
   const [selectedLesson, setSelectedLesson] = useState(null);
+
   const [selectedAnswer, setSelectedAnswer] = useState(null);
+
   const [quizResult, setQuizResult] = useState(null);
 
-  const [recording, setRecording] = useState(false);
-  const [recordedAudio, setRecordedAudio] = useState(null);
-  const [audioResult, setAudioResult] = useState(null);
-
   const [songFile, setSongFile] = useState(null);
-  const [songResult, setSongResult] = useState(null);
+
+  const [songAnalysis, setSongAnalysis] = useState(null);
+
+  const [voiceFile, setVoiceFile] = useState(null);
+
+  const [voiceAnalysis, setVoiceAnalysis] = useState(null);
+
+  const [recording, setRecording] = useState(false);
 
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
+
+  const [error, setError] = useState("");
 
   const mediaRecorderRef = useRef(null);
+
   const audioChunksRef = useRef([]);
 
   useEffect(() => {
-    localStorage.setItem(
-      "skillsensai_completed_lessons",
-      JSON.stringify(completedLessons)
+    try {
+      localStorage.setItem(
+        "skillsensai_music_progress",
+        String(completedLessons)
+      );
+    } catch {
+      // Ignore localStorage errors.
+    }
+  }, [completedLessons]);
+
+  const progress = useMemo(() => {
+    return Math.round(
+      (completedLessons / lessons.length) * 100
     );
   }, [completedLessons]);
 
-  const progress = Math.round(
-    (completedLessons.length / lessons.length) * 100
-  );
+  const characterLevel = useMemo(() => {
+    return Math.max(
+      0,
+      Math.min(6, completedLessons)
+    );
+  }, [completedLessons]);
 
-  const xp = completedLessons.length * 100;
+  const currentLesson = selectedLesson
+    ? lessons.find((lesson) => lesson.id === selectedLesson)
+    : null;
 
   function openLesson(lesson) {
-    setSelectedLesson(lesson);
+    setSelectedLesson(lesson.id);
     setSelectedAnswer(null);
     setQuizResult(null);
   }
@@ -149,37 +213,139 @@ function Music() {
     setQuizResult(null);
   }
 
-  function submitQuiz() {
-    if (selectedAnswer === null) {
-      setQuizResult("Please select an answer.");
+  function checkAnswer() {
+    if (!currentLesson || selectedAnswer === null) {
       return;
     }
 
-    if (selectedAnswer === selectedLesson.answer) {
-      setQuizResult("correct");
+    const correct =
+      selectedAnswer === currentLesson.answer;
 
-      if (!completedLessons.includes(selectedLesson.id)) {
-        setCompletedLessons((prev) => [...prev, selectedLesson.id]);
+    setQuizResult(correct ? "correct" : "wrong");
+
+    if (
+      correct &&
+      currentLesson.id > completedLessons
+    ) {
+      setCompletedLessons((previous) =>
+        Math.max(previous, currentLesson.id)
+      );
+    }
+  }
+
+  function resetProgress() {
+    setCompletedLessons(0);
+
+    try {
+      localStorage.removeItem(
+        "skillsensai_music_progress"
+      );
+    } catch {
+      // Ignore localStorage errors.
+    }
+  }
+
+  async function analyzeSong(file) {
+    if (!file) return;
+
+    setSongFile(file);
+    setSongAnalysis(null);
+    setError("");
+    setLoading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch(
+        `${API_URL}/analyze-song`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `Server returned ${response.status}`
+        );
       }
-    } else {
-      setQuizResult("wrong");
+
+      const data = await response.json();
+
+      setSongAnalysis(data);
+    } catch (err) {
+      console.error(err);
+
+      setError(
+        "Unable to analyse the song. Make sure the SkillSensAI backend is running."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function analyzeVoice(file) {
+    if (!file) return;
+
+    setVoiceFile(file);
+    setVoiceAnalysis(null);
+    setError("");
+    setLoading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch(
+        `${API_URL}/analyze-voice`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `Server returned ${response.status}`
+        );
+      }
+
+      const data = await response.json();
+
+      setVoiceAnalysis(data);
+    } catch (err) {
+      console.error(err);
+
+      setError(
+        "Unable to analyse the recording. Make sure the SkillSensAI backend is running."
+      );
+    } finally {
+      setLoading(false);
     }
   }
 
   async function startRecording() {
-    try {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        setMessage("Live recording is not supported by this browser.");
-        return;
-      }
+    setError("");
 
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-      });
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setError(
+        "Live recording is not supported by this browser."
+      );
+      return;
+    }
+
+    try {
+      const stream =
+        await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
+
+      audioChunksRef.current = [];
 
       const recorder = new MediaRecorder(stream);
 
-      audioChunksRef.current = [];
+      mediaRecorderRef.current = recorder;
 
       recorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
@@ -187,641 +353,1107 @@ function Music() {
         }
       };
 
-      recorder.onstop = () => {
-        const blob = new Blob(audioChunksRef.current, {
-          type: recorder.mimeType || "audio/webm",
-        });
+      recorder.onstop = async () => {
+        stream
+          .getTracks()
+          .forEach((track) => track.stop());
 
-        const url = URL.createObjectURL(blob);
-        setRecordedAudio({
-          blob,
-          url,
-          name: "live-recording.webm",
-        });
+        const blob = new Blob(
+          audioChunksRef.current,
+          {
+            type: "audio/webm",
+          }
+        );
 
-        stream.getTracks().forEach((track) => track.stop());
+        const file = new File(
+          [blob],
+          "skillsensai-recording.webm",
+          {
+            type: "audio/webm",
+          }
+        );
+
+        await analyzeVoice(file);
       };
 
       recorder.start();
 
-      mediaRecorderRef.current = recorder;
       setRecording(true);
-      setMessage("Recording started...");
-    } catch (error) {
-      console.error(error);
-      setMessage("Microphone permission was denied or unavailable.");
+    } catch (err) {
+      console.error(err);
+
+      setError(
+        "Microphone access was not available. Please allow microphone permission."
+      );
     }
   }
 
   function stopRecording() {
-    if (mediaRecorderRef.current) {
+    if (
+      mediaRecorderRef.current &&
+      mediaRecorderRef.current.state !== "inactive"
+    ) {
       mediaRecorderRef.current.stop();
-      mediaRecorderRef.current = null;
     }
 
     setRecording(false);
-    setMessage("Recording saved. You can analyse it now.");
   }
 
-  function handleRecordingUpload(event) {
-    const file = event.target.files?.[0];
-
-    if (!file) return;
-
-    const url = URL.createObjectURL(file);
-
-    setRecordedAudio({
-      blob: file,
-      url,
-      name: file.name,
-    });
-
-    setAudioResult(null);
-    setMessage("Recording uploaded.");
+  function goToLearnFromScratch() {
+    setScreen("scratch");
+    setError("");
   }
 
-  async function analyseVoice() {
-    if (!recordedAudio?.blob) {
-      setMessage("Please record or upload a recording first.");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setMessage("AI is analysing your voice...");
-
-      const formData = new FormData();
-      formData.append(
-        "file",
-        recordedAudio.blob,
-        recordedAudio.name || "recording.webm"
-      );
-
-      const response = await fetch(`${API_URL}/analyze-voice`, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error(`Voice analysis failed: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      setAudioResult(data);
-      setMessage("Voice analysis completed.");
-    } catch (error) {
-      console.error(error);
-      setMessage(
-        "Unable to analyse the recording. Check that the backend is running."
-      );
-    } finally {
-      setLoading(false);
-    }
+  function goToLearnSong() {
+    setScreen("song");
+    setError("");
   }
 
-  function handleSongUpload(event) {
-    const file = event.target.files?.[0];
-
-    if (!file) return;
-
-    setSongFile(file);
-    setSongResult(null);
-    setMessage(`Selected: ${file.name}`);
-  }
-
-  async function analyseSong() {
-    if (!songFile) {
-      setMessage("Please select a song first.");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setMessage("AI is analysing the song...");
-
-      const formData = new FormData();
-      formData.append("file", songFile);
-
-      const response = await fetch(`${API_URL}/analyze-song`, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error(`Song analysis failed: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      setSongResult(data);
-      setMessage("Song analysis completed.");
-    } catch (error) {
-      console.error(error);
-      setMessage(
-        "Unable to analyse the song. Check that the backend is running."
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function getAccuracy(result) {
-    const possibleValues = [
-      result?.accuracy,
-      result?.pitch_accuracy,
-      result?.score,
-    ];
-
-    const value = possibleValues.find(
-      (item) => typeof item === "number" && Number.isFinite(item)
-    );
-
-    if (value === undefined) return null;
-
-    return Math.max(0, Math.min(100, Math.round(value)));
-  }
-
-  function getGraphValues(result) {
-    const possible =
-      result?.pitches ||
-      result?.pitch_values ||
-      result?.pitch_graph ||
-      result?.graph ||
-      [];
-
-    if (!Array.isArray(possible) || possible.length === 0) {
-      return [35, 55, 42, 70, 60, 82, 65, 76, 50, 68, 80, 58];
-    }
-
-    return possible
-      .map((value) => {
-        if (typeof value === "number") return value;
-
-        if (typeof value === "object" && value !== null) {
-          return (
-            Number(value.pitch) ||
-            Number(value.value) ||
-            Number(value.frequency) ||
-            0
-          );
-        }
-
-        return Number(value) || 0;
-      })
-      .slice(0, 40);
+  function goHome() {
+    setScreen("home");
+    setError("");
   }
 
   return (
     <div className="music-page">
-      <header className="music-header">
-        <div>
-          <div className="brand-small">SKILLSENSAI</div>
-          <h1>Music</h1>
-          <p>Learn. Practice. Perform.</p>
-        </div>
+      <header className="music-navbar">
+        <button
+          className="music-brand"
+          onClick={goHome}
+        >
+          <span className="music-brand-icon">
+            <Music2 size={22} />
+          </span>
 
-        {mode !== "home" && (
-          <button
-            className="back-button"
-            onClick={() => {
-              setMode("home");
-              setMessage("");
-            }}
-          >
-            ← Back
-          </button>
-        )}
+          <span>
+            <strong>
+              Skill<span>SensAI</span>
+            </strong>
+
+            <small>Learn music your way</small>
+          </span>
+        </button>
+
+        <div className="music-progress-mini">
+          <span>
+            {completedLessons}/{lessons.length} lessons
+          </span>
+
+          <div className="mini-progress">
+            <div
+              style={{
+                width: `${progress}%`,
+              }}
+            />
+          </div>
+        </div>
       </header>
 
-      <main className="music-container">
-        {mode === "home" && (
-          <>
-            <section className="hero-card">
-              <div className="hero-text">
-                <span className="eyebrow">AI-POWERED MUSIC LEARNING</span>
-                <h2>Bring your inner musician to life.</h2>
-                <p>
-                  Learn music step by step, practise with AI feedback and
-                  watch your musician evolve as you improve.
-                </p>
+      {screen === "home" && (
+        <main className="music-home">
+          <section className="music-hero">
+            <div className="music-hero-copy">
+              <span className="eyebrow">
+                <Sparkles size={14} />
+                AI-POWERED MUSIC LEARNING
+              </span>
 
-                <div className="stats-row">
-                  <div className="stat-box">
-                    <strong>{progress}%</strong>
-                    <span>Progress</span>
-                  </div>
-
-                  <div className="stat-box">
-                    <strong>{xp}</strong>
-                    <span>XP</span>
-                  </div>
-
-                  <div className="stat-box">
-                    <strong>{completedLessons.length}/6</strong>
-                    <span>Lessons</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className={`musician ${progress === 100 ? "awakened" : ""}`}>
-                <div className={`musician-part head ${progress >= 17 ? "active" : ""}`} />
-                <div className={`musician-part chest ${progress >= 34 ? "active" : ""}`} />
-                <div className={`musician-part left-arm ${progress >= 50 ? "active" : ""}`} />
-                <div className={`musician-part right-arm ${progress >= 67 ? "active" : ""}`} />
-                <div className={`musician-part left-leg ${progress >= 84 ? "active" : ""}`} />
-                <div className={`musician-part right-leg ${progress === 100 ? "active" : ""}`} />
-                {progress === 100 && <div className="music-particles">♪ ♫ ✦ ♪</div>}
-              </div>
-            </section>
-
-            <section className="mode-grid">
-              <button
-                className="mode-card"
-                onClick={() => setMode("scratch")}
-              >
-                <div className="mode-icon">🎼</div>
-                <h3>Learn From Scratch</h3>
-                <p>
-                  Build your fundamentals through interactive lessons,
-                  quizzes and practice.
-                </p>
-                <span>Start learning →</span>
-              </button>
-
-              <button
-                className="mode-card"
-                onClick={() => setMode("song")}
-              >
-                <div className="mode-icon">🎤</div>
-                <h3>Learn a Song</h3>
-                <p>
-                  Upload a song and use AI analysis to understand pitch,
-                  timing and performance.
-                </p>
-                <span>Analyse a song →</span>
-              </button>
-            </section>
-
-            {message && <div className="message-box">{message}</div>}
-          </>
-        )}
-
-        {mode === "scratch" && (
-          <section>
-            <div className="section-heading">
-              <div>
-                <span className="eyebrow">LEARN FROM SCRATCH</span>
-                <h2>Build your musical foundation</h2>
-                <p>
-                  Complete lessons to gradually bring your musician to life.
-                </p>
-              </div>
-
-              <div className="progress-circle">
-                {progress}%
-              </div>
-            </div>
-
-            <div className="lesson-progress">
-              <div
-                className="lesson-progress-fill"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-
-            <div className="lesson-grid">
-              {lessons.map((lesson) => {
-                const completed = completedLessons.includes(lesson.id);
-
-                return (
-                  <button
-                    className={`lesson-card ${completed ? "completed" : ""}`}
-                    key={lesson.id}
-                    onClick={() => openLesson(lesson)}
-                  >
-                    <div className="lesson-number">
-                      {completed ? "✓" : lesson.id}
-                    </div>
-
-                    <div className="lesson-content">
-                      <h3>{lesson.title}</h3>
-                      <p>{lesson.description}</p>
-                      <span>{lesson.duration}</span>
-                    </div>
-
-                    <div className="lesson-arrow">→</div>
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="practice-card">
-              <div>
-                <span className="eyebrow">PRACTICE</span>
-                <h2>Train your voice</h2>
-                <p>
-                  Record yourself or upload a recording and get AI-powered
-                  feedback.
-                </p>
-              </div>
-
-              <div className="practice-actions">
-                {!recording ? (
-                  <button className="primary-button" onClick={startRecording}>
-                    ● Record Live
-                  </button>
-                ) : (
-                  <button className="danger-button" onClick={stopRecording}>
-                    ■ Stop Recording
-                  </button>
-                )}
-
-                <label className="secondary-button">
-                  ↑ Upload Recording
-                  <input
-                    type="file"
-                    accept="audio/*"
-                    onChange={handleRecordingUpload}
-                    hidden
-                  />
-                </label>
-              </div>
-
-              {recordedAudio && (
-                <div className="recording-result">
-                  <audio src={recordedAudio.url} controls />
-                  <button
-                    className="primary-button"
-                    onClick={analyseVoice}
-                    disabled={loading}
-                  >
-                    {loading ? "Analysing..." : "Analyse My Voice"}
-                  </button>
-                </div>
-              )}
-
-              {audioResult && (
-                <div className="analysis-card">
-                  <h3>AI Voice Feedback</h3>
-
-                  {getAccuracy(audioResult) !== null && (
-                    <div className="score-display">
-                      <strong>{getAccuracy(audioResult)}%</strong>
-                      <span>Pitch Accuracy</span>
-                    </div>
-                  )}
-
-                  <p>
-                    {audioResult.feedback ||
-                      audioResult.message ||
-                      "Your recording has been analysed successfully."}
-                  </p>
-                </div>
-              )}
-
-              {message && <div className="message-box">{message}</div>}
-            </div>
-          </section>
-        )}
-
-        {mode === "song" && (
-          <section>
-            <div className="section-heading">
-              <div>
-                <span className="eyebrow">LEARN A SONG</span>
-                <h2>Analyse your music</h2>
-                <p>
-                  Upload a song and let SkillSensAI analyse its musical
-                  characteristics.
-                </p>
-              </div>
-            </div>
-
-            <div className="upload-card">
-              <div className="upload-icon">🎵</div>
-
-              <h2>Upload a song</h2>
+              <h1>
+                Discover the
+                <span> musician </span>
+                inside you.
+              </h1>
 
               <p>
-                Supported formats depend on your backend configuration.
-                MP3, WAV and other common audio files can be selected.
+                Learn music from the beginning, practise
+                your voice, analyse your performance and
+                build your skills at your own pace.
               </p>
+            </div>
 
-              <label className="upload-area">
-                <span>Choose Audio File</span>
-                <input
-                  type="file"
-                  accept="audio/*"
-                  onChange={handleSongUpload}
-                  hidden
-                />
-              </label>
+            <div className="musician-stage">
+              <div
+                className={`musician-aura level-${characterLevel}`}
+              />
 
-              {songFile && (
-                <div className="selected-file">
-                  <strong>{songFile.name}</strong>
-                  <span>
-                    {(songFile.size / 1024 / 1024).toFixed(2)} MB
-                  </span>
+              <div
+                className={`musician-silhouette level-${characterLevel}`}
+              >
+                <div className="musician-head" />
+                <div className="musician-body" />
+                <div className="musician-arm left" />
+                <div className="musician-arm right" />
+                <div className="musician-leg left" />
+                <div className="musician-leg right" />
+              </div>
+
+              {characterLevel === 6 && (
+                <div className="musician-particles">
+                  <span>♪</span>
+                  <span>♫</span>
+                  <span>♪</span>
+                  <span>♬</span>
+                  <span>♫</span>
                 </div>
               )}
 
-              <button
-                className="primary-button large"
-                onClick={analyseSong}
-                disabled={!songFile || loading}
-              >
-                {loading ? "Analysing..." : "Analyse Song"}
-              </button>
+              <div className="musician-level">
+                <strong>
+                  Level {characterLevel}
+                </strong>
 
-              {message && <div className="message-box">{message}</div>}
+                <span>
+                  {progress}% awakened
+                </span>
+              </div>
             </div>
 
-            {songResult && (
-              <div className="song-analysis">
-                <div className="analysis-header">
-                  <div>
-                    <span className="eyebrow">AI ANALYSIS</span>
-                    <h2>Song Analysis Result</h2>
-                  </div>
-
-                  {songResult.duration !== undefined && (
-                    <div className="duration">
-                      {Number(songResult.duration).toFixed(2)} sec
-                    </div>
-                  )}
+            <div className="music-choice-grid">
+              <button
+                className="music-choice-card scratch"
+                onClick={goToLearnFromScratch}
+              >
+                <div className="choice-icon">
+                  <Brain size={27} />
                 </div>
 
-                {getAccuracy(songResult) !== null && (
-                  <div className="score-display large-score">
-                    <strong>{getAccuracy(songResult)}%</strong>
-                    <span>Analysis Score</span>
-                  </div>
-                )}
+                <div>
+                  <span className="choice-label">
+                    START HERE
+                  </span>
 
-                <div className="pitch-graph">
-                  {getGraphValues(songResult).map((value, index) => {
-                    const numericValue = Number(value) || 0;
+                  <h2>Learn From Scratch</h2>
 
-                    const height =
-                      numericValue > 100
-                        ? Math.min(100, numericValue / 5)
-                        : Math.max(10, numericValue);
-
-                    return (
-                      <div
-                        key={index}
-                        className="pitch-bar"
-                        style={{ height: `${height}%` }}
-                      />
-                    );
-                  })}
+                  <p>
+                    Build your musical foundation through
+                    guided lessons, quizzes and practice.
+                  </p>
                 </div>
 
-                <p className="analysis-feedback">
-                  {songResult.feedback ||
-                    songResult.message ||
-                    "The AI analysis is complete."}
-                </p>
-              </div>
-            )}
+                <ChevronRight className="choice-arrow" />
+              </button>
 
-            <div className="practice-card song-practice">
+              <button
+                className="music-choice-card song"
+                onClick={goToLearnSong}
+              >
+                <div className="choice-icon">
+                  <Music2 size={27} />
+                </div>
+
+                <div>
+                  <span className="choice-label">
+                    PRACTICE
+                  </span>
+
+                  <h2>Learn a Song</h2>
+
+                  <p>
+                    Upload a song and use AI feedback to
+                    practise your pitch and voice.
+                  </p>
+                </div>
+
+                <ChevronRight className="choice-arrow" />
+              </button>
+            </div>
+          </section>
+
+          <section className="music-stats">
+            <div>
+              <strong>{completedLessons}</strong>
+              <span>Lessons completed</span>
+            </div>
+
+            <div>
+              <strong>{progress}%</strong>
+              <span>Learning progress</span>
+            </div>
+
+            <div>
+              <strong>
+                {characterLevel === 6
+                  ? "Awakened"
+                  : "Learning"}
+              </strong>
+              <span>Musician status</span>
+            </div>
+          </section>
+
+          {completedLessons > 0 && (
+            <button
+              className="reset-progress"
+              onClick={resetProgress}
+            >
+              <RotateCcw size={15} />
+              Reset learning progress
+            </button>
+          )}
+        </main>
+      )}
+
+      {screen === "scratch" && (
+        <main className="music-content">
+          <button
+            className="back-button"
+            onClick={goHome}
+          >
+            <ArrowLeft size={18} />
+            Back to Music
+          </button>
+
+          <section className="page-heading">
+            <span className="eyebrow">
+              <Brain size={14} />
+              LEARN FROM SCRATCH
+            </span>
+
+            <h1>
+              Build your musical foundation.
+            </h1>
+
+            <p>
+              Complete lessons to bring your musician
+              to life.
+            </p>
+          </section>
+
+          <section className="progress-panel">
+            <div className="progress-panel-top">
               <div>
-                <span className="eyebrow">PRACTICE THE SONG</span>
-                <h2>Sing along</h2>
-                <p>
-                  Record your performance and compare it with the AI analysis.
-                </p>
+                <strong>Your journey</strong>
+
+                <span>
+                  {completedLessons} of {lessons.length}{" "}
+                  lessons completed
+                </span>
               </div>
 
-              <div className="practice-actions">
+              <strong>{progress}%</strong>
+            </div>
+
+            <div className="large-progress">
+              <div
+                style={{
+                  width: `${progress}%`,
+                }}
+              />
+            </div>
+          </section>
+
+          <section className="lesson-grid">
+            {lessons.map((lesson) => {
+              const completed =
+                lesson.id <= completedLessons;
+
+              return (
+                <button
+                  key={lesson.id}
+                  className={`lesson-card ${completed ? "completed" : ""}`}
+                  onClick={() => openLesson(lesson)}
+                >
+                  <div
+                    className={`lesson-number ${lesson.color}`}
+                  >
+                    {completed ? (
+                      <Check size={21} />
+                    ) : (
+                      lesson.id
+                    )}
+                  </div>
+
+                  <div className="lesson-icon">
+                    {lesson.icon}
+                  </div>
+
+                  <div className="lesson-details">
+                    <span>
+                      LESSON {lesson.id}
+                    </span>
+
+                    <h3>{lesson.title}</h3>
+
+                    <p>{lesson.description}</p>
+
+                    <small>
+                      {lesson.duration}
+                    </small>
+                  </div>
+
+                  <ChevronRight className="lesson-arrow" />
+                </button>
+              );
+            })}
+          </section>
+
+          <section className="practice-section">
+            <div className="section-heading">
+              <span>
+                <Mic size={15} />
+                PRACTICE
+              </span>
+
+              <h2>
+                Test what you've learned.
+              </h2>
+            </div>
+
+            <div className="practice-options">
+              <div className="practice-card">
+                <div className="practice-card-icon">
+                  <Mic size={22} />
+                </div>
+
+                <div className="practice-card-copy">
+                  <h3>Record Live</h3>
+
+                  <p>
+                    Record yourself singing and receive
+                    AI-powered feedback.
+                  </p>
+                </div>
+
                 {!recording ? (
-                  <button className="primary-button" onClick={startRecording}>
-                    ● Record Live
+                  <button
+                    className="practice-button recording-button"
+                    onClick={startRecording}
+                  >
+                    <Mic size={16} />
+                    Record Live
                   </button>
                 ) : (
-                  <button className="danger-button" onClick={stopRecording}>
-                    ■ Stop Recording
+                  <button
+                    className="practice-button recording-button"
+                    onClick={stopRecording}
+                  >
+                    <X size={16} />
+                    Stop Recording
                   </button>
                 )}
+              </div>
 
-                <label className="secondary-button">
-                  ↑ Upload Recording
+              <div className="practice-card">
+                <div className="practice-card-icon">
+                  <Upload size={22} />
+                </div>
+
+                <div className="practice-card-copy">
+                  <h3>Upload Recording</h3>
+
+                  <p>
+                    Upload an existing recording for
+                    AI analysis.
+                  </p>
+                </div>
+
+                <label className="practice-button upload-label">
+                  <Upload size={16} />
+                  Upload Recording
+
                   <input
                     type="file"
                     accept="audio/*"
-                    onChange={handleRecordingUpload}
                     hidden
+                    onChange={(event) =>
+                      analyzeVoice(
+                        event.target.files?.[0]
+                      )
+                    }
                   />
                 </label>
               </div>
-
-              {recordedAudio && (
-                <div className="recording-result">
-                  <audio src={recordedAudio.url} controls />
-
-                  <button
-                    className="primary-button"
-                    onClick={analyseVoice}
-                    disabled={loading}
-                  >
-                    {loading ? "Analysing..." : "Analyse Performance"}
-                  </button>
-                </div>
-              )}
-
-              {audioResult && (
-                <div className="analysis-card">
-                  <h3>Performance Feedback</h3>
-
-                  {getAccuracy(audioResult) !== null && (
-                    <div className="score-display">
-                      <strong>{getAccuracy(audioResult)}%</strong>
-                      <span>Pitch Accuracy</span>
-                    </div>
-                  )}
-
-                  <p>
-                    {audioResult.feedback ||
-                      audioResult.message ||
-                      "Your performance has been analysed."}
-                  </p>
-                </div>
-              )}
             </div>
           </section>
-        )}
-      </main>
 
-      {selectedLesson && (
-        <div className="modal-overlay" onClick={closeLesson}>
-          <div
-            className="lesson-modal"
-            onClick={(event) => event.stopPropagation()}
+          {recording && (
+            <div className="recording-status">
+              <span className="recording-pulse" />
+
+              <div>
+                <strong>
+                  Recording in progress
+                </strong>
+
+                <span>
+                  Sing naturally, then press stop.
+                </span>
+              </div>
+            </div>
+          )}
+
+          {voiceFile && (
+            <div className="selected-song">
+              <Volume2 size={20} />
+
+              <div>
+                <strong>
+                  {voiceFile.name}
+                </strong>
+
+                <small>
+                  Recording selected for analysis
+                </small>
+              </div>
+
+              <Check className="success-icon" />
+            </div>
+          )}
+
+          {voiceAnalysis && (
+            <section className="voice-result">
+              <div className="voice-result-icon">
+                <Sparkles size={24} />
+              </div>
+
+              <div>
+                <span>AI FEEDBACK</span>
+
+                <h2>
+                  {voiceAnalysis.accuracy !==
+                  undefined
+                    ? `${Math.round(
+                        Number(
+                          voiceAnalysis.accuracy
+                        )
+                      )}% pitch accuracy`
+                    : "Your recording has been analysed"}
+                </h2>
+
+                <p>
+                  {voiceAnalysis.message ||
+                    voiceAnalysis.feedback ||
+                    "Keep practising and focus on matching the target pitch."}
+                </p>
+              </div>
+            </section>
+          )}
+        </main>
+      )}
+
+      {screen === "song" && (
+        <main className="music-content">
+          <button
+            className="back-button"
+            onClick={goHome}
           >
-            <button className="modal-close" onClick={closeLesson}>
-              ×
-            </button>
+            <ArrowLeft size={18} />
+            Back to Music
+          </button>
 
-            <span className="eyebrow">LESSON {selectedLesson.id}</span>
+          <section className="page-heading">
+            <span className="eyebrow">
+              <Music2 size={14} />
+              LEARN A SONG
+            </span>
 
-            <h2>{selectedLesson.title}</h2>
+            <h1>
+              Practise with AI feedback.
+            </h1>
 
-            <p>{selectedLesson.description}</p>
+            <p>
+              Upload a song, study its pitch and compare
+              your performance.
+            </p>
+          </section>
 
-            <div className="lesson-video-placeholder">
-              <div>▶</div>
-              <span>Lesson content</span>
-              <small>
-                Replace this area with your uploaded lesson video when ready.
-              </small>
+          <section className="upload-song-card">
+            <div className="upload-song-icon">
+              <FileAudio size={30} />
             </div>
 
-            <h3>{selectedLesson.question}</h3>
+            <h2>Choose a song</h2>
 
-            <div className="quiz-options">
-              {selectedLesson.options.map((option, index) => (
-                <button
-                  key={option}
-                  className={`quiz-option ${
-                    selectedAnswer === index ? "selected" : ""
-                  }`}
-                  onClick={() => setSelectedAnswer(index)}
-                >
-                  <span>{String.fromCharCode(65 + index)}</span>
-                  {option}
-                </button>
-              ))}
+            <p>
+              Upload an audio file and SkillSensAI will
+              analyse its musical characteristics.
+            </p>
+
+            <label className="primary-upload-button">
+              <Upload size={18} />
+              Upload Song
+
+              <input
+                type="file"
+                accept="audio/*"
+                hidden
+                onChange={(event) =>
+                  analyzeSong(
+                    event.target.files?.[0]
+                  )
+                }
+              />
+            </label>
+
+            <small>
+              MP3, WAV, M4A and other supported audio
+              formats
+            </small>
+          </section>
+
+          {songFile && (
+            <div className="selected-song">
+              <FileAudio size={20} />
+
+              <div>
+                <strong>
+                  {songFile.name}
+                </strong>
+
+                <small>
+                  Song selected for analysis
+                </small>
+              </div>
+
+              <Check className="success-icon" />
+            </div>
+          )}
+
+          {loading && (
+            <div className="analysis-status">
+              <Sparkles
+                size={18}
+                className="loading-icon"
+              />
+
+              Analysing your audio with AI...
+            </div>
+          )}
+
+          {error && (
+            <div className="analysis-error">
+              {error}
+            </div>
+          )}
+
+          {songAnalysis && (
+            <section className="pitch-analysis">
+              <div className="pitch-header">
+                <div>
+                  <span>
+                    AI SONG ANALYSIS
+                  </span>
+
+                  <h2>
+                    Pitch profile
+                  </h2>
+                </div>
+
+                <div className="song-duration">
+                  <small>Duration</small>
+
+                  <strong>
+                    {songAnalysis.duration
+                      ? `${Number(
+                          songAnalysis.duration
+                        ).toFixed(1)} sec`
+                      : "Available"}
+                  </strong>
+                </div>
+              </div>
+
+              {songAnalysis.pitch &&
+              Array.isArray(songAnalysis.pitch) &&
+              songAnalysis.pitch.length > 0 ? (
+                <div className="pitch-graph-container">
+                  <svg
+                    className="pitch-graph"
+                    viewBox="0 0 1000 350"
+                    preserveAspectRatio="none"
+                  >
+                    <line
+                      className="graph-axis"
+                      x1="45"
+                      y1="20"
+                      x2="45"
+                      y2="320"
+                    />
+
+                    <line
+                      className="graph-axis"
+                      x1="45"
+                      y1="320"
+                      x2="980"
+                      y2="320"
+                    />
+
+                    {[80, 140, 200, 260].map(
+                      (y) => (
+                        <line
+                          key={y}
+                          className="graph-grid"
+                          x1="45"
+                          y1={y}
+                          x2="980"
+                          y2={y}
+                        />
+                      )
+                    )}
+
+                    <polyline
+                      className="pitch-line"
+                      points={songAnalysis.pitch
+                        .map(
+                          (value, index) => {
+                            const x =
+                              50 +
+                              (index /
+                                Math.max(
+                                  1,
+                                  songAnalysis
+                                    .pitch
+                                    .length -
+                                    1
+                                )) *
+                                920;
+
+                            const numeric =
+                              Number(value) || 0;
+
+                            const y =
+                              310 -
+                              Math.min(
+                                270,
+                                Math.max(
+                                  0,
+                                  numeric * 2
+                                )
+                              );
+
+                            return `${x},${y}`;
+                          }
+                        )
+                        .join(" ")}
+                    />
+                  </svg>
+
+                  <span className="pitch-label-high">
+                    High
+                  </span>
+
+                  <span className="pitch-label-low">
+                    Low
+                  </span>
+                </div>
+              ) : (
+                <div className="no-pitch">
+                  Pitch data was returned without a
+                  graphable pitch sequence.
+                </div>
+              )}
+
+              <div className="pitch-info">
+                <div>
+                  <span className="pitch-dot" />
+                  <p>
+                    Detected pitch over time
+                  </p>
+                </div>
+
+                <span>
+                  AI-generated analysis
+                </span>
+              </div>
+            </section>
+          )}
+
+          <section className="practice-section">
+            <div className="section-heading">
+              <span>
+                <Mic size={15} />
+                PRACTICE YOUR VOICE
+              </span>
+
+              <h2>
+                Sing along and compare your voice.
+              </h2>
+            </div>
+
+            <div className="practice-options">
+              <div className="practice-card">
+                <div className="practice-card-icon">
+                  <Mic size={22} />
+                </div>
+
+                <div className="practice-card-copy">
+                  <h3>Record Live</h3>
+
+                  <p>
+                    Sing into your microphone and let
+                    AI analyse your pitch.
+                  </p>
+                </div>
+
+                {!recording ? (
+                  <button
+                    className="practice-button recording-button"
+                    onClick={startRecording}
+                  >
+                    <Mic size={16} />
+                    Record Live
+                  </button>
+                ) : (
+                  <button
+                    className="practice-button recording-button"
+                    onClick={stopRecording}
+                  >
+                    <X size={16} />
+                    Stop Recording
+                  </button>
+                )}
+              </div>
+
+              <div className="practice-card">
+                <div className="practice-card-icon">
+                  <Upload size={22} />
+                </div>
+
+                <div className="practice-card-copy">
+                  <h3>Upload Recording</h3>
+
+                  <p>
+                    Use an existing recording instead.
+                  </p>
+                </div>
+
+                <label className="practice-button upload-label">
+                  <Upload size={16} />
+                  Upload Recording
+
+                  <input
+                    type="file"
+                    accept="audio/*"
+                    hidden
+                    onChange={(event) =>
+                      analyzeVoice(
+                        event.target.files?.[0]
+                      )
+                    }
+                  />
+                </label>
+              </div>
+            </div>
+          </section>
+
+          {recording && (
+            <div className="recording-status">
+              <span className="recording-pulse" />
+
+              <div>
+                <strong>
+                  Recording in progress
+                </strong>
+
+                <span>
+                  Sing naturally, then press stop.
+                </span>
+              </div>
+            </div>
+          )}
+
+          {voiceFile && (
+            <div className="selected-song">
+              <Mic size={20} />
+
+              <div>
+                <strong>
+                  {voiceFile.name}
+                </strong>
+
+                <small>
+                  Voice recording selected
+                </small>
+              </div>
+
+              <Check className="success-icon" />
+            </div>
+          )}
+
+          {voiceAnalysis && (
+            <section className="comparison-section">
+              <div className="comparison-header">
+                <div className="comparison-icon">
+                  <Sparkles size={24} />
+                </div>
+
+                <div>
+                  <span>
+                    AI VOICE FEEDBACK
+                  </span>
+
+                  <h2>
+                    Your performance
+                  </h2>
+
+                  <p>
+                    Compare your recording with the
+                    target performance.
+                  </p>
+                </div>
+              </div>
+
+              <div className="accuracy-card">
+                <span>
+                  PITCH ACCURACY
+                </span>
+
+                <strong>
+                  {voiceAnalysis.accuracy !==
+                  undefined
+                    ? `${Math.round(
+                        Number(
+                          voiceAnalysis.accuracy
+                        )
+                      )}%`
+                    : "--"}
+                </strong>
+
+                <p>
+                  {voiceAnalysis.message ||
+                    voiceAnalysis.feedback ||
+                    "Keep practising to improve your pitch consistency."}
+                </p>
+              </div>
+
+              {voiceAnalysis.original_pitch &&
+              voiceAnalysis.voice_pitch ? (
+                <div className="comparison-graph-container">
+                  <div className="comparison-legend">
+                    <div>
+                      <span className="legend-dot original-dot" />
+                      Original
+                    </div>
+
+                    <div>
+                      <span className="legend-dot voice-dot" />
+                      Your voice
+                    </div>
+                  </div>
+
+                  <svg
+                    className="comparison-graph"
+                    viewBox="0 0 1000 350"
+                    preserveAspectRatio="none"
+                  >
+                    <polyline
+                      className="original-pitch-line"
+                      points={voiceAnalysis.original_pitch
+                        .map(
+                          (value, index) => {
+                            const x =
+                              (index /
+                                Math.max(
+                                  1,
+                                  voiceAnalysis
+                                    .original_pitch
+                                    .length -
+                                    1
+                                )) *
+                                980 +
+                              10;
+
+                            const numeric =
+                              Number(value) || 0;
+
+                            const y =
+                              320 -
+                              Math.min(
+                                280,
+                                Math.max(
+                                  0,
+                                  numeric * 2
+                                )
+                              );
+
+                            return `${x},${y}`;
+                          }
+                        )
+                        .join(" ")}
+                    />
+
+                    <polyline
+                      className="voice-pitch-line"
+                      points={voiceAnalysis.voice_pitch
+                        .map(
+                          (value, index) => {
+                            const x =
+                              (index /
+                                Math.max(
+                                  1,
+                                  voiceAnalysis
+                                    .voice_pitch
+                                    .length -
+                                    1
+                                )) *
+                                980 +
+                              10;
+
+                            const numeric =
+                              Number(value) || 0;
+
+                            const y =
+                              320 -
+                              Math.min(
+                                280,
+                                Math.max(
+                                  0,
+                                  numeric * 2
+                                )
+                              );
+
+                            return `${x},${y}`;
+                          }
+                        )
+                        .join(" ")}
+                    />
+                  </svg>
+
+                  <span className="comparison-label-high">
+                    High
+                  </span>
+
+                  <span className="comparison-label-low">
+                    Low
+                  </span>
+                </div>
+              ) : null}
+            </section>
+          )}
+
+          <section className="music-ai-info">
+            <div className="ai-info-icon">
+              <Brain size={23} />
+            </div>
+
+            <div>
+              <h3>
+                How SkillSensAI helps
+              </h3>
+
+              <p>
+                SkillSensAI analyses audio characteristics
+                such as pitch and compares your performance
+                with the reference. The goal is to give
+                practical feedback that helps you improve
+                through repeated practice.
+              </p>
+            </div>
+          </section>
+        </main>
+      )}
+
+      {currentLesson && (
+        <div className="lesson-modal-backdrop">
+          <div className="lesson-modal">
+            <button
+              className="modal-close"
+              onClick={closeLesson}
+            >
+              <X size={20} />
+            </button>
+
+            <div className="modal-lesson-icon">
+              {currentLesson.icon}
+            </div>
+
+            <span className="modal-label">
+              LESSON {currentLesson.id}
+            </span>
+
+            <h2>{currentLesson.title}</h2>
+
+            <p>
+              {currentLesson.description}
+            </p>
+
+            <div className="lesson-tip">
+              <CircleHelp size={18} />
+
+              <span>
+                Take your time and answer the question
+                below.
+              </span>
+            </div>
+
+            <div className="quiz-box">
+              <h3>
+                {currentLesson.question}
+              </h3>
+
+              <div className="quiz-options">
+                {currentLesson.options.map(
+                  (option, index) => {
+                    const selected =
+                      selectedAnswer === index;
+
+                    const isCorrect =
+                      quizResult === "correct" &&
+                      index === currentLesson.answer;
+
+                    const isWrong =
+                      quizResult === "wrong" &&
+                      selected;
+
+                    return (
+                      <button
+                        key={option}
+                        className={`quiz-option ${
+                          selected ? "selected" : ""
+                        } ${
+                          isCorrect ? "correct" : ""
+                        } ${
+                          isWrong ? "wrong" : ""
+                        }`}
+                        onClick={() =>
+                          setSelectedAnswer(index)
+                        }
+                      >
+                        <span>
+                          {String.fromCharCode(
+                            65 + index
+                          )}
+                        </span>
+
+                        {option}
+                      </button>
+                    );
+                  }
+                )}
+              </div>
             </div>
 
             {quizResult === "correct" && (
-              <div className="quiz-success">
-                ✓ Correct! +100 XP. Your musician is getting stronger.
+              <div className="quiz-feedback correct">
+                <Check size={18} />
+
+                Correct! Your musician is becoming
+                more complete.
               </div>
             )}
 
             {quizResult === "wrong" && (
-              <div className="quiz-error">
-                Not quite. Try again.
+              <div className="quiz-feedback wrong">
+                Not quite. Try again and review the
+                lesson concept.
               </div>
             )}
 
-            {quizResult !== "correct" && (
-              <button className="primary-button large" onClick={submitQuiz}>
-                Check Answer
-              </button>
-            )}
-
-            {quizResult === "correct" && (
+            <div className="modal-actions">
               <button
-                className="primary-button large"
+                className="secondary-button"
                 onClick={closeLesson}
               >
-                Continue
+                Close
               </button>
-            )}
+
+              <button
+                className="primary-button"
+                onClick={checkAnswer}
+                disabled={selectedAnswer === null}
+              >
+                Check Answer
+                <ChevronRight size={17} />
+              </button>
+            </div>
           </div>
         </div>
       )}
