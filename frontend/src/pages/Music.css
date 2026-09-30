@@ -1,231 +1,195 @@
-/* =========================================================
-   SKILLSENSAI — MUSIC
-   Dark learning experience
-   ========================================================= */
-
 .music-page {
   min-height: 100vh;
   background:
-    radial-gradient(circle at 50% 18%, rgba(34, 91, 120, 0.18), transparent 28%),
-    radial-gradient(circle at 15% 80%, rgba(120, 20, 35, 0.12), transparent 30%),
-    #020202;
+    radial-gradient(
+      circle at 50% 15%,
+      rgba(33, 87, 115, 0.18),
+      transparent 32%
+    ),
+    #020303;
   color: #fff;
   overflow-x: hidden;
 }
 
-/* =========================================================
-   NAVBAR
-   ========================================================= */
-
 .music-navbar {
-  height: 76px;
+  height: 72px;
   padding: 0 42px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(2, 2, 2, 0.86);
-  backdrop-filter: blur(16px);
   position: sticky;
   top: 0;
   z-index: 50;
+  background: rgba(2, 3, 3, 0.92);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  backdrop-filter: blur(14px);
 }
 
 .music-brand {
+  border: 0;
+  background: transparent;
+  color: #fff;
   display: flex;
   align-items: center;
-  gap: 11px;
-  font-size: 22px;
+  gap: 10px;
+  font-size: 20px;
   font-weight: 800;
-  letter-spacing: -0.5px;
+  cursor: pointer;
 }
 
 .music-brand-icon {
   width: 38px;
   height: 38px;
-  border-radius: 12px;
   display: grid;
   place-items: center;
-  background: rgba(68, 142, 185, 0.12);
-  border: 1px solid rgba(96, 177, 224, 0.28);
-  color: #83c8ef;
-}
-
-.music-brand span {
-  color: #f5f8fa;
+  border-radius: 11px;
+  color: #78ccef;
+  background: rgba(75,160,205,.1);
+  border: 1px solid rgba(100,190,230,.2);
 }
 
 .music-mini-progress {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .music-mini-progress span {
-  font-size: 13px;
-  color: #aab5bc;
+  color: #89959b;
+  font-size: 12px;
 }
 
 .music-mini-bar {
-  width: 130px;
-  height: 7px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.09);
+  width: 120px;
+  height: 6px;
   overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255,255,255,.08);
 }
 
 .music-mini-bar-fill {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #2f7ca7, #82d4ff);
-  transition: width 0.4s ease;
+  background: linear-gradient(
+    90deg,
+    #327da5,
+    #78d5ff
+  );
+  transition: width .4s ease;
 }
 
-/* =========================================================
-   HOME / HERO
-   ========================================================= */
-
 .music-home {
-  max-width: 1250px;
-  margin: 0 auto;
-  padding: 65px 28px 90px;
+  max-width: 1150px;
+  margin: auto;
+  padding: 65px 25px 90px;
 }
 
 .music-hero {
   text-align: center;
-  position: relative;
 }
 
 .music-hero h1 {
   margin: 0;
-  font-size: clamp(42px, 6vw, 76px);
+  font-size: clamp(42px, 7vw, 76px);
   line-height: 1;
   letter-spacing: -3px;
-  font-weight: 850;
 }
 
 .music-hero h1 span {
-  color: #71c9f3;
+  color: #73ccef;
 }
 
 .music-hero p {
-  max-width: 690px;
-  margin: 22px auto 0;
-  color: #9eaab1;
-  font-size: 17px;
+  max-width: 650px;
+  margin: 20px auto 0;
+  color: #919da3;
   line-height: 1.7;
+  font-size: 16px;
 }
-
-/* =========================================================
-   CHARACTER
-   ========================================================= */
 
 .music-character {
   width: 310px;
   height: 330px;
-  margin: 50px auto 30px;
+  margin: 35px auto 5px;
   position: relative;
   display: flex;
   justify-content: center;
-  align-items: flex-end;
+  align-items: center;
 }
 
 .music-character-aura {
   position: absolute;
-  width: 260px;
-  height: 260px;
-  bottom: 20px;
+  width: 280px;
+  height: 280px;
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    rgba(70, 164, 211, 0.24),
-    rgba(70, 164, 211, 0.05) 48%,
-    transparent 72%
+    rgba(67,170,220,.27),
+    transparent 68%
   );
-  filter: blur(12px);
+  filter: blur(10px);
   opacity: 0;
-  transition: opacity 0.6s ease;
+  transition: opacity .6s;
 }
 
-.music-character.level-1 .music-character-aura,
-.music-character.level-2 .music-character-aura,
-.music-character.level-3 .music-character-aura,
-.music-character.level-4 .music-character-aura,
-.music-character.level-5 .music-character-aura,
-.music-character.level-6 .music-character-aura {
-  opacity: 0.7;
+.music-character[class*="level-"] .music-character-aura {
+  opacity: .5;
 }
 
 .music-character.level-6 .music-character-aura {
   opacity: 1;
-  animation: musicAuraPulse 2.4s ease-in-out infinite;
+  animation: auraPulse 2.5s infinite;
 }
 
 .music-character-silhouette {
-  width: 190px;
-  height: 290px;
+  width: 205px;
+  height: 295px;
   object-fit: contain;
   position: relative;
-  z-index: 3;
+  z-index: 2;
   filter:
-    brightness(0.08)
-    saturate(0.1)
-    drop-shadow(0 0 0 rgba(70, 180, 235, 0));
-  transition:
-    filter 0.7s ease,
-    transform 0.7s ease;
+    brightness(.08)
+    saturate(.1);
+  transition: filter .7s ease, transform .7s ease;
 }
 
 .music-character.level-1 .music-character-silhouette {
-  filter:
-    brightness(0.24)
-    saturate(0.35)
-    drop-shadow(0 0 10px rgba(70, 170, 220, 0.12));
+  filter: brightness(.25) saturate(.3);
 }
 
 .music-character.level-2 .music-character-silhouette {
-  filter:
-    brightness(0.34)
-    saturate(0.55)
-    drop-shadow(0 0 14px rgba(70, 170, 220, 0.17));
+  filter: brightness(.36) saturate(.5);
 }
 
 .music-character.level-3 .music-character-silhouette {
-  filter:
-    brightness(0.46)
-    saturate(0.7)
-    drop-shadow(0 0 18px rgba(70, 170, 220, 0.22));
+  filter: brightness(.48) saturate(.7);
 }
 
 .music-character.level-4 .music-character-silhouette {
-  filter:
-    brightness(0.6)
-    saturate(0.85)
-    drop-shadow(0 0 22px rgba(70, 170, 220, 0.3));
+  filter: brightness(.62) saturate(.85);
 }
 
 .music-character.level-5 .music-character-silhouette {
   filter:
-    brightness(0.78)
+    brightness(.8)
     saturate(1)
-    drop-shadow(0 0 28px rgba(70, 190, 240, 0.38));
+    drop-shadow(0 0 20px rgba(80,190,235,.35));
 }
 
 .music-character.level-6 .music-character-silhouette {
   filter:
     brightness(1)
     saturate(1.2)
-    drop-shadow(0 0 34px rgba(80, 205, 255, 0.58));
-  animation: musicianAwaken 2.8s ease-in-out infinite;
+    drop-shadow(0 0 35px rgba(80,205,255,.6));
+  animation: characterFloat 2.5s infinite;
 }
 
 .music-character-particles {
   position: absolute;
   inset: 0;
-  pointer-events: none;
   z-index: 4;
   opacity: 0;
-  transition: opacity 0.5s ease;
+  pointer-events: none;
 }
 
 .music-character.level-6 .music-character-particles {
@@ -234,229 +198,193 @@
 
 .music-character-particles span {
   position: absolute;
-  font-size: 18px;
-  color: #8edcff;
-  animation: musicParticleFloat 3s ease-in-out infinite;
+  color: #87ddff;
+  font-size: 19px;
+  animation: particleFloat 3s infinite ease-in-out;
 }
 
 .music-character-particles span:nth-child(1) {
-  left: 28px;
-  top: 100px;
+  left: 35px;
+  top: 90px;
 }
 
 .music-character-particles span:nth-child(2) {
   right: 35px;
-  top: 145px;
-  animation-delay: 0.6s;
+  top: 125px;
+  animation-delay: .5s;
 }
 
 .music-character-particles span:nth-child(3) {
-  left: 50px;
-  top: 215px;
-  animation-delay: 1.1s;
+  left: 55px;
+  bottom: 70px;
+  animation-delay: 1s;
 }
 
 .music-character-particles span:nth-child(4) {
-  right: 52px;
-  top: 235px;
-  animation-delay: 1.7s;
+  right: 55px;
+  bottom: 65px;
+  animation-delay: 1.5s;
 }
 
 .music-character-particles span:nth-child(5) {
-  left: 90px;
-  top: 65px;
-  animation-delay: 2.1s;
+  left: 85px;
+  top: 50px;
+  animation-delay: 2s;
 }
 
 .music-character-particles span:nth-child(6) {
-  right: 95px;
-  top: 80px;
-  animation-delay: 2.4s;
+  right: 85px;
+  top: 55px;
+  animation-delay: 2.5s;
 }
-
-/* =========================================================
-   LEVELS
-   ========================================================= */
 
 .music-levels {
   display: flex;
   justify-content: center;
   gap: 8px;
-  margin-top: 22px;
 }
 
 .music-level-dot {
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  background: #222b30;
-  border: 1px solid #36444b;
-  transition: all 0.35s ease;
+  background: #222a2e;
+  border: 1px solid #39464b;
 }
 
 .music-level-dot.active {
-  background: #6fc9f2;
-  border-color: #9de1ff;
-  box-shadow: 0 0 12px rgba(94, 196, 241, 0.55);
+  background: #70ccef;
+  border-color: #a5e6ff;
+  box-shadow: 0 0 12px rgba(100,205,245,.55);
 }
 
 .music-awakened-message {
-  margin: 22px auto 0;
-  max-width: 520px;
-  padding: 13px 20px;
-  border: 1px solid rgba(105, 207, 247, 0.3);
-  border-radius: 14px;
-  background: rgba(66, 156, 197, 0.08);
-  color: #a9e5ff;
-  font-size: 14px;
-  animation: awakenedGlow 2s ease-in-out infinite;
+  width: fit-content;
+  max-width: 90%;
+  margin: 20px auto;
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(100,205,245,.3);
+  background: rgba(60,150,195,.08);
+  color: #a6e5ff;
+  font-size: 13px;
 }
 
-/* =========================================================
-   CHOICES
-   ========================================================= */
-
 .music-choices {
-  max-width: 920px;
-  margin: 60px auto 0;
+  max-width: 900px;
+  margin: 55px auto 0;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 22px;
+  grid-template-columns: repeat(2,1fr);
+  gap: 20px;
 }
 
 .music-choice-card {
   position: relative;
-  padding: 32px;
-  min-height: 230px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 24px;
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.045),
-      rgba(255, 255, 255, 0.015)
-    );
-  transition:
-    transform 0.3s ease,
-    border-color 0.3s ease,
-    background 0.3s ease;
+  text-align: left;
+  min-height: 220px;
+  padding: 30px;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,.09);
+  background: rgba(255,255,255,.025);
+  color: white;
+  cursor: pointer;
+  transition: .25s ease;
 }
 
 .music-choice-card:hover {
-  transform: translateY(-5px);
-  border-color: rgba(104, 196, 237, 0.4);
-  background: rgba(62, 142, 184, 0.08);
+  transform: translateY(-4px);
+  border-color: rgba(90,190,235,.4);
+  background: rgba(60,145,190,.07);
 }
 
 .music-choice-icon {
   width: 52px;
   height: 52px;
-  border-radius: 16px;
   display: grid;
   place-items: center;
-  margin-bottom: 20px;
-  color: #83d2f6;
-  background: rgba(70, 164, 211, 0.1);
-  border: 1px solid rgba(90, 177, 220, 0.2);
+  border-radius: 15px;
+  color: #7fd4f5;
+  background: rgba(70,165,210,.1);
 }
 
 .music-choice-card h2 {
-  margin: 0 0 9px;
-  font-size: 23px;
+  margin: 18px 0 8px;
 }
 
 .music-choice-card p {
   margin: 0;
-  color: #9ba7ad;
+  max-width: 450px;
+  color: #8f9ba1;
   line-height: 1.6;
   font-size: 14px;
 }
 
 .music-choice-arrow {
   position: absolute;
-  right: 27px;
-  bottom: 26px;
-  color: #75c9ef;
+  right: 25px;
+  bottom: 25px;
+  color: #70ccef;
 }
 
-/* =========================================================
-   STATS
-   ========================================================= */
-
 .music-stats {
-  margin: 35px auto 0;
-  max-width: 920px;
+  max-width: 900px;
+  margin: 30px auto 0;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3,1fr);
   gap: 12px;
 }
 
 .music-stat {
   text-align: center;
   padding: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 15px;
-  background: rgba(255, 255, 255, 0.025);
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.07);
+  background: rgba(255,255,255,.025);
 }
 
 .music-stat strong {
   display: block;
-  font-size: 22px;
-  color: #dff5ff;
+  font-size: 21px;
 }
 
 .music-stat span {
   display: block;
   margin-top: 5px;
+  color: #727f85;
   font-size: 12px;
-  color: #77848b;
 }
-
-/* =========================================================
-   RESET
-   ========================================================= */
 
 .music-reset {
-  margin: 25px auto 0;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 7px;
+  gap: 6px;
+  margin: 25px auto 0;
   border: 0;
   background: transparent;
-  color: #68757c;
-  font-size: 12px;
+  color: #68757a;
   cursor: pointer;
+  font-size: 12px;
 }
-
-.music-reset:hover {
-  color: #9eabb1;
-}
-
-/* =========================================================
-   CONTENT PAGES
-   ========================================================= */
 
 .music-content-page {
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 45px 28px 90px;
+  max-width: 1100px;
+  margin: auto;
+  padding: 40px 25px 90px;
 }
 
 .music-back-button {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 8px;
   border: 0;
   background: transparent;
-  color: #9da9af;
-  font-size: 14px;
-  padding: 8px 0;
+  color: #919da2;
   cursor: pointer;
+  font-size: 14px;
 }
 
 .music-back-button:hover {
-  color: #fff;
+  color: white;
 }
 
 .music-page-heading {
@@ -465,34 +393,29 @@
 
 .music-page-heading h1 {
   margin: 0;
-  font-size: clamp(32px, 5vw, 54px);
-  letter-spacing: -1.8px;
+  font-size: clamp(34px,5vw,55px);
+  letter-spacing: -2px;
 }
 
 .music-page-heading p {
-  margin: 12px 0 0;
   max-width: 680px;
-  color: #929da3;
+  margin-top: 12px;
+  color: #8c989e;
   line-height: 1.65;
 }
 
-/* =========================================================
-   PROGRESS PANEL
-   ========================================================= */
-
 .music-progress-panel {
-  margin-top: 30px;
-  padding: 18px 20px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.025);
+  margin-top: 28px;
+  padding: 18px;
+  border-radius: 15px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.025);
 }
 
 .music-progress-panel-top {
   display: flex;
   justify-content: space-between;
-  gap: 20px;
-  color: #9ba6ac;
+  color: #8d999f;
   font-size: 13px;
 }
 
@@ -501,58 +424,51 @@
 }
 
 .music-progress-track {
-  height: 8px;
-  margin-top: 12px;
+  height: 7px;
+  margin-top: 11px;
   border-radius: 999px;
+  background: rgba(255,255,255,.08);
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.08);
 }
 
 .music-progress-fill {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #377da2, #8ddcff);
-  transition: width 0.4s ease;
+  background: linear-gradient(90deg,#327da5,#7bd7ff);
 }
-
-/* =========================================================
-   LESSON GRID
-   ========================================================= */
 
 .music-lessons-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 17px;
-  margin-top: 30px;
+  grid-template-columns: repeat(3,1fr);
+  gap: 16px;
+  margin-top: 28px;
 }
 
 .music-lesson-card {
   position: relative;
-  min-height: 220px;
+  min-height: 205px;
   padding: 22px;
-  border-radius: 19px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  background: rgba(255, 255, 255, 0.025);
+  text-align: left;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.025);
+  color: white;
   cursor: pointer;
-  transition:
-    transform 0.25s ease,
-    border-color 0.25s ease,
-    background 0.25s ease;
+  transition: .25s;
 }
 
-.music-lesson-card:hover:not(.locked) {
-  transform: translateY(-4px);
-  border-color: rgba(96, 192, 236, 0.38);
-  background: rgba(67, 150, 190, 0.07);
-}
-
-.music-lesson-card.completed {
-  border-color: rgba(75, 189, 139, 0.3);
+.music-lesson-card:hover:not(:disabled) {
+  transform: translateY(-3px);
+  border-color: rgba(90,190,235,.4);
 }
 
 .music-lesson-card.locked {
-  opacity: 0.45;
+  opacity: .4;
   cursor: not-allowed;
+}
+
+.music-lesson-card.completed {
+  border-color: rgba(70,190,140,.3);
 }
 
 .music-lesson-number {
@@ -560,164 +476,127 @@
   height: 39px;
   display: grid;
   place-items: center;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.07);
-  color: #9faab0;
-  font-weight: 700;
+  border-radius: 11px;
+  background: rgba(255,255,255,.07);
+  color: #aeb9be;
 }
 
-.music-lesson-card.completed .music-lesson-number {
-  background: rgba(55, 172, 121, 0.13);
-  color: #76e0b0;
+.music-lesson-card.completed
+.music-lesson-number {
+  color: #7de2b0;
+  background: rgba(65,180,125,.12);
+}
+
+.music-lesson-status {
+  position: absolute;
+  top: 23px;
+  right: 22px;
+  color: #6c787d;
+}
+
+.music-lesson-card.completed
+.music-lesson-status {
+  color: #72dda9;
 }
 
 .music-lesson-card h3 {
-  margin: 22px 0 8px;
+  margin: 20px 0 8px;
   font-size: 18px;
 }
 
 .music-lesson-card p {
   margin: 0;
-  color: #89959b;
-  line-height: 1.55;
+  color: #859197;
   font-size: 13px;
+  line-height: 1.55;
 }
-
-.music-lesson-status {
-  position: absolute;
-  top: 22px;
-  right: 22px;
-  color: #69767d;
-}
-
-.music-lesson-card.completed .music-lesson-status {
-  color: #6cdda8;
-}
-
-/* =========================================================
-   PRACTICE
-   ========================================================= */
 
 .music-practice-section {
-  margin-top: 45px;
+  margin-top: 42px;
 }
 
 .music-practice-section h2 {
   margin: 0;
-  font-size: 25px;
 }
 
 .music-practice-section > p {
-  margin: 8px 0 20px;
   color: #879399;
   font-size: 14px;
 }
 
 .music-practice-options {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2,1fr);
   gap: 15px;
+  margin-top: 20px;
 }
 
 .music-practice-card {
-  min-height: 145px;
   padding: 22px;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.025);
+  border-radius: 17px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.025);
 }
 
 .music-practice-card h3 {
-  margin: 14px 0 7px;
+  margin: 13px 0 6px;
 }
 
 .music-practice-card p {
-  margin: 0;
-  color: #859198;
+  color: #808c92;
   font-size: 13px;
   line-height: 1.5;
 }
 
 .music-practice-button {
   width: 100%;
-  min-height: 54px;
+  min-height: 48px;
+  margin-top: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
-  border: 1px solid rgba(102, 190, 232, 0.25);
-  border-radius: 14px;
-  background: rgba(69, 159, 201, 0.08);
-  color: #a8e1fa;
-  font-size: 14px;
+  gap: 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(100,195,235,.25);
+  background: rgba(70,160,205,.08);
+  color: #a9e2fa;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.25s ease;
 }
 
-.music-practice-button:hover:not(.disabled) {
-  background: rgba(69, 159, 201, 0.16);
-  border-color: rgba(102, 190, 232, 0.48);
-  transform: translateY(-2px);
+.music-practice-button:hover:not(:disabled) {
+  background: rgba(70,160,205,.16);
 }
 
+.music-practice-button:disabled,
 .music-practice-button.disabled {
-  opacity: 0.38;
+  opacity: .35;
   cursor: not-allowed;
-  transform: none;
 }
 
-/* =========================================================
-   RECORDING
-   ========================================================= */
-
-.music-recording-status {
-  margin-top: 18px;
-  padding: 14px 17px;
-  border-radius: 13px;
-  background: rgba(176, 55, 55, 0.08);
-  border: 1px solid rgba(220, 85, 85, 0.22);
+.music-practice-button.stop {
+  margin-top: 15px;
+  border-color: rgba(230,90,90,.25);
+  background: rgba(190,55,55,.08);
   color: #ffaaaa;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 13px;
 }
-
-.music-recording-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #ff5e5e;
-  animation: recordingPulse 1s infinite;
-}
-
-/* =========================================================
-   UPLOAD
-   ========================================================= */
 
 .music-upload-song {
-  margin-top: 25px;
-  padding: 25px;
-  border: 1px dashed rgba(110, 190, 225, 0.3);
+  margin-top: 28px;
+  padding: 24px;
   border-radius: 18px;
-  background: rgba(64, 147, 187, 0.035);
+  border: 1px dashed rgba(100,195,235,.3);
+  background: rgba(70,160,205,.035);
 }
 
 .music-upload-song label {
+  min-height: 65px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
-  min-height: 70px;
-  border-radius: 14px;
-  color: #a7dff5;
+  gap: 8px;
+  color: #a8def4;
   cursor: pointer;
-  transition: background 0.25s ease;
-}
-
-.music-upload-song label:hover {
-  background: rgba(66, 153, 194, 0.08);
 }
 
 .music-upload-song input {
@@ -725,100 +604,78 @@
 }
 
 .music-selected-file {
-  margin-top: 14px;
-  padding: 12px 15px;
-  border-radius: 11px;
-  background: rgba(255, 255, 255, 0.045);
-  color: #aeb9be;
-  font-size: 13px;
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-/* =========================================================
-   ANALYSIS
-   ========================================================= */
-
-.music-analysis-status {
-  margin-top: 20px;
-  padding: 15px;
-  border-radius: 13px;
-  background: rgba(255, 255, 255, 0.035);
+  padding: 12px;
+  margin-top: 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.04);
   color: #a8b3b8;
   font-size: 13px;
 }
 
-.music-analysis-error {
-  border-color: rgba(229, 77, 77, 0.3);
-  background: rgba(229, 77, 77, 0.07);
-  color: #ff9f9f;
+.music-analysis-status {
+  margin-top: 18px;
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.035);
+  color: #9ca8ad;
+  font-size: 13px;
 }
 
-/* =========================================================
-   PITCH GRAPH
-   ========================================================= */
+.music-analysis-error {
+  color: #ffaaaa;
+  border: 1px solid rgba(220,70,70,.25);
+  background: rgba(220,70,70,.07);
+}
 
 .music-pitch-graph {
-  margin-top: 22px;
-  padding: 20px;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 20px;
+  padding: 18px;
+  border-radius: 17px;
+  border: 1px solid rgba(255,255,255,.08);
   background:
     linear-gradient(
-      rgba(255, 255, 255, 0.025) 1px,
+      rgba(255,255,255,.025) 1px,
       transparent 1px
     ),
     linear-gradient(
       90deg,
-      rgba(255, 255, 255, 0.025) 1px,
+      rgba(255,255,255,.025) 1px,
       transparent 1px
-    ),
-    rgba(255, 255, 255, 0.015);
+    );
   background-size: 45px 45px;
-  overflow: hidden;
 }
 
 .music-pitch-graph svg {
-  display: block;
   width: 100%;
   height: 260px;
+  display: block;
 }
 
 .music-pitch-line {
   fill: none;
   stroke: #70cfff;
-  stroke-width: 2.8;
+  stroke-width: 3;
   stroke-linecap: round;
   stroke-linejoin: round;
-  filter: drop-shadow(0 0 5px rgba(95, 196, 239, 0.3));
-}
-
-.music-pitch-dot {
-  fill: #9ee5ff;
-  filter: drop-shadow(0 0 5px rgba(105, 204, 244, 0.5));
 }
 
 .reference-pitch-line {
   fill: none;
-  stroke: #e58b8b;
-  stroke-width: 2.2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  stroke: #e48b8b;
+  stroke-width: 2.5;
   stroke-dasharray: 7 6;
-  opacity: 0.85;
-}
-
-.reference-dot {
-  fill: #ffaaaa;
+  stroke-linecap: round;
 }
 
 .music-pitch-legend {
   display: flex;
   justify-content: center;
-  gap: 24px;
-  margin-top: 13px;
-  color: #7f8b91;
+  gap: 25px;
+  margin-top: 12px;
+  color: #89959a;
   font-size: 12px;
 }
 
@@ -831,26 +688,21 @@
 .music-pitch-legend-line {
   width: 22px;
   height: 3px;
-  border-radius: 999px;
+  border-radius: 5px;
   background: #70cfff;
 }
 
 .music-pitch-legend-reference {
   width: 22px;
-  height: 0;
-  border-top: 2px dashed #e58b8b;
+  border-top: 2px dashed #e48b8b;
 }
-
-/* =========================================================
-   VOICE RESULT
-   ========================================================= */
 
 .music-voice-result {
   margin-top: 25px;
   padding: 23px;
   border-radius: 18px;
-  border: 1px solid rgba(90, 191, 146, 0.2);
-  background: rgba(61, 170, 121, 0.045);
+  border: 1px solid rgba(70,190,140,.2);
+  background: rgba(60,170,120,.045);
 }
 
 .music-voice-score {
@@ -862,48 +714,20 @@
 .music-voice-score-number {
   font-size: 48px;
   font-weight: 850;
-  color: #82e1b3;
-  line-height: 1;
+  color: #80dfb0;
 }
 
 .music-voice-score-label {
-  color: #84918e;
-  font-size: 13px;
+  margin-top: 5px;
+  color: #84908d;
+  font-size: 12px;
 }
 
 .music-voice-message {
-  margin-top: 15px;
-  color: #b6c4c0;
+  color: #b3c0bc;
   line-height: 1.6;
   font-size: 14px;
 }
-
-/* =========================================================
-   AI INFO
-   ========================================================= */
-
-.music-ai-info {
-  margin-top: 25px;
-  display: flex;
-  gap: 13px;
-  align-items: flex-start;
-  padding: 17px;
-  border-radius: 15px;
-  border: 1px solid rgba(105, 185, 230, 0.15);
-  background: rgba(70, 155, 199, 0.045);
-  color: #9eabb1;
-  font-size: 13px;
-  line-height: 1.55;
-}
-
-.music-ai-info svg {
-  flex: 0 0 auto;
-  color: #76c9ed;
-}
-
-/* =========================================================
-   LESSON MODAL
-   ========================================================= */
 
 .music-modal-overlay {
   position: fixed;
@@ -912,41 +736,32 @@
   display: grid;
   place-items: center;
   padding: 20px;
-  background: rgba(0, 0, 0, 0.78);
-  backdrop-filter: blur(8px);
+  background: rgba(0,0,0,.8);
+  backdrop-filter: blur(7px);
 }
 
 .music-lesson-modal {
-  width: min(720px, 100%);
+  width: min(700px,100%);
   max-height: 90vh;
   overflow-y: auto;
-  padding: 30px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 23px;
-  background:
-    radial-gradient(
-      circle at 80% 0%,
-      rgba(65, 151, 195, 0.08),
-      transparent 30%
-    ),
-    #0a0d0f;
-  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.65);
+  padding: 28px;
+  border-radius: 21px;
+  border: 1px solid rgba(255,255,255,.1);
+  background: #090c0e;
+  box-shadow: 0 30px 80px rgba(0,0,0,.65);
 }
 
 .music-modal-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
   gap: 20px;
 }
 
 .music-modal-header h2 {
   margin: 0;
-  font-size: 27px;
 }
 
 .music-modal-header p {
-  margin: 7px 0 0;
   color: #7e8a90;
   font-size: 13px;
 }
@@ -954,55 +769,35 @@
 .music-modal-close {
   width: 38px;
   height: 38px;
-  border-radius: 11px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.04);
-  color: #9ca7ac;
   display: grid;
   place-items: center;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.04);
+  color: #9ba6ab;
   cursor: pointer;
 }
 
-.music-modal-close:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.08);
-}
-
 .music-lesson-video {
-  margin-top: 24px;
-  width: 100%;
-  border-radius: 16px;
+  margin-top: 22px;
+  border-radius: 15px;
   overflow: hidden;
-  background: #050607;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-}
-
-.music-lesson-video video {
-  display: block;
-  width: 100%;
-  max-height: 370px;
-  object-fit: contain;
-  background: #000;
+  border: 1px solid rgba(255,255,255,.07);
 }
 
 .music-lesson-video-placeholder {
-  min-height: 250px;
+  min-height: 230px;
   display: flex;
-  align-items: center;
-  justify-content: center;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
   gap: 12px;
   text-align: center;
-  color: #68757b;
-  padding: 30px;
-}
-
-.music-lesson-video-placeholder svg {
-  color: #4c7b90;
+  color: #69767c;
 }
 
 .music-lesson-video-placeholder strong {
-  color: #98a7ad;
+  color: #a1adb2;
 }
 
 .music-lesson-video-placeholder span {
@@ -1012,82 +807,69 @@
 }
 
 .music-quiz {
-  margin-top: 28px;
+  margin-top: 25px;
 }
 
 .music-quiz h3 {
-  margin: 0 0 17px;
-  font-size: 18px;
+  margin-bottom: 15px;
 }
 
 .music-quiz-option {
   width: 100%;
-  padding: 14px 16px;
+  display: block;
   margin-top: 9px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  background: rgba(255, 255, 255, 0.025);
-  color: #b3bec3;
+  padding: 14px;
   text-align: left;
+  border-radius: 11px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.025);
+  color: #b3bec3;
   cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.music-quiz-option:hover {
-  border-color: rgba(91, 188, 231, 0.3);
-  background: rgba(66, 153, 194, 0.06);
 }
 
 .music-quiz-option.selected {
-  border-color: rgba(91, 188, 231, 0.5);
-  background: rgba(66, 153, 194, 0.1);
+  border-color: rgba(100,195,235,.5);
+  background: rgba(70,160,205,.1);
   color: #d8f4ff;
 }
 
 .music-quiz-result {
-  margin-top: 15px;
-  padding: 13px 15px;
-  border-radius: 11px;
+  margin-top: 14px;
+  padding: 12px;
+  border-radius: 10px;
   font-size: 13px;
 }
 
 .music-quiz-result.correct {
   color: #8ce2b5;
-  background: rgba(57, 172, 117, 0.08);
-  border: 1px solid rgba(57, 172, 117, 0.2);
+  background: rgba(60,175,120,.08);
 }
 
 .music-quiz-result.incorrect {
-  color: #ffabab;
-  background: rgba(205, 65, 65, 0.08);
-  border: 1px solid rgba(205, 65, 65, 0.2);
+  color: #ffaaaa;
+  background: rgba(210,60,60,.08);
 }
 
 .music-quiz-submit {
   width: 100%;
-  margin-top: 17px;
-  min-height: 48px;
+  margin-top: 15px;
+  height: 48px;
   border: 0;
-  border-radius: 12px;
-  background: linear-gradient(90deg, #347fa5, #4ca6ce);
-  color: #fff;
+  border-radius: 11px;
+  background: linear-gradient(
+    90deg,
+    #327da5,
+    #4da8d0
+  );
+  color: white;
   font-weight: 750;
   cursor: pointer;
 }
 
-.music-quiz-submit:hover {
-  filter: brightness(1.08);
-}
-
-/* =========================================================
-   ANIMATIONS
-   ========================================================= */
-
-@keyframes musicAuraPulse {
-  0%,
-  100% {
-    transform: scale(0.96);
-    opacity: 0.65;
+@keyframes auraPulse {
+  0%,100% {
+    transform: scale(.95);
+    opacity: .65;
   }
 
   50% {
@@ -1096,153 +878,66 @@
   }
 }
 
-@keyframes musicianAwaken {
-  0%,
-  100% {
-    transform: translateY(0) scale(1);
+@keyframes characterFloat {
+  0%,100% {
+    transform: translateY(0);
   }
 
   50% {
-    transform: translateY(-5px) scale(1.015);
+    transform: translateY(-6px);
   }
 }
 
-@keyframes musicParticleFloat {
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg);
-    opacity: 0.35;
+@keyframes particleFloat {
+  0%,100% {
+    transform: translateY(0);
+    opacity: .35;
   }
 
   50% {
-    transform: translateY(-18px) rotate(12deg);
+    transform: translateY(-18px);
     opacity: 1;
   }
 }
 
-@keyframes awakenedGlow {
-  0%,
-  100% {
-    box-shadow: 0 0 0 rgba(86, 202, 245, 0);
-  }
-
-  50% {
-    box-shadow: 0 0 24px rgba(86, 202, 245, 0.12);
-  }
-}
-
-@keyframes recordingPulse {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-
-  50% {
-    transform: scale(1.45);
-    opacity: 0.55;
-  }
-}
-
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
-
-@media (max-width: 900px) {
-  .music-navbar {
-    padding: 0 24px;
-  }
-
-  .music-home {
-    padding-top: 45px;
-  }
-
+@media (max-width: 850px) {
   .music-lessons-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2,1fr);
+  }
+
+  .music-choices {
+    grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 650px) {
   .music-navbar {
-    height: 68px;
-  }
-
-  .music-brand {
-    font-size: 18px;
+    padding: 0 18px;
   }
 
   .music-mini-progress span {
     display: none;
   }
 
-  .music-mini-bar {
-    width: 90px;
-  }
-
-  .music-choices,
-  .music-practice-options {
-    grid-template-columns: 1fr;
-  }
-
-  .music-stats {
-    grid-template-columns: 1fr;
-  }
-
-  .music-character {
-    transform: scale(0.88);
-    margin-top: 30px;
-    margin-bottom: 10px;
-  }
-
+  .music-home,
   .music-content-page {
-    padding-left: 18px;
-    padding-right: 18px;
-  }
-}
-
-@media (max-width: 520px) {
-  .music-navbar {
-    padding: 0 15px;
+    padding-left: 17px;
+    padding-right: 17px;
   }
 
-  .music-home {
-    padding-left: 16px;
-    padding-right: 16px;
-  }
-
-  .music-hero h1 {
-    letter-spacing: -2px;
-  }
-
-  .music-hero p {
-    font-size: 14px;
-  }
-
+  .music-stats,
+  .music-practice-options,
   .music-lessons-grid {
     grid-template-columns: 1fr;
   }
 
   .music-character {
-    transform: scale(0.78);
-    margin-top: 10px;
-    margin-bottom: -20px;
-  }
-
-  .music-levels {
-    margin-top: 5px;
+    transform: scale(.85);
+    margin-top: 15px;
+    margin-bottom: -15px;
   }
 
   .music-lesson-modal {
-    padding: 21px;
-    border-radius: 18px;
-  }
-
-  .music-pitch-graph svg {
-    height: 200px;
-  }
-
-  .music-pitch-legend {
-    gap: 12px;
-    flex-wrap: wrap;
+    padding: 20px;
   }
 }
