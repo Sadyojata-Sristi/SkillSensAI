@@ -637,6 +637,12 @@
     scale(1.08);
 }
 
+.skill-button.music:hover {
+  transform:
+    translateX(-50%)
+    scale(1.08);
+}
+
 /* Upper left */
 
 .skill-button.art {
