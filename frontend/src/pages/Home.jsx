@@ -1,3 +1,5 @@
+import "./Home.css";
+
 import {
   Music2,
   Swords,
@@ -12,7 +14,7 @@ import {
   Flame,
   Trophy,
   Target,
-  BarChart3
+  BarChart3,
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
@@ -24,7 +26,7 @@ const skills = [
     icon: Music2,
     color: "#ff2d91",
     position: "music",
-    active: true
+    active: true,
   },
   {
     name: "Martial Arts",
@@ -32,7 +34,7 @@ const skills = [
     icon: Swords,
     color: "#ff6b18",
     position: "martial",
-    active: true
+    active: true,
   },
   {
     name: "Dance",
@@ -40,7 +42,7 @@ const skills = [
     icon: PersonStanding,
     color: "#b84cff",
     position: "dance",
-    active: false
+    active: false,
   },
   {
     name: "Instruments",
@@ -48,7 +50,7 @@ const skills = [
     icon: Guitar,
     color: "#ffc928",
     position: "instruments",
-    active: false
+    active: false,
   },
   {
     name: "Yoga",
@@ -56,7 +58,7 @@ const skills = [
     icon: Flower2,
     color: "#72e51d",
     position: "yoga",
-    active: false
+    active: false,
   },
   {
     name: "Coding",
@@ -64,7 +66,7 @@ const skills = [
     icon: Code2,
     color: "#00cfff",
     position: "coding",
-    active: false
+    active: false,
   },
   {
     name: "Art & Creativity",
@@ -72,7 +74,7 @@ const skills = [
     icon: Palette,
     color: "#9d4dff",
     position: "art",
-    active: false
+    active: false,
   },
   {
     name: "More Skills",
@@ -80,16 +82,14 @@ const skills = [
     icon: Sparkles,
     color: "#3caeff",
     position: "more",
-    active: false
-  }
+    active: false,
+  },
 ];
 
 function Home() {
-
   const navigate = useNavigate();
 
   const handleSkillClick = (skill) => {
-
     if (!skill.active) {
       alert(`${skill.name} will be available soon!`);
       return;
@@ -106,92 +106,43 @@ function Home() {
 
   return (
     <div className="app">
-
-      {/* NAVBAR */}
-
       <header className="navbar">
-
         <div className="brand">
-
-          <div className="brand-logo">
-            S
-          </div>
+          <div className="brand-logo">S</div>
 
           <div>
             <h1>
               SkillSens<span>AI</span>
             </h1>
 
-            <p>
-              Learn. Train. Master.
-            </p>
+            <p>Learn. Train. Master.</p>
           </div>
-
         </div>
 
-
         <nav>
-
-          <a className="active-link">
-            Home
-          </a>
-
-          <a>
-            Progress
-          </a>
-
-          <a>
-            AI Coach
-          </a>
-
-          <a>
-            Leaderboard
-          </a>
-
-          <a>
-            About Us
-          </a>
-
+          <a className="active-link">Home</a>
+          <a>Progress</a>
+          <a>AI Coach</a>
+          <a>Leaderboard</a>
+          <a>About Us</a>
         </nav>
 
-
         <button className="login-button">
-
           <UserRound size={18} />
-
           Login
-
         </button>
-
       </header>
 
-
-      {/* MAIN HERO */}
-
       <main className="hero">
-
         <div className="skill-orbit">
-
-          {/* Orbit ring */}
-
           <div className="orbit-ring"></div>
 
-
-          {/* Small glowing points */}
-
           <div className="orbit-dot dot-1"></div>
-
           <div className="orbit-dot dot-2"></div>
-
           <div className="orbit-dot dot-3"></div>
-
           <div className="orbit-dot dot-4"></div>
 
-
-          {/* SAMURAI */}
-
           <div className="samurai-container">
-
             <div className="samurai-glow"></div>
 
             <img
@@ -199,196 +150,104 @@ function Home() {
               alt="SkillSensAI Samurai"
               className="samurai"
             />
-
           </div>
 
-
-          {/* SKILLS */}
-
           {skills.map((skill) => {
-
             const Icon = skill.icon;
 
             return (
-
               <button
                 key={skill.name}
                 className={`skill-button ${skill.position}`}
                 style={{
-                  "--skill-color": skill.color
+                  "--skill-color": skill.color,
                 }}
                 onClick={() => handleSkillClick(skill)}
               >
-
                 <div className="skill-icon">
-
-                  <Icon
-                    size={34}
-                    strokeWidth={1.8}
-                  />
-
+                  <Icon size={34} strokeWidth={1.8} />
                 </div>
 
-
-                <div className="skill-name">
-                  {skill.name}
-                </div>
-
+                <div className="skill-name">{skill.name}</div>
 
                 <div className="skill-description">
                   {skill.description}
                 </div>
 
-
                 <div className="skill-arrow">
-
                   <ArrowRight size={16} />
-
                 </div>
-
               </button>
-
             );
-
           })}
-
         </div>
 
-
-        {/* HERO TEXT */}
-
         <section className="hero-text">
-
           <h2>
-            Unleash Your{" "}
-            <span>Potential</span>
+            Unleash Your <span>Potential</span>
           </h2>
 
-          <p>
-            AI-powered learning. Personalized for you.
-          </p>
+          <p>AI-powered learning. Personalized for you.</p>
 
-
-          <button className="journey-button">
-
+          <button
+            className="journey-button"
+            onClick={() => navigate("/music")}
+          >
             Start Your Journey
-
             <ArrowRight size={21} />
-
           </button>
-
         </section>
 
-
-        {/* STATS */}
-
         <section className="stats">
-
-
           <div className="stat">
-
             <div className="stat-icon orange">
               <Flame />
             </div>
 
             <div>
-
-              <small>
-                Daily Streak
-              </small>
-
-              <strong>
-                7 Days
-              </strong>
-
-              <p>
-                Keep it up!
-              </p>
-
+              <small>Daily Streak</small>
+              <strong>7 Days</strong>
+              <p>Keep it up!</p>
             </div>
-
           </div>
 
-
           <div className="stat">
-
             <div className="stat-icon blue">
               <BarChart3 />
             </div>
 
             <div>
-
-              <small>
-                Skills Explored
-              </small>
-
-              <strong>
-                3
-              </strong>
-
-              <p>
-                Keep exploring!
-              </p>
-
+              <small>Skills Explored</small>
+              <strong>3</strong>
+              <p>Keep exploring!</p>
             </div>
-
           </div>
 
-
           <div className="stat">
-
             <div className="stat-icon yellow">
               <Trophy />
             </div>
 
             <div>
-
-              <small>
-                Lessons Completed
-              </small>
-
-              <strong>
-                24
-              </strong>
-
-              <p>
-                You're doing great!
-              </p>
-
+              <small>Lessons Completed</small>
+              <strong>24</strong>
+              <p>You're doing great!</p>
             </div>
-
           </div>
 
-
           <div className="stat">
-
             <div className="stat-icon green">
               <Target />
             </div>
 
             <div>
-
-              <small>
-                Accuracy
-              </small>
-
-              <strong>
-                92%
-              </strong>
-
-              <p>
-                Excellent!
-              </p>
-
+              <small>Accuracy</small>
+              <strong>92%</strong>
+              <p>Excellent!</p>
             </div>
-
           </div>
-
-
         </section>
-
       </main>
-
     </div>
   );
 }
