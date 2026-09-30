@@ -1,21 +1,27 @@
 /* =========================================================
    SKILLSENSAI — HOME PAGE
-   LIGHT THEME
+   LIGHT THEME / CIRCULAR SKILL WHEEL
    ========================================================= */
 
 .app {
   min-height: 100vh;
   width: 100%;
   overflow-x: hidden;
+
   background:
     radial-gradient(
-      circle at 50% 35%,
-      rgba(112, 190, 255, 0.18) 0%,
-      rgba(255, 255, 255, 0) 42%
+      circle at 50% 38%,
+      rgba(110, 175, 225, 0.12),
+      transparent 45%
     ),
-    linear-gradient(135deg, #f7fbff 0%, #eef5ff 48%, #ffffff 100%);
-  color: #111827;
-  position: relative;
+    linear-gradient(
+      135deg,
+      #f7fbff 0%,
+      #edf5fc 50%,
+      #ffffff 100%
+    );
+
+  color: #172b44;
 }
 
 /* =========================================================
@@ -25,18 +31,20 @@
 .navbar {
   width: 100%;
   height: 82px;
+
   padding: 0 5%;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  background: rgba(255, 255, 255, 0.88);
-  border-bottom: 1px solid rgba(25, 65, 110, 0.08);
+  background: rgba(255, 255, 255, 0.92);
 
-  box-shadow: 0 5px 25px rgba(45, 85, 125, 0.08);
+  border-bottom: 1px solid rgba(40, 80, 120, 0.08);
 
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 4px 18px rgba(40, 80, 120, 0.06);
+
+  backdrop-filter: blur(16px);
 
   position: relative;
   z-index: 100;
@@ -60,23 +68,27 @@
 
   border-radius: 14px;
 
-  background: linear-gradient(135deg, #172a46, #315d91);
+  background: linear-gradient(
+    135deg,
+    #172c47,
+    #315d8c
+  );
+
   color: white;
 
   font-size: 24px;
   font-weight: 800;
 
-  box-shadow:
-    0 8px 20px rgba(36, 76, 120, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  box-shadow: 0 7px 18px rgba(35, 75, 115, 0.18);
 }
 
 .brand h1 {
   font-size: 24px;
   line-height: 1;
+
   font-weight: 800;
-  letter-spacing: -0.5px;
-  color: #15253b;
+
+  color: #172b44;
 }
 
 .brand h1 span {
@@ -85,10 +97,14 @@
 
 .brand p {
   margin-top: 5px;
+
   font-size: 10px;
+
   letter-spacing: 2px;
+
   text-transform: uppercase;
-  color: #7b8da3;
+
+  color: #7e90a4;
 }
 
 /* Navigation */
@@ -96,13 +112,14 @@
 .navbar nav {
   display: flex;
   align-items: center;
-  gap: 34px;
+  gap: 32px;
 }
 
 .navbar nav a {
   position: relative;
 
-  color: #687990;
+  color: #718197;
+
   font-size: 14px;
   font-weight: 600;
 
@@ -114,26 +131,28 @@
 }
 
 .navbar nav a:hover {
-  color: #172f50;
-  transform: translateY(-2px);
+  color: #1d3857;
+  transform: translateY(-1px);
 }
 
 .navbar nav a.active-link {
-  color: #172f50;
+  color: #1d3857;
 }
 
 .navbar nav a.active-link::after {
   content: "";
 
   position: absolute;
+
   left: 0;
   right: 0;
   bottom: -9px;
 
   height: 3px;
+
   border-radius: 10px;
 
-  background: linear-gradient(90deg, #d7193f, #ff6b4a);
+  background: #d7193f;
 }
 
 /* Login */
@@ -145,30 +164,29 @@
 
   padding: 11px 18px;
 
-  border: 1px solid rgba(30, 65, 105, 0.12);
+  border: 1px solid rgba(40, 80, 120, 0.1);
+
   border-radius: 999px;
 
   background: white;
+
   color: #263d59;
 
   font-size: 14px;
   font-weight: 700;
 
-  box-shadow: 0 5px 16px rgba(40, 80, 120, 0.1);
+  box-shadow: 0 5px 15px rgba(40, 80, 120, 0.08);
 
   transition:
     transform 0.25s ease,
-    box-shadow 0.25s ease,
-    background 0.25s ease;
+    box-shadow 0.25s ease;
 }
 
 .login-button:hover {
-  transform: translateY(-3px);
-  background: #f7fbff;
+  transform: translateY(-2px);
 
   box-shadow:
-    0 10px 25px rgba(40, 80, 120, 0.16),
-    0 0 0 4px rgba(64, 145, 220, 0.08);
+    0 9px 22px rgba(40, 80, 120, 0.13);
 }
 
 /* =========================================================
@@ -178,22 +196,22 @@
 .hero {
   min-height: calc(100vh - 82px);
 
-  padding: 45px 5% 60px;
+  padding: 35px 5% 55px;
 
   display: flex;
   flex-direction: column;
   align-items: center;
-
-  position: relative;
 }
 
 /* =========================================================
-   SKILL ORBIT
+   CIRCULAR SKILL AREA
    ========================================================= */
 
 .skill-orbit {
-  width: min(900px, 92vw);
-  height: 600px;
+  width: 900px;
+  height: 620px;
+
+  max-width: 100%;
 
   position: relative;
 
@@ -201,49 +219,25 @@
   align-items: center;
   justify-content: center;
 
-  margin-top: 5px;
+  margin: 0 auto;
 }
 
-/* Large soft background glow */
-
-.skill-orbit::before {
-  content: "";
-
-  position: absolute;
-
-  width: 520px;
-  height: 520px;
-
-  border-radius: 50%;
-
-  background:
-    radial-gradient(
-      circle,
-      rgba(85, 163, 225, 0.15) 0%,
-      rgba(255, 255, 255, 0) 70%
-    );
-
-  filter: blur(15px);
-
-  z-index: 0;
-}
-
-/* Orbit */
+/* Main circular guide */
 
 .orbit-ring {
   position: absolute;
 
-  width: 470px;
-  height: 470px;
+  width: 570px;
+  height: 570px;
 
   border-radius: 50%;
 
-  border: 1px dashed rgba(76, 130, 180, 0.2);
+  border: 1px solid rgba(77, 128, 173, 0.13);
 
   z-index: 1;
 }
 
-/* Inner orbit */
+/* Second subtle ring */
 
 .orbit-ring::after {
   content: "";
@@ -254,72 +248,54 @@
 
   border-radius: 50%;
 
-  border: 1px solid rgba(76, 130, 180, 0.08);
+  border: 1px dashed rgba(77, 128, 173, 0.08);
 }
 
-/* Orbit dots */
+/* =========================================================
+   ORBIT DOTS
+   ========================================================= */
 
 .orbit-dot {
   position: absolute;
 
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 
   border-radius: 50%;
 
-  background: #8bbce5;
+  background: #91abc2;
 
-  box-shadow:
-    0 0 10px rgba(70, 155, 225, 0.6),
-    0 0 25px rgba(70, 155, 225, 0.3);
+  opacity: 0.55;
 
   z-index: 2;
-
-  animation: orbitPulse 2.5s ease-in-out infinite;
 }
 
 .dot-1 {
-  top: 63px;
+  top: 25px;
   left: 50%;
 
   transform: translateX(-50%);
 }
 
 .dot-2 {
-  right: 168px;
+  right: 165px;
   top: 50%;
 
   transform: translateY(-50%);
-  animation-delay: 0.6s;
 }
 
 .dot-3 {
-  bottom: 63px;
+  bottom: 25px;
   left: 50%;
 
   transform: translateX(-50%);
-  animation-delay: 1.2s;
 }
 
 .dot-4 {
-  left: 168px;
+  left: 165px;
   top: 50%;
 
   transform: translateY(-50%);
-  animation-delay: 1.8s;
-}
-
-@keyframes orbitPulse {
-  0%,
-  100% {
-    opacity: 0.45;
-    transform: scale(0.8);
-  }
-
-  50% {
-    opacity: 1;
-    transform: scale(1.25);
-  }
 }
 
 /* =========================================================
@@ -329,75 +305,58 @@
 .samurai-container {
   position: absolute;
 
-  width: 390px;
-  height: 550px;
+  width: 380px;
+  height: 540px;
 
   display: flex;
   align-items: flex-end;
   justify-content: center;
 
-  z-index: 3;
+  z-index: 4;
 
   pointer-events: none;
 }
 
-/* Samurai glow */
+/* Subtle glow */
 
 .samurai-glow {
   position: absolute;
 
-  width: 340px;
-  height: 340px;
+  width: 330px;
+  height: 330px;
 
-  bottom: 65px;
+  bottom: 70px;
 
   border-radius: 50%;
 
   background:
     radial-gradient(
       circle,
-      rgba(73, 145, 211, 0.23) 0%,
-      rgba(73, 145, 211, 0.08) 40%,
-      transparent 72%
+      rgba(80, 145, 200, 0.15),
+      transparent 70%
     );
 
-  filter: blur(20px);
-
-  animation: samuraiGlow 4s ease-in-out infinite;
+  filter: blur(15px);
 }
 
-@keyframes samuraiGlow {
-  0%,
-  100% {
-    transform: scale(0.95);
-    opacity: 0.7;
-  }
-
-  50% {
-    transform: scale(1.08);
-    opacity: 1;
-  }
-}
-
-/* BIG SAMURAI */
+/* Large Samurai */
 
 .samurai {
   position: relative;
 
-  width: 390px;
-  height: 550px;
+  width: 380px;
+  height: 540px;
 
   object-fit: contain;
 
   filter:
-    drop-shadow(0 20px 25px rgba(17, 45, 75, 0.25))
-    drop-shadow(0 0 25px rgba(69, 141, 205, 0.12));
+    drop-shadow(
+      0 18px 25px rgba(25, 60, 95, 0.18)
+    );
 
-  transform-origin: center bottom;
+  z-index: 5;
 
   animation: samuraiFloat 5s ease-in-out infinite;
-
-  z-index: 4;
 }
 
 @keyframes samuraiFloat {
@@ -407,31 +366,25 @@
   }
 
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-7px);
   }
 }
 
 /* =========================================================
-   ROUND SKILL BUTTONS
+   SKILL BUTTON BASE
    ========================================================= */
 
 .skill-button {
   position: absolute;
 
-  width: 142px;
-  height: 142px;
+  width: 126px;
+  height: 126px;
 
   border-radius: 50%;
 
-  border: 4px solid rgba(255, 255, 255, 0.9);
+  border: 2px solid rgba(255, 255, 255, 0.95);
 
-  background:
-    radial-gradient(
-      circle at 32% 25%,
-      rgba(255, 255, 255, 0.95),
-      rgba(255, 255, 255, 0.82) 35%,
-      rgba(245, 249, 253, 0.96) 100%
-    );
+  background: rgba(255, 255, 255, 0.96);
 
   color: #172b44;
 
@@ -440,111 +393,67 @@
   align-items: center;
   justify-content: center;
 
-  padding: 12px;
+  padding: 10px;
 
   text-align: center;
 
   z-index: 10;
 
   box-shadow:
-    0 12px 28px rgba(40, 80, 120, 0.15),
-    0 0 0 1px rgba(50, 100, 150, 0.05),
-    inset 0 2px 5px rgba(255, 255, 255, 0.9);
+    0 8px 22px rgba(40, 80, 120, 0.12);
 
   transition:
-    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
-    box-shadow 0.35s ease,
-    border-color 0.35s ease,
-    background 0.35s ease;
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
 }
 
-/* Colored outer glow */
+/* Small colored border accent */
 
 .skill-button::before {
   content: "";
 
   position: absolute;
 
-  inset: -6px;
+  inset: -2px;
 
   border-radius: 50%;
 
-  background: var(--skill-color);
+  border: 2px solid var(--skill-color);
 
-  opacity: 0.08;
-
-  filter: blur(10px);
-
-  z-index: -1;
-
-  transition:
-    opacity 0.35s ease,
-    transform 0.35s ease;
-}
-
-/* Small shine */
-
-.skill-button::after {
-  content: "";
-
-  position: absolute;
-
-  width: 42px;
-  height: 20px;
-
-  top: 17px;
-  left: 27px;
-
-  border-radius: 50%;
-
-  background: rgba(255, 255, 255, 0.55);
-
-  filter: blur(7px);
-
-  transform: rotate(-25deg);
+  opacity: 0.25;
 
   pointer-events: none;
+
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
 }
 
 /* Hover */
 
 .skill-button:hover {
-  transform: scale(1.13) translateY(-8px);
+  transform: scale(1.08);
 
   border-color: var(--skill-color);
 
-  background:
-    radial-gradient(
-      circle at 35% 25%,
-      #ffffff 0%,
-      #ffffff 40%,
-      #f4f8fc 100%
-    );
-
   box-shadow:
-    0 22px 40px rgba(35, 75, 115, 0.2),
-    0 0 0 7px color-mix(in srgb, var(--skill-color) 12%, transparent),
-    0 0 35px color-mix(in srgb, var(--skill-color) 30%, transparent);
+    0 14px 28px rgba(40, 80, 120, 0.16);
 }
 
 .skill-button:hover::before {
-  opacity: 0.28;
-  transform: scale(1.12);
-}
+  opacity: 0.65;
 
-/* Click */
-
-.skill-button:active {
-  transform: scale(1.04) translateY(-2px);
+  transform: scale(1.04);
 }
 
 /* =========================================================
-   SKILL ICON
+   ICON
    ========================================================= */
 
 .skill-icon {
-  width: 50px;
-  height: 50px;
+  width: 47px;
+  height: 47px;
 
   display: flex;
   align-items: center;
@@ -556,69 +465,51 @@
 
   background: color-mix(
     in srgb,
-    var(--skill-color) 10%,
+    var(--skill-color) 9%,
     white
   );
 
   margin-bottom: 5px;
 
   transition:
-    transform 0.35s ease,
-    background 0.35s ease,
-    box-shadow 0.35s ease;
+    transform 0.3s ease,
+    background 0.3s ease;
 }
 
 .skill-button:hover .skill-icon {
-  transform: scale(1.16) rotate(-5deg);
+  transform: scale(1.1);
 
   background: color-mix(
     in srgb,
-    var(--skill-color) 16%,
+    var(--skill-color) 14%,
     white
   );
-
-  box-shadow:
-    0 5px 16px color-mix(
-      in srgb,
-      var(--skill-color) 25%,
-      transparent
-    );
 }
 
 /* =========================================================
-   SKILL TEXT
+   TEXT
    ========================================================= */
 
 .skill-name {
-  font-size: 14px;
+  font-size: 13px;
+
   font-weight: 800;
 
-  color: #182c43;
+  color: #1a304a;
 
   white-space: nowrap;
-
-  transition: color 0.25s ease;
 }
 
 .skill-description {
   margin-top: 3px;
 
-  max-width: 110px;
+  max-width: 100px;
 
-  font-size: 9px;
+  font-size: 8.5px;
+
   line-height: 1.25;
 
-  color: #7a8da3;
-
-  transition: color 0.25s ease;
-}
-
-.skill-button:hover .skill-name {
-  color: var(--skill-color);
-}
-
-.skill-button:hover .skill-description {
-  color: #536b84;
+  color: #8091a3;
 }
 
 /* Arrow */
@@ -626,11 +517,11 @@
 .skill-arrow {
   position: absolute;
 
-  bottom: 16px;
-  right: 20px;
+  right: 15px;
+  bottom: 15px;
 
-  width: 19px;
-  height: 19px;
+  width: 17px;
+  height: 17px;
 
   border-radius: 50%;
 
@@ -638,99 +529,121 @@
   align-items: center;
   justify-content: center;
 
-  background: #edf3f8;
+  background: #eef3f7;
 
-  color: #7990a6;
+  color: #7890a6;
 
   opacity: 0;
-
-  transform: translateX(-5px);
 
   transition:
     opacity 0.25s ease,
     transform 0.25s ease,
-    background 0.25s ease,
-    color 0.25s ease;
+    background 0.25s ease;
 }
 
 .skill-button:hover .skill-arrow {
   opacity: 1;
-  transform: translateX(0);
+
+  transform: translateX(2px);
 
   background: var(--skill-color);
+
   color: white;
 }
 
 /* =========================================================
-   BUTTON POSITIONS
+   CIRCULAR POSITIONS
    ========================================================= */
 
-/* Top */
+/*
+   The Samurai stays in the center.
+
+   Buttons are placed around it:
+   
+              MUSIC
+
+       CODING       MARTIAL
+
+   ART                  DANCE
+
+       YOGA       INSTRUMENTS
+
+             MORE
+*/
+
+/* 12 o'clock */
 
 .skill-button.music {
-  top: 5px;
+  top: 2px;
   left: 50%;
 
   transform: translateX(-50%);
 }
 
 .skill-button.music:hover {
-  transform: translateX(-50%) scale(1.13) translateY(-8px);
+  transform: translateX(-50%) scale(1.08);
 }
 
-/* Upper right */
+/* 1:30 */
 
 .skill-button.martial {
-  top: 105px;
-  right: 85px;
+  top: 88px;
+  right: 112px;
 }
 
-/* Lower right */
+/* 3:00 */
 
 .skill-button.dance {
-  bottom: 52px;
-  right: 120px;
+  top: 250px;
+  right: 30px;
 }
 
-/* Bottom */
+/* 4:30 */
 
 .skill-button.instruments {
-  bottom: 0;
+  bottom: 35px;
+  right: 160px;
+}
+
+/* 6:00 */
+
+.skill-button.yoga {
+  bottom: 35px;
+  left: 160px;
+}
+
+/* 7:30 */
+
+.skill-button.coding {
+  top: 250px;
+  left: 30px;
+}
+
+/* 9:00 */
+
+.skill-button.art {
+  top: 88px;
+  left: 112px;
+}
+
+/* 10:30 */
+
+.skill-button.more {
+  top: 2px;
   left: 50%;
+
+  margin-left: 285px;
 
   transform: translateX(-50%);
 }
 
-.skill-button.instruments:hover {
-  transform: translateX(-50%) scale(1.13) translateY(-8px);
-}
+/*
+   More Skills gets moved slightly farther out so
+   it does not collide with Music.
+*/
 
-/* Lower left */
-
-.skill-button.yoga {
-  bottom: 52px;
-  left: 120px;
-}
-
-/* Upper left */
-
-.skill-button.coding {
-  top: 105px;
-  left: 85px;
-}
-
-/* Left-middle */
-
-.skill-button.art {
-  top: 245px;
-  left: 10px;
-}
-
-/* Right-middle */
-
-.skill-button.more {
-  top: 245px;
-  right: 10px;
+.skill-button.more:hover {
+  transform: translateX(-50%) scale(1.08);
 }
 
 /* =========================================================
@@ -740,7 +653,7 @@
 .hero-text {
   text-align: center;
 
-  margin-top: -8px;
+  margin-top: -5px;
 
   position: relative;
 
@@ -748,7 +661,7 @@
 }
 
 .hero-text h2 {
-  font-size: clamp(32px, 4vw, 48px);
+  font-size: clamp(32px, 4vw, 47px);
 
   font-weight: 850;
 
@@ -758,12 +671,13 @@
 }
 
 .hero-text h2 span {
-  background: linear-gradient(
-    90deg,
-    #d7193f,
-    #ff5c5c,
-    #ff8a3d
-  );
+  background:
+    linear-gradient(
+      90deg,
+      #d7193f,
+      #ef4059,
+      #f47b32
+    );
 
   -webkit-background-clip: text;
   background-clip: text;
@@ -772,7 +686,7 @@
 }
 
 .hero-text p {
-  margin-top: 10px;
+  margin-top: 9px;
 
   color: #71849a;
 
@@ -784,53 +698,50 @@
    ========================================================= */
 
 .journey-button {
-  margin-top: 22px;
+  margin-top: 21px;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  gap: 10px;
+  gap: 9px;
 
   padding: 14px 26px;
 
   border: none;
-  border-radius: 999px;
 
-  color: white;
+  border-radius: 999px;
 
   background:
     linear-gradient(
       135deg,
-      #172f50,
-      #32679b
+      #1b3554,
+      #356b9e
     );
 
+  color: white;
+
   font-size: 15px;
+
   font-weight: 750;
 
   box-shadow:
-    0 12px 25px rgba(37, 78, 120, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    0 9px 22px rgba(35, 75, 115, 0.2);
 
   transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease,
-    filter 0.3s ease;
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .journey-button:hover {
-  transform: translateY(-5px) scale(1.04);
-
-  filter: brightness(1.08);
+  transform: translateY(-4px);
 
   box-shadow:
-    0 18px 35px rgba(37, 78, 120, 0.3),
-    0 0 25px rgba(62, 143, 215, 0.2);
+    0 14px 28px rgba(35, 75, 115, 0.25);
 }
 
 .journey-button:active {
-  transform: translateY(-1px) scale(0.98);
+  transform: translateY(-1px);
 }
 
 /* =========================================================
@@ -840,7 +751,7 @@
 .stats {
   width: min(1050px, 94vw);
 
-  margin-top: 50px;
+  margin-top: 48px;
 
   display: grid;
 
@@ -849,6 +760,7 @@
   gap: 16px;
 
   position: relative;
+
   z-index: 20;
 }
 
@@ -862,32 +774,30 @@
 
   padding: 17px 19px;
 
-  background: rgba(255, 255, 255, 0.78);
+  background: rgba(255, 255, 255, 0.85);
 
-  border: 1px solid rgba(45, 85, 125, 0.09);
+  border: 1px solid rgba(40, 80, 120, 0.08);
 
-  border-radius: 20px;
+  border-radius: 19px;
 
   box-shadow:
-    0 8px 25px rgba(50, 90, 130, 0.07);
-
-  backdrop-filter: blur(10px);
+    0 7px 20px rgba(40, 80, 120, 0.06);
 
   transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .stat:hover {
-  transform: translateY(-5px);
+  transform: translateY(-4px);
 
   box-shadow:
-    0 15px 35px rgba(50, 90, 130, 0.12);
+    0 12px 27px rgba(40, 80, 120, 0.1);
 }
 
 .stat-icon {
-  width: 45px;
-  height: 45px;
+  width: 44px;
+  height: 44px;
 
   flex-shrink: 0;
 
@@ -895,7 +805,7 @@
   align-items: center;
   justify-content: center;
 
-  border-radius: 14px;
+  border-radius: 13px;
 }
 
 .stat-icon svg {
@@ -905,7 +815,7 @@
 
 .stat-icon.orange {
   background: #fff1e8;
-  color: #f07828;
+  color: #ef7629;
 }
 
 .stat-icon.blue {
@@ -914,13 +824,13 @@
 }
 
 .stat-icon.yellow {
-  background: #fff8d9;
-  color: #d7a900;
+  background: #fff8dc;
+  color: #d3a600;
 }
 
 .stat-icon.green {
   background: #eaf9e7;
-  color: #50a33b;
+  color: #4da63b;
 }
 
 .stat small {
@@ -954,7 +864,7 @@
 }
 
 /* =========================================================
-   RESPONSIVE — TABLET
+   TABLET
    ========================================================= */
 
 @media (max-width: 950px) {
@@ -967,9 +877,10 @@
   }
 
   .skill-orbit {
-    transform: scale(0.88);
-    margin-top: -20px;
-    margin-bottom: -40px;
+    transform: scale(0.82);
+
+    margin-top: -35px;
+    margin-bottom: -70px;
   }
 
   .stats {
@@ -978,7 +889,7 @@
 }
 
 /* =========================================================
-   RESPONSIVE — MOBILE
+   MOBILE
    ========================================================= */
 
 @media (max-width: 700px) {
@@ -999,59 +910,25 @@
 
     justify-content: center;
 
-    gap: 18px;
+    gap: 17px;
 
     overflow-x: auto;
-
-    padding-bottom: 4px;
   }
 
   .navbar nav a {
     font-size: 12px;
+
     white-space: nowrap;
-  }
-
-  .login-button {
-    padding: 9px 13px;
-  }
-
-  .hero {
-    min-height: auto;
-
-    padding-top: 15px;
   }
 
   .skill-orbit {
     width: 100%;
-    height: 580px;
+    height: 560px;
 
-    transform: scale(0.72);
+    transform: scale(0.63);
 
-    margin-top: -70px;
-    margin-bottom: -90px;
-  }
-
-  .samurai-container {
-    width: 360px;
-    height: 520px;
-  }
-
-  .samurai {
-    width: 360px;
-    height: 520px;
-  }
-
-  .skill-button {
-    width: 125px;
-    height: 125px;
-  }
-
-  .skill-button.art {
-    left: 20px;
-  }
-
-  .skill-button.more {
-    right: 20px;
+    margin-top: -80px;
+    margin-bottom: -120px;
   }
 
   .stats {
@@ -1062,12 +939,8 @@
     margin-top: 35px;
   }
 
-  .hero-text {
-    margin-top: 5px;
-  }
-
   .hero-text h2 {
-    font-size: 31px;
+    font-size: 30px;
   }
 
   .hero-text p {
@@ -1088,15 +961,11 @@
     font-size: 8px;
   }
 
-  .navbar nav {
-    gap: 14px;
-  }
-
   .skill-orbit {
-    transform: scale(0.58);
+    transform: scale(0.53);
 
-    margin-top: -105px;
-    margin-bottom: -125px;
+    margin-top: -110px;
+    margin-bottom: -145px;
   }
 
   .hero-text h2 {
