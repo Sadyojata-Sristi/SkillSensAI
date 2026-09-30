@@ -2848,3 +2848,553 @@
     font-size: 28px;
   }
 }
+
+/* =========================================================
+   LIVING MUSICIAN
+   ========================================================= */
+
+.musician-stage {
+  position: relative;
+  z-index: 6;
+
+  width: 410px;
+  height: 430px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  animation:
+    musicianBreathing 3.2s ease-in-out
+    infinite;
+}
+
+@keyframes musicianBreathing {
+  0%,
+  100% {
+    transform:
+      translateY(0)
+      rotate(0deg);
+  }
+
+  50% {
+    transform:
+      translateY(-7px)
+      rotate(0.7deg);
+  }
+}
+
+/* =========================================================
+   FINAL COLOR TRANSFORMATION
+   ========================================================= */
+
+.fully-awakened .musician-stage {
+  animation:
+    musicianAlive 2.8s ease-in-out
+    infinite;
+}
+
+@keyframes musicianAlive {
+  0%,
+  100% {
+    transform:
+      translateY(0)
+      scale(1)
+      rotate(-0.4deg);
+  }
+
+  25% {
+    transform:
+      translateY(-6px)
+      scale(1.015)
+      rotate(0.5deg);
+  }
+
+  50% {
+    transform:
+      translateY(-11px)
+      scale(1.025)
+      rotate(-0.5deg);
+  }
+
+  75% {
+    transform:
+      translateY(-5px)
+      scale(1.015)
+      rotate(0.4deg);
+  }
+}
+
+/* =========================================================
+   MUSICIAN COLOR AWAKENING
+   ========================================================= */
+
+.stage-0 .awakening-image {
+  filter:
+    grayscale(1)
+    brightness(0.12)
+    contrast(1.4)
+    saturate(0);
+}
+
+.stage-1 .awakening-image {
+  filter:
+    grayscale(0.8)
+    brightness(0.38)
+    contrast(1.25)
+    saturate(0.55)
+    drop-shadow(
+      0 0 12px
+      rgba(119, 76, 211, 0.18)
+    );
+}
+
+.stage-2 .awakening-image {
+  filter:
+    grayscale(0.6)
+    brightness(0.52)
+    contrast(1.18)
+    saturate(0.8)
+    drop-shadow(
+      0 0 16px
+      rgba(119, 76, 211, 0.25)
+    );
+}
+
+.stage-3 .awakening-image {
+  filter:
+    grayscale(0.4)
+    brightness(0.68)
+    contrast(1.12)
+    saturate(1)
+    drop-shadow(
+      0 0 20px
+      rgba(133, 73, 205, 0.3)
+    );
+}
+
+.stage-4 .awakening-image {
+  filter:
+    grayscale(0.2)
+    brightness(0.82)
+    contrast(1.1)
+    saturate(1.2)
+    drop-shadow(
+      0 0 24px
+      rgba(146, 72, 214, 0.36)
+    );
+}
+
+.stage-5 .awakening-image {
+  filter:
+    grayscale(0.08)
+    brightness(0.94)
+    contrast(1.08)
+    saturate(1.45)
+    drop-shadow(
+      0 0 28px
+      rgba(170, 71, 218, 0.42)
+    );
+}
+
+.stage-6 .awakening-image,
+.fully-awakened .awakening-image {
+  filter:
+    grayscale(0)
+    brightness(1.08)
+    contrast(1.08)
+    saturate(1.7)
+    drop-shadow(
+      0 0 20px
+      rgba(151, 67, 224, 0.6)
+    )
+    drop-shadow(
+      0 0 48px
+      rgba(236, 73, 170, 0.3)
+    );
+
+  animation:
+    musicianGlow 2.5s
+    ease-in-out
+    infinite;
+}
+
+@keyframes musicianGlow {
+  0%,
+  100% {
+    filter:
+      grayscale(0)
+      brightness(1.02)
+      saturate(1.55)
+      drop-shadow(
+        0 0 20px
+        rgba(151, 67, 224, 0.45)
+      );
+  }
+
+  50% {
+    filter:
+      grayscale(0)
+      brightness(1.16)
+      saturate(1.85)
+      drop-shadow(
+        0 0 34px
+        rgba(151, 67, 224, 0.7)
+      );
+  }
+}
+
+/* =========================================================
+   MICROPHONE
+   ========================================================= */
+
+.musician-mic {
+  position: absolute;
+
+  z-index: 20;
+
+  width: 54px;
+  height: 125px;
+
+  left: 48%;
+  top: 43%;
+
+  transform:
+    translate(-50%, -50%)
+    rotate(-13deg);
+
+  transform-origin: bottom center;
+
+  animation:
+    microphoneSinging 2.8s
+    ease-in-out
+    infinite;
+
+  filter:
+    drop-shadow(
+      0 5px 8px
+      rgba(43, 25, 62, 0.28)
+    );
+}
+
+@keyframes microphoneSinging {
+  0%,
+  100% {
+    transform:
+      translate(-50%, -50%)
+      rotate(-13deg);
+  }
+
+  25% {
+    transform:
+      translate(-50%, -54%)
+      rotate(-8deg);
+  }
+
+  50% {
+    transform:
+      translate(-50%, -58%)
+      rotate(-16deg);
+  }
+
+  75% {
+    transform:
+      translate(-50%, -53%)
+      rotate(-9deg);
+  }
+}
+
+.mic-head {
+  position: absolute;
+
+  top: 0;
+  left: 50%;
+
+  width: 43px;
+  height: 53px;
+
+  transform: translateX(-50%);
+
+  border-radius:
+    50% 50% 45% 45%;
+
+  background:
+    linear-gradient(
+      145deg,
+      #f7f5fa,
+      #aaa4b5
+    );
+
+  border: 2px solid
+    rgba(80, 67, 94, 0.4);
+
+  box-shadow:
+    inset 0 -5px 8px
+    rgba(48, 35, 58, 0.18),
+    0 4px 9px
+    rgba(47, 31, 61, 0.2);
+}
+
+.mic-grille {
+  position: absolute;
+
+  inset: 7px;
+
+  border-radius: 50%;
+
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(58, 47, 67, 0.3) 0,
+      rgba(58, 47, 67, 0.3) 2px,
+      transparent 2px,
+      transparent 5px
+    );
+}
+
+.mic-body {
+  position: absolute;
+
+  top: 48px;
+  left: 50%;
+
+  width: 25px;
+  height: 54px;
+
+  transform: translateX(-50%);
+
+  border-radius:
+    5px 5px 9px 9px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #7c7586,
+      #e1dce6,
+      #716a7b
+    );
+
+  box-shadow:
+    0 3px 8px
+    rgba(46, 32, 59, 0.25);
+}
+
+.mic-handle {
+  position: absolute;
+
+  top: 94px;
+  left: 50%;
+
+  width: 15px;
+  height: 31px;
+
+  transform: translateX(-50%);
+
+  border-radius: 0 0 9px 9px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #5c5367,
+      #b7b0bd,
+      #534a5f
+    );
+}
+
+/* =========================================================
+   SINGING NOTES
+   ========================================================= */
+
+.singing-wave {
+  position: absolute;
+
+  z-index: 25;
+
+  color: #a34dd7;
+
+  font-size: 28px;
+  font-weight: 900;
+
+  opacity: 0;
+
+  text-shadow:
+    0 0 12px
+    rgba(170, 73, 222, 0.35);
+
+  animation:
+    singingNote 2.5s
+    ease-out
+    infinite;
+}
+
+.fully-awakened .singing-wave {
+  opacity: 1;
+}
+
+.wave-one {
+  left: 51%;
+  top: 34%;
+
+  animation-delay: 0s;
+}
+
+.wave-two {
+  left: 56%;
+  top: 28%;
+
+  animation-delay: 0.55s;
+}
+
+.wave-three {
+  left: 61%;
+  top: 23%;
+
+  animation-delay: 1.1s;
+}
+
+@keyframes singingNote {
+  0% {
+    opacity: 0;
+    transform:
+      translate(0, 20px)
+      scale(0.65)
+      rotate(-10deg);
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  70% {
+    opacity: 0.85;
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      translate(32px, -65px)
+      scale(1.15)
+      rotate(14deg);
+  }
+}
+
+/* =========================================================
+   FINAL AURA
+   ========================================================= */
+
+.fully-awakened .glow-one {
+  width: 420px;
+  height: 420px;
+
+  opacity: 1;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(128, 75, 220, 0.34),
+      rgba(203, 72, 180, 0.14) 40%,
+      transparent 70%
+    );
+
+  animation:
+    livingAura 3s
+    ease-in-out
+    infinite;
+}
+
+.fully-awakened .glow-two {
+  width: 300px;
+  height: 300px;
+
+  opacity: 0.95;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(237, 78, 168, 0.25),
+      transparent 70%
+    );
+
+  animation:
+    livingAuraTwo 3s
+    ease-in-out
+    infinite;
+}
+
+@keyframes livingAura {
+  0%,
+  100% {
+    transform: scale(0.88);
+    opacity: 0.55;
+  }
+
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+@keyframes livingAuraTwo {
+  0%,
+  100% {
+    transform: scale(0.8);
+  }
+
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+/* =========================================================
+   FINAL MESSAGE
+   ========================================================= */
+
+.fully-awakened-label {
+  position: relative;
+
+  animation:
+    awakeningMessage 2s
+    ease-in-out
+    infinite;
+}
+
+@keyframes awakeningMessage {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.035);
+  }
+}
+
+/* =========================================================
+   RESPONSIVE MICROPHONE
+   ========================================================= */
+
+@media (max-width: 760px) {
+  .musician-stage {
+    width: 350px;
+    height: 380px;
+  }
+
+  .musician-mic {
+    transform:
+      translate(-50%, -50%)
+      scale(0.88)
+      rotate(-13deg);
+  }
+
+  .wave-one {
+    left: 47%;
+  }
+
+  .wave-two {
+    left: 54%;
+  }
+
+  .wave-three {
+    left: 60%;
+  }
+}
