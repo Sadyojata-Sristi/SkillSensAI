@@ -2,11 +2,7 @@ import React from "react";
 import Music from "./pages/Music";
 
 function App() {
-  return (
-    <div>
-      <Music />
-    </div>
-  );
+  return <Music />;
 }
 
 export default App;
