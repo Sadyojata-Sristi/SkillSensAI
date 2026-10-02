@@ -1,5 +1,6 @@
 /* =========================================================
    SKILLSENSAI — HOME PAGE
+   MATCHES CURRENT Home.jsx
    ========================================================= */
 
 * {
@@ -13,28 +14,54 @@ html {
 body {
   margin: 0;
   padding: 0;
-  background: #02050b;
-  color: white;
+  background: #02040a;
+  color: #ffffff;
   font-family: Arial, Helvetica, sans-serif;
 }
+
+button {
+  font-family: inherit;
+}
+
+/* =========================================================
+   MAIN PAGE
+   ========================================================= */
 
 .home-page {
   min-height: 100vh;
   width: 100%;
   overflow-x: hidden;
   background:
-    radial-gradient(circle at 50% 25%, rgba(18, 46, 82, 0.35), transparent 35%),
-    linear-gradient(180deg, #02050b 0%, #050a13 55%, #02040a 100%);
+    radial-gradient(
+      circle at 50% 20%,
+      rgba(20, 55, 95, 0.35),
+      transparent 35%
+    ),
+    radial-gradient(
+      circle at 85% 70%,
+      rgba(100, 20, 35, 0.08),
+      transparent 30%
+    ),
+    linear-gradient(
+      180deg,
+      #02050b 0%,
+      #050a12 45%,
+      #02040a 100%
+    );
 }
 
-/* ================= NAVBAR ================= */
+/* =========================================================
+   NAVBAR
+   ========================================================= */
 
-.home-navbar {
+.navbar {
   position: fixed;
   top: 0;
   left: 0;
+
   width: 100%;
   height: 76px;
+
   z-index: 1000;
 
   display: flex;
@@ -42,62 +69,105 @@ body {
   justify-content: space-between;
 
   padding: 0 6%;
+
   background: rgba(2, 5, 11, 0.78);
-  backdrop-filter: blur(14px);
-  border-bottom: 1px solid rgba(120, 170, 220, 0.08);
+  backdrop-filter: blur(16px);
+
+  border-bottom: 1px solid rgba(100, 150, 210, 0.1);
 }
 
 .logo {
-  font-size: 25px;
-  font-weight: 800;
+  font-size: 26px;
+  font-weight: 900;
   letter-spacing: -1px;
-  cursor: pointer;
+  user-select: none;
 }
 
 .logo-skill {
-  color: #9bc7ff;
+  color: #9ecbff;
 }
 
 .logo-sensai {
-  color: #e53935;
+  color: #e33b3b;
 }
 
-.nav-links {
+.nav-right {
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 28px;
 }
 
-.nav-links a {
+.nav-link {
+  border: none;
+  background: transparent;
+
   color: #aab7c8;
-  text-decoration: none;
+
   font-size: 14px;
-  transition: 0.25s;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition: color 0.25s ease;
 }
 
-.nav-links a:hover {
-  color: white;
+.nav-link:hover {
+  color: #ffffff;
 }
+
+/* =========================================================
+   LOGIN BUTTON
+   ========================================================= */
 
 .login-button {
-  border: 1px solid rgba(130, 180, 240, 0.35);
-  background: rgba(30, 60, 100, 0.25);
-  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 10px 18px;
+
   border-radius: 12px;
-  padding: 10px 20px;
+  border: 1px solid rgba(120, 180, 240, 0.35);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(40, 80, 130, 0.45),
+      rgba(15, 30, 55, 0.65)
+    );
+
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 700;
+
   cursor: pointer;
-  font-weight: 600;
-  transition: 0.25s;
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease;
 }
 
 .login-button:hover {
-  background: rgba(55, 100, 160, 0.4);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(55, 105, 165, 0.6),
+      rgba(20, 40, 70, 0.75)
+    );
+
+  box-shadow: 0 8px 25px rgba(30, 100, 180, 0.2);
 }
 
-/* ================= PROFILE ================= */
+/* =========================================================
+   PROFILE
+   ========================================================= */
 
-.profile-wrapper {
+.profile-container {
   position: relative;
 }
 
@@ -105,323 +175,1174 @@ body {
   display: flex;
   align-items: center;
   gap: 9px;
-  border: 1px solid rgba(130, 180, 240, 0.25);
-  background: rgba(20, 35, 55, 0.6);
-  color: white;
-  padding: 7px 12px;
+
+  padding: 6px 12px 6px 7px;
+
   border-radius: 25px;
+
+  border: 1px solid rgba(120, 180, 240, 0.25);
+
+  background: rgba(15, 30, 50, 0.75);
+
+  color: #ffffff;
+
   cursor: pointer;
+
+  font-weight: 600;
 }
 
-.profile-avatar {
-  width: 30px;
-  height: 30px;
+.profile-image,
+.profile-placeholder {
+  width: 32px;
+  height: 32px;
+
   border-radius: 50%;
+}
+
+.profile-image {
   object-fit: cover;
+}
+
+.profile-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: linear-gradient(
+    135deg,
+    #3b6c9e,
+    #1d3857
+  );
+
+  color: white;
+  font-weight: 800;
 }
 
 .profile-dropdown {
   position: absolute;
+
   right: 0;
-  top: 52px;
-  width: 260px;
+  top: 54px;
+
+  width: 270px;
+
   padding: 18px;
 
-  background: #0b111c;
-  border: 1px solid rgba(130, 180, 240, 0.18);
-  border-radius: 16px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  background:
+    radial-gradient(
+      circle at top,
+      rgba(35, 70, 115, 0.25),
+      transparent 60%
+    ),
+    #090f19;
+
+  border: 1px solid rgba(120, 180, 240, 0.18);
+
+  border-radius: 17px;
+
+  box-shadow:
+    0 25px 70px rgba(0, 0, 0, 0.65);
+
+  z-index: 2000;
 }
 
 .profile-info {
   display: flex;
-  gap: 12px;
   align-items: center;
+  gap: 12px;
 }
 
-.profile-info img {
+.profile-dropdown-image,
+.profile-dropdown-placeholder {
   width: 48px;
   height: 48px;
+
   border-radius: 50%;
+
+  flex-shrink: 0;
 }
 
-.profile-name {
-  font-weight: 700;
+.profile-dropdown-image {
+  object-fit: cover;
 }
 
-.profile-email {
-  color: #8492a6;
+.profile-dropdown-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: linear-gradient(
+    135deg,
+    #477dad,
+    #213b5c
+  );
+
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.profile-info strong {
+  display: block;
+
+  color: #ffffff;
+
+  font-size: 15px;
+
+  margin-bottom: 5px;
+}
+
+.profile-info small {
+  display: block;
+
+  color: #8291a5;
+
   font-size: 12px;
+
   word-break: break-word;
+
+  margin-top: 3px;
 }
 
 .logout-button {
   width: 100%;
-  margin-top: 16px;
-  padding: 10px;
-  border: 0;
-  border-radius: 10px;
-  background: #e53935;
-  color: white;
-  cursor: pointer;
-}
 
-/* ================= HERO ================= */
+  margin-top: 17px;
 
-.hero-section {
-  min-height: 760px;
-  padding-top: 100px;
+  padding: 11px;
 
   display: flex;
   align-items: center;
   justify-content: center;
-  text-align: center;
+  gap: 8px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: rgba(220, 50, 50, 0.13);
+
+  color: #ff7777;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.logout-button:hover {
+  background: rgba(220, 50, 50, 0.22);
+}
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.hero-section {
+  min-height: 820px;
+
+  padding: 120px 7% 80px;
+
+  display: flex;
+  align-items: center;
 
   position: relative;
+
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: "";
+
+  position: absolute;
+
+  width: 700px;
+  height: 700px;
+
+  left: 50%;
+  top: 45%;
+
+  transform: translate(-50%, -50%);
+
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle,
+    rgba(25, 70, 120, 0.14),
+    transparent 68%
+  );
+
+  pointer-events: none;
 }
 
 .hero-content {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1250px;
+
   margin: auto;
+
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  align-items: center;
+
+  gap: 40px;
+
+  position: relative;
+  z-index: 2;
 }
 
-.hero-title {
+/* =========================================================
+   HERO TEXT
+   ========================================================= */
+
+.hero-text {
+  max-width: 600px;
+
+  text-align: left;
+}
+
+.hero-small-text {
+  margin: 0 0 20px;
+
+  color: #70849d;
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+  letter-spacing: 4px;
+}
+
+.hero-text h1 {
   margin: 0;
-  font-size: clamp(48px, 7vw, 92px);
-  line-height: 0.95;
-  font-weight: 900;
+
+  color: #ffffff;
+
+  font-size: clamp(50px, 6vw, 82px);
+
+  line-height: 0.98;
+
   letter-spacing: -4px;
+
+  font-weight: 900;
 }
 
-.hero-title .skill {
-  color: #b7d8ff;
+.hero-highlight {
+  color: #9fcfff;
+
+  text-shadow:
+    0 0 25px rgba(90, 160, 230, 0.15);
 }
 
-.hero-title .sensai {
-  color: #e53935;
+.hero-description {
+  max-width: 570px;
+
+  margin: 28px 0;
+
+  color: #8d9bad;
+
+  font-size: 17px;
+
+  line-height: 1.75;
 }
 
-.hero-subtitle {
-  max-width: 650px;
-  margin: 25px auto 0;
-  color: #9ba9bb;
-  font-size: 18px;
-  line-height: 1.7;
+.hero-button {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  padding: 14px 22px;
+
+  border: 1px solid rgba(120, 185, 245, 0.4);
+
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #315f91,
+      #172e4d
+    );
+
+  color: white;
+
+  font-size: 15px;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 10px 30px rgba(25, 90, 160, 0.18);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
-/* ================= SAMURAI ================= */
+.hero-button:hover {
+  transform: translateY(-3px);
 
-.hero-character {
-  width: 300px;
-  height: 390px;
-  margin: 30px auto 0;
+  box-shadow:
+    0 15px 35px rgba(30, 110, 190, 0.28);
+}
+
+/* =========================================================
+   HERO VISUAL
+   ========================================================= */
+
+.hero-visual {
+  min-height: 550px;
 
   display: flex;
-  justify-content: center;
+
   align-items: center;
+  justify-content: center;
 
   position: relative;
 }
 
-.hero-character img {
+.samurai-container {
+  width: min(440px, 90%);
+
+  height: 560px;
+
+  position: relative;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+}
+
+.samurai-image {
+  position: relative;
+
+  z-index: 2;
+
   width: 100%;
   height: 100%;
+
   object-fit: contain;
+
   filter:
-    drop-shadow(0 0 25px rgba(60, 130, 220, 0.25))
-    drop-shadow(0 0 70px rgba(20, 70, 130, 0.15));
+    drop-shadow(
+      0 0 30px rgba(50, 120, 200, 0.25)
+    )
+    drop-shadow(
+      0 0 90px rgba(30, 70, 130, 0.18)
+    );
+
+  animation: samuraiFloat 5s ease-in-out infinite;
 }
 
-/* ================= SKILLS ================= */
+.samurai-glow {
+  position: absolute;
 
-.skills-section {
-  padding: 100px 6%;
-  text-align: center;
-}
-
-.section-title {
-  font-size: 40px;
-  margin-bottom: 12px;
-}
-
-.section-subtitle {
-  color: #8492a6;
-  margin-bottom: 55px;
-}
-
-.skills-orbit {
-  max-width: 900px;
-  min-height: 440px;
-  margin: auto;
-
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 22px;
-
-  position: relative;
-}
-
-.skill-card {
-  width: 145px;
-  height: 145px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
+  width: 330px;
+  height: 330px;
 
   border-radius: 50%;
 
   background:
-    radial-gradient(circle at 35% 25%, rgba(65, 110, 165, 0.3), rgba(7, 13, 22, 0.95));
+    radial-gradient(
+      circle,
+      rgba(40, 100, 170, 0.25),
+      rgba(20, 50, 90, 0.08),
+      transparent 70%
+    );
 
-  border: 1px solid rgba(120, 170, 220, 0.18);
+  filter: blur(15px);
+
+  z-index: 1;
+}
+
+@keyframes samuraiFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* =========================================================
+   SKILLS SECTION
+   ========================================================= */
+
+.skills-section {
+  min-height: 850px;
+
+  padding: 110px 5% 120px;
+
+  position: relative;
+
+  text-align: center;
+
+  overflow: hidden;
+}
+
+.section-heading {
+  position: relative;
+
+  z-index: 5;
+
+  margin-bottom: 30px;
+}
+
+.section-heading > p {
+  margin: 0 0 12px;
+
+  color: #73869d;
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+  letter-spacing: 4px;
+}
+
+.section-heading h2 {
+  margin: 0;
 
   color: white;
+
+  font-size: clamp(35px, 4vw, 55px);
+
+  line-height: 1.1;
+
+  letter-spacing: -2px;
+}
+
+.section-heading h2 span {
+  color: #e34444;
+}
+
+.heading-line {
+  width: 70px;
+  height: 3px;
+
+  margin: 20px auto 0;
+
+  border-radius: 10px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #7fb9ee,
+      #e34343
+    );
+}
+
+/* =========================================================
+   ORBIT
+   ========================================================= */
+
+.skills-orbit {
+  width: min(850px, 95vw);
+
+  height: 620px;
+
+  margin: 0 auto;
+
+  position: relative;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+}
+
+.orbit-ring {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  transform: translate(-50%, -50%);
+
+  border: 1px solid rgba(100, 155, 210, 0.13);
+
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+.orbit-ring-one {
+  width: 430px;
+  height: 430px;
+}
+
+.orbit-ring-two {
+  width: 610px;
+  height: 610px;
+
+  border-color: rgba(100, 155, 210, 0.08);
+}
+
+/* =========================================================
+   CENTER
+   ========================================================= */
+
+.orbit-center {
+  width: 180px;
+  height: 180px;
+
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  transform: translate(-50%, -50%);
+
+  border-radius: 50%;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  background:
+    radial-gradient(
+      circle at 35% 25%,
+      rgba(55, 105, 160, 0.45),
+      rgba(7, 14, 25, 0.98)
+    );
+
+  border: 1px solid rgba(120, 180, 240, 0.25);
+
+  box-shadow:
+    0 0 50px rgba(30, 100, 170, 0.14),
+    inset 0 0 35px rgba(50, 100, 160, 0.08);
+
+  z-index: 5;
+}
+
+.center-icon {
+  width: 58px;
+  height: 58px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  color: #a7d1ff;
+
+  background: rgba(50, 100, 160, 0.18);
+
+  margin-bottom: 8px;
+}
+
+.orbit-center h3 {
+  margin: 0;
+
+  font-size: 17px;
+
+  color: #ffffff;
+}
+
+.orbit-center p {
+  margin: 6px 0 0;
+
+  color: #718196;
+
+  font-size: 11px;
+}
+
+/* =========================================================
+   SKILL BUTTONS
+   ========================================================= */
+
+.skill-orbit-button {
+  width: 125px;
+  height: 125px;
+
+  position: absolute;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  border-radius: 50%;
+
+  color: white;
+
+  font-size: 13px;
+
+  font-weight: 800;
 
   cursor: pointer;
 
   transition:
-    transform 0.3s,
-    border-color 0.3s,
-    box-shadow 0.3s;
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+
+  z-index: 10;
 }
 
-.skill-card:hover {
-  transform: translateY(-8px) scale(1.04);
-  border-color: rgba(120, 190, 255, 0.6);
-  box-shadow: 0 15px 40px rgba(30, 100, 180, 0.18);
+.skill-orbit-button .skill-icon {
+  width: 47px;
+  height: 47px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
 }
 
-.skill-card.active {
-  border-color: rgba(230, 60, 60, 0.55);
-  box-shadow: 0 0 35px rgba(220, 50, 50, 0.1);
+.skill-orbit-button span {
+  font-size: 13px;
 }
 
-.skill-card.disabled {
-  opacity: 0.38;
-  cursor: default;
+.skill-orbit-button small {
+  font-size: 8px;
+
+  color: #738196;
+
+  margin-top: -2px;
 }
 
-.skill-icon {
-  width: 34px;
-  height: 34px;
+/* ACTIVE */
+
+.active-skill {
+  border: 1px solid rgba(105, 180, 245, 0.55);
+
+  background:
+    radial-gradient(
+      circle at 35% 25%,
+      rgba(70, 130, 195, 0.45),
+      rgba(8, 16, 28, 0.97)
+    );
+
+  box-shadow:
+    0 0 25px rgba(50, 130, 210, 0.13);
 }
 
-.skill-name {
-  font-size: 15px;
-  font-weight: 700;
+.active-skill .skill-icon {
+  color: #9dccff;
+
+  background: rgba(60, 120, 185, 0.18);
 }
 
-/* ================= STATS ================= */
+.active-skill:hover {
+  transform: translateY(-7px) scale(1.07);
+
+  box-shadow:
+    0 0 35px rgba(60, 150, 230, 0.3);
+}
+
+/* INACTIVE */
+
+.inactive-skill {
+  border: 1px solid rgba(100, 120, 145, 0.16);
+
+  background:
+    radial-gradient(
+      circle at 35% 25%,
+      rgba(40, 50, 65, 0.22),
+      rgba(7, 12, 20, 0.94)
+    );
+
+  opacity: 0.48;
+}
+
+.inactive-skill .skill-icon {
+  color: #758294;
+
+  background: rgba(90, 100, 115, 0.08);
+}
+
+.inactive-skill:hover {
+  opacity: 0.7;
+
+  transform: scale(1.04);
+}
+
+/* =========================================================
+   ORBIT POSITIONS
+   ========================================================= */
+
+.skill-music {
+  top: 50%;
+  left: 50%;
+
+  transform:
+    translate(-50%, -50%)
+    translateY(-250px);
+}
+
+.skill-martial {
+  top: 50%;
+  left: 50%;
+
+  transform:
+    translate(-50%, -50%)
+    translate(235px, -85px);
+}
+
+.skill-dance {
+  top: 50%;
+  left: 50%;
+
+  transform:
+    translate(-50%, -50%)
+    translate(235px, 100px);
+}
+
+.skill-coding {
+  top: 50%;
+  left: 50%;
+
+  transform:
+    translate(-50%, -50%)
+    translate(0, 255px);
+}
+
+.skill-instruments {
+  top: 50%;
+  left: 50%;
+
+  transform:
+    translate(-50%, -50%)
+    translate(-235px, 100px);
+}
+
+.skill-art {
+  top: 50%;
+  left: 50%;
+
+  transform:
+    translate(-50%, -50%)
+    translate(-235px, -85px);
+}
+
+.skill-speaking {
+  top: 50%;
+  left: 50%;
+
+  transform:
+    translate(-50%, -50%)
+    translate(-175px, -205px);
+}
+
+.skill-yoga {
+  top: 50%;
+  left: 50%;
+
+  transform:
+    translate(-50%, -50%)
+    translate(175px, -205px);
+}
+
+/* =========================================================
+   STATS
+   ========================================================= */
 
 .stats-section {
-  padding: 80px 6%;
-}
+  width: min(1150px, 90%);
 
-.stats-grid {
-  max-width: 1000px;
-  margin: auto;
+  margin: 0 auto;
+
+  padding: 60px 0 110px;
 
   display: grid;
+
   grid-template-columns: repeat(4, 1fr);
+
   gap: 18px;
 }
 
 .stat-card {
-  padding: 30px 20px;
-  text-align: center;
+  min-height: 125px;
 
-  border-radius: 18px;
+  padding: 24px;
 
-  background: rgba(10, 17, 28, 0.7);
-  border: 1px solid rgba(120, 170, 220, 0.1);
+  display: flex;
+
+  align-items: center;
+
+  gap: 17px;
+
+  border-radius: 17px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(18, 30, 48, 0.85),
+      rgba(7, 12, 21, 0.9)
+    );
+
+  border: 1px solid rgba(100, 150, 210, 0.1);
+
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease;
 }
 
-.stat-number {
-  font-size: 34px;
-  font-weight: 800;
-  color: #b8d8ff;
+.stat-card:hover {
+  transform: translateY(-5px);
+
+  border-color: rgba(100, 170, 230, 0.25);
 }
 
-.stat-label {
-  margin-top: 8px;
-  color: #77869a;
-  font-size: 14px;
+.stat-icon {
+  width: 52px;
+  height: 52px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+
+  color: #9ecbff;
+
+  background: rgba(60, 110, 170, 0.13);
 }
 
-/* ================= ABOUT ================= */
+.stat-card h3 {
+  margin: 0 0 6px;
+
+  color: #ffffff;
+
+  font-size: 17px;
+}
+
+.stat-card p {
+  margin: 0;
+
+  color: #718096;
+
+  font-size: 12px;
+
+  line-height: 1.4;
+}
+
+/* =========================================================
+   ABOUT
+   ========================================================= */
 
 .about-section {
-  padding: 110px 8%;
+  padding: 120px 8% 150px;
+
   text-align: center;
+
+  position: relative;
 }
 
 .about-content {
   max-width: 850px;
+
   margin: auto;
 }
 
-.about-content p {
-  color: #9aa8ba;
+.about-label {
+  margin: 0 0 15px;
+
+  color: #71849a;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  letter-spacing: 4px;
+}
+
+.about-content h2 {
+  margin: 0 0 28px;
+
+  font-size: clamp(38px, 5vw, 58px);
+
+  letter-spacing: -2px;
+
+  color: #ffffff;
+}
+
+.about-content h2 span {
+  color: #e34444;
+}
+
+.about-content > p:not(.about-label) {
+  max-width: 760px;
+
+  margin: 18px auto;
+
+  color: #8b99aa;
+
+  font-size: 16px;
+
   line-height: 1.9;
-  font-size: 17px;
 }
 
-/* ================= FOOTER ================= */
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
 
-.home-footer {
-  padding: 35px 6%;
-  text-align: center;
-  color: #536174;
-  border-top: 1px solid rgba(120, 170, 220, 0.08);
+@media (max-width: 1000px) {
+
+  .hero-content {
+    grid-template-columns: 1fr;
+
+    text-align: center;
+  }
+
+  .hero-text {
+    max-width: 700px;
+
+    margin: auto;
+
+    text-align: center;
+  }
+
+  .hero-description {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-visual {
+    min-height: 480px;
+  }
+
+  .samurai-container {
+    width: 350px;
+    height: 450px;
+  }
+
+  .stats-section {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
-/* ================= RESPONSIVE ================= */
+@media (max-width: 750px) {
 
-@media (max-width: 800px) {
-  .nav-links {
+  .navbar {
+    padding: 0 20px;
+  }
+
+  .nav-right {
+    gap: 12px;
+  }
+
+  .nav-link {
     display: none;
   }
 
   .hero-section {
-    min-height: 680px;
+    padding-top: 110px;
   }
 
-  .hero-title {
-    font-size: 52px;
+  .hero-text h1 {
+    font-size: 54px;
+
+    letter-spacing: -3px;
   }
 
-  .hero-character {
-    width: 240px;
-    height: 310px;
+  .hero-small-text {
+    letter-spacing: 2px;
   }
 
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .skills-section {
+    min-height: auto;
+
+    padding-bottom: 80px;
   }
 
-  .skill-card {
-    width: 120px;
-    height: 120px;
+  .skills-orbit {
+    height: auto;
+
+    min-height: 800px;
+  }
+
+  .orbit-ring {
+    display: none;
+  }
+
+  .orbit-center {
+    width: 145px;
+    height: 145px;
+  }
+
+  .skill-orbit-button {
+    width: 105px;
+    height: 105px;
+  }
+
+  .skill-music {
+    transform:
+      translate(-50%, -50%)
+      translateY(-190px);
+  }
+
+  .skill-martial {
+    transform:
+      translate(-50%, -50%)
+      translate(150px, -100px);
+  }
+
+  .skill-dance {
+    transform:
+      translate(-50%, -50%)
+      translate(150px, 90px);
+  }
+
+  .skill-coding {
+    transform:
+      translate(-50%, -50%)
+      translate(0, 200px);
+  }
+
+  .skill-instruments {
+    transform:
+      translate(-50%, -50%)
+      translate(-150px, 90px);
+  }
+
+  .skill-art {
+    transform:
+      translate(-50%, -50%)
+      translate(-150px, -100px);
+  }
+
+  .skill-speaking {
+    transform:
+      translate(-50%, -50%)
+      translate(-125px, -175px);
+  }
+
+  .skill-yoga {
+    transform:
+      translate(-50%, -50%)
+      translate(125px, -175px);
   }
 }
 
-@media (max-width: 500px) {
-  .home-navbar {
-    padding: 0 20px;
+@media (max-width: 520px) {
+
+  .logo {
+    font-size: 21px;
   }
 
-  .stats-grid {
-    grid-template-columns: 1fr 1fr;
+  .login-button {
+    padding: 9px 12px;
   }
 
-  .hero-title {
-    font-size: 42px;
-    letter-spacing: -2px;
+  .hero-section {
+    min-height: 760px;
+  }
+
+  .hero-text h1 {
+    font-size: 44px;
+  }
+
+  .hero-description {
+    font-size: 14px;
+  }
+
+  .samurai-container {
+    width: 280px;
+    height: 380px;
+  }
+
+  .stats-section {
+    grid-template-columns: 1fr;
+
+    width: 92%;
+  }
+
+  .skills-orbit {
+    min-height: 720px;
+  }
+
+  .skill-orbit-button {
+    width: 90px;
+    height: 90px;
+  }
+
+  .skill-orbit-button .skill-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  .skill-orbit-button span {
+    font-size: 11px;
+  }
+
+  .skill-orbit-button small {
+    font-size: 7px;
+  }
+
+  .skill-music {
+    transform:
+      translate(-50%, -50%)
+      translateY(-165px);
+  }
+
+  .skill-martial {
+    transform:
+      translate(-50%, -50%)
+      translate(115px, -90px);
+  }
+
+  .skill-dance {
+    transform:
+      translate(-50%, -50%)
+      translate(115px, 80px);
+  }
+
+  .skill-coding {
+    transform:
+      translate(-50%, -50%)
+      translate(0, 175px);
+  }
+
+  .skill-instruments {
+    transform:
+      translate(-50%, -50%)
+      translate(-115px, 80px);
+  }
+
+  .skill-art {
+    transform:
+      translate(-50%, -50%)
+      translate(-115px, -90px);
+  }
+
+  .skill-speaking {
+    transform:
+      translate(-50%, -50%)
+      translate(-95px, -150px);
+  }
+
+  .skill-yoga {
+    transform:
+      translate(-50%, -50%)
+      translate(95px, -150px);
+  }
+
+  .about-section {
+    padding-left: 20px;
+    padding-right: 20px;
   }
 }
