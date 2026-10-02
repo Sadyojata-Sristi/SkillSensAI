@@ -33,6 +33,22 @@ export function getCompletedLessons() {
 }
 
 /**
+ * Get the number of lessons learned
+ *
+ * Used by Home.jsx
+ */
+export function getLessonsLearned() {
+  return getCompletedLessons().length;
+}
+
+/**
+ * Get the total number of completed lessons
+ */
+export function getCompletedLessonCount() {
+  return getCompletedLessons().length;
+}
+
+/**
  * Check whether a specific lesson is completed
  */
 export function isLessonCompleted(lessonId) {
@@ -40,9 +56,7 @@ export function isLessonCompleted(lessonId) {
     return false;
   }
 
-  const completedLessons = getCompletedLessons();
-
-  return completedLessons.includes(lessonId);
+  return getCompletedLessons().includes(lessonId);
 }
 
 /**
@@ -55,7 +69,7 @@ export function completeLesson(lessonId) {
 
   const completedLessons = getCompletedLessons();
 
-  // Don't add the same lesson twice
+  // Prevent duplicate lessons
   if (completedLessons.includes(lessonId)) {
     return false;
   }
@@ -71,7 +85,7 @@ export function completeLesson(lessonId) {
       JSON.stringify(updatedLessons)
     );
 
-    // Tell other pages/components that progress changed
+    // Notify Home.jsx and other pages
     window.dispatchEvent(
       new Event("skillsensai-progress-updated")
     );
@@ -123,10 +137,46 @@ export function uncompleteLesson(lessonId) {
 }
 
 /**
- * Get the total number of completed lessons
+ * Calculate progress percentage
+ *
+ * Example:
+ * getProgressPercentage(15)
+ *
+ * 3 completed out of 15 = 20%
  */
-export function getCompletedLessonCount() {
-  return getCompletedLessons().length;
+export function getProgressPercentage(totalLessons) {
+  if (!totalLessons || totalLessons <= 0) {
+    return 0;
+  }
+
+  const completedCount = getCompletedLessons().length;
+
+  return Math.min(
+    100,
+    Math.round(
+      (completedCount / totalLessons) * 100
+    )
+  );
+}
+
+/**
+ * Check whether all supplied lessons are completed
+ */
+export function areAllLessonsCompleted(
+  lessonIds = []
+) {
+  if (
+    !Array.isArray(lessonIds) ||
+    lessonIds.length === 0
+  ) {
+    return false;
+  }
+
+  const completedLessons = getCompletedLessons();
+
+  return lessonIds.every((lessonId) =>
+    completedLessons.includes(lessonId)
+  );
 }
 
 /**
@@ -149,39 +199,4 @@ export function resetProgress() {
 
     return false;
   }
-}
-
-/**
- * Get progress percentage
- *
- * Example:
- * getProgressPercentage(5)
- * If 3 of 5 lessons are completed → 60
- */
-export function getProgressPercentage(totalLessons) {
-  if (!totalLessons || totalLessons <= 0) {
-    return 0;
-  }
-
-  const completedCount = getCompletedLessonCount();
-
-  return Math.min(
-    100,
-    Math.round((completedCount / totalLessons) * 100)
-  );
-}
-
-/**
- * Check whether ALL lessons are completed
- */
-export function areAllLessonsCompleted(lessonIds = []) {
-  if (!Array.isArray(lessonIds) || lessonIds.length === 0) {
-    return false;
-  }
-
-  const completedLessons = getCompletedLessons();
-
-  return lessonIds.every((lessonId) =>
-    completedLessons.includes(lessonId)
-  );
 }
