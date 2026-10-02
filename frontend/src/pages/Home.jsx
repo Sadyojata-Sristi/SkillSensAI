@@ -13,6 +13,8 @@ import {
   UserRound,
   LogOut,
   X,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
@@ -33,7 +35,12 @@ import "./LoginModal.css";
 function Home() {
   const navigate = useNavigate();
 
+  /* =====================================================
+     STATE
+     ===================================================== */
+
   const [user, setUser] = useState(null);
+
   const [showLogin, setShowLogin] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
 
@@ -42,19 +49,34 @@ function Home() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [otp, setOtp] = useState("");
 
-  const [confirmationResult, setConfirmationResult] = useState(null);
+  const [confirmationResult, setConfirmationResult] =
+    useState(null);
 
   const [loading, setLoading] = useState(false);
+
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const [darkMode, setDarkMode] = useState(true);
+
+  /* =====================================================
+     FIREBASE AUTH STATE
+     ===================================================== */
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (currentUser) => {
+        setUser(currentUser);
+      }
+    );
 
     return () => unsubscribe();
   }, []);
+
+  /* =====================================================
+     SKILLS
+     ===================================================== */
 
   const skills = [
     {
@@ -117,6 +139,10 @@ function Home() {
     }
   };
 
+  /* =====================================================
+     GOOGLE LOGIN
+     ===================================================== */
+
   const handleGoogleLogin = async () => {
     try {
       setLoading(true);
@@ -138,11 +164,18 @@ function Home() {
       }, 800);
     } catch (err) {
       console.error(err);
-      setError(err.message || "Google login failed.");
+
+      setError(
+        err.message || "Google login failed."
+      );
     } finally {
       setLoading(false);
     }
   };
+
+  /* =====================================================
+     PHONE LOGIN
+     ===================================================== */
 
   const setupRecaptcha = () => {
     if (window.recaptchaVerifier) {
@@ -160,7 +193,9 @@ function Home() {
         },
 
         "expired-callback": () => {
-          setError("reCAPTCHA expired. Please verify again.");
+          setError(
+            "reCAPTCHA expired. Please verify again."
+          );
         },
       }
     );
@@ -232,11 +267,16 @@ function Home() {
       }, 800);
     } catch (err) {
       console.error(err);
+
       setError("Invalid OTP. Please try again.");
     } finally {
       setLoading(false);
     }
   };
+
+  /* =====================================================
+     LOGOUT
+     ===================================================== */
 
   const handleLogout = async () => {
     try {
@@ -248,6 +288,10 @@ function Home() {
       console.error(err);
     }
   };
+
+  /* =====================================================
+     LOGIN MODAL
+     ===================================================== */
 
   const openLogin = () => {
     setShowLogin(true);
@@ -264,20 +308,44 @@ function Home() {
 
   const changeLoginMethod = (method) => {
     setLoginMethod(method);
+
     setError("");
     setSuccess("");
+
+    setConfirmationResult(null);
+    setOtp("");
+
+    if (window.recaptchaVerifier) {
+      window.recaptchaVerifier.clear();
+      window.recaptchaVerifier = null;
+    }
   };
 
-  return (
-    <div className="app">
+  /* =====================================================
+     RENDER
+     ===================================================== */
 
-      {/* ================= NAVBAR ================= */}
+  return (
+    <div
+      className={`app ${
+        darkMode ? "dark-theme" : "light-theme"
+      }`}
+    >
+
+      {/* =================================================
+          NAVBAR
+          ================================================= */}
 
       <nav className="navbar">
 
         <div className="logo">
-          <span className="logo-skill">Skill</span>
-          <span className="logo-sensai">SensAI</span>
+          <span className="logo-skill">
+            Skill
+          </span>
+
+          <span className="logo-sensai">
+            SensAI
+          </span>
         </div>
 
         <div className="tagline">
@@ -288,7 +356,12 @@ function Home() {
 
           <button
             className="nav-link active-nav"
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            onClick={() =>
+              window.scrollTo({
+                top: 0,
+                behavior: "smooth",
+              })
+            }
           >
             Home
           </button>
@@ -298,7 +371,9 @@ function Home() {
             onClick={() =>
               document
                 .getElementById("stats")
-                ?.scrollIntoView({ behavior: "smooth" })
+                ?.scrollIntoView({
+                  behavior: "smooth",
+                })
             }
           >
             Progress
@@ -309,7 +384,9 @@ function Home() {
             onClick={() =>
               document
                 .getElementById("skills")
-                ?.scrollIntoView({ behavior: "smooth" })
+                ?.scrollIntoView({
+                  behavior: "smooth",
+                })
             }
           >
             AI Coach
@@ -320,7 +397,9 @@ function Home() {
             onClick={() =>
               document
                 .getElementById("stats")
-                ?.scrollIntoView({ behavior: "smooth" })
+                ?.scrollIntoView({
+                  behavior: "smooth",
+                })
             }
           >
             Leaderboard
@@ -331,18 +410,52 @@ function Home() {
             onClick={() =>
               document
                 .getElementById("about")
-                ?.scrollIntoView({ behavior: "smooth" })
+                ?.scrollIntoView({
+                  behavior: "smooth",
+                })
             }
           >
             About Us
           </button>
+
+          {/* THEME SWITCH */}
+
+          <div className="theme-toggle">
+
+            <button
+              className={`theme-option ${
+                !darkMode ? "selected" : ""
+              }`}
+              onClick={() => setDarkMode(false)}
+              title="Light Theme"
+            >
+              <Sun size={15} />
+              <span>Light</span>
+            </button>
+
+            <button
+              className={`theme-option ${
+                darkMode ? "selected" : ""
+              }`}
+              onClick={() => setDarkMode(true)}
+              title="Dark Theme"
+            >
+              <Moon size={15} />
+              <span>Dark</span>
+            </button>
+
+          </div>
+
+          {/* LOGIN / PROFILE */}
 
           {user ? (
             <div className="profile-container">
 
               <button
                 className="profile-button"
-                onClick={() => setShowProfile(!showProfile)}
+                onClick={() =>
+                  setShowProfile(!showProfile)
+                }
               >
                 {user.photoURL ? (
                   <img
@@ -373,13 +486,17 @@ function Home() {
                   )}
 
                   <div className="profile-info">
+
                     <strong>
-                      {user.displayName || "SkillSensAI User"}
+                      {user.displayName ||
+                        "SkillSensAI User"}
                     </strong>
 
                     <small>
-                      {user.email || user.phoneNumber}
+                      {user.email ||
+                        user.phoneNumber}
                     </small>
+
                   </div>
 
                   <button
@@ -407,7 +524,10 @@ function Home() {
 
       </nav>
 
-      {/* ================= HERO ================= */}
+
+      {/* =================================================
+          HERO
+          ================================================= */}
 
       <section className="hero">
 
@@ -437,28 +557,41 @@ function Home() {
               onClick={() =>
                 document
                   .getElementById("skills")
-                  ?.scrollIntoView({ behavior: "smooth" })
+                  ?.scrollIntoView({
+                    behavior: "smooth",
+                  })
               }
             >
               Start Your Journey
-              <span>→</span>
+
+              <span>
+                →
+              </span>
             </button>
 
           </div>
 
-          {/* ================= SAMURAI + SKILLS ================= */}
+
+          {/* HERO VISUAL */}
 
           <div className="hero-visual">
 
             <div className="skill-orbit">
 
               <div className="orbit-ring orbit-ring-one"></div>
+
               <div className="orbit-ring orbit-ring-two"></div>
 
               <div className="orbit-dot dot-one"></div>
+
               <div className="orbit-dot dot-two"></div>
+
               <div className="orbit-dot dot-three"></div>
+
               <div className="orbit-dot dot-four"></div>
+
+
+              {/* SAMURAI */}
 
               <div className="samurai-container">
 
@@ -472,23 +605,38 @@ function Home() {
 
               </div>
 
+
+              {/* SKILLS */}
+
               {skills.map((skill) => (
                 <button
                   key={skill.name}
-                  className={`skill-card ${skill.className} ${
-                    skill.active ? "active-skill" : "inactive-skill"
+                  className={`skill-card ${
+                    skill.className
+                  } ${
+                    skill.active
+                      ? "active-skill"
+                      : "inactive-skill"
                   }`}
-                  onClick={() => handleSkillClick(skill)}
+                  onClick={() =>
+                    handleSkillClick(skill)
+                  }
                 >
+
                   <div className="skill-icon">
                     {skill.icon}
                   </div>
 
-                  <span>{skill.name}</span>
+                  <span>
+                    {skill.name}
+                  </span>
 
                   {!skill.active && (
-                    <small>Coming Soon</small>
+                    <small>
+                      Coming Soon
+                    </small>
                   )}
+
                 </button>
               ))}
 
@@ -500,7 +648,10 @@ function Home() {
 
       </section>
 
-      {/* ================= STATS ================= */}
+
+      {/* =================================================
+          STATS
+          ================================================= */}
 
       <section
         className="stats-section"
@@ -533,7 +684,10 @@ function Home() {
 
       </section>
 
-      {/* ================= SKILLS ================= */}
+
+      {/* =================================================
+          SKILLS
+          ================================================= */}
 
       <section
         className="skills-section"
@@ -556,16 +710,21 @@ function Home() {
         </div>
 
         <div className="skills-info">
+
           <p>
             Learn at your own pace.
             Practice with AI.
             Track your progress.
           </p>
+
         </div>
 
       </section>
 
-      {/* ================= ABOUT ================= */}
+
+      {/* =================================================
+          ABOUT
+          ================================================= */}
 
       <section
         className="about-section"
@@ -586,18 +745,23 @@ function Home() {
           </h2>
 
           <p>
-            SkillSensAI combines artificial intelligence,
-            expert knowledge and practical learning to
-            help anyone develop real-world skills.
+            SkillSensAI combines artificial
+            intelligence, expert knowledge and
+            practical learning to help anyone
+            develop real-world skills.
           </p>
 
         </div>
 
       </section>
 
-      {/* ================= LOGIN MODAL ================= */}
+
+      {/* =================================================
+          LOGIN MODAL
+          ================================================= */}
 
       {showLogin && (
+
         <div
           className="login-overlay"
           onClick={closeLogin}
@@ -605,7 +769,9 @@ function Home() {
 
           <div
             className="login-modal"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) =>
+              e.stopPropagation()
+            }
           >
 
             <button
@@ -615,11 +781,19 @@ function Home() {
               <X size={22} />
             </button>
 
+
             <div className="login-header">
 
               <div className="login-logo">
-                <span>Skill</span>
-                <strong>SensAI</strong>
+
+                <span>
+                  Skill
+                </span>
+
+                <strong>
+                  SensAI
+                </strong>
+
               </div>
 
               <h2>
@@ -627,10 +801,14 @@ function Home() {
               </h2>
 
               <p>
-                Login to continue your learning journey.
+                Login to continue your
+                learning journey.
               </p>
 
             </div>
+
+
+            {/* LOGIN TABS */}
 
             <div className="login-tabs">
 
@@ -662,7 +840,11 @@ function Home() {
 
             </div>
 
+
+            {/* GOOGLE LOGIN */}
+
             {loginMethod === "google" && (
+
               <div className="google-login-section">
 
                 <button
@@ -670,6 +852,7 @@ function Home() {
                   onClick={handleGoogleLogin}
                   disabled={loading}
                 >
+
                   <span className="google-icon">
                     G
                   </span>
@@ -677,12 +860,18 @@ function Home() {
                   {loading
                     ? "Signing in..."
                     : "Continue with Google"}
+
                 </button>
 
               </div>
+
             )}
 
+
+            {/* PHONE LOGIN */}
+
             {loginMethod === "phone" && (
+
               <div className="phone-login-section">
 
                 <input
@@ -690,13 +879,19 @@ function Home() {
                   placeholder="+91 9876543210"
                   value={phoneNumber}
                   onChange={(e) =>
-                    setPhoneNumber(e.target.value)
+                    setPhoneNumber(
+                      e.target.value
+                    )
                   }
-                  disabled={!!confirmationResult}
+                  disabled={
+                    !!confirmationResult
+                  }
                 />
+
 
                 {!confirmationResult && (
                   <>
+
                     <div
                       id="phone-recaptcha"
                       className="recaptcha-container"
@@ -711,11 +906,14 @@ function Home() {
                         ? "Sending OTP..."
                         : "Send OTP"}
                     </button>
+
                   </>
                 )}
 
+
                 {confirmationResult && (
                   <>
+
                     <input
                       type="text"
                       placeholder="Enter OTP"
@@ -738,24 +936,38 @@ function Home() {
                     <button
                       className="change-number-button"
                       onClick={() => {
-                        setConfirmationResult(null);
+
+                        setConfirmationResult(
+                          null
+                        );
+
                         setOtp("");
+
                         setError("");
+
                         setSuccess("");
 
-                        if (window.recaptchaVerifier) {
+                        if (
+                          window.recaptchaVerifier
+                        ) {
                           window.recaptchaVerifier.clear();
-                          window.recaptchaVerifier = null;
+
+                          window.recaptchaVerifier =
+                            null;
                         }
+
                       }}
                     >
                       Change phone number
                     </button>
+
                   </>
                 )}
 
               </div>
+
             )}
+
 
             {error && (
               <div className="login-error">
@@ -769,6 +981,7 @@ function Home() {
               </div>
             )}
 
+
             <div className="login-footer">
               Secure authentication powered by Firebase
             </div>
@@ -776,6 +989,7 @@ function Home() {
           </div>
 
         </div>
+
       )}
 
     </div>
