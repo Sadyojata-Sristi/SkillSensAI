@@ -1,8 +1,3 @@
-/* =========================================================
-   SKILLSENSAI — ORIGINAL HOME PAGE
-   Dark / Premium / Samurai / Skill Orbit
-   ========================================================= */
-
 * {
   box-sizing: border-box;
 }
@@ -14,8 +9,6 @@ html {
 body {
   margin: 0;
   padding: 0;
-  background: #02050b;
-  color: #ffffff;
   font-family:
     Inter,
     -apple-system,
@@ -32,6 +25,7 @@ button {
 .app {
   min-height: 100vh;
   overflow-x: hidden;
+
   background:
     radial-gradient(
       circle at 75% 20%,
@@ -49,6 +43,12 @@ button {
       #030811 45%,
       #02050b 100%
     );
+
+  color: #ffffff;
+
+  transition:
+    background 0.4s ease,
+    color 0.4s ease;
 }
 
 
@@ -58,6 +58,7 @@ button {
 
 .navbar {
   position: fixed;
+
   top: 0;
   left: 0;
   right: 0;
@@ -72,22 +73,29 @@ button {
   z-index: 1000;
 
   background: rgba(2, 5, 11, 0.82);
-  border-bottom: 1px solid rgba(90, 130, 190, 0.12);
+
+  border-bottom:
+    1px solid
+    rgba(90, 130, 190, 0.12);
 
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
+
+  transition:
+    background 0.4s ease,
+    border-color 0.4s ease;
 }
 
 
-/* ---------- Logo ---------- */
+/* LOGO */
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 0;
 
   font-size: 25px;
   font-weight: 800;
+
   letter-spacing: -0.8px;
 
   white-space: nowrap;
@@ -102,7 +110,7 @@ button {
 }
 
 
-/* ---------- Tagline ---------- */
+/* TAGLINE */
 
 .tagline {
   margin-left: 22px;
@@ -119,13 +127,14 @@ button {
 }
 
 
-/* ---------- Navigation ---------- */
+/* NAVIGATION */
 
 .nav-right {
   margin-left: auto;
 
   display: flex;
   align-items: center;
+
   gap: 6px;
 }
 
@@ -173,11 +182,88 @@ button {
   background: #5799ed;
 
   box-shadow:
-    0 0 10px rgba(87, 153, 237, 0.65);
+    0 0 10px
+    rgba(87, 153, 237, 0.65);
 }
 
 
-/* ---------- Login ---------- */
+/* =========================================================
+   THEME TOGGLE
+   ========================================================= */
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+
+  margin-left: 12px;
+
+  padding: 3px;
+
+  gap: 2px;
+
+  border:
+    1px solid
+    rgba(100, 130, 165, 0.18);
+
+  border-radius: 9px;
+
+  background:
+    rgba(70, 90, 115, 0.12);
+}
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  padding: 7px 9px;
+
+  border: none;
+  border-radius: 7px;
+
+  background: transparent;
+
+  color: #68798d;
+
+  font-size: 10px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.theme-option:hover {
+  color: #b9cde4;
+}
+
+.theme-option.selected {
+  color: #e5f2ff;
+
+  background:
+    rgba(62, 121, 188, 0.28);
+
+  box-shadow:
+    0 0 12px
+    rgba(55, 126, 208, 0.12);
+}
+
+.theme-option:first-child.selected {
+  color: #ffd76b;
+
+  background:
+    rgba(255, 190, 50, 0.12);
+}
+
+
+/* =========================================================
+   LOGIN BUTTON
+   ========================================================= */
 
 .login-button {
   margin-left: 12px;
@@ -186,7 +272,10 @@ button {
 
   padding: 9px 19px;
 
-  border: 1px solid rgba(91, 151, 226, 0.55);
+  border:
+    1px solid
+    rgba(91, 151, 226, 0.55);
+
   border-radius: 9px;
 
   background:
@@ -220,7 +309,8 @@ button {
     );
 
   box-shadow:
-    0 0 20px rgba(52, 126, 219, 0.2);
+    0 0 20px
+    rgba(52, 126, 219, 0.2);
 }
 
 
@@ -240,7 +330,10 @@ button {
 
   padding: 0;
 
-  border: 1px solid rgba(100, 150, 210, 0.35);
+  border:
+    1px solid
+    rgba(100, 150, 210, 0.35);
+
   border-radius: 50%;
 
   background: rgba(15, 28, 45, 0.9);
@@ -259,10 +352,12 @@ button {
 }
 
 .profile-button:hover {
-  border-color: rgba(99, 169, 245, 0.75);
+  border-color:
+    rgba(99, 169, 245, 0.75);
 
   box-shadow:
-    0 0 18px rgba(62, 139, 225, 0.25);
+    0 0 18px
+    rgba(62, 139, 225, 0.25);
 }
 
 .profile-image {
@@ -283,9 +378,6 @@ button {
   color: #9ec9ff;
 }
 
-
-/* ---------- Profile dropdown ---------- */
-
 .profile-dropdown {
   position: absolute;
 
@@ -296,7 +388,10 @@ button {
 
   padding: 20px;
 
-  border: 1px solid rgba(95, 140, 195, 0.25);
+  border:
+    1px solid
+    rgba(95, 140, 195, 0.25);
+
   border-radius: 14px;
 
   background:
@@ -307,8 +402,7 @@ button {
     );
 
   box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.5),
-    0 0 30px rgba(35, 86, 145, 0.1);
+    0 20px 60px rgba(0, 0, 0, 0.5);
 
   backdrop-filter: blur(20px);
 
@@ -330,7 +424,9 @@ button {
   align-items: center;
   justify-content: center;
 
-  border: 2px solid rgba(93, 155, 225, 0.35);
+  border:
+    2px solid
+    rgba(93, 155, 225, 0.35);
 
   background: #0b1726;
 
@@ -371,12 +467,17 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
+
   gap: 8px;
 
-  border: 1px solid rgba(225, 80, 80, 0.25);
+  border:
+    1px solid
+    rgba(225, 80, 80, 0.25);
+
   border-radius: 8px;
 
-  background: rgba(120, 30, 30, 0.12);
+  background:
+    rgba(120, 30, 30, 0.12);
 
   color: #ff8f8f;
 
@@ -389,9 +490,11 @@ button {
 }
 
 .logout-button:hover {
-  background: rgba(180, 40, 40, 0.2);
+  background:
+    rgba(180, 40, 40, 0.2);
 
-  border-color: rgba(230, 80, 80, 0.45);
+  border-color:
+    rgba(230, 80, 80, 0.45);
 }
 
 
@@ -452,10 +555,11 @@ button {
 }
 
 
-/* ---------- Hero text ---------- */
+/* HERO TEXT */
 
 .hero-text {
   position: relative;
+
   z-index: 10;
 
   padding-left: 4%;
@@ -479,7 +583,8 @@ button {
 
   color: #eef6ff;
 
-  font-size: clamp(50px, 5.4vw, 78px);
+  font-size:
+    clamp(50px, 5.4vw, 78px);
 
   line-height: 0.98;
 
@@ -492,11 +597,13 @@ button {
   color: #68a8f2;
 
   text-shadow:
-    0 0 30px rgba(65, 139, 227, 0.2);
+    0 0 30px
+    rgba(65, 139, 227, 0.2);
 }
 
 .hero-description {
-  margin: 27px 0 30px;
+  margin:
+    27px 0 30px;
 
   color: #8090a3;
 
@@ -508,11 +615,16 @@ button {
 .hero-button {
   display: inline-flex;
   align-items: center;
+
   gap: 18px;
 
-  padding: 14px 23px;
+  padding:
+    14px 23px;
 
-  border: 1px solid rgba(87, 155, 230, 0.65);
+  border:
+    1px solid
+    rgba(87, 155, 230, 0.65);
+
   border-radius: 9px;
 
   background:
@@ -530,7 +642,8 @@ button {
   cursor: pointer;
 
   box-shadow:
-    0 8px 30px rgba(20, 81, 145, 0.2);
+    0 8px 30px
+    rgba(20, 81, 145, 0.2);
 
   transition:
     transform 0.25s ease,
@@ -541,7 +654,8 @@ button {
 .hero-button span {
   font-size: 18px;
 
-  transition: transform 0.25s ease;
+  transition:
+    transform 0.25s ease;
 }
 
 .hero-button:hover {
@@ -555,7 +669,8 @@ button {
     );
 
   box-shadow:
-    0 12px 35px rgba(27, 107, 190, 0.3);
+    0 12px 35px
+    rgba(27, 107, 190, 0.3);
 }
 
 .hero-button:hover span {
@@ -589,7 +704,7 @@ button {
 }
 
 
-/* ---------- Orbit rings ---------- */
+/* ORBIT */
 
 .orbit-ring {
   position: absolute;
@@ -608,7 +723,8 @@ button {
     rgba(70, 126, 190, 0.17);
 
   box-shadow:
-    0 0 35px rgba(40, 98, 160, 0.06);
+    0 0 35px
+    rgba(40, 98, 160, 0.06);
 }
 
 .orbit-ring-two {
@@ -623,7 +739,7 @@ button {
 }
 
 
-/* ---------- Orbit dots ---------- */
+/* ORBIT DOTS */
 
 .orbit-dot {
   position: absolute;
@@ -636,7 +752,8 @@ button {
   background: #5e9de5;
 
   box-shadow:
-    0 0 12px rgba(74, 148, 230, 0.8);
+    0 0 12px
+    rgba(74, 148, 230, 0.8);
 }
 
 .dot-one {
@@ -695,7 +812,10 @@ button {
 
   filter: blur(15px);
 
-  animation: samuraiGlow 4s ease-in-out infinite;
+  animation:
+    samuraiGlow 4s
+    ease-in-out
+    infinite;
 }
 
 .samurai {
@@ -709,10 +829,15 @@ button {
   z-index: 2;
 
   filter:
-    drop-shadow(0 0 25px rgba(50, 118, 200, 0.25));
+    drop-shadow(
+      0 0 25px
+      rgba(50, 118, 200, 0.25)
+    );
 
   animation:
-    samuraiFloat 5s ease-in-out infinite;
+    samuraiFloat 5s
+    ease-in-out
+    infinite;
 }
 
 @keyframes samuraiFloat {
@@ -805,10 +930,12 @@ button {
 }
 
 
-/* ---------- Active skill ---------- */
+/* ACTIVE */
 
 .active-skill {
-  border: 1px solid rgba(72, 155, 240, 0.6);
+  border:
+    1px solid
+    rgba(72, 155, 240, 0.6);
 
   background:
     radial-gradient(
@@ -820,8 +947,8 @@ button {
   color: #cde5ff;
 
   box-shadow:
-    0 0 22px rgba(44, 127, 214, 0.2),
-    inset 0 0 20px rgba(52, 123, 197, 0.07);
+    0 0 22px
+    rgba(44, 127, 214, 0.2);
 }
 
 .active-skill .skill-icon {
@@ -829,24 +956,28 @@ button {
 
   filter:
     drop-shadow(
-      0 0 7px rgba(87, 166, 241, 0.6)
+      0 0 7px
+      rgba(87, 166, 241, 0.6)
     );
 }
 
 .active-skill:hover {
   transform: scale(1.08);
 
-  border-color: rgba(108, 183, 255, 0.9);
+  border-color:
+    rgba(108, 183, 255, 0.9);
 
   box-shadow:
-    0 0 35px rgba(50, 137, 225, 0.35);
+    0 0 35px
+    rgba(50, 137, 225, 0.35);
 }
 
 
-/* ---------- Martial Arts ---------- */
+/* MARTIAL ARTS */
 
 .skill-martial {
-  border-color: rgba(221, 66, 63, 0.55);
+  border-color:
+    rgba(221, 66, 63, 0.55);
 
   background:
     radial-gradient(
@@ -858,7 +989,8 @@ button {
   color: #ffd4d3;
 
   box-shadow:
-    0 0 22px rgba(210, 49, 45, 0.17);
+    0 0 22px
+    rgba(210, 49, 45, 0.17);
 }
 
 .skill-martial .skill-icon {
@@ -866,21 +998,26 @@ button {
 
   filter:
     drop-shadow(
-      0 0 7px rgba(238, 64, 60, 0.55)
+      0 0 7px
+      rgba(238, 64, 60, 0.55)
     );
 }
 
 .skill-martial:hover {
-  transform: scale(1.08);
+  transform:
+    translateY(-50%)
+    scale(1.08);
 
-  border-color: rgba(255, 101, 96, 0.9);
+  border-color:
+    rgba(255, 101, 96, 0.9);
 
   box-shadow:
-    0 0 35px rgba(224, 50, 47, 0.3);
+    0 0 35px
+    rgba(224, 50, 47, 0.3);
 }
 
 
-/* ---------- Inactive ---------- */
+/* INACTIVE */
 
 .inactive-skill {
   border:
@@ -897,7 +1034,8 @@ button {
   color: #67788d;
 
   box-shadow:
-    0 0 15px rgba(0, 0, 0, 0.18);
+    0 0 15px
+    rgba(0, 0, 0, 0.18);
 }
 
 .inactive-skill .skill-icon {
@@ -911,32 +1049,25 @@ button {
     rgba(100, 132, 165, 0.4);
 
   color: #8fa4bb;
-
-  background:
-    radial-gradient(
-      circle,
-      rgba(27, 46, 68, 0.9),
-      rgba(7, 15, 25, 0.96)
-    );
 }
 
 
-/* =========================================================
-   SKILL POSITIONS
-   ========================================================= */
+/* POSITIONS */
 
 .skill-music {
   top: 14px;
   left: 50%;
 
-  transform: translateX(-50%);
+  transform:
+    translateX(-50%);
 }
 
 .skill-martial {
   top: 50%;
   right: 12px;
 
-  transform: translateY(-50%);
+  transform:
+    translateY(-50%);
 }
 
 .skill-dance {
@@ -953,14 +1084,16 @@ button {
   left: 50%;
   bottom: 14px;
 
-  transform: translateX(-50%);
+  transform:
+    translateX(-50%);
 }
 
 .skill-coding {
   left: 12px;
   top: 50%;
 
-  transform: translateY(-50%);
+  transform:
+    translateY(-50%);
 }
 
 .skill-art {
@@ -973,17 +1106,17 @@ button {
   top: 47px;
 }
 
-
-/* Preserve centered hover positioning */
-
 .skill-music:hover,
 .skill-yoga:hover {
-  transform: translateX(-50%) scale(1.06);
+  transform:
+    translateX(-50%)
+    scale(1.06);
 }
 
-.skill-coding:hover,
-.skill-martial:hover {
-  transform: translateY(-50%) scale(1.06);
+.skill-coding:hover {
+  transform:
+    translateY(-50%)
+    scale(1.06);
 }
 
 
@@ -994,7 +1127,9 @@ button {
 .stats-section {
   position: relative;
 
-  padding: 30px 5% 90px;
+  padding:
+    30px 5%
+    90px;
 }
 
 .stats-grid {
@@ -1033,9 +1168,6 @@ button {
       rgba(4, 10, 17, 0.75)
     );
 
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.02);
-
   transition:
     transform 0.25s ease,
     border-color 0.25s ease,
@@ -1047,13 +1179,6 @@ button {
 
   border-color:
     rgba(82, 144, 209, 0.3);
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(15, 34, 55, 0.85),
-      rgba(5, 13, 22, 0.85)
-    );
 }
 
 .stat-card strong {
@@ -1088,8 +1213,7 @@ button {
   min-height: 330px;
 
   padding:
-    85px
-    5%
+    85px 5%
     100px;
 
   text-align: center;
@@ -1114,7 +1238,8 @@ button {
   background: #508fd3;
 
   box-shadow:
-    0 0 10px rgba(80, 143, 211, 0.55);
+    0 0 10px
+    rgba(80, 143, 211, 0.55);
 }
 
 .section-heading p {
@@ -1133,7 +1258,8 @@ button {
 
   color: #dcecff;
 
-  font-size: clamp(32px, 4vw, 48px);
+  font-size:
+    clamp(32px, 4vw, 48px);
 
   letter-spacing: -1.5px;
 }
@@ -1167,8 +1293,7 @@ button {
   position: relative;
 
   padding:
-    90px
-    5%
+    90px 5%
     130px;
 
   border-top:
@@ -1196,11 +1321,13 @@ button {
 }
 
 .about-content h2 {
-  margin: 0 0 22px;
+  margin:
+    0 0 22px;
 
   color: #dcecff;
 
-  font-size: clamp(35px, 4vw, 52px);
+  font-size:
+    clamp(35px, 4vw, 52px);
 
   line-height: 1;
 
@@ -1225,7 +1352,397 @@ button {
 
 
 /* =========================================================
-   LOGIN / PROFILE RESPONSIVE AREA
+   LIGHT THEME
+   ========================================================= */
+
+.light-theme {
+  background:
+    radial-gradient(
+      circle at 75% 15%,
+      rgba(91, 158, 230, 0.14),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 15% 65%,
+      rgba(70, 120, 190, 0.08),
+      transparent 30%
+    ),
+    linear-gradient(
+      180deg,
+      #f7fbff 0%,
+      #edf5fc 50%,
+      #f8fbff 100%
+    );
+
+  color: #17263a;
+}
+
+
+/* LIGHT NAVBAR */
+
+.light-theme .navbar {
+  background:
+    rgba(248, 252, 255, 0.88);
+
+  border-bottom:
+    1px solid
+    rgba(54, 93, 130, 0.14);
+
+  box-shadow:
+    0 4px 25px
+    rgba(42, 82, 120, 0.06);
+}
+
+.light-theme .logo-skill {
+  color: #3476b8;
+}
+
+.light-theme .logo-sensai {
+  color: #d73532;
+}
+
+.light-theme .tagline {
+  color: #7b8da0;
+}
+
+.light-theme .nav-link {
+  color: #64778b;
+}
+
+.light-theme .nav-link:hover {
+  color: #24598b;
+}
+
+.light-theme .nav-link.active-nav {
+  color: #276da9;
+}
+
+
+/* LIGHT LOGIN */
+
+.light-theme .login-button {
+  color: #245b8d;
+
+  border-color:
+    rgba(45, 111, 177, 0.35);
+
+  background:
+    rgba(55, 125, 196, 0.08);
+}
+
+.light-theme .login-button:hover {
+  background:
+    rgba(55, 125, 196, 0.15);
+}
+
+
+/* LIGHT THEME TOGGLE */
+
+.light-theme .theme-toggle {
+  background:
+    rgba(70, 110, 150, 0.08);
+
+  border-color:
+    rgba(70, 110, 150, 0.14);
+}
+
+.light-theme .theme-option {
+  color: #718297;
+}
+
+.light-theme .theme-option:hover {
+  color: #315f87;
+}
+
+.light-theme .theme-option.selected {
+  color: #275b87;
+
+  background:
+    rgba(67, 143, 214, 0.14);
+
+  box-shadow: none;
+}
+
+.light-theme .theme-option:first-child.selected {
+  color: #b47700;
+
+  background:
+    rgba(255, 190, 50, 0.16);
+}
+
+
+/* LIGHT HERO */
+
+.light-theme .hero-text h1 {
+  color: #152b42;
+}
+
+.light-theme .hero-small-text {
+  color: #477aa7;
+}
+
+.light-theme .hero-highlight {
+  color: #2c79bd;
+
+  text-shadow: none;
+}
+
+.light-theme .hero-description {
+  color: #60758a;
+}
+
+.light-theme .hero-button {
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #347fbd,
+      #235b8d
+    );
+
+  border-color:
+    rgba(40, 105, 165, 0.45);
+}
+
+
+/* LIGHT ORBIT */
+
+.light-theme .orbit-ring-one {
+  border-color:
+    rgba(50, 108, 165, 0.18);
+}
+
+.light-theme .orbit-ring-two {
+  border-color:
+    rgba(50, 108, 165, 0.12);
+}
+
+.light-theme .orbit-dot {
+  background: #478dc6;
+
+  box-shadow:
+    0 0 10px
+    rgba(60, 132, 197, 0.4);
+}
+
+
+/* LIGHT SAMURAI */
+
+.light-theme .samurai-glow {
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(48, 126, 203, 0.18),
+      rgba(68, 139, 199, 0.08) 45%,
+      transparent 70%
+    );
+}
+
+.light-theme .samurai {
+  filter:
+    drop-shadow(
+      0 0 22px
+      rgba(39, 112, 180, 0.18)
+    );
+}
+
+
+/* LIGHT SKILLS */
+
+.light-theme .active-skill {
+  color: #285d87;
+
+  background:
+    radial-gradient(
+      circle at 35% 30%,
+      rgba(99, 174, 233, 0.24),
+      rgba(228, 242, 252, 0.95)
+    );
+
+  border-color:
+    rgba(48, 125, 193, 0.42);
+
+  box-shadow:
+    0 5px 25px
+    rgba(48, 125, 193, 0.12);
+}
+
+.light-theme .active-skill .skill-icon {
+  color: #277bbd;
+}
+
+.light-theme .skill-martial {
+  color: #a33432;
+
+  background:
+    radial-gradient(
+      circle at 35% 30%,
+      rgba(241, 111, 107, 0.18),
+      rgba(255, 242, 242, 0.96)
+    );
+
+  border-color:
+    rgba(205, 65, 61, 0.35);
+}
+
+.light-theme .skill-martial .skill-icon {
+  color: #d9403c;
+}
+
+.light-theme .inactive-skill {
+  color: #8293a4;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(236, 243, 249, 0.96),
+      rgba(222, 233, 242, 0.96)
+    );
+
+  border-color:
+    rgba(91, 120, 148, 0.17);
+
+  box-shadow:
+    0 5px 20px
+    rgba(60, 90, 120, 0.06);
+}
+
+.light-theme .inactive-skill .skill-icon {
+  color: #8296aa;
+}
+
+.light-theme .skill-card small {
+  color: #8b9baa;
+}
+
+
+/* LIGHT STATS */
+
+.light-theme .stat-card {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.95),
+      rgba(239, 247, 253, 0.92)
+    );
+
+  border-color:
+    rgba(73, 112, 149, 0.14);
+
+  box-shadow:
+    0 8px 30px
+    rgba(43, 81, 113, 0.06);
+}
+
+.light-theme .stat-card:hover {
+  background: #ffffff;
+}
+
+.light-theme .stat-card strong {
+  color: #2e6fa8;
+}
+
+.light-theme .stat-card span {
+  color: #7b8d9f;
+}
+
+
+/* LIGHT SECTIONS */
+
+.light-theme .skills-section,
+.light-theme .about-section {
+  border-top-color:
+    rgba(70, 110, 145, 0.1);
+}
+
+.light-theme .section-heading p {
+  color: #5c83a8;
+}
+
+.light-theme .section-heading h2 {
+  color: #213b55;
+}
+
+.light-theme .section-heading h2 span {
+  color: #d53b38;
+}
+
+.light-theme .heading-line {
+  background: #3c80b9;
+
+  box-shadow:
+    0 0 10px
+    rgba(60, 128, 185, 0.3);
+}
+
+.light-theme .skills-info p {
+  color: #718398;
+}
+
+.light-theme .about-label {
+  color: #5b81a6;
+}
+
+.light-theme .about-content h2 {
+  color: #203b55;
+}
+
+.light-theme .about-content h2 span {
+  color: #d53b38;
+}
+
+.light-theme .about-content > p:last-child {
+  color: #718398;
+}
+
+
+/* LIGHT PROFILE */
+
+.light-theme .profile-button {
+  background: #eef5fb;
+
+  border-color:
+    rgba(60, 110, 155, 0.25);
+}
+
+.light-theme .profile-placeholder {
+  color: #3c79aa;
+}
+
+.light-theme .profile-dropdown {
+  background:
+    rgba(249, 253, 255, 0.98);
+
+  border-color:
+    rgba(72, 112, 150, 0.16);
+
+  box-shadow:
+    0 20px 60px
+    rgba(37, 72, 104, 0.16);
+}
+
+.light-theme .profile-dropdown-image,
+.light-theme .profile-dropdown-placeholder {
+  background: #eaf3fa;
+
+  border-color:
+    rgba(65, 125, 180, 0.25);
+
+  color: #3979ac;
+}
+
+.light-theme .profile-info strong {
+  color: #29435d;
+}
+
+.light-theme .profile-info small {
+  color: #7c8d9e;
+}
+
+
+/* =========================================================
+   TABLET
    ========================================================= */
 
 @media (max-width: 1100px) {
@@ -1239,7 +1756,8 @@ button {
   }
 
   .nav-link {
-    padding: 9px 9px;
+    padding:
+      9px 9px;
   }
 
   .hero {
@@ -1248,7 +1766,8 @@ button {
   }
 
   .hero-content {
-    grid-template-columns: 0.8fr 1.2fr;
+    grid-template-columns:
+      0.8fr 1.2fr;
   }
 
   .skill-orbit {
@@ -1279,12 +1798,26 @@ button {
     margin-left: 5px;
   }
 
+  .theme-toggle {
+    margin-left: 5px;
+  }
+
+  .theme-option {
+    width: 34px;
+    height: 32px;
+
+    padding: 0;
+  }
+
+  .theme-option span {
+    display: none;
+  }
+
   .hero {
     min-height: auto;
 
     padding:
-      115px
-      20px
+      115px 20px
       60px;
   }
 
@@ -1304,7 +1837,8 @@ button {
     margin-left: auto;
     margin-right: auto;
 
-    font-size: clamp(48px, 10vw, 68px);
+    font-size:
+      clamp(48px, 10vw, 68px);
   }
 
   .hero-description {
@@ -1345,7 +1879,8 @@ button {
   .login-button {
     min-width: 75px;
 
-    padding: 8px 13px;
+    padding:
+      8px 13px;
 
     font-size: 11px;
   }
@@ -1376,7 +1911,8 @@ button {
   }
 
   .hero-button {
-    padding: 13px 18px;
+    padding:
+      13px 18px;
   }
 
   .hero-visual {
@@ -1436,7 +1972,7 @@ button {
 
 
 /* =========================================================
-   VERY SMALL PHONES
+   SMALL PHONES
    ========================================================= */
 
 @media (max-width: 420px) {
@@ -1454,7 +1990,8 @@ button {
   }
 
   .stats-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns:
+      1fr 1fr;
   }
 
   .stat-card {
