@@ -9,11 +9,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "firebase": "^12.19.0",
-    "lucide-react": "^0.468.0",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1"
-  },
+  "firebase": "^12.19.0",
+  "lucide-react": "^0.468.0",
+  "react": "^19.1.1",
+  "react-dom": "^19.1.1",
+  "react-router-dom": "^7.9.3"
+}
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.0",
     "@vitejs/plugin-react": "^5.0.4",
