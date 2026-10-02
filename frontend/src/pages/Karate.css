@@ -1,1347 +1,323 @@
-/* =========================================================
-   SKILLSENSAI - KARATE
-   Light Premium Amber / Gold Theme
-   ========================================================= */
+/* =========================================
+   SKILLSENSAI — KARATE
+   ========================================= */
 
 .karate-page {
-  --karate-color: #d69b2c;
-  --karate-dark: #b67c14;
-  --karate-light: #fff7e4;
-  --karate-lighter: #fffbf2;
-  --karate-border: #f0ddb1;
-  --karate-glow: rgba(214, 155, 44, 0.16);
-
   min-height: 100vh;
-  padding: 28px 7% 70px;
-  background:
-    radial-gradient(
-      circle at 10% 5%,
-      rgba(214, 155, 44, 0.08),
-      transparent 28%
-    ),
-    linear-gradient(180deg, #fffdf8 0%, #f7f9fc 100%);
-  color: #18202a;
+  background: #05070d;
+  color: white;
+  padding-bottom: 60px;
 }
 
-
-/* =========================================================
-   BACK BUTTON
-   ========================================================= */
-
-.karate-back-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-
-  border: 1px solid #e5eaf0;
-  background: #ffffff;
-  color: #667085;
-
-  padding: 10px 16px;
-  border-radius: 12px;
-
-  font-size: 14px;
-  font-weight: 600;
-
-  cursor: pointer;
-
-  box-shadow: 0 5px 18px rgba(25, 35, 50, 0.05);
-
-  transition:
-    transform 0.2s ease,
-    color 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.karate-back-button:hover {
-  transform: translateX(-3px);
-  color: var(--karate-dark);
-  border-color: var(--karate-border);
-  box-shadow: 0 8px 24px rgba(25, 35, 50, 0.08);
-}
-
-
-/* =========================================================
-   HEADER
-   ========================================================= */
+/* ---------- Header ---------- */
 
 .karate-header {
-  max-width: 900px;
-  margin: 55px auto 65px;
-  text-align: center;
-}
-
-.karate-header-icon {
-  width: 82px;
-  height: 82px;
-
-  margin: 0 auto 22px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  color: var(--karate-color);
-
-  background: linear-gradient(
-    145deg,
-    #fffaf0,
-    var(--karate-light)
-  );
-
-  border: 1px solid var(--karate-border);
-  border-radius: 24px;
-
-  box-shadow:
-    0 12px 35px var(--karate-glow),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
-}
-
-.karate-label {
-  display: inline-block;
-
-  margin-bottom: 12px;
-
-  color: var(--karate-dark);
-
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 2px;
-}
-
-.karate-header h1 {
-  margin: 0;
-
-  font-size: clamp(42px, 6vw, 68px);
-  line-height: 1.05;
-
-  font-weight: 800;
-  letter-spacing: -2px;
-
-  color: #18202a;
-}
-
-.karate-header h1 span {
-  color: var(--karate-color);
-}
-
-.karate-header p {
-  max-width: 680px;
-
-  margin: 20px auto 0;
-
-  color: #667085;
-
-  font-size: 17px;
-  line-height: 1.7;
-}
-
-
-/* =========================================================
-   GENERAL SECTION TITLES
-   ========================================================= */
-
-.karate-section-title {
-  margin-bottom: 24px;
-}
-
-.karate-section-title h2 {
-  margin: 0 0 8px;
-
-  color: #18202a;
-
-  font-size: 28px;
-  font-weight: 750;
-  letter-spacing: -0.5px;
-}
-
-.karate-section-title p {
-  margin: 0;
-
-  color: #667085;
-
-  font-size: 15px;
-  line-height: 1.6;
-}
-
-
-/* =========================================================
-   LESSONS
-   ========================================================= */
-
-.karate-lessons {
-  max-width: 1180px;
-  margin: 0 auto 50px;
-}
-
-.karate-lesson-grid {
-  display: grid;
-
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-
-  gap: 16px;
-}
-
-.karate-lesson-card {
-  width: 100%;
-
-  display: grid;
-  grid-template-columns: 48px 1fr auto;
-  align-items: center;
-
-  gap: 16px;
-
-  padding: 20px;
-
-  text-align: left;
-
-  background: #ffffff;
-
-  border: 1px solid #e5eaf0;
-  border-radius: 18px;
-
-  color: #18202a;
-
-  cursor: pointer;
-
-  box-shadow: 0 8px 25px rgba(25, 35, 50, 0.05);
-
-  transition:
-    transform 0.22s ease,
-    border-color 0.22s ease,
-    box-shadow 0.22s ease,
-    background 0.22s ease;
-}
-
-.karate-lesson-card:hover {
-  transform: translateY(-4px);
-
-  border-color: var(--karate-border);
-
-  box-shadow:
-    0 14px 32px rgba(25, 35, 50, 0.09),
-    0 0 0 4px rgba(214, 155, 44, 0.04);
-}
-
-.karate-lesson-card.selected {
-  background: var(--karate-lighter);
-
-  border-color: var(--karate-color);
-
-  box-shadow:
-    0 12px 30px var(--karate-glow),
-    0 0 0 4px rgba(214, 155, 44, 0.07);
-}
-
-.karate-lesson-card > svg {
-  color: var(--karate-color);
-
-  transition: transform 0.2s ease;
-}
-
-.karate-lesson-card:hover > svg {
-  transform: translateX(3px);
-}
-
-.karate-lesson-number {
-  width: 48px;
-  height: 48px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 14px;
-
-  background: var(--karate-light);
-  border: 1px solid var(--karate-border);
-
-  color: var(--karate-dark);
-
-  font-size: 17px;
-  font-weight: 800;
-}
-
-.karate-lesson-content {
-  min-width: 0;
-}
-
-.karate-lesson-content h3 {
-  margin: 0 0 6px;
-
-  font-size: 16px;
-  font-weight: 750;
-
-  color: #18202a;
-}
-
-.karate-lesson-content p {
-  margin: 0;
-
-  color: #667085;
-
-  font-size: 13px;
-  line-height: 1.55;
-}
-
-
-/* =========================================================
-   LESSON VIDEO
-   ========================================================= */
-
-.karate-video-section {
-  max-width: 1180px;
-
-  margin: 0 auto 55px;
-
-  padding: 28px;
-
-  background: #ffffff;
-
-  border: 1px solid #e5eaf0;
-  border-radius: 24px;
-
-  box-shadow: 0 12px 35px rgba(25, 35, 50, 0.06);
-}
-
-.karate-video-container {
-  overflow: hidden;
-
-  background: #111827;
-
-  border-radius: 18px;
-
-  border: 1px solid #e5eaf0;
-
-  box-shadow: 0 10px 30px rgba(25, 35, 50, 0.12);
-}
-
-.karate-lesson-video {
-  display: block;
-
-  width: 100%;
-  max-height: 620px;
-
-  background: #111827;
-}
-
-
-/* =========================================================
-   PRACTICE SECTION
-   ========================================================= */
-
-.karate-practice {
-  max-width: 1180px;
-  margin: 0 auto 55px;
-}
-
-.karate-practice-grid {
-  display: grid;
-
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-
-  gap: 20px;
-}
-
-.karate-practice-card {
-  padding: 26px;
-
-  background: #ffffff;
-
-  border: 1px solid #e5eaf0;
-  border-radius: 22px;
-
-  box-shadow: 0 10px 30px rgba(25, 35, 50, 0.05);
-
-  transition:
-    transform 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.karate-practice-card:hover {
-  transform: translateY(-3px);
-
-  border-color: var(--karate-border);
-
-  box-shadow: 0 15px 35px rgba(25, 35, 50, 0.08);
-}
-
-.karate-practice-icon {
-  width: 58px;
-  height: 58px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  margin-bottom: 18px;
-
-  color: var(--karate-color);
-
-  background: var(--karate-light);
-
-  border: 1px solid var(--karate-border);
-
-  border-radius: 16px;
-}
-
-.karate-practice-card h3 {
-  margin: 0 0 8px;
-
-  font-size: 21px;
-  font-weight: 750;
-
-  color: #18202a;
-}
-
-.karate-practice-card > p {
-  margin: 0 0 20px;
-
-  color: #667085;
-
-  font-size: 14px;
-  line-height: 1.65;
-}
-
-
-/* =========================================================
-   CAMERA
-   ========================================================= */
-
-.karate-camera-container {
-  position: relative;
-
-  width: 100%;
-  min-height: 270px;
-
-  margin: 20px 0;
-
-  overflow: hidden;
-
-  background:
-    radial-gradient(
-      circle at center,
-      rgba(214, 155, 44, 0.08),
-      transparent 50%
-    ),
-    #f7f9fc;
-
-  border: 1px solid #e5eaf0;
-  border-radius: 18px;
-}
-
-.karate-camera-preview {
-  display: block;
-
-  width: 100%;
-  height: 320px;
-
-  object-fit: cover;
-
-  background: #111827;
-}
-
-.karate-camera-placeholder {
-  min-height: 270px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  padding: 30px;
-
-  text-align: center;
-
-  color: #98a2b3;
-}
-
-.karate-camera-placeholder svg {
-  margin-bottom: 12px;
-
-  color: var(--karate-color);
-}
-
-.karate-camera-placeholder h4 {
-  margin: 0 0 6px;
-
-  color: #344054;
-
-  font-size: 16px;
-}
-
-.karate-camera-placeholder p {
-  max-width: 300px;
-
-  margin: 0;
-
-  color: #98a2b3;
-
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-
-/* =========================================================
-   RECORDING STATUS
-   ========================================================= */
-
-.karate-recording-status {
-  position: absolute;
-
-  top: 14px;
-  left: 14px;
-  z-index: 5;
-
-  display: flex;
-  align-items: center;
-  gap: 7px;
-
-  padding: 8px 12px;
-
-  background: rgba(255, 255, 255, 0.94);
-
-  border: 1px solid #f0d1d1;
-
-  border-radius: 10px;
-
-  color: #b42318;
-
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.6px;
-
-  box-shadow: 0 6px 18px rgba(25, 35, 50, 0.12);
-
-  backdrop-filter: blur(8px);
-}
-
-.karate-recording-dot {
-  width: 8px;
-  height: 8px;
-
-  border-radius: 50%;
-
-  background: #e05252;
-
-  animation: karate-recording-pulse 1.2s infinite;
-}
-
-@keyframes karate-recording-pulse {
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  50% {
-    opacity: 0.45;
-    transform: scale(0.8);
-  }
-}
-
-
-/* =========================================================
-   CAMERA ERROR
-   ========================================================= */
-
-.karate-camera-error {
-  margin: 12px 0;
-
-  padding: 12px 14px;
-
-  background: #fff5f5;
-
-  border: 1px solid #f2caca;
-  border-radius: 12px;
-
-  color: #b42318;
-
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-
-/* =========================================================
-   ACTION BUTTONS
-   ========================================================= */
-
-.karate-action-button {
-  width: 100%;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
-
-  min-height: 46px;
-
-  padding: 12px 18px;
-
-  border: 1px solid var(--karate-color);
-  border-radius: 12px;
-
-  background: var(--karate-color);
-
-  color: #ffffff;
-
-  font-size: 14px;
-  font-weight: 750;
-
-  cursor: pointer;
-
-  text-decoration: none;
-
-  box-shadow: 0 7px 20px var(--karate-glow);
-
-  transition:
-    transform 0.2s ease,
-    background 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.karate-action-button:hover {
-  transform: translateY(-2px);
-
-  background: var(--karate-dark);
-
-  box-shadow: 0 10px 25px var(--karate-glow);
-}
-
-.karate-action-button.recording {
-  background: #d94d4d;
-  border-color: #d94d4d;
-
-  box-shadow: 0 7px 20px rgba(217, 77, 77, 0.16);
-}
-
-.karate-action-button.recording:hover {
-  background: #bd3e3e;
-}
-
-.karate-action-button span {
-  margin-left: 5px;
-
-  padding-left: 10px;
-
-  border-left: 1px solid rgba(255, 255, 255, 0.35);
-}
-
-
-/* =========================================================
-   UPLOAD SUCCESS
-   ========================================================= */
-
-.karate-upload-success {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-
-  margin-top: 18px;
-
-  padding: 11px 13px;
-
-  background: #f0faf4;
-
-  border: 1px solid #c9ead5;
-  border-radius: 11px;
-
-  color: #28794b;
-
-  font-size: 13px;
-  font-weight: 600;
-
-  overflow: hidden;
-}
-
-.karate-upload-success svg {
-  flex-shrink: 0;
-}
-
-.karate-upload-success span {
-  overflow: hidden;
-
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-
-/* =========================================================
-   PRACTICE VIDEO RESULT
-   ========================================================= */
-
-.karate-practice-result {
-  margin-top: 24px;
-
-  padding: 26px;
-
-  background: #ffffff;
-
-  border: 1px solid #e5eaf0;
-  border-radius: 22px;
-
-  box-shadow: 0 10px 30px rgba(25, 35, 50, 0.05);
-}
-
-.karate-result-heading {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  margin-bottom: 18px;
-
-  color: var(--karate-color);
-}
-
-.karate-result-heading > div {
-  color: #18202a;
-}
-
-.karate-result-heading h3 {
-  margin: 0 0 4px;
-
-  font-size: 19px;
-}
-
-.karate-result-heading p {
-  margin: 0;
-
-  color: #667085;
-
-  font-size: 13px;
-}
-
-.karate-uploaded-video-preview {
-  display: block;
-
-  width: 100%;
-  max-height: 600px;
-
-  background: #111827;
-
-  border-radius: 16px;
-
-  border: 1px solid #e5eaf0;
-}
-
-.karate-video-actions {
-  display: flex;
-  gap: 12px;
-
-  margin-top: 18px;
-}
-
-.karate-analyze-button,
-.karate-reset-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-
-  min-height: 45px;
-
-  padding: 11px 18px;
-
-  border-radius: 12px;
-
-  font-size: 14px;
-  font-weight: 750;
-
-  cursor: pointer;
-
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    background 0.2s ease;
-}
-
-.karate-analyze-button {
-  flex: 1;
-
-  border: 1px solid var(--karate-color);
-
-  background: var(--karate-color);
-
-  color: #ffffff;
-
-  box-shadow: 0 7px 20px var(--karate-glow);
-}
-
-.karate-analyze-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-
-  background: var(--karate-dark);
-
-  box-shadow: 0 10px 25px var(--karate-glow);
-}
-
-.karate-reset-button {
-  border: 1px solid #e5eaf0;
-
-  background: #ffffff;
-
-  color: #667085;
-}
-
-.karate-reset-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-
-  border-color: var(--karate-border);
-
-  color: var(--karate-dark);
-
-  background: var(--karate-lighter);
-}
-
-.karate-analyze-button:disabled,
-.karate-reset-button:disabled {
-  cursor: not-allowed;
-
-  opacity: 0.6;
-}
-
-.karate-spin {
-  animation: karate-spin 1s linear infinite;
-}
-
-@keyframes karate-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-
-/* =========================================================
-   ANALYSIS RESULT
-   ========================================================= */
-
-.karate-analysis-result {
-  margin-top: 24px;
-
-  padding: 28px;
-
-  background:
-    linear-gradient(
-      145deg,
-      #ffffff 0%,
-      var(--karate-lighter) 100%
-    );
-
-  border: 1px solid var(--karate-border);
-
-  border-radius: 24px;
-
-  box-shadow:
-    0 12px 35px var(--karate-glow),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
-}
-
-.karate-analysis-header {
-  display: grid;
-
-  grid-template-columns: auto 1fr auto;
-
-  align-items: center;
-
-  gap: 14px;
-
-  padding-bottom: 22px;
-
-  border-bottom: 1px solid var(--karate-border);
-}
-
-.karate-analysis-success {
-  width: 50px;
-  height: 50px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  color: #28794b;
-
-  background: #effaf3;
-
-  border: 1px solid #c9ead5;
-
-  border-radius: 15px;
-}
-
-.karate-analysis-header > div:nth-child(2) > span {
-  color: var(--karate-dark);
-
-  font-size: 10px;
-  font-weight: 850;
-  letter-spacing: 1.5px;
-}
-
-.karate-analysis-header h3 {
-  margin: 4px 0 0;
-
-  color: #18202a;
-
-  font-size: 20px;
-}
-
-.karate-analysis-score {
-  min-width: 82px;
-
-  padding: 11px 14px;
-
-  text-align: center;
-
-  background: var(--karate-light);
-
-  border: 1px solid var(--karate-border);
-
-  border-radius: 14px;
-
-  color: var(--karate-dark);
-
-  font-size: 25px;
-  font-weight: 850;
-}
-
-
-/* =========================================================
-   FEEDBACK
-   ========================================================= */
-
-.karate-feedback-list {
-  padding: 24px 0;
-}
-
-.karate-feedback-list h4,
-.karate-technique-breakdown h4 {
-  margin: 0 0 14px;
-
-  color: #18202a;
-
-  font-size: 16px;
-}
-
-.karate-feedback-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-
-  padding: 11px 0;
-
-  color: #475467;
-
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.karate-feedback-item svg {
-  flex-shrink: 0;
-
-  margin-top: 2px;
-
-  color: #3b9a62;
-}
-
-
-/* =========================================================
-   TECHNIQUE BREAKDOWN
-   ========================================================= */
-
-.karate-technique-breakdown {
-  padding: 22px 0;
-
-  border-top: 1px solid var(--karate-border);
-}
-
-.karate-technique-grid {
-  display: grid;
-
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-
-  gap: 10px;
-}
-
-.karate-technique-item {
+  height: 76px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-
-  gap: 12px;
-
-  padding: 13px 15px;
-
-  border-radius: 12px;
-
-  border: 1px solid #e5eaf0;
-
-  background: #ffffff;
-
-  font-size: 13px;
+  padding: 0 6%;
+  background: rgba(5, 7, 13, 0.94);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+  position: sticky;
+  top: 0;
+  z-index: 20;
 }
 
-.karate-technique-left {
+.karate-logo {
+  font-size: 25px;
+  font-weight: 800;
+}
+
+.karate-logo span:first-child {
+  color: #7dd3fc;
+}
+
+.karate-logo span:last-child {
+  color: #ef4444;
+}
+
+.karate-back {
+  border: 1px solid rgba(125, 211, 252, 0.35);
+  background: rgba(125, 211, 252, 0.08);
+  color: #bae6fd;
+  padding: 10px 17px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* ---------- Hero ---------- */
+
+.karate-hero {
+  max-width: 1200px;
+  margin: auto;
+  padding: 60px 24px 35px;
+}
+
+.karate-hero h1 {
+  margin: 0;
+  font-size: clamp(40px, 5vw, 64px);
+  letter-spacing: -2px;
+}
+
+.karate-hero h1 span {
+  color: #38bdf8;
+}
+
+.karate-hero p {
+  max-width: 700px;
+  color: #94a3b8;
+  line-height: 1.7;
+  font-size: 17px;
+}
+
+/* ---------- Content ---------- */
+
+.karate-content {
+  max-width: 1200px;
+  margin: auto;
+  padding: 0 24px;
+}
+
+/* ---------- Progress ---------- */
+
+.karate-progress {
+  padding: 20px;
+  margin-bottom: 25px;
+  border-radius: 16px;
+  background: rgba(56, 189, 248, 0.07);
+  border: 1px solid rgba(56, 189, 248, 0.15);
+}
+
+.karate-progress strong {
+  font-size: 24px;
+  color: #38bdf8;
+}
+
+.karate-progress span {
+  margin-left: 8px;
+  color: #94a3b8;
+}
+
+/* ---------- Lessons ---------- */
+
+.karate-lessons {
+  display: grid;
+  gap: 14px;
+}
+
+.karate-lesson-card {
   display: flex;
   align-items: center;
-  gap: 8px;
-
-  color: #475467;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px;
+  background: #0b1120;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  border-radius: 16px;
+  transition: 0.25s ease;
 }
 
-.karate-technique-item.good {
-  border-color: #cce8d5;
-
-  background: #f6fcf8;
+.karate-lesson-card:hover {
+  transform: translateX(3px);
+  border-color: rgba(56, 189, 248, 0.3);
 }
 
-.karate-technique-item.good .karate-technique-left svg {
-  color: #3b9a62;
-}
-
-.karate-technique-item.improve {
-  border-color: #f0ddb1;
-
-  background: #fffaf0;
-}
-
-.karate-technique-item.improve .karate-technique-left svg {
-  color: var(--karate-color);
-}
-
-.karate-technique-item strong {
-  font-size: 12px;
-}
-
-.karate-technique-item.good strong {
-  color: #28794b;
-}
-
-.karate-technique-item.improve strong {
-  color: var(--karate-dark);
-}
-
-
-/* =========================================================
-   AI IMPROVEMENT SUMMARY
-   ========================================================= */
-
-.karate-improvement-summary {
+.karate-lesson-info {
   display: flex;
-  align-items: flex-start;
-  gap: 13px;
-
-  margin-top: 20px;
-
-  padding: 18px;
-
-  background: var(--karate-light);
-
-  border: 1px solid var(--karate-border);
-
-  border-radius: 15px;
-
-  color: var(--karate-dark);
+  align-items: center;
+  gap: 15px;
 }
 
-.karate-improvement-summary svg {
-  flex-shrink: 0;
-
-  margin-top: 2px;
+.karate-lesson-number {
+  min-width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: rgba(56, 189, 248, 0.1);
+  color: #38bdf8;
+  font-weight: 800;
 }
 
-.karate-improvement-summary strong {
-  display: block;
+.karate-lesson-info h3 {
+  margin: 0 0 5px;
+}
 
-  margin-bottom: 5px;
-
-  color: #8b6417;
-
+.karate-lesson-info p {
+  margin: 0;
+  color: #64748b;
   font-size: 14px;
 }
 
-.karate-improvement-summary p {
-  margin: 0;
+.karate-lesson-button {
+  padding: 9px 15px;
+  border-radius: 9px;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  background: rgba(56, 189, 248, 0.08);
+  color: #bae6fd;
+  cursor: pointer;
+  font-weight: 600;
+}
 
-  color: #6f5b30;
+.karate-lesson-button:hover {
+  background: rgba(56, 189, 248, 0.16);
+}
 
-  font-size: 13px;
+.karate-completed {
+  color: #4ade80;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* ---------- Viewer ---------- */
+
+.karate-lesson-viewer {
+  margin-top: 25px;
+  padding: 25px;
+  border-radius: 20px;
+  background: #080d18;
+  border: 1px solid rgba(56, 189, 248, 0.15);
+}
+
+.karate-lesson-viewer h2 {
+  margin-top: 0;
+}
+
+.karate-video {
+  width: 100%;
+  max-height: 520px;
+  display: block;
+  background: #000;
+  border-radius: 14px;
+}
+
+.karate-complete-button {
+  margin-top: 18px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #38bdf8, #2563eb);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ---------- Practice ---------- */
+
+.karate-practice {
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.karate-practice-card {
+  padding: 24px;
+  border-radius: 18px;
+  background: #0b1120;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.karate-practice-card h3 {
+  margin-top: 0;
+}
+
+.karate-practice-card p {
+  color: #94a3b8;
   line-height: 1.6;
 }
 
-
-/* =========================================================
-   ANALYSIS NOTE
-   ========================================================= */
-
-.karate-analysis-note {
+.karate-action-row {
   display: flex;
-  align-items: flex-start;
+  flex-wrap: wrap;
   gap: 10px;
+  margin-top: 16px;
+}
 
+.karate-action-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 16px;
+  border: none;
+  border-radius: 10px;
+  background: #172033;
+  color: #e2e8f0;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.karate-action-button:hover {
+  background: #1e293b;
+}
+
+.karate-action-button.primary {
+  background: linear-gradient(135deg, #38bdf8, #2563eb);
+  color: white;
+}
+
+.karate-action-button.recording {
+  background: #dc2626;
+  color: white;
+}
+
+/* ---------- Upload ---------- */
+
+.karate-upload {
   margin-top: 15px;
-
-  padding: 13px 15px;
-
-  background: rgba(255, 255, 255, 0.75);
-
-  border: 1px dashed var(--karate-border);
-
-  border-radius: 12px;
-
-  color: #7a6b4b;
-
-  font-size: 12px;
-  line-height: 1.55;
 }
 
-.karate-analysis-note svg {
-  flex-shrink: 0;
-
-  color: var(--karate-color);
+.karate-upload input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border-radius: 10px;
+  background: #070b14;
+  color: #cbd5e1;
+  border: 1px dashed rgba(56, 189, 248, 0.3);
 }
 
+/* ---------- Message ---------- */
 
-/* =========================================================
-   ANALYSIS ERROR
-   ========================================================= */
-
-.karate-analysis-error {
-  margin-top: 24px;
-
-  padding: 18px;
-
-  background: #fff5f5;
-
-  border: 1px solid #f0cccc;
-
-  border-radius: 15px;
-
-  color: #b42318;
+.karate-message {
+  margin-top: 18px;
+  padding: 13px 16px;
+  border-radius: 10px;
+  color: #bae6fd;
+  background: rgba(56, 189, 248, 0.07);
+  border: 1px solid rgba(56, 189, 248, 0.15);
 }
 
-.karate-analysis-error strong {
-  display: block;
+/* ---------- Responsive ---------- */
 
-  margin-bottom: 5px;
-}
-
-.karate-analysis-error p {
-  margin: 0;
-
-  color: #8f3030;
-
-  font-size: 13px;
-}
-
-
-/* =========================================================
-   AI SECTION
-   ========================================================= */
-
-.karate-ai-section {
-  max-width: 1180px;
-
-  margin: 0 auto;
-
-  display: flex;
-  align-items: flex-start;
-  gap: 18px;
-
-  padding: 24px 26px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #fffaf0,
-      #ffffff
-    );
-
-  border: 1px solid var(--karate-border);
-
-  border-radius: 20px;
-
-  box-shadow: 0 10px 30px rgba(25, 35, 50, 0.05);
-}
-
-.karate-ai-section > svg {
-  flex-shrink: 0;
-
-  margin-top: 2px;
-
-  color: var(--karate-color);
-}
-
-.karate-ai-section h3 {
-  margin: 0 0 7px;
-
-  color: #18202a;
-
-  font-size: 18px;
-}
-
-.karate-ai-section p {
-  margin: 0;
-
-  color: #667085;
-
-  font-size: 14px;
-  line-height: 1.65;
-}
-
-
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
-
-@media (max-width: 900px) {
-  .karate-page {
-    padding: 24px 5% 55px;
-  }
-
-  .karate-header {
-    margin-top: 45px;
-    margin-bottom: 50px;
-  }
-
-  .karate-lesson-grid,
-  .karate-practice-grid {
+@media (max-width: 800px) {
+  .karate-practice {
     grid-template-columns: 1fr;
   }
 
-  .karate-video-section {
-    padding: 22px;
-  }
-}
-
-
-@media (max-width: 650px) {
-  .karate-page {
-    padding: 20px 16px 45px;
-  }
-
-  .karate-header {
-    margin-top: 38px;
-    margin-bottom: 42px;
-  }
-
-  .karate-header-icon {
-    width: 70px;
-    height: 70px;
-    border-radius: 20px;
-  }
-
-  .karate-header h1 {
-    font-size: 42px;
-    letter-spacing: -1.5px;
-  }
-
-  .karate-header p {
-    font-size: 15px;
-  }
-
-  .karate-section-title h2 {
-    font-size: 24px;
-  }
-
   .karate-lesson-card {
-    grid-template-columns: 44px 1fr auto;
-
-    padding: 16px;
-
-    gap: 12px;
-  }
-
-  .karate-lesson-number {
-    width: 44px;
-    height: 44px;
-  }
-
-  .karate-lesson-content h3 {
-    font-size: 15px;
-  }
-
-  .karate-lesson-content p {
-    font-size: 12px;
-  }
-
-  .karate-video-section,
-  .karate-practice-card,
-  .karate-practice-result,
-  .karate-analysis-result {
-    padding: 18px;
-
-    border-radius: 18px;
-  }
-
-  .karate-camera-container {
-    min-height: 230px;
-  }
-
-  .karate-camera-preview {
-    height: 260px;
-  }
-
-  .karate-camera-placeholder {
-    min-height: 230px;
-  }
-
-  .karate-video-actions {
     flex-direction: column;
+    align-items: flex-start;
   }
 
-  .karate-analyze-button,
-  .karate-reset-button {
+  .karate-lesson-button {
     width: 100%;
-  }
-
-  .karate-analysis-header {
-    grid-template-columns: auto 1fr;
-  }
-
-  .karate-analysis-score {
-    grid-column: 1 / -1;
-
-    width: 100%;
-  }
-
-  .karate-technique-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .karate-ai-section {
-    padding: 20px;
-
-    border-radius: 18px;
   }
 }
 
-
-@media (max-width: 420px) {
-  .karate-back-button {
-    font-size: 13px;
-
-    padding: 9px 12px;
+@media (max-width: 500px) {
+  .karate-header {
+    padding: 0 18px;
   }
 
-  .karate-header h1 {
-    font-size: 36px;
+  .karate-content {
+    padding: 0 16px;
   }
 
-  .karate-lesson-card {
-    grid-template-columns: 40px 1fr auto;
-  }
-
-  .karate-lesson-number {
-    width: 40px;
-    height: 40px;
-  }
-
-  .karate-recording-status {
-    top: 9px;
-    left: 9px;
-
-    padding: 7px 9px;
-
-    font-size: 9px;
+  .karate-hero {
+    padding-top: 40px;
   }
 }
