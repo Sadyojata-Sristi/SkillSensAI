@@ -7,30 +7,99 @@ import {
   Sparkles,
   User,
   Loader2,
+  Settings,
+  Upload,
+  Check,
 } from "lucide-react";
 
 import "./AIChat.css";
 
-export default function AIChat() {
+const AI_OPTIONS = [
+  { id: "cat", name: "Mochi", emoji: "🐱" },
+  { id: "dog", name: "Buddy", emoji: "🐶" },
+  { id: "robot", name: "Nova", emoji: "🤖" },
+  { id: "panda", name: "Panda", emoji: "🐼" },
+  { id: "fox", name: "Foxy", emoji: "🦊" },
+  { id: "bear", name: "Bear", emoji: "🐻" },
+  { id: "owl", name: "Ollie", emoji: "🦉" },
+  { id: "alien", name: "Zippy", emoji: "👽" },
+  { id: "frog", name: "Froggy", emoji: "🐸" },
+  { id: "rabbit", name: "Bunny", emoji: "🐰" },
+];
+
+function AIChat() {
   const [isOpen, setIsOpen] = useState(false);
+  const [showCustomize, setShowCustomize] = useState(false);
 
   const [messages, setMessages] = useState([
     {
       id: 1,
       sender: "ai",
-      text: "Hi! I'm your SkillSensAI assistant. How can I help you learn today?",
+      text: "Hi! I'm your SkillSensAI companion. How can I help you today?",
     },
   ]);
 
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
+  const [aiName, setAiName] = useState(() => {
+    try {
+      return localStorage.getItem("skillsensai_ai_name") || "Nova";
+    } catch {
+      return "Nova";
+    }
+  });
+
+  const [aiCharacter, setAiCharacter] = useState(() => {
+    try {
+      return (
+        localStorage.getItem("skillsensai_ai_character") ||
+        "robot"
+      );
+    } catch {
+      return "robot";
+    }
+  });
+
+  const [aiImage, setAiImage] = useState(() => {
+    try {
+      return localStorage.getItem("skillsensai_ai_image") || "";
+    } catch {
+      return "";
+    }
+  });
+
+  const [tempName, setTempName] = useState(aiName);
+  const [tempCharacter, setTempCharacter] =
+    useState(aiCharacter);
+  const [tempImage, setTempImage] = useState(aiImage);
+
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const fileInputRef = useRef(null);
 
-  /* =========================================================
-     AUTO SCROLL TO LATEST MESSAGE
-     ========================================================= */
+  const selectedCharacter =
+    AI_OPTIONS.find(
+      (item) => item.id === aiCharacter
+    ) || AI_OPTIONS[2];
+
+  const getCharacter = () => {
+    if (aiImage) {
+      return (
+        <img
+          src={aiImage}
+          alt={aiName}
+          className="ai-character-image"
+        />
+      );
+    }
+
+    return (
+      <span className="ai-character-emoji">
+        {selectedCharacter.emoji}
+      </span>
+    );
+  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
@@ -38,90 +107,85 @@ export default function AIChat() {
     });
   }, [messages, isTyping]);
 
-  /* =========================================================
-     FOCUS INPUT WHEN CHAT OPENS
-     ========================================================= */
-
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !showCustomize) {
       setTimeout(() => {
         inputRef.current?.focus();
       }, 100);
     }
-  }, [isOpen]);
+  }, [isOpen, showCustomize]);
 
-  /* =========================================================
-     FRONTEND DEMO AI RESPONSE
-     
-     Later this function can be replaced with:
-     
-     const response = await fetch("/api/chat", {
-       method: "POST",
-       headers: {
-         "Content-Type": "application/json",
-       },
-       body: JSON.stringify({
-         message: userMessage,
-       }),
-     });
-     
-     const data = await response.json();
-     ========================================================= */
-
-  const getDemoResponse = (message) => {
-    const lowerMessage = message.toLowerCase();
-
-    if (
-      lowerMessage.includes("sing") ||
-      lowerMessage.includes("singing") ||
-      lowerMessage.includes("voice")
-    ) {
-      return "For singing, start with breathing exercises, humming, and simple pitch-matching exercises. Practice consistently for a few minutes every day rather than trying to improve everything at once.";
-    }
-
-    if (
-      lowerMessage.includes("music") ||
-      lowerMessage.includes("song")
-    ) {
-      return "A good music practice session can be divided into three parts: warm-up, focused skill practice, and a short performance. SkillSensAI can help you track your progress as you practice.";
-    }
-
-    if (
-      lowerMessage.includes("boxing") ||
-      lowerMessage.includes("fight") ||
-      lowerMessage.includes("martial")
-    ) {
-      return "For beginners in martial arts, focus first on stance, balance, guard position, footwork, and basic technique. Quality and control are more important than speed.";
-    }
-
-    if (
-      lowerMessage.includes("practice") ||
-      lowerMessage.includes("today")
-    ) {
-      return "Try a focused 20-minute session today: 5 minutes warm-up, 10 minutes on one specific skill, and 5 minutes reviewing your performance.";
-    }
-
-    if (
-      lowerMessage.includes("skill") ||
-      lowerMessage.includes("learn")
-    ) {
-      return "The best way to learn a skill is to practice consistently, get feedback, identify your weakest area, and repeat. SkillSensAI is designed around that learning → practice → feedback cycle.";
-    }
-
-    if (
-      lowerMessage.includes("hello") ||
-      lowerMessage.includes("hi") ||
-      lowerMessage.includes("hey")
-    ) {
-      return "Hello! 👋 I'm ready to help you with your learning journey. Ask me about Music, Martial Arts, practice routines, or anything related to your skills.";
-    }
-
-    return "That's a great question! I'm currently running in demo mode. Soon I'll be connected to the SkillSensAI AI backend, where I'll be able to give you much more detailed and personalized answers.";
+  const openCustomize = () => {
+    setTempName(aiName);
+    setTempCharacter(aiCharacter);
+    setTempImage(aiImage);
+    setShowCustomize(true);
   };
 
-  /* =========================================================
-     SEND MESSAGE
-     ========================================================= */
+  const closeCustomize = () => {
+    setShowCustomize(false);
+  };
+
+  const saveCustomization = () => {
+    const finalName =
+      tempName.trim() || "Nova";
+
+    setAiName(finalName);
+    setAiCharacter(tempCharacter);
+    setAiImage(tempImage);
+
+    try {
+      localStorage.setItem(
+        "skillsensai_ai_name",
+        finalName
+      );
+
+      localStorage.setItem(
+        "skillsensai_ai_character",
+        tempCharacter
+      );
+
+      if (tempImage) {
+        localStorage.setItem(
+          "skillsensai_ai_image",
+          tempImage
+        );
+      } else {
+        localStorage.removeItem(
+          "skillsensai_ai_image"
+        );
+      }
+    } catch {
+      // Ignore localStorage errors.
+    }
+
+    setShowCustomize(false);
+  };
+
+  const handleImageUpload = (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Please select an image file.");
+      return;
+    }
+
+    // Keep uploaded image reasonably small.
+    if (file.size > 3 * 1024 * 1024) {
+      alert("Please choose an image smaller than 3 MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      setTempImage(reader.result);
+    };
+
+    reader.readAsDataURL(file);
+  };
 
   const sendMessage = async () => {
     const trimmedMessage = input.trim();
@@ -136,125 +200,151 @@ export default function AIChat() {
       text: trimmedMessage,
     };
 
-    setMessages((previousMessages) => [
-      ...previousMessages,
+    setMessages((prev) => [
+      ...prev,
       userMessage,
     ]);
 
     setInput("");
     setIsTyping(true);
 
-    try {
-      /*
-       * =====================================================
-       * FUTURE REAL AI BACKEND
-       * =====================================================
-       *
-       * Replace the demo section below with:
-       *
-       * const response = await fetch(
-       *   "https://YOUR-BACKEND-URL/api/chat",
-       *   {
-       *     method: "POST",
-       *     headers: {
-       *       "Content-Type": "application/json",
-       *     },
-       *     body: JSON.stringify({
-       *       message: trimmedMessage,
-       *     }),
-       *   }
-       * );
-       *
-       * const data = await response.json();
-       *
-       * const aiText = data.response;
-       *
-       * =====================================================
-       */
+    /*
+      FUTURE REAL AI BACKEND
 
-      await new Promise((resolve) =>
-        setTimeout(resolve, 900)
+      Replace the demo response section below with:
+
+      const response = await fetch(
+        "https://YOUR-BACKEND-URL/api/chat",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            message: trimmedMessage,
+            ai_name: aiName,
+            ai_character: aiCharacter,
+          }),
+        }
       );
 
-      const aiText = getDemoResponse(trimmedMessage);
+      const data = await response.json();
+      const aiText = data.response;
+    */
 
-      const aiMessage = {
-        id: Date.now() + 1,
-        sender: "ai",
-        text: aiText,
-      };
+    setTimeout(() => {
+      const lower =
+        trimmedMessage.toLowerCase();
 
-      setMessages((previousMessages) => [
-        ...previousMessages,
-        aiMessage,
-      ]);
-    } catch (error) {
-      console.error("AI Chat Error:", error);
+      let aiText =
+        `I'm ${aiName}! I'm currently in demo mode, but I'm ready to help you learn.`;
 
-      setMessages((previousMessages) => [
-        ...previousMessages,
+      if (
+        lower.includes("sing") ||
+        lower.includes("voice") ||
+        lower.includes("pitch")
+      ) {
+        aiText =
+          "Let's work on your singing! Try a few minutes of humming first, then practice matching one note at a time. I can help you understand pitch, stability and accuracy.";
+      } else if (
+        lower.includes("music") ||
+        lower.includes("song")
+      ) {
+        aiText =
+          "For music practice, try this: 5 minutes of warm-up, 10 minutes of lesson practice, and 5 minutes recording yourself. Then review your mistakes.";
+      } else if (
+        lower.includes("boxing") ||
+        lower.includes("fight") ||
+        lower.includes("martial")
+      ) {
+        aiText =
+          "For martial arts, focus on stance, guard, balance and controlled movement before increasing speed. Consistency matters more than rushing.";
+      } else if (
+        lower.includes("practice") ||
+        lower.includes("today")
+      ) {
+        aiText =
+          "Here's a quick 20-minute session: 5 minutes warm-up, 10 minutes focused practice, and 5 minutes testing yourself.";
+      } else if (
+        lower.includes("skill") ||
+        lower.includes("learn")
+      ) {
+        aiText =
+          "SkillSensAI works best when you follow the cycle: Learn → Practice → Get Feedback → Improve → Master.";
+      } else if (
+        lower.includes("hello") ||
+        lower.includes("hi") ||
+        lower.includes("hey")
+      ) {
+        aiText =
+          `Hey! ${aiName} here. What would you like to learn today?`;
+      }
+
+      setMessages((prev) => [
+        ...prev,
         {
           id: Date.now() + 1,
           sender: "ai",
-          text: "Sorry, something went wrong. Please try again.",
+          text: aiText,
         },
       ]);
-    } finally {
+
       setIsTyping(false);
-    }
+    }, 900);
   };
 
-  /* =========================================================
-     ENTER KEY
-     ========================================================= */
-
   const handleKeyDown = (event) => {
-    if (event.key === "Enter" && !event.shiftKey) {
+    if (
+      event.key === "Enter" &&
+      !event.shiftKey
+    ) {
       event.preventDefault();
       sendMessage();
     }
   };
 
-  /* =========================================================
-     CLOSE CHAT
-     ========================================================= */
-
-  const closeChat = () => {
-    setIsOpen(false);
-  };
-
-  /* =========================================================
-     OPEN CHAT
-     ========================================================= */
-
-  const openChat = () => {
-    setIsOpen(true);
-  };
-
   return (
     <>
       {/* =====================================================
-          FLOATING CHAT BUTTON
+          AI CHARACTER
+          ===================================================== */}
+
+      <button
+        className="ai-character-floating"
+        onClick={openCustomize}
+        title="Customize your AI"
+        aria-label="Customize your AI"
+      >
+        <div className="ai-character-glow" />
+
+        <div className="ai-character-bubble">
+          {getCharacter()}
+        </div>
+
+        <div className="ai-character-edit">
+          <Settings size={13} />
+        </div>
+
+        <div className="ai-character-name">
+          {aiName}
+        </div>
+      </button>
+
+      {/* =====================================================
+          CHAT BUTTON
           ===================================================== */}
 
       {!isOpen && (
         <button
-          type="button"
-          className="skillsensai-ai-floating-button"
-          onClick={openChat}
-          aria-label="Chat with AI"
+          className="ai-chat-floating-button"
+          onClick={() => setIsOpen(true)}
         >
-          <span className="ai-floating-icon">
-            <MessageCircle size={23} />
-          </span>
-
-          <span className="ai-floating-text">
-            Chat with AI
-          </span>
-
-          <span className="ai-floating-sparkle">
-            <Sparkles size={13} />
-          </span>
+          <MessageCircle size={21} />
+          <span>Chat with AI</span>
+          <Sparkles
+            size={16}
+            className="ai-chat-sparkle"
+          />
         </button>
       )}
 
@@ -265,49 +355,60 @@ export default function AIChat() {
       {isOpen && (
         <div className="skillsensai-ai-chat-window">
           {/* HEADER */}
-
           <div className="ai-chat-header">
             <div className="ai-chat-header-left">
               <div className="ai-chat-avatar">
-                <Bot size={23} />
+                {getCharacter()}
               </div>
 
-              <div className="ai-chat-title-area">
+              <div>
                 <div className="ai-chat-title">
-                  SkillSensAI AI
+                  {aiName}
                 </div>
 
                 <div className="ai-chat-status">
-                  <span className="ai-online-dot" />
-                  AI Learning Assistant
+                  <span className="ai-status-dot" />
+                  Your AI companion
                 </div>
               </div>
             </div>
 
-            <button
-              type="button"
-              className="ai-chat-close"
-              onClick={closeChat}
-              aria-label="Close AI chat"
-            >
-              <X size={19} />
-            </button>
+            <div className="ai-chat-header-actions">
+              <button
+                className="ai-header-icon"
+                onClick={openCustomize}
+                title="Customize AI"
+              >
+                <Settings size={17} />
+              </button>
+
+              <button
+                className="ai-header-icon"
+                onClick={() =>
+                  setIsOpen(false)
+                }
+                title="Close"
+              >
+                <X size={19} />
+              </button>
+            </div>
           </div>
 
-          {/* CHAT MESSAGES */}
-
+          {/* MESSAGES */}
           <div className="ai-chat-messages">
             <div className="ai-chat-welcome">
               <div className="ai-welcome-icon">
-                <Sparkles size={18} />
+                {getCharacter()}
               </div>
 
               <div>
-                <strong>Your learning assistant</strong>
+                <strong>
+                  Hi! I'm {aiName}
+                </strong>
 
                 <p>
-                  Ask me anything about your skills,
-                  practice, or learning journey.
+                  Your personal SkillSensAI
+                  learning companion.
                 </p>
               </div>
             </div>
@@ -317,40 +418,40 @@ export default function AIChat() {
                 key={message.id}
                 className={`ai-message-row ${
                   message.sender === "user"
-                    ? "ai-user-row"
-                    : "ai-bot-row"
+                    ? "user-row"
+                    : "ai-row"
                 }`}
               >
-                {message.sender === "ai" && (
-                  <div className="ai-message-avatar">
-                    <Bot size={15} />
-                  </div>
-                )}
+                <div
+                  className={`ai-message-avatar ${
+                    message.sender === "user"
+                      ? "user-avatar"
+                      : ""
+                  }`}
+                >
+                  {message.sender === "user" ? (
+                    <User size={16} />
+                  ) : (
+                    getCharacter()
+                  )}
+                </div>
 
                 <div
                   className={`ai-message-bubble ${
                     message.sender === "user"
-                      ? "ai-user-message"
-                      : "ai-bot-message"
+                      ? "user-message"
+                      : "ai-message"
                   }`}
                 >
                   {message.text}
                 </div>
-
-                {message.sender === "user" && (
-                  <div className="ai-message-user-avatar">
-                    <User size={15} />
-                  </div>
-                )}
               </div>
             ))}
 
-            {/* TYPING INDICATOR */}
-
             {isTyping && (
-              <div className="ai-message-row ai-bot-row">
+              <div className="ai-message-row ai-row">
                 <div className="ai-message-avatar">
-                  <Bot size={15} />
+                  {getCharacter()}
                 </div>
 
                 <div className="ai-typing-bubble">
@@ -364,8 +465,7 @@ export default function AIChat() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* INPUT AREA */}
-
+          {/* INPUT */}
           <div className="ai-chat-input-area">
             <div className="ai-chat-input-wrapper">
               <input
@@ -376,24 +476,20 @@ export default function AIChat() {
                   setInput(event.target.value)
                 }
                 onKeyDown={handleKeyDown}
-                placeholder="Ask SkillSensAI..."
-                disabled={isTyping}
-                maxLength={500}
+                placeholder={`Ask ${aiName} anything...`}
               />
 
               <button
-                type="button"
                 className="ai-send-button"
                 onClick={sendMessage}
                 disabled={
                   !input.trim() || isTyping
                 }
-                aria-label="Send message"
               >
                 {isTyping ? (
                   <Loader2
                     size={18}
-                    className="ai-send-loader"
+                    className="ai-loading-icon"
                   />
                 ) : (
                   <Send size={18} />
@@ -401,13 +497,182 @@ export default function AIChat() {
               </button>
             </div>
 
-            <div className="ai-chat-disclaimer">
-              SkillSensAI AI can make mistakes. Check
-              important information.
+            <div className="ai-chat-footer">
+              <span>
+                ✨ SkillSensAI AI Companion
+              </span>
             </div>
           </div>
+
+          {/* =================================================
+              CUSTOMIZATION PANEL
+              ================================================= */}
+
+          {showCustomize && (
+            <div className="ai-customize-overlay">
+              <div className="ai-customize-panel">
+                <div className="ai-customize-header">
+                  <div>
+                    <h3>Customize Your AI</h3>
+                    <p>
+                      Create your own learning
+                      companion.
+                    </p>
+                  </div>
+
+                  <button
+                    className="ai-customize-close"
+                    onClick={closeCustomize}
+                  >
+                    <X size={19} />
+                  </button>
+                </div>
+
+                {/* PREVIEW */}
+                <div className="ai-customize-preview">
+                  <div className="ai-preview-character">
+                    {tempImage ? (
+                      <img
+                        src={tempImage}
+                        alt="AI preview"
+                      />
+                    ) : (
+                      <span>
+                        {
+                          (
+                            AI_OPTIONS.find(
+                              (item) =>
+                                item.id ===
+                                tempCharacter
+                            ) ||
+                            AI_OPTIONS[2]
+                          ).emoji
+                        }
+                      </span>
+                    )}
+                  </div>
+
+                  <strong>
+                    {tempName.trim() ||
+                      "Your AI"}
+                  </strong>
+
+                  <span>
+                    Your personal AI
+                    companion
+                  </span>
+                </div>
+
+                {/* NAME */}
+                <label className="ai-customize-label">
+                  AI Name
+                </label>
+
+                <input
+                  className="ai-name-input"
+                  value={tempName}
+                  onChange={(event) =>
+                    setTempName(
+                      event.target.value
+                    )
+                  }
+                  maxLength={24}
+                  placeholder="Give your AI a name"
+                />
+
+                {/* CHARACTERS */}
+                <label className="ai-customize-label">
+                  Choose your AI character
+                </label>
+
+                <div className="ai-character-options">
+                  {AI_OPTIONS.map((option) => (
+                    <button
+                      key={option.id}
+                      className={`ai-character-option ${
+                        tempCharacter ===
+                        option.id
+                          ? "selected"
+                          : ""
+                      }`}
+                      onClick={() => {
+                        setTempCharacter(
+                          option.id
+                        );
+                        setTempImage("");
+                      }}
+                      title={option.name}
+                    >
+                      <span>
+                        {option.emoji}
+                      </span>
+
+                      {tempCharacter ===
+                        option.id && (
+                        <div className="ai-option-check">
+                          <Check size={11} />
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+
+                {/* UPLOAD */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={
+                    handleImageUpload
+                  }
+                  style={{
+                    display: "none",
+                  }}
+                />
+
+                <button
+                  className="ai-upload-button"
+                  onClick={() =>
+                    fileInputRef.current?.click()
+                  }
+                >
+                  <Upload size={17} />
+
+                  <span>
+                    {tempImage
+                      ? "Change AI Image"
+                      : "Upload Your Own AI Image"}
+                  </span>
+                </button>
+
+                {tempImage && (
+                  <button
+                    className="ai-remove-image"
+                    onClick={() =>
+                      setTempImage("")
+                    }
+                  >
+                    Remove uploaded image
+                  </button>
+                )}
+
+                {/* SAVE */}
+                <button
+                  className="ai-save-button"
+                  onClick={
+                    saveCustomization
+                  }
+                >
+                  <Check size={18} />
+                  Save AI
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </>
   );
 }
+
+export default AIChat;
