@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import AIChat from "../components/AIChat";
 
 import {
   Music,
@@ -2829,6 +2830,7 @@ export default function Home() {
         )}
 
       </div>
+      <AIChat />
     </div>
   );
 }
