@@ -3061,3 +3061,378 @@ body.skillsensai-dark-theme {
 .room-rug {
   bottom: -28px !important;
 }
+
+/* =========================================================
+   SKILLSENSAI — FINAL DARK MODE
+   Violet → Deep Purple → Black
+   ========================================================= */
+
+.skillsensai-dark-theme {
+  background:
+    radial-gradient(
+      circle at 50% 35%,
+      rgba(124, 92, 252, 0.30) 0%,
+      rgba(98, 69, 216, 0.20) 28%,
+      rgba(35, 24, 65, 0.72) 58%,
+      #05030b 100%
+    ) !important;
+
+  color: #f5f1ff;
+}
+
+
+/* ---------------------------------------------------------
+   MAIN ROOM
+   --------------------------------------------------------- */
+
+.skillsensai-dark-theme .room-background {
+  background:
+    radial-gradient(
+      ellipse at 50% 38%,
+      rgba(124, 92, 252, 0.28) 0%,
+      rgba(92, 63, 180, 0.18) 25%,
+      rgba(30, 20, 55, 0.70) 55%,
+      #05030b 100%
+    ) !important;
+}
+
+
+/* ---------------------------------------------------------
+   PURPLE AMBIENT LIGHT
+   --------------------------------------------------------- */
+
+.skillsensai-dark-theme .room-background::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background:
+    radial-gradient(
+      ellipse at 50% 45%,
+      rgba(124, 92, 252, 0.22),
+      transparent 52%
+    );
+
+  pointer-events: none;
+  z-index: 1;
+}
+
+
+/* ---------------------------------------------------------
+   SECONDARY VIOLET GLOW
+   --------------------------------------------------------- */
+
+.skillsensai-dark-theme .room-background::after {
+  content: "";
+  position: absolute;
+  width: 850px;
+  height: 500px;
+
+  left: 50%;
+  top: 42%;
+
+  transform: translate(-50%, -50%);
+
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(98, 69, 216, 0.18),
+      transparent 70%
+    );
+
+  filter: blur(30px);
+
+  pointer-events: none;
+  z-index: 2;
+}
+
+
+/* ---------------------------------------------------------
+   ROOM CONTENT STAYS ABOVE AMBIENT GLOW
+   --------------------------------------------------------- */
+
+.skillsensai-dark-theme .home-content {
+  position: relative;
+  z-index: 20;
+}
+
+
+/* ---------------------------------------------------------
+   SAMURAI — KEEP VISIBLE
+   --------------------------------------------------------- */
+
+.skillsensai-dark-theme .samurai-container {
+  filter:
+    drop-shadow(
+      0 0 18px rgba(124, 92, 252, 0.40)
+    )
+    drop-shadow(
+      0 0 45px rgba(98, 69, 216, 0.20)
+    );
+}
+
+
+/* ---------------------------------------------------------
+   SAMURAI SHADOW
+   --------------------------------------------------------- */
+
+.skillsensai-dark-theme .character-shadow {
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(0, 0, 0, 0.65) 0%,
+      rgba(35, 20, 65, 0.35) 45%,
+      transparent 75%
+    );
+}
+
+
+/* =========================================================
+   PLANT — DARK MODE
+   ========================================================= */
+
+.skillsensai-dark-theme .room-plant {
+  filter:
+    drop-shadow(
+      0 5px 12px rgba(0, 0, 0, 0.55)
+    );
+}
+
+
+/* Plant pot */
+
+.skillsensai-dark-theme .plant-pot {
+  filter:
+    brightness(0.78)
+    saturate(0.90);
+}
+
+
+/* ---------------------------------------------------------
+   PLANT STEMS
+   --------------------------------------------------------- */
+
+.skillsensai-dark-theme .plant-stem {
+  background:
+    linear-gradient(
+      90deg,
+      #18251a,
+      #304b2c,
+      #18251a
+    ) !important;
+
+  box-shadow:
+    0 0 5px rgba(76, 130, 75, 0.18);
+}
+
+
+/* =========================================================
+   PLANT LEAVES
+   ========================================================= */
+
+/*
+   These explicitly create visible leaves even if the original
+   leaf rules are being overridden elsewhere.
+*/
+
+.skillsensai-dark-theme .plant-leaf {
+  display: block !important;
+
+  position: absolute;
+
+  width: 42px;
+  height: 20px;
+
+  border-radius:
+    100% 0 100% 0;
+
+  background:
+    linear-gradient(
+      135deg,
+      #507a4c 0%,
+      #304e32 48%,
+      #17261b 100%
+    ) !important;
+
+  box-shadow:
+    inset -3px -3px 5px rgba(0, 0, 0, 0.35),
+    0 0 7px rgba(72, 120, 70, 0.15);
+
+  opacity: 0.95;
+
+  transform-origin: 0% 50%;
+}
+
+
+/* Individual leaves */
+
+.skillsensai-dark-theme .plant-leaf-1 {
+  left: -10px;
+  top: 28px;
+  transform: rotate(-35deg);
+}
+
+.skillsensai-dark-theme .plant-leaf-2 {
+  left: 12px;
+  top: 4px;
+  transform: rotate(-70deg);
+}
+
+.skillsensai-dark-theme .plant-leaf-3 {
+  left: 30px;
+  top: 34px;
+  transform: rotate(12deg);
+}
+
+.skillsensai-dark-theme .plant-leaf-4 {
+  left: 40px;
+  top: 8px;
+  transform: rotate(55deg);
+}
+
+.skillsensai-dark-theme .plant-leaf-5 {
+  left: 4px;
+  top: 58px;
+  transform: rotate(-15deg);
+}
+
+.skillsensai-dark-theme .plant-leaf-6 {
+  left: 46px;
+  top: 55px;
+  transform: rotate(35deg);
+}
+
+
+/* ---------------------------------------------------------
+   LEAF VEINS
+   --------------------------------------------------------- */
+
+.skillsensai-dark-theme .plant-leaf::after {
+  content: "";
+
+  position: absolute;
+
+  width: 30px;
+  height: 1px;
+
+  left: 5px;
+  top: 10px;
+
+  background:
+    rgba(150, 190, 135, 0.30);
+
+  transform: rotate(-8deg);
+
+  border-radius: 50%;
+}
+
+
+/* =========================================================
+   SOFA — DARK BUT STILL VISIBLE
+   ========================================================= */
+
+.skillsensai-dark-theme .room-sofa {
+  filter:
+    brightness(0.68)
+    saturate(0.85)
+    drop-shadow(
+      0 12px 18px rgba(0, 0, 0, 0.55)
+    );
+}
+
+
+/* =========================================================
+   RUG
+   ========================================================= */
+
+.skillsensai-dark-theme .room-rug {
+  filter:
+    brightness(0.65)
+    saturate(0.85);
+}
+
+
+/* =========================================================
+   SKILL ORBIT
+   ========================================================= */
+
+.skillsensai-dark-theme .skills-orbit {
+  filter:
+    drop-shadow(
+      0 0 12px rgba(124, 92, 252, 0.08)
+    );
+}
+
+
+/* =========================================================
+   ACTIVE SKILLS
+   ========================================================= */
+
+.skillsensai-dark-theme .skill-active {
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 10px 25px rgba(0, 0, 0, 0.45),
+    0 0 24px rgba(124, 92, 252, 0.25);
+}
+
+
+/* =========================================================
+   LOGIN BUTTON
+   ========================================================= */
+
+.skillsensai-dark-theme .login-button {
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.35),
+    0 0 18px rgba(124, 92, 252, 0.12);
+}
+
+
+/* =========================================================
+   PROFILE
+   ========================================================= */
+
+.skillsensai-dark-theme .profile-button {
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.40);
+}
+
+
+/* =========================================================
+   LEARNING FLOW
+   ========================================================= */
+
+.skillsensai-dark-theme .flow-card {
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.38);
+}
+
+
+/* =========================================================
+   BULB OFF — KEEP SOME PURPLE AMBIENT LIGHT
+   ========================================================= */
+
+.skillsensai-dark-theme .bulb-off .bulb-glass {
+  box-shadow:
+    0 0 8px rgba(124, 92, 252, 0.10) !important;
+}
+
+
+/* =========================================================
+   BULB ON
+   ========================================================= */
+
+.skillsensai-light-theme .bulb-on .bulb-glass {
+  box-shadow:
+    0 0 15px rgba(255, 220, 100, 0.70),
+    0 0 40px rgba(255, 210, 80, 0.35);
+}
+
+
+/* =========================================================
+   DARK MODE — DO NOT MAKE ROOM PURE BLACK
+   ========================================================= */
+
+.skillsensai-dark-theme,
+.skillsensai-dark-theme .room-background {
+  background-color: #080510 !important;
+}
