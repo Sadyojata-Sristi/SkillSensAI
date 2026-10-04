@@ -13,9 +13,7 @@ import {
   LogIn,
   LogOut,
   ChevronDown,
-  User,
   Phone,
-  Mail,
   ArrowRight,
   Loader2,
   X,
@@ -87,7 +85,7 @@ const skills = [
 
 
 /* =========================================================
-   GLOBAL THEME
+   THEME
    ========================================================= */
 
 const applyGlobalTheme = (theme) => {
@@ -104,25 +102,21 @@ const applyGlobalTheme = (theme) => {
     "skillsensai-dark-theme"
   );
 
-  root.classList.add(
+  const className =
     theme === "dark"
       ? "skillsensai-dark-theme"
-      : "skillsensai-light-theme"
-  );
+      : "skillsensai-light-theme";
 
-  body.classList.add(
-    theme === "dark"
-      ? "skillsensai-dark-theme"
-      : "skillsensai-light-theme"
-  );
+  root.classList.add(className);
+  body.classList.add(className);
 };
 
 
 /* =========================================================
-   HOME COMPONENT
+   COMPONENT
    ========================================================= */
 
-function Home() {
+export default function Home() {
   const navigate = useNavigate();
 
   /* -------------------------------------------------------
@@ -130,18 +124,22 @@ function Home() {
      ------------------------------------------------------- */
 
   const [user, setUser] = useState(null);
+
   const [showProfile, setShowProfile] = useState(false);
 
   const [showLogin, setShowLogin] = useState(false);
+
   const [loginMethod, setLoginMethod] = useState("google");
 
   const [phoneNumber, setPhoneNumber] = useState("+91 ");
+
   const [otp, setOtp] = useState("");
 
   const [confirmationResult, setConfirmationResult] =
     useState(null);
 
   const [loginLoading, setLoginLoading] = useState(false);
+
   const [loginError, setLoginError] = useState("");
 
   const recaptchaVerifierRef = useRef(null);
@@ -164,7 +162,7 @@ function Home() {
 
 
   /* =======================================================
-     APPLY THEME
+     THEME EFFECT
      ======================================================= */
 
   useEffect(() => {
@@ -200,7 +198,7 @@ function Home() {
   useEffect(() => {
     try {
       const count = getLessonsLearned();
-      setLessonsLearned(count);
+      setLessonsLearned(count || 0);
     } catch (error) {
       console.error(
         "Unable to load lesson progress:",
@@ -253,26 +251,42 @@ function Home() {
 
 
   /* =======================================================
-     LOGIN
+     OPEN LOGIN
      ======================================================= */
 
   const openLogin = () => {
     setShowProfile(false);
+    setShowLogin(true);
+
+    setLoginMethod("google");
     setLoginError("");
     setOtp("");
     setConfirmationResult(null);
-    setLoginMethod("google");
-    setShowLogin(true);
   };
 
 
-  const closeLogin = () => {
-    if (loginLoading) return;
+  /* =======================================================
+     CLOSE LOGIN
+     ======================================================= */
 
+  const closeLogin = () => {
     setShowLogin(false);
+
     setLoginError("");
     setOtp("");
     setConfirmationResult(null);
+
+    setLoginLoading(false);
+
+    if (recaptchaVerifierRef.current) {
+      try {
+        recaptchaVerifierRef.current.clear();
+      } catch (error) {
+        console.log(error);
+      }
+
+      recaptchaVerifierRef.current = null;
+    }
   };
 
 
@@ -297,17 +311,33 @@ function Home() {
         provider
       );
 
-      setShowLogin(false);
+      closeLogin();
     } catch (error) {
       console.error(
         "Google login error:",
         error
       );
 
-      setLoginError(
-        error?.message ||
-          "Google sign-in failed. Please try again."
-      );
+      if (
+        error?.code ===
+        "auth/popup-closed-by-user"
+      ) {
+        setLoginError(
+          "Google login was cancelled."
+        );
+      } else if (
+        error?.code ===
+        "auth/popup-blocked"
+      ) {
+        setLoginError(
+          "Your browser blocked the login popup. Please allow popups for this site."
+        );
+      } else {
+        setLoginError(
+          error?.message ||
+            "Unable to sign in with Google."
+        );
+      }
     } finally {
       setLoginLoading(false);
     }
@@ -315,7 +345,7 @@ function Home() {
 
 
   /* =======================================================
-     PHONE FORMATTER
+     PHONE FORMAT
      ======================================================= */
 
   const formatPhoneNumber = (value) => {
@@ -325,16 +355,21 @@ function Home() {
     );
 
     if (!cleaned.startsWith("+91")) {
-      cleaned = "+91" + cleaned.replace(/\+/g, "");
+      const digits = cleaned.replace(
+        /\D/g,
+        ""
+      );
+
+      cleaned = "+91" + digits;
     }
 
-    let digits = cleaned
-      .replace("+91", "")
-      .replace(/\D/g, "");
+    const numberOnly =
+      cleaned
+        .replace("+91", "")
+        .replace(/\D/g, "")
+        .slice(0, 10);
 
-    digits = digits.slice(0, 10);
-
-    return `+91 ${digits}`;
+    return "+91 " + numberOnly;
   };
 
 
@@ -357,58 +392,67 @@ function Home() {
      ======================================================= */
 
   const sendOtp = async () => {
-    setLoginLoading(true);
     setLoginError("");
 
+    const digits =
+      phoneNumber
+        .replace("+91", "")
+        .replace(/\D/g, "");
+
+    if (digits.length !== 10) {
+      setLoginError(
+        "Please enter a valid 10-digit Indian mobile number."
+      );
+
+      return;
+    }
+
+    setLoginLoading(true);
+
     try {
-      const digits =
-        phoneNumber
-          .replace("+91", "")
-          .replace(/\D/g, "");
+      if (recaptchaVerifierRef.current) {
+        try {
+          recaptchaVerifierRef.current.clear();
+        } catch (error) {
+          console.log(error);
+        }
 
-      if (digits.length !== 10) {
-        throw new Error(
-          "Please enter a valid 10-digit Indian mobile number."
+        recaptchaVerifierRef.current = null;
+      }
+
+      const verifier =
+        new RecaptchaVerifier(
+          auth,
+          "recaptcha-container",
+          {
+            size: "normal",
+          }
         );
-      }
 
+      recaptchaVerifierRef.current =
+        verifier;
 
-      if (
-        !recaptchaVerifierRef.current
-      ) {
-        recaptchaVerifierRef.current =
-          new RecaptchaVerifier(
-            auth,
-            "recaptcha-container",
-            {
-              size: "invisible",
-              callback: () => {},
-            }
-          );
-      }
-
+      const fullPhoneNumber =
+        "+91" + digits;
 
       const confirmation =
         await signInWithPhoneNumber(
           auth,
-          `+91${digits}`,
-          recaptchaVerifierRef.current
+          fullPhoneNumber,
+          verifier
         );
 
       setConfirmationResult(
         confirmation
       );
 
+      setOtp("");
+
       setLoginError("");
     } catch (error) {
       console.error(
-        "Phone OTP error:",
+        "OTP error:",
         error
-      );
-
-      setLoginError(
-        error?.message ||
-          "Unable to send OTP. Please try again."
       );
 
       if (
@@ -416,13 +460,18 @@ function Home() {
       ) {
         try {
           recaptchaVerifierRef.current.clear();
-        } catch {
-          // Ignore cleanup errors
+        } catch (clearError) {
+          console.log(clearError);
         }
 
         recaptchaVerifierRef.current =
           null;
       }
+
+      setLoginError(
+        error?.message ||
+          "Unable to send OTP. Please try again."
+      );
     } finally {
       setLoginLoading(false);
     }
@@ -442,7 +491,7 @@ function Home() {
       return;
     }
 
-    if (otp.length < 6) {
+    if (otp.trim().length < 6) {
       setLoginError(
         "Please enter the 6-digit OTP."
       );
@@ -455,12 +504,10 @@ function Home() {
 
     try {
       await confirmationResult.confirm(
-        otp
+        otp.trim()
       );
 
-      setShowLogin(false);
-      setOtp("");
-      setConfirmationResult(null);
+      closeLogin();
     } catch (error) {
       console.error(
         "OTP verification error:",
@@ -484,6 +531,7 @@ function Home() {
     try {
       await signOut(auth);
 
+      setUser(null);
       setShowProfile(false);
     } catch (error) {
       console.error(
@@ -495,40 +543,62 @@ function Home() {
 
 
   /* =======================================================
-     SKILL NAVIGATION
+     SKILL CLICK
      ======================================================= */
 
   const handleSkillClick = (skill) => {
-    if (!skill.active) return;
+    if (!skill.active) {
+      return;
+    }
 
-    navigate(skill.path);
+    if (skill.path) {
+      navigate(skill.path);
+    }
   };
 
 
   /* =======================================================
-     USER DISPLAY INFORMATION
+     USER DISPLAY
      ======================================================= */
 
-  const displayName =
-    user?.displayName ||
-    "SkillSensAI Learner";
+  const getUserName = () => {
+    if (!user) {
+      return "";
+    }
 
-  const displayEmail =
-    user?.email ||
-    user?.phoneNumber ||
-    "Learner";
+    if (user.displayName) {
+      return user.displayName;
+    }
+
+    if (user.phoneNumber) {
+      return user.phoneNumber;
+    }
+
+    return "Learner";
+  };
+
+
+  const getUserInitial = () => {
+    const name = getUserName();
+
+    return (
+      name
+        ?.charAt(0)
+        ?.toUpperCase() || "U"
+    );
+  };
 
 
   /* =======================================================
-     RENDER
+     JSX
      ======================================================= */
 
   return (
     <div className="home-page">
 
-      {/* ===================================================
+      {/* =================================================
           ROOM BACKGROUND
-          =================================================== */}
+          ================================================= */}
 
       <div className="room-background">
 
@@ -538,17 +608,11 @@ function Home() {
 
         <div className="room-corner-glow" />
 
-
-        {/* =================================================
-            CEILING
-            ================================================= */}
-
+        {/* Ceiling */}
         <div className="ceiling">
+
           <div className="ceiling-line" />
 
-          {/*
-            Ceiling fan intentionally removed.
-          */}
         </div>
 
 
@@ -596,504 +660,507 @@ function Home() {
 
         </div>
 
+      </div>
 
-        {/* =================================================
-            LOGIN / PROFILE
-            ================================================= */}
 
-        <div className="room-login">
+      {/* =================================================
+          LOGIN / PROFILE
+          ================================================= */}
 
-          {!user ? (
+      <div className="room-login">
+
+        {!user ? (
+
+          <button
+            type="button"
+            className="login-button"
+            onClick={openLogin}
+          >
+
+            <LogIn size={17} />
+
+            <span>
+              Login
+            </span>
+
+          </button>
+
+        ) : (
+
+          <div className="profile-area">
 
             <button
               type="button"
-              className="login-button"
-              onClick={openLogin}
-            >
-              <LogIn size={18} />
+              className="profile-button"
+              onClick={(event) => {
+                event.stopPropagation();
 
-              <span>Login</span>
+                setShowProfile(
+                  (previous) =>
+                    !previous
+                );
+              }}
+            >
+
+              <span className="profile-avatar">
+
+                {user.photoURL ? (
+
+                  <img
+                    src={user.photoURL}
+                    alt="Profile"
+                  />
+
+                ) : (
+
+                  getUserInitial()
+
+                )}
+
+              </span>
+
+              <span className="profile-name">
+                {getUserName()}
+              </span>
+
+              <ChevronDown size={15} />
+
             </button>
 
-          ) : (
 
-            <div className="profile-area">
+            {showProfile && (
 
-              <button
-                type="button"
-                className="profile-button"
-                onClick={(event) => {
-                  event.stopPropagation();
+              <div className="profile-dropdown">
 
-                  setShowProfile(
-                    (previous) =>
-                      !previous
-                  );
-                }}
-              >
+                <div className="profile-dropdown-header">
 
-                <span className="profile-avatar">
+                  <div className="profile-dropdown-avatar">
 
-                  {user.photoURL ? (
-                    <img
-                      src={user.photoURL}
-                      alt={displayName}
-                    />
-                  ) : (
-                    <User size={18} />
-                  )}
+                    {user.photoURL ? (
 
-                </span>
+                      <img
+                        src={user.photoURL}
+                        alt="Profile"
+                      />
 
-                <span className="profile-name">
-                  {displayName}
-                </span>
+                    ) : (
 
-                <ChevronDown
-                  size={16}
-                  className={
-                    showProfile
-                      ? "profile-chevron-open"
-                      : ""
-                  }
-                />
+                      getUserInitial()
 
-              </button>
-
-
-              {showProfile && (
-
-                <div className="profile-dropdown">
-
-                  <div className="profile-dropdown-header">
-
-                    <div className="profile-large-avatar">
-
-                      {user.photoURL ? (
-                        <img
-                          src={user.photoURL}
-                          alt={displayName}
-                        />
-                      ) : (
-                        <User size={24} />
-                      )}
-
-                    </div>
-
-                    <div>
-
-                      <strong>
-                        {displayName}
-                      </strong>
-
-                      <span>
-                        {displayEmail}
-                      </span>
-
-                    </div>
+                    )}
 
                   </div>
 
+                  <div className="profile-dropdown-user">
 
-                  <div className="profile-progress">
-
-                    <div className="profile-progress-icon">
-                      <BookOpen size={18} />
-                    </div>
-
-                    <div>
-
-                      <strong>
-                        {lessonsLearned}
-                      </strong>
-
-                      <span>
-                        Lessons completed
-                      </span>
-
-                    </div>
-
-                  </div>
-
-
-                  <button
-                    type="button"
-                    className="logout-button"
-                    onClick={handleLogout}
-                  >
-                    <LogOut size={17} />
+                    <strong>
+                      {getUserName()}
+                    </strong>
 
                     <span>
-                      Sign out
+                      {user.email ||
+                        user.phoneNumber ||
+                        "SkillSensAI Learner"}
                     </span>
-                  </button>
+
+                  </div>
 
                 </div>
 
-              )}
 
-            </div>
+                <div className="profile-stat">
 
-          )}
+                  <span>
+                    Lessons learned
+                  </span>
 
-        </div>
+                  <strong>
+                    {lessonsLearned}
+                  </strong>
+
+                </div>
+
+
+                <button
+                  type="button"
+                  className="logout-button"
+                  onClick={handleLogout}
+                >
+
+                  <LogOut size={16} />
+
+                  <span>
+                    Sign Out
+                  </span>
+
+                </button>
+
+              </div>
+
+            )}
+
+          </div>
+
+        )}
+
+      </div>
+
+
+      {/* =================================================
+          MAIN CONTENT
+          ================================================= */}
+
+      <main className="home-content">
+
+        {/* =================================================
+            INTRO
+            ================================================= */}
+
+        <section className="home-intro">
+
+          <span className="home-eyebrow">
+            AI-POWERED SKILL LEARNING
+          </span>
+
+          <h1>
+            Learn. Practice.{" "}
+            <span>
+              Master.
+            </span>
+          </h1>
+
+          <p>
+            Learn real-world skills with
+            guided lessons, practical
+            training and intelligent
+            feedback.
+          </p>
+
+        </section>
 
 
         {/* =================================================
-            MAIN CONTENT
+            SKILLS ROOM
             ================================================= */}
 
-        <main className="home-content">
+        <section className="skills-room">
+
 
           {/* =================================================
-              INTRO
+              SOFA
               ================================================= */}
 
-          <section className="home-intro">
+          <div className="room-sofa">
 
-            <span className="home-eyebrow">
-              AI-POWERED SKILL LEARNING
+            <div className="sofa-back">
+
+              <span className="sofa-cushion sofa-cushion-one" />
+
+              <span className="sofa-cushion sofa-cushion-two" />
+
+              <span className="sofa-cushion sofa-cushion-three" />
+
+            </div>
+
+
+            <div className="sofa-seat">
+
+              <span />
+
+            </div>
+
+
+            <div className="sofa-arm sofa-arm-left" />
+
+            <div className="sofa-arm sofa-arm-right" />
+
+            <div className="sofa-leg sofa-leg-left" />
+
+            <div className="sofa-leg sofa-leg-right" />
+
+          </div>
+
+
+          {/* =================================================
+              RUG
+              ================================================= */}
+
+          <div className="room-rug">
+
+            <div className="rug-inner" />
+
+          </div>
+
+
+          {/* =================================================
+              PLANT
+              ================================================= */}
+
+          <div className="room-plant">
+
+            <div className="plant-pot">
+              <span />
+            </div>
+
+            <div className="plant-stem stem-one" />
+
+            <div className="plant-stem stem-two" />
+
+            <div className="plant-stem stem-three" />
+
+            <div className="plant-stem stem-four" />
+
+            <span className="plant-leaf leaf-one" />
+
+            <span className="plant-leaf leaf-two" />
+
+            <span className="plant-leaf leaf-three" />
+
+            <span className="plant-leaf leaf-four" />
+
+            <span className="plant-leaf leaf-five" />
+
+            <span className="plant-leaf leaf-six" />
+
+          </div>
+
+
+          {/* =================================================
+              CHARACTER
+              ================================================= */}
+
+          <div className="character-shadow" />
+
+          <div className="samurai-container">
+
+            <div className="samurai-aura" />
+
+            <img
+              src="/samurai.png"
+              alt="SkillSensAI learner"
+              className="samurai-image"
+            />
+
+          </div>
+
+
+          {/* =================================================
+              SKILLS ORBIT
+              ================================================= */}
+
+          <div className="skills-orbit">
+
+            {skills.map(
+              (skill, index) => {
+
+                const Icon =
+                  skill.icon;
+
+                return (
+
+                  <button
+                    key={skill.name}
+                    type="button"
+                    className={`
+                      skill-circle
+                      skill-${skill.color}
+                      skill-position-${index + 1}
+                      ${
+                        skill.active
+                          ? "skill-active"
+                          : "skill-disabled"
+                      }
+                    `}
+                    onClick={() =>
+                      handleSkillClick(
+                        skill
+                      )
+                    }
+                    disabled={
+                      !skill.active
+                    }
+                  >
+
+                    <span className="skill-icon">
+
+                      <Icon size={25} />
+
+                    </span>
+
+                    <span className="skill-name">
+                      {skill.name}
+                    </span>
+
+                    {!skill.active && (
+
+                      <span className="coming-soon">
+                        Soon
+                      </span>
+
+                    )}
+
+                  </button>
+
+                );
+              }
+            )}
+
+          </div>
+
+        </section>
+
+
+        {/* =================================================
+            LEARNING JOURNEY
+            ================================================= */}
+
+        <section className="learning-flow">
+
+          <div className="flow-heading">
+
+            <span>
+              YOUR LEARNING JOURNEY
             </span>
 
-            <h1>
-              Learn. Practice.{" "}
-              <span>Master.</span>
-            </h1>
+            <h2>
+              Learn. Practice. Master.
+            </h2>
 
             <p>
-              Learn real-world skills with
-              guided lessons, practical
-              training and intelligent
-              feedback.
+              Build your skill step by
+              step with SkillSensAI.
             </p>
 
-          </section>
+          </div>
 
 
-          {/* =================================================
-              SKILL ROOM
-              ================================================= */}
+          <div className="flow-cards">
 
-          <section className="skills-room">
 
-            {/* =================================================
-                SOFA
-                ================================================= */}
+            {/* LEARN */}
 
-            <div className="room-sofa">
+            <div className="flow-card flow-learn">
 
-              <div className="sofa-back">
+              <div className="flow-card-icon">
 
-                <span
-                  className="sofa-cushion sofa-cushion-one"
-                />
-
-                <span
-                  className="sofa-cushion sofa-cushion-two"
-                />
-
-                <span
-                  className="sofa-cushion sofa-cushion-three"
-                />
+                <BookOpen size={24} />
 
               </div>
 
+              <div>
 
-              <div className="sofa-seat">
-                <span />
+                <span>
+                  01
+                </span>
+
+                <h3>
+                  Learn
+                </h3>
+
+                <p>
+                  Follow structured
+                  lessons and understand
+                  the fundamentals.
+                </p>
+
               </div>
 
-
-              <div className="sofa-arm sofa-arm-left" />
-
-              <div className="sofa-arm sofa-arm-right" />
-
-
-              <div className="sofa-leg sofa-leg-left" />
-
-              <div className="sofa-leg sofa-leg-right" />
-
-            </div>
-
-
-            {/* =================================================
-                FLOOR MAT / RUG
-                ================================================= */}
-
-            <div className="room-rug">
-
-              <div className="rug-inner" />
-
-            </div>
-
-
-            {/* =================================================
-                PLANT
-                ================================================= */}
-
-            <div className="room-plant">
-
-              <div className="plant-pot">
-                <span />
-              </div>
-
-              <div className="plant-stem stem-one" />
-
-              <div className="plant-stem stem-two" />
-
-              <div className="plant-stem stem-three" />
-
-              <div className="plant-stem stem-four" />
-
-
-              <span className="plant-leaf leaf-one" />
-
-              <span className="plant-leaf leaf-two" />
-
-              <span className="plant-leaf leaf-three" />
-
-              <span className="plant-leaf leaf-four" />
-
-              <span className="plant-leaf leaf-five" />
-
-              <span className="plant-leaf leaf-six" />
-
-            </div>
-
-
-            {/* =================================================
-                CHARACTER SHADOW
-                ================================================= */}
-
-            <div className="character-shadow" />
-
-
-            {/* =================================================
-                SAMURAI
-                ================================================= */}
-
-            <div className="samurai-container">
-
-              <div className="samurai-aura" />
-
-              <img
-                src="/samurai.png"
-                alt="SkillSensAI learner"
-                className="samurai-image"
+              <ArrowRight
+                className="flow-arrow"
+                size={20}
               />
 
             </div>
 
 
-            {/* =================================================
-                SKILL ORBIT
-                ================================================= */}
+            {/* PRACTICE */}
 
-            <div className="skills-orbit">
+            <div className="flow-card flow-practice">
 
-              {skills.map(
-                (skill, index) => {
+              <div className="flow-card-icon">
 
-                  const Icon =
-                    skill.icon;
+                <Target size={24} />
 
-                  return (
-                    <button
-                      key={skill.name}
-                      type="button"
-                      className={`
-                        skill-circle
-                        skill-${skill.color}
-                        skill-position-${index + 1}
-                        ${
-                          skill.active
-                            ? "skill-active"
-                            : "skill-disabled"
-                        }
-                      `}
-                      onClick={() =>
-                        handleSkillClick(
-                          skill
-                        )
-                      }
-                      disabled={
-                        !skill.active
-                      }
-                    >
+              </div>
 
-                      <span className="skill-icon">
+              <div>
 
-                        <Icon size={25} />
+                <span>
+                  02
+                </span>
 
-                      </span>
+                <h3>
+                  Practice
+                </h3>
 
+                <p>
+                  Record, upload and
+                  practise your skill in
+                  a practical environment.
+                </p>
 
-                      <span className="skill-name">
-                        {skill.name}
-                      </span>
+              </div>
 
-
-                      {!skill.active && (
-                        <span className="coming-soon">
-                          Soon
-                        </span>
-                      )}
-
-                    </button>
-                  );
-
-                }
-              )}
-
-            </div>
-
-          </section>
-
-
-          {/* =================================================
-              ONE — LEARN / PRACTICE / MASTER
-              ================================================= */}
-
-          <section className="learning-flow">
-
-            <div className="flow-heading">
-
-              <span>
-                YOUR LEARNING JOURNEY
-              </span>
-
-              <h2>
-                Learn. Practice. Master.
-              </h2>
-
-              <p>
-                Build your skill step by step
-                with SkillSensAI.
-              </p>
+              <ArrowRight
+                className="flow-arrow"
+                size={20}
+              />
 
             </div>
 
 
-            <div className="flow-cards">
+            {/* MASTER */}
 
-              {/* LEARN */}
+            <div className="flow-card flow-master">
 
-              <div className="flow-card flow-learn">
+              <div className="flow-card-icon">
 
-                <div className="flow-card-icon">
-                  <BookOpen size={24} />
-                </div>
-
-                <div>
-
-                  <span>01</span>
-
-                  <h3>
-                    Learn
-                  </h3>
-
-                  <p>
-                    Follow structured lessons
-                    and understand the
-                    fundamentals.
-                  </p>
-
-                </div>
-
-                <ArrowRight
-                  className="flow-arrow"
-                  size={20}
-                />
+                <Trophy size={24} />
 
               </div>
 
+              <div>
 
-              {/* PRACTICE */}
+                <span>
+                  03
+                </span>
 
-              <div className="flow-card flow-practice">
+                <h3>
+                  Master
+                </h3>
 
-                <div className="flow-card-icon">
-                  <Target size={24} />
-                </div>
-
-                <div>
-
-                  <span>02</span>
-
-                  <h3>
-                    Practice
-                  </h3>
-
-                  <p>
-                    Record, upload and
-                    practise your skill in
-                    a practical environment.
-                  </p>
-
-                </div>
-
-                <ArrowRight
-                  className="flow-arrow"
-                  size={20}
-                />
-
-              </div>
-
-
-              {/* MASTER */}
-
-              <div className="flow-card flow-master">
-
-                <div className="flow-card-icon">
-                  <Trophy size={24} />
-                </div>
-
-                <div>
-
-                  <span>03</span>
-
-                  <h3>
-                    Master
-                  </h3>
-
-                  <p>
-                    Use feedback and progress
-                    tracking to continuously
-                    improve.
-                  </p>
-
-                </div>
+                <p>
+                  Use feedback and progress
+                  tracking to continuously
+                  improve.
+                </p>
 
               </div>
 
             </div>
 
-
-            {/* =================================================
-                BOTTOM NOTE
-                ================================================= */}
-
-            <div className="home-bottom-note">
-
-              <Sparkles size={16} />
-
-              <span>
-                Your progress grows with
-                every practice.
-              </span>
-
-            </div>
-
-          </section>
-
-        </main>
-
-      </div>
+          </div>
 
 
-      {/* =====================================================
+          <div className="home-bottom-note">
+
+            <Sparkles size={16} />
+
+            <span>
+              Your progress grows with
+              every practice.
+            </span>
+
+          </div>
+
+        </section>
+
+      </main>
+
+
+      {/* =================================================
           LOGIN MODAL
-          ===================================================== */}
+          ================================================= */}
 
       {showLogin && (
 
@@ -1113,6 +1180,7 @@ function Home() {
 
           <div className="login-modal">
 
+
             {/* CLOSE */}
 
             <button
@@ -1121,7 +1189,9 @@ function Home() {
               onClick={closeLogin}
               aria-label="Close login"
             >
+
               <X size={20} />
+
             </button>
 
 
@@ -1130,7 +1200,9 @@ function Home() {
             <div className="login-header">
 
               <div className="login-shield">
-                <ShieldCheck size={28} />
+
+                <ShieldCheck size={29} />
+
               </div>
 
               <h2>
@@ -1145,51 +1217,78 @@ function Home() {
             </div>
 
 
-            {/* TABS */}
+            {/* =================================================
+                TABS
+                ================================================= */}
 
             <div className="login-tabs">
 
               <button
                 type="button"
-                className={
+                className={`login-tab ${
                   loginMethod === "google"
-                    ? "login-tab active"
-                    : "login-tab"
-                }
+                    ? "active"
+                    : ""
+                }`}
                 onClick={() => {
-                  setLoginMethod("google");
+
+                  setLoginMethod(
+                    "google"
+                  );
+
                   setLoginError("");
+
                 }}
               >
-                <Mail size={17} />
+
+                <span
+                  style={{
+                    fontWeight: 900,
+                    color: "#4285F4",
+                  }}
+                >
+                  G
+                </span>
+
                 Google
+
               </button>
 
 
               <button
                 type="button"
-                className={
+                className={`login-tab ${
                   loginMethod === "phone"
-                    ? "login-tab active"
-                    : "login-tab"
-                }
+                    ? "active"
+                    : ""
+                }`}
                 onClick={() => {
-                  setLoginMethod("phone");
+
+                  setLoginMethod(
+                    "phone"
+                  );
+
                   setLoginError("");
+
                 }}
               >
-                <Phone size={17} />
+
+                <Phone size={15} />
+
                 Phone
+
               </button>
 
             </div>
 
 
-            {/* GOOGLE */}
+            {/* =================================================
+                GOOGLE LOGIN
+                ================================================= */}
 
             {loginMethod === "google" && (
 
-              <div className="login-method-content">
+              <div>
 
                 <button
                   type="button"
@@ -1197,22 +1296,30 @@ function Home() {
                   onClick={
                     handleGoogleLogin
                   }
-                  disabled={loginLoading}
+                  disabled={
+                    loginLoading
+                  }
                 >
 
                   {loginLoading ? (
+
                     <Loader2
-                      size={20}
+                      size={19}
                       className="login-spinner"
                     />
+
                   ) : (
-                    <span className="google-logo">
+
+                    <span className="google-letter">
                       G
                     </span>
+
                   )}
 
                   <span>
-                    Continue with Google
+                    {loginLoading
+                      ? "Signing in..."
+                      : "Continue with Google"}
                   </span>
 
                 </button>
@@ -1222,147 +1329,157 @@ function Home() {
             )}
 
 
-            {/* PHONE */}
+            {/* =================================================
+                PHONE LOGIN
+                ================================================= */}
 
             {loginMethod === "phone" && (
 
-              <div className="login-method-content">
-
-                <label className="login-label">
-                  Mobile number
-                </label>
-
-                <div className="login-input-wrapper">
-
-                  <Phone size={18} />
-
-                  <input
-                    type="tel"
-                    value={phoneNumber}
-                    onChange={
-                      handlePhoneChange
-                    }
-                    placeholder="+91 9876543210"
-                    disabled={
-                      loginLoading ||
-                      !!confirmationResult
-                    }
-                  />
-
-                </div>
+              <div className="phone-login-container">
 
 
                 {!confirmationResult ? (
 
-                  <button
-                    type="button"
-                    className="otp-button"
-                    onClick={sendOtp}
-                    disabled={loginLoading}
-                  >
-
-                    {loginLoading ? (
-                      <>
-                        <Loader2
-                          size={18}
-                          className="login-spinner"
-                        />
-
-                        Sending OTP...
-                      </>
-                    ) : (
-                      <>
-                        Send OTP
-                        <ArrowRight
-                          size={18}
-                        />
-                      </>
-                    )}
-
-                  </button>
-
-                ) : (
-
                   <>
 
-                    <label className="login-label">
-                      Enter OTP
-                    </label>
+                    <input
+                      type="tel"
+                      className="phone-login-input"
+                      value={phoneNumber}
+                      onChange={
+                        handlePhoneChange
+                      }
+                      placeholder="+91 9876543210"
+                      maxLength={14}
+                      autoComplete="tel"
+                    />
 
-                    <div className="login-input-wrapper">
 
-                      <ShieldCheck
-                        size={18}
-                      />
-
-                      <input
-                        type="text"
-                        value={otp}
-                        onChange={(event) =>
-                          setOtp(
-                            event.target.value
-                              .replace(
-                                /\D/g,
-                                ""
-                              )
-                              .slice(0, 6)
-                          )
-                        }
-                        placeholder="6-digit OTP"
-                        inputMode="numeric"
-                        autoComplete="one-time-code"
-                        disabled={
-                          loginLoading
-                        }
-                      />
-
-                    </div>
+                    <div
+                      id="recaptcha-container"
+                      className="phone-recaptcha"
+                    />
 
 
                     <button
                       type="button"
-                      className="otp-button"
-                      onClick={
-                        verifyOtp
-                      }
+                      className="send-otp-button"
+                      onClick={sendOtp}
                       disabled={
                         loginLoading
                       }
                     >
 
                       {loginLoading ? (
-                        <>
-                          <Loader2
-                            size={18}
-                            className="login-spinner"
-                          />
 
-                          Verifying...
-                        </>
+                        <Loader2
+                          size={18}
+                          className="login-spinner"
+                        />
+
                       ) : (
-                        <>
-                          Verify OTP
-                          <ArrowRight
-                            size={18}
-                          />
-                        </>
+
+                        <Phone size={18} />
+
                       )}
+
+                      <span>
+                        {loginLoading
+                          ? "Sending OTP..."
+                          : "Send OTP"}
+                      </span>
+
+                    </button>
+
+                  </>
+
+                ) : (
+
+                  <>
+
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      className="otp-input"
+                      value={otp}
+                      onChange={(event) =>
+                        setOtp(
+                          event.target.value
+                            .replace(
+                              /\D/g,
+                              ""
+                            )
+                            .slice(0, 6)
+                        )
+                      }
+                      placeholder="Enter 6-digit OTP"
+                      maxLength={6}
+                      autoComplete="one-time-code"
+                    />
+
+
+                    <button
+                      type="button"
+                      className="verify-otp-button"
+                      onClick={verifyOtp}
+                      disabled={
+                        loginLoading
+                      }
+                    >
+
+                      {loginLoading ? (
+
+                        <Loader2
+                          size={18}
+                          className="login-spinner"
+                        />
+
+                      ) : (
+
+                        <ShieldCheck size={18} />
+
+                      )}
+
+                      <span>
+                        {loginLoading
+                          ? "Verifying..."
+                          : "Verify OTP"}
+                      </span>
 
                     </button>
 
 
                     <button
                       type="button"
-                      className="change-number-button"
+                      className="change-phone-button"
                       onClick={() => {
+
                         setConfirmationResult(
                           null
                         );
+
                         setOtp("");
+
                         setLoginError("");
+
+                        if (
+                          recaptchaVerifierRef.current
+                        ) {
+                          try {
+                            recaptchaVerifierRef.current.clear();
+                          } catch (error) {
+                            console.log(
+                              error
+                            );
+                          }
+
+                          recaptchaVerifierRef.current =
+                            null;
+                        }
+
                       }}
                     >
-                      Change number
+                      Change phone number
                     </button>
 
                   </>
@@ -1374,36 +1491,35 @@ function Home() {
             )}
 
 
-            {/* ERROR */}
+            {/* =================================================
+                ERROR
+                ================================================= */}
 
             {loginError && (
 
-              <div className="login-error">
+              <div className="login-message">
                 {loginError}
               </div>
 
             )}
 
 
-            {/* SECURITY */}
+            {/* =================================================
+                SECURITY NOTE
+                ================================================= */}
 
-            <div className="login-security">
+            <div className="login-security-note">
 
               <ShieldCheck size={16} />
 
               <span>
                 Your account is securely
-                authenticated by Firebase.
+                authenticated using Firebase.
+                Your learning progress stays
+                connected to your account.
               </span>
 
             </div>
-
-
-            {/* INVISIBLE RECAPTCHA */}
-
-            <div
-              id="recaptcha-container"
-            />
 
           </div>
 
@@ -1414,6 +1530,3 @@ function Home() {
     </div>
   );
 }
-
-
-export default Home;
