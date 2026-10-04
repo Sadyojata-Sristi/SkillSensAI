@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -12,11 +12,16 @@ import {
   User,
   LogOut,
   ChevronDown,
+  Loader2,
 } from "lucide-react";
 
 import {
   onAuthStateChanged,
   signOut,
+  GoogleAuthProvider,
+  signInWithPopup,
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
 } from "firebase/auth";
 
 import { auth } from "../firebase";
@@ -29,13 +34,18 @@ import "./Home.css";
 import "./LoginModal.css";
 
 
+/* =========================================================
+   SKILLSENSAI — HOME PAGE
+   REAL FIREBASE AUTHENTICATION
+   ========================================================= */
+
 function Home() {
 
   const navigate = useNavigate();
 
   /* =========================================================
      AUTH
-  ========================================================= */
+     ========================================================= */
 
   const [user, setUser] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
@@ -56,14 +66,14 @@ function Home() {
 
   /* =========================================================
      LOGIN MODAL
-  ========================================================= */
+     ========================================================= */
 
   const [showLogin, setShowLogin] = useState(false);
 
 
   /* =========================================================
      PROGRESS
-  ========================================================= */
+     ========================================================= */
 
   const [lessonsLearned, setLessonsLearned] =
     useState(() => getLessonsLearned());
@@ -95,8 +105,21 @@ function Home() {
 
 
   /* =========================================================
+     CLOSE LOGIN WHEN AUTHENTICATED
+     ========================================================= */
+
+  useEffect(() => {
+
+    if (user) {
+      setShowLogin(false);
+    }
+
+  }, [user]);
+
+
+  /* =========================================================
      LOGOUT
-  ========================================================= */
+     ========================================================= */
 
   const handleLogout = async () => {
 
@@ -113,6 +136,10 @@ function Home() {
         error
       );
 
+      alert(
+        "Unable to sign out. Please try again."
+      );
+
     }
 
   };
@@ -120,7 +147,7 @@ function Home() {
 
   /* =========================================================
      SKILLS
-  ========================================================= */
+     ========================================================= */
 
   const skills = [
 
@@ -191,14 +218,12 @@ function Home() {
 
   /* =========================================================
      SKILL CLICK
-  ========================================================= */
+     ========================================================= */
 
   const handleSkillClick = (skill) => {
 
     if (!skill.active) {
-
       return;
-
     }
 
     navigate(skill.route);
@@ -208,7 +233,7 @@ function Home() {
 
   /* =========================================================
      RENDER
-  ========================================================= */
+     ========================================================= */
 
   return (
 
@@ -216,7 +241,7 @@ function Home() {
 
       {/* =====================================================
           NAVBAR
-      ===================================================== */}
+          ===================================================== */}
 
       <header className="home-navbar">
 
@@ -358,7 +383,7 @@ function Home() {
 
       {/* =====================================================
           HERO
-      ===================================================== */}
+          ===================================================== */}
 
       <main className="home-main">
 
@@ -435,8 +460,8 @@ function Home() {
 
 
           {/* =================================================
-              SAMURAI / CHARACTER
-          ================================================= */}
+              CHARACTER
+              ================================================= */}
 
           <div className="home-character">
 
@@ -455,7 +480,7 @@ function Home() {
 
         {/* =====================================================
             SKILLS
-        ===================================================== */}
+            ===================================================== */}
 
         <section className="skills-section">
 
@@ -529,7 +554,7 @@ function Home() {
 
         {/* =====================================================
             VALUE PROPOSITION
-        ===================================================== */}
+            ===================================================== */}
 
         <section className="home-value-section">
 
@@ -614,7 +639,7 @@ function Home() {
 
       {/* =====================================================
           LOGIN MODAL
-      ===================================================== */}
+          ===================================================== */}
 
       {showLogin && (
 
@@ -635,23 +660,451 @@ function Home() {
 
 /* ============================================================
    LOGIN MODAL
+   REAL GOOGLE + PHONE OTP FIREBASE AUTH
    ============================================================ */
 
 function LoginModal({ onClose }) {
 
-  /*
-     IMPORTANT:
-     We intentionally keep the authentication
-     implementation inside the modal component.
-
-     Your existing Firebase login logic can be
-     connected here without changing the Home
-     page structure.
-  */
-
   const [activeTab, setActiveTab] =
     useState("google");
 
+  const [phoneNumber, setPhoneNumber] =
+    useState("");
+
+  const [otp, setOtp] =
+    useState("");
+
+  const [confirmationResult, setConfirmationResult] =
+    useState(null);
+
+  const [loading, setLoading] =
+    useState(false);
+
+  const [errorMessage, setErrorMessage] =
+    useState("");
+
+  const recaptchaVerifierRef =
+    useRef(null);
+
+
+  /* =========================================================
+     CLEANUP RECAPTCHA
+     ========================================================= */
+
+  useEffect(() => {
+
+    return () => {
+
+      try {
+
+        if (recaptchaVerifierRef.current) {
+
+          recaptchaVerifierRef.current.clear();
+
+          recaptchaVerifierRef.current = null;
+
+        }
+
+      } catch (error) {
+
+        console.error(
+          "reCAPTCHA cleanup failed:",
+          error
+        );
+
+      }
+
+    };
+
+  }, []);
+
+
+  /* =========================================================
+     RESET TAB STATE
+     ========================================================= */
+
+  const handleTabChange = (tab) => {
+
+    setActiveTab(tab);
+
+    setErrorMessage("");
+
+    setOtp("");
+
+    setConfirmationResult(null);
+
+  };
+
+
+  /* =========================================================
+     GOOGLE LOGIN
+     ========================================================= */
+
+  const handleGoogleLogin = async () => {
+
+    setLoading(true);
+    setErrorMessage("");
+
+    try {
+
+      const provider =
+        new GoogleAuthProvider();
+
+      provider.setCustomParameters({
+        prompt: "select_account",
+      });
+
+      await signInWithPopup(
+        auth,
+        provider
+      );
+
+      onClose();
+
+    } catch (error) {
+
+      console.error(
+        "Google login failed:",
+        error
+      );
+
+      if (
+        error.code ===
+        "auth/popup-closed-by-user"
+      ) {
+
+        setErrorMessage(
+          "Google sign-in was cancelled."
+        );
+
+      } else if (
+        error.code ===
+        "auth/popup-blocked"
+      ) {
+
+        setErrorMessage(
+          "Your browser blocked the Google sign-in popup. Please allow popups for SkillSensAI."
+        );
+
+      } else {
+
+        setErrorMessage(
+          error.message ||
+          "Google sign-in failed. Please try again."
+        );
+
+      }
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  };
+
+
+  /* =========================================================
+     PHONE NUMBER FORMAT
+     ========================================================= */
+
+  const formatPhoneNumber = (value) => {
+
+    let cleaned =
+      value.replace(/\D/g, "");
+
+    /*
+      Automatically handle:
+
+      9876543210
+      919876543210
+      +919876543210
+    */
+
+    if (cleaned.startsWith("91")) {
+
+      cleaned =
+        cleaned.substring(2);
+
+    }
+
+    cleaned =
+      cleaned.substring(0, 10);
+
+    if (!cleaned) {
+      return "";
+    }
+
+    return `+91${cleaned}`;
+
+  };
+
+
+  /* =========================================================
+     PHONE INPUT
+     ========================================================= */
+
+  const handlePhoneChange = (event) => {
+
+    const formatted =
+      formatPhoneNumber(
+        event.target.value
+      );
+
+    setPhoneNumber(formatted);
+
+    setErrorMessage("");
+
+  };
+
+
+  /* =========================================================
+     CREATE RECAPTCHA
+     ========================================================= */
+
+  const createRecaptcha = () => {
+
+    if (
+      recaptchaVerifierRef.current
+    ) {
+
+      return recaptchaVerifierRef.current;
+
+    }
+
+    recaptchaVerifierRef.current =
+      new RecaptchaVerifier(
+        auth,
+        "recaptcha-container",
+        {
+          size: "invisible",
+
+          callback: () => {
+            console.log(
+              "reCAPTCHA verified."
+            );
+          },
+
+          "expired-callback": () => {
+
+            console.log(
+              "reCAPTCHA expired."
+            );
+
+          },
+
+        }
+      );
+
+    return recaptchaVerifierRef.current;
+
+  };
+
+
+  /* =========================================================
+     SEND OTP
+     ========================================================= */
+
+  const handleSendOTP = async () => {
+
+    setErrorMessage("");
+
+    const digits =
+      phoneNumber.replace(/\D/g, "");
+
+    if (digits.length !== 12) {
+
+      setErrorMessage(
+        "Please enter a valid 10-digit Indian mobile number."
+      );
+
+      return;
+
+    }
+
+    setLoading(true);
+
+    try {
+
+      const appVerifier =
+        createRecaptcha();
+
+      const result =
+        await signInWithPhoneNumber(
+          auth,
+          phoneNumber,
+          appVerifier
+        );
+
+      setConfirmationResult(result);
+
+      setOtp("");
+
+    } catch (error) {
+
+      console.error(
+        "Phone OTP failed:",
+        error
+      );
+
+      /*
+        Reset reCAPTCHA if Firebase
+        reports a reCAPTCHA problem.
+      */
+
+      try {
+
+        if (recaptchaVerifierRef.current) {
+
+          recaptchaVerifierRef.current.clear();
+
+          recaptchaVerifierRef.current =
+            null;
+
+        }
+
+      } catch (cleanupError) {
+
+        console.error(
+          "reCAPTCHA reset failed:",
+          cleanupError
+        );
+
+      }
+
+
+      if (
+        error.code ===
+        "auth/invalid-phone-number"
+      ) {
+
+        setErrorMessage(
+          "The phone number is invalid."
+        );
+
+      } else if (
+        error.code ===
+        "auth/too-many-requests"
+      ) {
+
+        setErrorMessage(
+          "Too many attempts. Please wait and try again."
+        );
+
+      } else if (
+        error.code ===
+        "auth/quota-exceeded"
+      ) {
+
+        setErrorMessage(
+          "SMS quota exceeded for this Firebase project."
+        );
+
+      } else {
+
+        setErrorMessage(
+          error.message ||
+          "Unable to send OTP. Please try again."
+        );
+
+      }
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  };
+
+
+  /* =========================================================
+     VERIFY OTP
+     ========================================================= */
+
+  const handleVerifyOTP = async () => {
+
+    if (!confirmationResult) {
+
+      setErrorMessage(
+        "Please request an OTP first."
+      );
+
+      return;
+
+    }
+
+    if (
+      otp.trim().length !== 6
+    ) {
+
+      setErrorMessage(
+        "Please enter the 6-digit OTP."
+      );
+
+      return;
+
+    }
+
+    setLoading(true);
+    setErrorMessage("");
+
+    try {
+
+      await confirmationResult.confirm(
+        otp.trim()
+      );
+
+      onClose();
+
+    } catch (error) {
+
+      console.error(
+        "OTP verification failed:",
+        error
+      );
+
+      if (
+        error.code ===
+        "auth/invalid-verification-code"
+      ) {
+
+        setErrorMessage(
+          "Incorrect OTP. Please check the code and try again."
+        );
+
+      } else if (
+        error.code ===
+        "auth/code-expired"
+      ) {
+
+        setErrorMessage(
+          "This OTP has expired. Please request a new one."
+        );
+
+        setConfirmationResult(null);
+
+      } else {
+
+        setErrorMessage(
+          error.message ||
+          "OTP verification failed."
+        );
+
+      }
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  };
+
+
+  /* =========================================================
+     RENDER
+     ========================================================= */
 
   return (
 
@@ -663,7 +1116,9 @@ function LoginModal({ onClose }) {
           event.target ===
           event.currentTarget
         ) {
+
           onClose();
+
         }
 
       }}
@@ -671,13 +1126,18 @@ function LoginModal({ onClose }) {
 
       <div className="login-modal">
 
+        {/* CLOSE */}
+
         <button
           className="login-close"
           onClick={onClose}
+          disabled={loading}
         >
           ×
         </button>
 
+
+        {/* HEADER */}
 
         <div className="login-header">
 
@@ -697,6 +1157,8 @@ function LoginModal({ onClose }) {
         </div>
 
 
+        {/* TABS */}
+
         <div className="login-tabs">
 
           <button
@@ -706,8 +1168,9 @@ function LoginModal({ onClose }) {
                 : "login-tab"
             }
             onClick={() =>
-              setActiveTab("google")
+              handleTabChange("google")
             }
+            disabled={loading}
           >
             Google
           </button>
@@ -719,8 +1182,9 @@ function LoginModal({ onClose }) {
                 : "login-tab"
             }
             onClick={() =>
-              setActiveTab("phone")
+              handleTabChange("phone")
             }
+            disabled={loading}
           >
             Phone
           </button>
@@ -728,53 +1192,236 @@ function LoginModal({ onClose }) {
         </div>
 
 
-        {activeTab === "google" ? (
+        {/* ERROR */}
 
-          <button
-            className="google-login-button"
-            onClick={() => {
+        {errorMessage && (
 
-              /*
-                The existing Google Firebase
-                handler should be connected here.
-              */
+          <div className="login-error">
 
-              console.log(
-                "Google login"
-              );
-
-            }}
-          >
-
-            Continue with Google
-
-          </button>
-
-        ) : (
-
-          <div className="phone-login-placeholder">
-
-            <p>
-              Enter your phone number to
-              continue with OTP verification.
-            </p>
-
-            <input
-              type="tel"
-              placeholder="+91 XXXXX XXXXX"
-              className="phone-login-input"
-            />
-
-            <button
-              className="phone-login-button"
-            >
-              Send OTP
-            </button>
+            {errorMessage}
 
           </div>
 
         )}
 
+
+        {/* ===================================================
+            GOOGLE
+            =================================================== */}
+
+        {activeTab === "google" ? (
+
+          <button
+            className="google-login-button"
+            onClick={handleGoogleLogin}
+            disabled={loading}
+          >
+
+            {loading ? (
+
+              <>
+                <Loader2
+                  size={19}
+                  className="login-spinner"
+                />
+
+                Signing in...
+
+              </>
+
+            ) : (
+
+              <>
+                <span className="google-g-icon">
+                  G
+                </span>
+
+                Continue with Google
+
+              </>
+
+            )}
+
+          </button>
+
+        ) : (
+
+          /* =================================================
+             PHONE
+             ================================================= */
+
+          <div className="phone-login-container">
+
+            {!confirmationResult ? (
+
+              <>
+
+                <p className="phone-login-description">
+
+                  Enter your mobile number.
+                  We'll send you a verification
+                  code.
+
+                </p>
+
+
+                <input
+                  type="tel"
+                  value={
+                    phoneNumber
+                      ? phoneNumber
+                          .replace(
+                            "+91",
+                            "+91 "
+                          )
+                      : ""
+                  }
+                  onChange={
+                    handlePhoneChange
+                  }
+                  placeholder="+91 XXXXX XXXXX"
+                  className="phone-login-input"
+                  disabled={loading}
+                  maxLength={14}
+                />
+
+
+                <button
+                  className="phone-login-button"
+                  onClick={
+                    handleSendOTP
+                  }
+                  disabled={loading}
+                >
+
+                  {loading ? (
+
+                    <>
+                      <Loader2
+                        size={18}
+                        className="login-spinner"
+                      />
+
+                      Sending OTP...
+
+                    </>
+
+                  ) : (
+
+                    "Send OTP"
+
+                  )}
+
+                </button>
+
+              </>
+
+            ) : (
+
+              <>
+
+                <p className="phone-login-description">
+
+                  Enter the 6-digit OTP sent
+                  to{" "}
+
+                  <strong>
+                    {phoneNumber}
+                  </strong>
+
+                </p>
+
+
+                <input
+                  type="text"
+                  value={otp}
+                  onChange={(event) => {
+
+                    const value =
+                      event.target.value
+                        .replace(/\D/g, "")
+                        .substring(0, 6);
+
+                    setOtp(value);
+
+                    setErrorMessage("");
+
+                  }}
+                  placeholder="Enter OTP"
+                  className="phone-login-input otp-input"
+                  inputMode="numeric"
+                  maxLength={6}
+                  disabled={loading}
+                  autoFocus
+                />
+
+
+                <button
+                  className="phone-login-button"
+                  onClick={
+                    handleVerifyOTP
+                  }
+                  disabled={loading}
+                >
+
+                  {loading ? (
+
+                    <>
+                      <Loader2
+                        size={18}
+                        className="login-spinner"
+                      />
+
+                      Verifying...
+
+                    </>
+
+                  ) : (
+
+                    "Verify OTP"
+
+                  )}
+
+                </button>
+
+
+                <button
+                  className="change-number-button"
+                  onClick={() => {
+
+                    setConfirmationResult(
+                      null
+                    );
+
+                    setOtp("");
+
+                    setErrorMessage("");
+
+                  }}
+                  disabled={loading}
+                >
+
+                  Change phone number
+
+                </button>
+
+              </>
+
+            )}
+
+
+            {/* REQUIRED FOR FIREBASE PHONE AUTH */}
+
+            <div
+              id="recaptcha-container"
+            />
+
+          </div>
+
+        )}
+
+
+        {/* FOOTER */}
 
         <p className="login-footer">
 
