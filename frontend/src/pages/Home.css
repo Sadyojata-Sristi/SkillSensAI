@@ -3436,3 +3436,1396 @@ body.skillsensai-dark-theme {
 .skillsensai-dark-theme .room-background {
   background-color: #080510 !important;
 }
+
+/* =========================================================
+   SKILLSENSAI — ACCOUNT / PROFILE SYSTEM
+   ========================================================= */
+
+
+/* ---------------------------------------------------------
+   ACCOUNT DROPDOWN
+--------------------------------------------------------- */
+
+.account-dropdown {
+  width: 390px !important;
+  max-width: calc(100vw - 28px);
+  padding: 0 !important;
+  overflow: hidden;
+  animation: accountDropdownIn 0.18s ease-out;
+}
+
+@keyframes accountDropdownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+
+/* ---------------------------------------------------------
+   ACCOUNT HEADER
+--------------------------------------------------------- */
+
+.account-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 18px 18px 15px;
+}
+
+.account-header-avatar {
+  width: 54px;
+  height: 54px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7658f6,
+      #5b43d4
+    );
+
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 800;
+
+  box-shadow:
+    0 8px 20px
+    rgba(91, 67, 212, 0.25);
+}
+
+.account-header-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.account-header-info {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.account-header-info strong {
+  color: var(--room-text);
+  font-size: 15px;
+  font-weight: 800;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.account-header-info span {
+  color: var(--room-muted);
+  font-size: 11px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* ---------------------------------------------------------
+   ACCOUNT TABS
+--------------------------------------------------------- */
+
+.account-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  margin: 0 12px;
+
+  padding: 4px;
+
+  border-radius: 12px;
+
+  background:
+    rgba(118, 88, 246, 0.08);
+
+  border:
+    1px solid
+    rgba(118, 88, 246, 0.10);
+}
+
+.account-tab {
+  border: none;
+  background: transparent;
+
+  min-height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  border-radius: 9px;
+
+  color: var(--room-muted);
+
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.account-tab:hover {
+  color: var(--purple);
+}
+
+.account-tab.active {
+  background:
+    rgba(255, 255, 255, 0.82);
+
+  color: var(--purple-dark);
+
+  box-shadow:
+    0 4px 12px
+    rgba(80, 60, 130, 0.10);
+}
+
+.account-tab:active {
+  transform: scale(0.97);
+}
+
+
+/* ---------------------------------------------------------
+   ACCOUNT CONTENT
+--------------------------------------------------------- */
+
+.account-panel-content {
+  padding: 18px;
+  max-height: 470px;
+  overflow-y: auto;
+}
+
+.account-panel-content::-webkit-scrollbar {
+  width: 5px;
+}
+
+.account-panel-content::-webkit-scrollbar-thumb {
+  border-radius: 20px;
+  background: rgba(118, 88, 246, 0.25);
+}
+
+
+/* ---------------------------------------------------------
+   PROFILE
+--------------------------------------------------------- */
+
+.account-profile-photo-section {
+  position: relative;
+
+  width: 82px;
+  height: 82px;
+
+  margin: 2px auto 16px;
+}
+
+.large-profile-avatar {
+  width: 82px;
+  height: 82px;
+
+  border-radius: 50%;
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7658f6,
+      #5b43d4
+    );
+
+  color: #ffffff;
+
+  font-size: 28px;
+  font-weight: 800;
+
+  border:
+    3px solid
+    rgba(255, 255, 255, 0.75);
+
+  box-shadow:
+    0 10px 28px
+    rgba(91, 67, 212, 0.22);
+}
+
+.large-profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-camera-button {
+  position: absolute;
+
+  right: -2px;
+  bottom: -2px;
+
+  width: 30px;
+  height: 30px;
+
+  border: 2px solid #ffffff;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7658f6,
+      #5b43d4
+    );
+
+  color: #ffffff;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 5px 14px
+    rgba(0, 0, 0, 0.18);
+
+  transition:
+    transform 0.18s ease,
+    filter 0.18s ease;
+}
+
+.profile-camera-button:hover {
+  transform: scale(1.08);
+  filter: brightness(1.08);
+}
+
+.account-name-section,
+.account-contact-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  padding: 11px 12px;
+
+  margin-bottom: 8px;
+
+  border-radius: 11px;
+
+  background:
+    rgba(118, 88, 246, 0.055);
+
+  border:
+    1px solid
+    rgba(118, 88, 246, 0.08);
+}
+
+.account-label {
+  color: var(--room-muted);
+
+  font-size: 9px;
+  font-weight: 800;
+
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.account-name-section strong {
+  color: var(--room-text);
+  font-size: 13px;
+}
+
+.account-contact-section span:last-child {
+  color: var(--room-text);
+
+  font-size: 11px;
+
+  word-break: break-word;
+}
+
+
+/* ---------------------------------------------------------
+   ACCOUNT STATS
+--------------------------------------------------------- */
+
+.account-stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  gap: 8px;
+
+  margin-top: 10px;
+}
+
+.account-stat {
+  min-height: 75px;
+
+  padding: 11px;
+
+  border-radius: 12px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+
+  background:
+    rgba(255, 255, 255, 0.58);
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.72);
+
+  box-shadow:
+    0 5px 16px
+    rgba(70, 55, 45, 0.06);
+}
+
+.account-stat svg {
+  color: var(--purple);
+  margin-bottom: 5px;
+}
+
+.account-stat strong {
+  color: var(--room-text);
+  font-size: 17px;
+  line-height: 1;
+}
+
+.account-stat span {
+  margin-top: 4px;
+
+  color: var(--room-muted);
+
+  font-size: 9px;
+  font-weight: 700;
+}
+
+
+/* ---------------------------------------------------------
+   ACCOUNT PROGRESS
+--------------------------------------------------------- */
+
+.account-progress-section {
+  margin-top: 12px;
+}
+
+.account-progress-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 7px;
+
+  color: var(--room-muted);
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.account-progress-heading strong {
+  color: var(--purple-dark);
+}
+
+.account-progress-bar {
+  width: 100%;
+  height: 7px;
+
+  overflow: hidden;
+
+  border-radius: 20px;
+
+  background:
+    rgba(118, 88, 246, 0.12);
+}
+
+.account-progress-fill {
+  height: 100%;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      90deg,
+      #7658f6,
+      #5b43d4
+    );
+
+  transition:
+    width 0.4s ease;
+}
+
+
+/* ---------------------------------------------------------
+   ACCOUNT BUTTONS
+--------------------------------------------------------- */
+
+.account-settings-button {
+  width: 100%;
+
+  margin-top: 14px;
+
+  min-height: 42px;
+
+  border: none;
+  border-radius: 11px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  background:
+    rgba(118, 88, 246, 0.10);
+
+  color: var(--purple-dark);
+
+  font-family: inherit;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    background 0.18s ease,
+    transform 0.18s ease;
+}
+
+.account-settings-button:hover {
+  background:
+    rgba(118, 88, 246, 0.16);
+}
+
+.account-settings-button:active {
+  transform: scale(0.98);
+}
+
+
+/* ---------------------------------------------------------
+   SKILLS LIST
+--------------------------------------------------------- */
+
+.account-section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  margin-bottom: 13px;
+}
+
+.account-section-title h3 {
+  margin: 0;
+
+  color: var(--room-text);
+
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.account-section-title p {
+  margin: 4px 0 0;
+
+  color: var(--room-muted);
+
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.account-skills-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.account-skill-card {
+  width: 100%;
+
+  min-height: 70px;
+
+  border: 1px solid
+    rgba(255, 255, 255, 0.68);
+
+  border-radius: 13px;
+
+  padding: 10px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  text-align: left;
+
+  background:
+    rgba(255, 255, 255, 0.58);
+
+  font-family: inherit;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+}
+
+.account-skill-card:hover {
+  transform: translateY(-1px);
+
+  background:
+    rgba(255, 255, 255, 0.78);
+
+  box-shadow:
+    0 7px 18px
+    rgba(70, 55, 45, 0.08);
+}
+
+.account-skill-icon {
+  width: 38px;
+  height: 38px;
+
+  flex-shrink: 0;
+
+  border-radius: 11px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #ffffff;
+}
+
+.skill-card-music
+.account-skill-icon {
+  background:
+    linear-gradient(
+      135deg,
+      #8b69ff,
+      #6245d8
+    );
+}
+
+.skill-card-martial
+.account-skill-icon {
+  background:
+    linear-gradient(
+      135deg,
+      #ed6868,
+      #b83745
+    );
+}
+
+.account-skill-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.account-skill-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  margin-bottom: 6px;
+}
+
+.account-skill-title-row strong {
+  color: var(--room-text);
+
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.account-skill-title-row span {
+  color: var(--purple-dark);
+
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.account-skill-progress {
+  width: 100%;
+  height: 5px;
+
+  overflow: hidden;
+
+  border-radius: 20px;
+
+  background:
+    rgba(118, 88, 246, 0.10);
+}
+
+.account-skill-progress div {
+  height: 100%;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      90deg,
+      #7658f6,
+      #5b43d4
+    );
+
+  transition:
+    width 0.35s ease;
+}
+
+.account-skill-card small {
+  display: block;
+
+  margin-top: 5px;
+
+  color: var(--room-muted);
+
+  font-size: 8px;
+}
+
+.skill-card-martial
+.account-skill-progress div {
+  background:
+    linear-gradient(
+      90deg,
+      #ed6868,
+      #b83745
+    );
+}
+
+.skill-card-arrow {
+  color: var(--room-muted);
+
+  transform: rotate(-90deg);
+}
+
+.coming-skills-account {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+
+  margin-top: 12px;
+  padding: 10px;
+
+  border-radius: 10px;
+
+  background:
+    rgba(118, 88, 246, 0.06);
+
+  color: var(--room-muted);
+
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+
+/* ---------------------------------------------------------
+   SELECTED SKILL DETAIL
+--------------------------------------------------------- */
+
+.account-back-button {
+  border: none;
+  background: transparent;
+
+  padding: 0;
+  margin-bottom: 16px;
+
+  color: var(--purple-dark);
+
+  font-family: inherit;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.selected-skill-detail {
+  text-align: center;
+}
+
+.selected-skill-icon {
+  width: 64px;
+  height: 64px;
+
+  margin: 0 auto 12px;
+
+  border-radius: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #ffffff;
+
+  box-shadow:
+    0 10px 24px
+    rgba(91, 67, 212, 0.18);
+}
+
+.selected-skill-icon.skill-music {
+  background:
+    linear-gradient(
+      135deg,
+      #8b69ff,
+      #6245d8
+    );
+}
+
+.selected-skill-icon.skill-martial {
+  background:
+    linear-gradient(
+      135deg,
+      #ed6868,
+      #b83745
+    );
+}
+
+.selected-skill-detail h3 {
+  margin: 0;
+
+  color: var(--room-text);
+
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.selected-skill-detail > p {
+  margin: 6px auto 16px;
+
+  max-width: 285px;
+
+  color: var(--room-muted);
+
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.selected-skill-stat {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 6px;
+}
+
+.selected-skill-stat > div {
+  padding: 10px 5px;
+
+  border-radius: 10px;
+
+  background:
+    rgba(118, 88, 246, 0.06);
+
+  border:
+    1px solid
+    rgba(118, 88, 246, 0.08);
+}
+
+.selected-skill-stat span {
+  display: block;
+
+  color: var(--room-muted);
+
+  font-size: 7px;
+  line-height: 1.3;
+}
+
+.selected-skill-stat strong {
+  display: block;
+
+  margin-top: 4px;
+
+  color: var(--room-text);
+
+  font-size: 15px;
+}
+
+.selected-skill-progress {
+  margin-top: 16px;
+
+  text-align: left;
+}
+
+.selected-skill-progress-header {
+  display: flex;
+  justify-content: space-between;
+
+  margin-bottom: 7px;
+
+  color: var(--room-muted);
+
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.selected-skill-progress-header strong {
+  color: var(--purple-dark);
+}
+
+.selected-skill-progress-bar {
+  width: 100%;
+  height: 7px;
+
+  border-radius: 20px;
+
+  overflow: hidden;
+
+  background:
+    rgba(118, 88, 246, 0.11);
+}
+
+.selected-skill-progress-bar div {
+  height: 100%;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      90deg,
+      #7658f6,
+      #5b43d4
+    );
+}
+
+.open-skill-button {
+  width: 100%;
+
+  margin-top: 15px;
+
+  min-height: 42px;
+
+  border: none;
+  border-radius: 11px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7658f6,
+      #5b43d4
+    );
+
+  color: #ffffff;
+
+  font-family: inherit;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 8px 18px
+    rgba(91, 67, 212, 0.20);
+
+  transition:
+    transform 0.18s ease,
+    filter 0.18s ease;
+}
+
+.open-skill-button:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+
+/* ---------------------------------------------------------
+   CHARACTER PREVIEW
+--------------------------------------------------------- */
+
+.character-preview-card {
+  position: relative;
+
+  width: 100%;
+  height: 145px;
+
+  margin-bottom: 14px;
+
+  border-radius: 16px;
+
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    radial-gradient(
+      circle at 50% 45%,
+      rgba(118, 88, 246, 0.25),
+      rgba(118, 88, 246, 0.07) 45%,
+      rgba(255, 255, 255, 0.48) 100%
+    );
+
+  border:
+    1px solid
+    rgba(118, 88, 246, 0.12);
+}
+
+.character-preview-glow {
+  position: absolute;
+
+  width: 130px;
+  height: 130px;
+
+  border-radius: 50%;
+
+  background:
+    rgba(118, 88, 246, 0.18);
+
+  filter: blur(25px);
+}
+
+.character-preview-card img {
+  position: relative;
+  z-index: 2;
+
+  height: 132px;
+  max-width: 180px;
+
+  object-fit: contain;
+
+  filter:
+    drop-shadow(
+      0 10px 18px
+      rgba(74, 45, 145, 0.25)
+    );
+}
+
+
+/* ---------------------------------------------------------
+   CHARACTER GRID
+--------------------------------------------------------- */
+
+.character-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 8px;
+}
+
+.character-option {
+  position: relative;
+
+  min-width: 0;
+
+  padding: 8px;
+
+  border-radius: 12px;
+
+  border:
+    1px solid
+    rgba(118, 88, 246, 0.09);
+
+  background:
+    rgba(255, 255, 255, 0.50);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  font-family: inherit;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.18s ease,
+    border 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.character-option:hover {
+  transform: translateY(-1px);
+
+  background:
+    rgba(255, 255, 255, 0.76);
+}
+
+.character-option.selected {
+  border-color:
+    rgba(118, 88, 246, 0.65);
+
+  background:
+    rgba(118, 88, 246, 0.08);
+
+  box-shadow:
+    0 5px 15px
+    rgba(91, 67, 212, 0.10);
+}
+
+.character-option-image {
+  width: 78px;
+  height: 78px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.character-option-image img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+
+  filter:
+    drop-shadow(
+      0 5px 8px
+      rgba(50, 40, 80, 0.14)
+    );
+}
+
+.character-option strong {
+  margin-top: 2px;
+
+  color: var(--room-text);
+
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.character-option span {
+  margin-top: 3px;
+
+  color: var(--room-muted);
+
+  font-size: 7px;
+  line-height: 1.35;
+
+  text-align: center;
+}
+
+.character-selected-check {
+  position: absolute;
+
+  top: 6px;
+  right: 6px;
+
+  width: 20px;
+  height: 20px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    #7658f6;
+
+  color: #ffffff;
+
+  box-shadow:
+    0 4px 10px
+    rgba(91, 67, 212, 0.25);
+}
+
+
+/* ---------------------------------------------------------
+   UPLOAD CHARACTER
+--------------------------------------------------------- */
+
+.upload-character-button {
+  width: 100%;
+
+  min-height: 42px;
+
+  margin-top: 10px;
+
+  border:
+    1px dashed
+    rgba(118, 88, 246, 0.40);
+
+  border-radius: 11px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  background:
+    rgba(118, 88, 246, 0.055);
+
+  color: var(--purple-dark);
+
+  font-family: inherit;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.upload-character-button:hover {
+  background:
+    rgba(118, 88, 246, 0.10);
+
+  border-color:
+    rgba(118, 88, 246, 0.65);
+}
+
+.character-info-note {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 7px;
+
+  margin-top: 10px;
+
+  padding: 9px;
+
+  border-radius: 10px;
+
+  background:
+    rgba(118, 88, 246, 0.05);
+
+  color: var(--room-muted);
+
+  font-size: 8px;
+  line-height: 1.4;
+}
+
+.character-info-note svg {
+  flex-shrink: 0;
+  color: var(--purple);
+}
+
+
+/* =========================================================
+   DARK MODE — ACCOUNT
+   ========================================================= */
+
+.skillsensai-dark-theme .account-dropdown {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(29, 20, 49, 0.98),
+      rgba(12, 8, 22, 0.98)
+    ) !important;
+
+  border:
+    1px solid
+    rgba(156, 130, 255, 0.18) !important;
+
+  box-shadow:
+    0 24px 55px
+    rgba(0, 0, 0, 0.42) !important;
+}
+
+.skillsensai-dark-theme
+.account-header-info strong,
+.skillsensai-dark-theme
+.account-section-title h3,
+.skillsensai-dark-theme
+.account-name-section strong,
+.skillsensai-dark-theme
+.account-contact-section span:last-child,
+.skillsensai-dark-theme
+.account-stat strong,
+.skillsensai-dark-theme
+.account-skill-title-row strong,
+.skillsensai-dark-theme
+.selected-skill-detail h3,
+.skillsensai-dark-theme
+.selected-skill-stat strong,
+.skillsensai-dark-theme
+.character-option strong {
+  color: #f5f1ff;
+}
+
+.skillsensai-dark-theme
+.account-header-info span,
+.skillsensai-dark-theme
+.account-section-title p,
+.skillsensai-dark-theme
+.account-label,
+.skillsensai-dark-theme
+.account-stat span,
+.skillsensai-dark-theme
+.account-skill-card small,
+.skillsensai-dark-theme
+.coming-skills-account,
+.skillsensai-dark-theme
+.selected-skill-detail > p,
+.skillsensai-dark-theme
+.selected-skill-stat span,
+.skillsensai-dark-theme
+.selected-skill-progress-header,
+.skillsensai-dark-theme
+.character-option span,
+.skillsensai-dark-theme
+.character-info-note {
+  color: #a99fc1;
+}
+
+.skillsensai-dark-theme .account-tabs {
+  background:
+    rgba(118, 88, 246, 0.10);
+
+  border-color:
+    rgba(156, 130, 255, 0.12);
+}
+
+.skillsensai-dark-theme
+.account-tab.active {
+  background:
+    rgba(118, 88, 246, 0.22);
+
+  color: #d8ceff;
+
+  box-shadow:
+    0 4px 15px
+    rgba(0, 0, 0, 0.20);
+}
+
+.skillsensai-dark-theme .account-name-section,
+.skillsensai-dark-theme .account-contact-section {
+  background:
+    rgba(118, 88, 246, 0.07);
+
+  border-color:
+    rgba(156, 130, 255, 0.10);
+}
+
+.skillsensai-dark-theme .account-stat,
+.skillsensai-dark-theme .account-skill-card,
+.skillsensai-dark-theme .character-option {
+  background:
+    rgba(255, 255, 255, 0.045);
+
+  border-color:
+    rgba(156, 130, 255, 0.10);
+}
+
+.skillsensai-dark-theme
+.account-skill-card:hover,
+.skillsensai-dark-theme
+.character-option:hover {
+  background:
+    rgba(118, 88, 246, 0.10);
+}
+
+.skillsensai-dark-theme
+.account-progress-bar,
+.skillsensai-dark-theme
+.account-skill-progress,
+.skillsensai-dark-theme
+.selected-skill-progress-bar {
+  background:
+    rgba(255, 255, 255, 0.09);
+}
+
+.skillsensai-dark-theme
+.character-preview-card {
+  background:
+    radial-gradient(
+      circle at 50% 45%,
+      rgba(124, 92, 252, 0.25),
+      rgba(40, 25, 70, 0.35) 45%,
+      rgba(10, 6, 18, 0.85) 100%
+    );
+
+  border-color:
+    rgba(156, 130, 255, 0.14);
+}
+
+.skillsensai-dark-theme
+.character-option.selected {
+  background:
+    rgba(118, 88, 246, 0.12);
+
+  border-color:
+    rgba(156, 130, 255, 0.55);
+}
+
+.skillsensai-dark-theme
+.coming-skills-account,
+.skillsensai-dark-theme
+.character-info-note {
+  background:
+    rgba(118, 88, 246, 0.08);
+}
+
+
+/* ---------------------------------------------------------
+   DARK PROFILE AVATAR
+--------------------------------------------------------- */
+
+.skillsensai-dark-theme
+.account-header-avatar,
+.skillsensai-dark-theme
+.large-profile-avatar {
+  box-shadow:
+    0 10px 30px
+    rgba(118, 88, 246, 0.30);
+}
+
+
+/* =========================================================
+   MOBILE ACCOUNT
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  .account-dropdown {
+    width: min(
+      360px,
+      calc(100vw - 24px)
+    ) !important;
+  }
+
+  .account-panel-content {
+    max-height: 430px;
+  }
+
+  .account-tabs {
+    margin: 0 10px;
+  }
+
+  .account-tab {
+    font-size: 10px;
+  }
+
+  .character-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+}
