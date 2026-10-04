@@ -4,44 +4,37 @@ import { useNavigate } from "react-router-dom";
 import {
   Music,
   Swords,
-  Dumbbell,
+  Video,
   Palette,
   Code2,
   Sparkles,
   Lightbulb,
-  LightbulbOff,
-  LogIn,
   LogOut,
   ChevronDown,
-  User,
-  Phone,
-  X,
-  ShieldCheck,
-  BookOpen,
-  Target,
-  Trophy,
-  ArrowRight,
-  Loader2,
+  ChevronRight,
   Camera,
   Upload,
   Check,
   Settings,
   Award,
+  User,
+  BookOpen,
 } from "lucide-react";
 
 import {
+  GoogleAuthProvider,
+  RecaptchaVerifier,
+  signInWithPopup,
+  signInWithPhoneNumber,
   onAuthStateChanged,
   signOut,
-  GoogleAuthProvider,
-  signInWithPopup,
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
 } from "firebase/auth";
 
 import { auth } from "../firebase";
 import { getLessonsLearned } from "../utils/progress";
 
 import "./Home.css";
+import "./LoginModal.css";
 
 
 /* =========================================================
@@ -50,80 +43,57 @@ import "./Home.css";
 
 const skills = [
   {
+    id: "music",
     name: "Music",
     icon: Music,
     color: "music",
     active: true,
-    path: "/music",
-    description:
-      "Learn singing, pitch, rhythm and musical expression.",
-    lessons: 15,
+    route: "/music",
   },
   {
+    id: "martial",
     name: "Martial Arts",
     icon: Swords,
     color: "martial",
     active: true,
-    path: "/martial-arts",
-    description:
-      "Build discipline, technique, movement and confidence.",
-    lessons: 10,
+    route: "/martial-arts",
   },
   {
+    id: "dance",
     name: "Dance",
-    icon: Dumbbell,
+    icon: Video,
     color: "dance",
     active: false,
-    description:
-      "Dance lessons will be available soon.",
-    lessons: 0,
   },
   {
-    name: "Art",
+    id: "art",
+    name: "Art & Creativity",
     icon: Palette,
     color: "art",
     active: false,
-    description:
-      "Creative art learning will be available soon.",
-    lessons: 0,
   },
   {
+    id: "coding",
     name: "Coding",
     icon: Code2,
     color: "coding",
     active: false,
-    description:
-      "Practical coding lessons will be available soon.",
-    lessons: 0,
   },
   {
-    name: "More",
+    id: "more",
+    name: "More Skills",
     icon: Sparkles,
     color: "more",
     active: false,
-    description:
-      "More skills are coming soon.",
-    lessons: 0,
   },
 ];
-
-
-/* =========================================================
-   TOTAL LESSONS
-   ========================================================= */
 
 const TOTAL_LESSONS = 15;
 
 
 /* =========================================================
-   CHARACTER OPTIONS
-   =========================================================
-   
-   For now we use the existing samurai image.
-
-   Later, when you upload your character images into /public,
-   we can simply add their filenames here.
-========================================================= */
+   BUILT-IN CHARACTERS
+   ========================================================= */
 
 const defaultCharacters = [
   {
@@ -154,10 +124,9 @@ const defaultCharacters = [
 export default function Home() {
   const navigate = useNavigate();
 
-
   /* -------------------------------------------------------
      THEME
-  ------------------------------------------------------- */
+     ------------------------------------------------------- */
 
   const [theme, setTheme] = useState(() => {
     try {
@@ -167,131 +136,93 @@ export default function Home() {
     }
   });
 
+  /*
+    IMPORTANT:
+
+    bulbOn is directly connected to theme.
+
+    DARK  = BULB ON
+    LIGHT = BULB OFF
+  */
+  const [bulbOn, setBulbOn] = useState(() => {
+    try {
+      return localStorage.getItem("skillsensai_theme") === "dark";
+    } catch {
+      return false;
+    }
+  });
+
 
   /* -------------------------------------------------------
      AUTH
-  ------------------------------------------------------- */
+     ------------------------------------------------------- */
 
   const [user, setUser] = useState(null);
 
-  const [profileOpen, setProfileOpen] = useState(false);
-
   const [loginOpen, setLoginOpen] = useState(false);
-
   const [loginMethod, setLoginMethod] = useState("google");
 
   const [loading, setLoading] = useState(false);
-
   const [loginError, setLoginError] = useState("");
 
-
-  /* -------------------------------------------------------
-     ACCOUNT PANEL
-  ------------------------------------------------------- */
-
-  const [accountTab, setAccountTab] = useState("profile");
-
-  const [profileImage, setProfileImage] = useState(null);
-
-  const [selectedCharacter, setSelectedCharacter] =
-    useState("samurai");
-
-  const [customCharacter, setCustomCharacter] =
-    useState(null);
-
-  const [selectedSkill, setSelectedSkill] =
-    useState(null);
-
-  const profileImageInputRef = useRef(null);
-
-  const characterImageInputRef = useRef(null);
-
-
-  /* -------------------------------------------------------
-     PHONE LOGIN
-  ------------------------------------------------------- */
-
   const [phoneNumber, setPhoneNumber] = useState("");
-
   const [otp, setOtp] = useState("");
 
-  const [confirmationResult, setConfirmationResult] =
-    useState(null);
-
-  const [phoneStep, setPhoneStep] =
-    useState("phone");
+  const [confirmationResult, setConfirmationResult] = useState(null);
+  const [phoneStep, setPhoneStep] = useState("phone");
 
   const recaptchaRef = useRef(null);
 
 
   /* -------------------------------------------------------
-     PROGRESS
-  ------------------------------------------------------- */
+     ACCOUNT
+     ------------------------------------------------------- */
 
-  const [lessonsLearned, setLessonsLearned] =
-    useState(0);
+  const [profileOpen, setProfileOpen] = useState(false);
 
+  const [accountTab, setAccountTab] = useState("profile");
 
-  /* -------------------------------------------------------
-     BULB
-  ------------------------------------------------------- */
-
-  const [bulbOn, setBulbOn] = useState(true);
-
-
-  /* =========================================================
-     LOAD ACCOUNT SETTINGS
-  ========================================================= */
-
-  useEffect(() => {
+  const [profileImage, setProfileImage] = useState(() => {
     try {
-      const savedProfileImage =
-        localStorage.getItem(
-          "skillsensai_profile_image"
-        );
-
-      if (savedProfileImage) {
-        setProfileImage(savedProfileImage);
-      }
-
-      const savedCharacter =
-        localStorage.getItem(
-          "skillsensai_character"
-        );
-
-      if (savedCharacter) {
-        setSelectedCharacter(savedCharacter);
-      }
-
-      const savedCustomCharacter =
-        localStorage.getItem(
-          "skillsensai_custom_character"
-        );
-
-      if (savedCustomCharacter) {
-        setCustomCharacter(
-          savedCustomCharacter
-        );
-      }
-    } catch (error) {
-      console.error(
-        "Could not load account settings:",
-        error
-      );
+      return localStorage.getItem("skillsensai_profile_image") || "";
+    } catch {
+      return "";
     }
-  }, []);
+  });
+
+  const [selectedCharacter, setSelectedCharacter] = useState(() => {
+    try {
+      return localStorage.getItem("skillsensai_character") || "samurai";
+    } catch {
+      return "samurai";
+    }
+  });
+
+  const [customCharacter, setCustomCharacter] = useState(() => {
+    try {
+      return (
+        localStorage.getItem("skillsensai_custom_character") || ""
+      );
+    } catch {
+      return "";
+    }
+  });
+
+  const [selectedSkill, setSelectedSkill] = useState(null);
+
+  const profileInputRef = useRef(null);
+  const characterInputRef = useRef(null);
+
+  const [lessonsLearned, setLessonsLearned] = useState(0);
 
 
   /* =========================================================
-     THEME
-  ========================================================= */
+     THEME EFFECT
+     ========================================================= */
 
   useEffect(() => {
     try {
-      localStorage.setItem(
-        "skillsensai_theme",
-        theme
-      );
+      localStorage.setItem("skillsensai_theme", theme);
     } catch {
       // Ignore localStorage errors.
     }
@@ -306,881 +237,480 @@ export default function Home() {
         ? "skillsensai-dark-theme"
         : "skillsensai-light-theme"
     );
+
+    /*
+      Keep bulb synchronized with theme.
+    */
+    setBulbOn(theme === "dark");
   }, [theme]);
 
 
   /* =========================================================
-     FIREBASE AUTH STATE
-  ========================================================= */
+     LOAD AUTH USER
+     ========================================================= */
 
   useEffect(() => {
-    const unsubscribe =
-      onAuthStateChanged(
-        auth,
-        (currentUser) => {
-          console.log(
-            "SkillSensAI auth state:",
-            currentUser
-          );
-
-          setUser(currentUser);
-
-          if (!currentUser) {
-            setProfileOpen(false);
-          }
-        },
-        (error) => {
-          console.error(
-            "Firebase auth state error:",
-            error
-          );
-        }
-      );
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
 
     return () => unsubscribe();
   }, []);
 
 
   /* =========================================================
-     LOAD REAL PROGRESS
-  ========================================================= */
-
-  const loadProgress = () => {
-    try {
-      const completed =
-        getLessonsLearned();
-
-      const numericValue =
-        Number(completed);
-
-      if (
-        Number.isFinite(
-          numericValue
-        )
-      ) {
-        setLessonsLearned(
-          Math.max(
-            0,
-            numericValue
-          )
-        );
-      } else {
-        setLessonsLearned(0);
-      }
-    } catch (error) {
-      console.error(
-        "Could not load lesson progress:",
-        error
-      );
-
-      setLessonsLearned(0);
-    }
-  };
-
+     LOAD PROGRESS
+     ========================================================= */
 
   useEffect(() => {
     loadProgress();
+  }, [user]);
 
-    const handleProgressUpdate = () => {
-      loadProgress();
-    };
-
-    window.addEventListener(
-      "skillsensai-progress-updated",
-      handleProgressUpdate
-    );
-
-    window.addEventListener(
-      "storage",
-      handleProgressUpdate
-    );
-
-    return () => {
-      window.removeEventListener(
-        "skillsensai-progress-updated",
-        handleProgressUpdate
-      );
-
-      window.removeEventListener(
-        "storage",
-        handleProgressUpdate
-      );
-    };
-  }, []);
+  async function loadProgress() {
+    try {
+      const count = await getLessonsLearned();
+      setLessonsLearned(Number(count) || 0);
+    } catch {
+      setLessonsLearned(0);
+    }
+  }
 
 
   /* =========================================================
      CLOSE PROFILE WHEN CLICKING OUTSIDE
-  ========================================================= */
+     ========================================================= */
 
   useEffect(() => {
-    const handleOutsideClick =
-      (event) => {
-        if (
-          !event.target.closest(
-            ".profile-area"
-          )
-        ) {
-          setProfileOpen(false);
-          setSelectedSkill(null);
-        }
-      };
+    function handleClickOutside(event) {
+      if (
+        profileOpen &&
+        !event.target.closest(".profile-area")
+      ) {
+        setProfileOpen(false);
+      }
+    }
 
-    document.addEventListener(
-      "mousedown",
-      handleOutsideClick
-    );
+    document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
       document.removeEventListener(
         "mousedown",
-        handleOutsideClick
+        handleClickOutside
       );
     };
-  }, []);
-
-
-  /* =========================================================
-     LOGIN MODAL
-  ========================================================= */
-
-  const openLogin = () => {
-    setLoginError("");
-    setLoginMethod("google");
-    setPhoneStep("phone");
-    setOtp("");
-    setConfirmationResult(null);
-    setLoginOpen(true);
-    setProfileOpen(false);
-  };
-
-
-  const closeLogin = () => {
-    if (loading) return;
-
-    setLoginOpen(false);
-    setLoginError("");
-    setPhoneStep("phone");
-    setOtp("");
-    setConfirmationResult(null);
-  };
+  }, [profileOpen]);
 
 
   /* =========================================================
      GOOGLE LOGIN
-  ========================================================= */
+     ========================================================= */
 
-  const handleGoogleLogin =
-    async () => {
-      setLoading(true);
-      setLoginError("");
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    setLoginError("");
 
-      try {
-        const provider =
-          new GoogleAuthProvider();
+    try {
+      const provider = new GoogleAuthProvider();
 
-        provider.setCustomParameters(
-          {
-            prompt:
-              "select_account",
-          }
-        );
+      await signInWithPopup(auth, provider);
 
-        const result =
-          await signInWithPopup(
-            auth,
-            provider
-          );
+      setLoginOpen(false);
+      setPhoneStep("phone");
+      setOtp("");
+      setConfirmationResult(null);
+    } catch (error) {
+      console.error(error);
 
-        console.log(
-          "Google login successful:",
-          result.user
-        );
-
-        setUser(result.user);
-
-        setLoginOpen(false);
-        setProfileOpen(true);
-        setAccountTab("profile");
-
-        loadProgress();
-
-      } catch (error) {
-        console.error(
-          "Google login error:",
-          error
-        );
-
-        if (
-          error?.code ===
-          "auth/popup-closed-by-user"
-        ) {
-          setLoginError(
-            "Login window was closed."
-          );
-        } else if (
-          error?.code ===
-          "auth/popup-blocked"
-        ) {
-          setLoginError(
-            "Your browser blocked the login popup. Please allow popups for SkillSensAI."
-          );
-        } else if (
-          error?.code ===
-          "auth/unauthorized-domain"
-        ) {
-          setLoginError(
-            "This website is not authorized for Firebase login."
-          );
-        } else {
-          setLoginError(
-            error?.message ||
-              "Google login failed. Please try again."
-          );
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-
-  /* =========================================================
-     PHONE NUMBER FORMAT
-  ========================================================= */
-
-  const formatPhoneNumber =
-    (value) => {
-      let digits =
-        value.replace(
-          /\D/g,
-          ""
-        );
-
-      if (
-        digits.startsWith("91")
-      ) {
-        digits =
-          digits.substring(2);
-      }
-
-      digits =
-        digits.substring(
-          0,
-          10
-        );
-
-      if (!digits) {
-        return "";
-      }
-
-      return `+91 ${digits}`;
-    };
-
-
-  const handlePhoneChange =
-    (event) => {
-      const formatted =
-        formatPhoneNumber(
-          event.target.value
-        );
-
-      setPhoneNumber(
-        formatted
+      setLoginError(
+        error?.message ||
+          "Google login failed. Please try again."
       );
-    };
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   /* =========================================================
-     PHONE OTP
-  ========================================================= */
+     PHONE LOGIN
+     ========================================================= */
 
-  const handleSendOtp =
-    async () => {
-      setLoginError("");
+  const setupRecaptcha = () => {
+    if (recaptchaRef.current) {
+      return recaptchaRef.current;
+    }
 
-      const digits =
-        phoneNumber.replace(
-          /\D/g,
-          ""
-        );
-
-      if (
-        digits.length !==
-        10
-      ) {
-        setLoginError(
-          "Please enter a valid 10-digit Indian mobile number."
-        );
-
-        return;
-      }
-
-      setLoading(true);
-
-      try {
-        if (
-          recaptchaRef.current
-        ) {
-          try {
-            recaptchaRef.current.clear();
-          } catch {
-            // Ignore.
+    try {
+      recaptchaRef.current =
+        new RecaptchaVerifier(
+          auth,
+          "recaptcha-container",
+          {
+            size: "invisible",
           }
-
-          recaptchaRef.current =
-            null;
-        }
-
-        const verifier =
-          new RecaptchaVerifier(
-            auth,
-            "recaptcha-container",
-            {
-              size: "invisible",
-            }
-          );
-
-        recaptchaRef.current =
-          verifier;
-
-        const fullPhoneNumber =
-          `+91${digits}`;
-
-        const result =
-          await signInWithPhoneNumber(
-            auth,
-            fullPhoneNumber,
-            verifier
-          );
-
-        setConfirmationResult(
-          result
         );
 
-        setPhoneStep("otp");
-        setOtp("");
+      return recaptchaRef.current;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  };
 
-      } catch (error) {
-        console.error(
-          "Phone OTP error:",
-          error
+
+  const handleSendOtp = async () => {
+    if (!phoneNumber.trim()) {
+      setLoginError("Please enter your phone number.");
+      return;
+    }
+
+    setLoading(true);
+    setLoginError("");
+
+    try {
+      const formattedNumber = phoneNumber.startsWith("+")
+        ? phoneNumber
+        : `+91${phoneNumber.replace(/\D/g, "")}`;
+
+      const appVerifier = setupRecaptcha();
+
+      if (!appVerifier) {
+        throw new Error(
+          "Unable to initialize phone verification."
         );
-
-        if (
-          error?.code ===
-          "auth/billing-not-enabled"
-        ) {
-          setLoginError(
-            "Phone authentication requires Firebase billing to be enabled."
-          );
-        } else if (
-          error?.code ===
-          "auth/invalid-phone-number"
-        ) {
-          setLoginError(
-            "The phone number is invalid."
-          );
-        } else if (
-          error?.code ===
-          "auth/too-many-requests"
-        ) {
-          setLoginError(
-            "Too many attempts. Please try again later."
-          );
-        } else {
-          setLoginError(
-            error?.message ||
-              "Could not send OTP."
-          );
-        }
-
-        if (
-          recaptchaRef.current
-        ) {
-          try {
-            recaptchaRef.current.clear();
-          } catch {
-            // Ignore.
-          }
-
-          recaptchaRef.current =
-            null;
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-
-  /* =========================================================
-     VERIFY OTP
-  ========================================================= */
-
-  const handleVerifyOtp =
-    async () => {
-      if (
-        !confirmationResult
-      ) {
-        setLoginError(
-          "Please request a new OTP."
-        );
-
-        return;
       }
 
-      if (
-        otp.length < 6
-      ) {
-        setLoginError(
-          "Please enter the 6-digit OTP."
-        );
+      const result = await signInWithPhoneNumber(
+        auth,
+        formattedNumber,
+        appVerifier
+      );
 
-        return;
-      }
+      setConfirmationResult(result);
+      setPhoneStep("otp");
+    } catch (error) {
+      console.error(error);
 
-      setLoading(true);
-      setLoginError("");
+      setLoginError(
+        error?.message ||
+          "Unable to send OTP."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      try {
-        const result =
-          await confirmationResult.confirm(
-            otp
-          );
 
-        console.log(
-          "Phone login successful:",
-          result.user
-        );
+  const handleVerifyOtp = async () => {
+    if (!otp.trim()) {
+      setLoginError("Please enter the OTP.");
+      return;
+    }
 
-        setUser(result.user);
+    if (!confirmationResult) {
+      setLoginError(
+        "Please request an OTP first."
+      );
+      return;
+    }
 
-        setLoginOpen(false);
-        setProfileOpen(true);
-        setAccountTab("profile");
+    setLoading(true);
+    setLoginError("");
 
-        setPhoneStep("phone");
-        setOtp("");
-        setConfirmationResult(
-          null
-        );
+    try {
+      await confirmationResult.confirm(otp);
 
-        loadProgress();
+      setLoginOpen(false);
+      setPhoneStep("phone");
+      setOtp("");
+      setConfirmationResult(null);
+    } catch (error) {
+      console.error(error);
 
-      } catch (error) {
-        console.error(
-          "OTP verification error:",
-          error
-        );
-
-        if (
-          error?.code ===
-          "auth/invalid-verification-code"
-        ) {
-          setLoginError(
-            "Incorrect OTP. Please try again."
-          );
-        } else {
-          setLoginError(
-            error?.message ||
-              "OTP verification failed."
-          );
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
+      setLoginError(
+        error?.message ||
+          "Invalid OTP."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   /* =========================================================
      LOGOUT
-  ========================================================= */
+     ========================================================= */
 
-  const handleLogout =
-    async () => {
-      try {
-        await signOut(auth);
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
 
-        setUser(null);
-        setProfileOpen(false);
-        setLoginOpen(false);
-        setSelectedSkill(null);
-
-      } catch (error) {
-        console.error(
-          "Logout error:",
-          error
-        );
-      }
-    };
+      setProfileOpen(false);
+      setSelectedSkill(null);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
 
   /* =========================================================
-     USER DISPLAY
-  ========================================================= */
+     USER DETAILS
+     ========================================================= */
 
-  const getUserName =
-    () => {
-      if (!user) {
-        return "Learner";
-      }
+  const getUserName = () => {
+    if (!user) return "Guest";
 
-      if (user.displayName) {
-        return user.displayName;
-      }
-
-      if (user.phoneNumber) {
-        return user.phoneNumber;
-      }
-
-      if (user.email) {
-        return user.email.split(
-          "@"
-        )[0];
-      }
-
-      return "Learner";
-    };
+    return (
+      user.displayName ||
+      user.phoneNumber ||
+      "SkillSensAI User"
+    );
+  };
 
 
-  const getUserContact =
-    () => {
-      if (!user) {
-        return "";
-      }
+  const getUserContact = () => {
+    if (!user) return "";
 
-      if (user.email) {
-        return user.email;
-      }
-
-      if (user.phoneNumber) {
-        return user.phoneNumber;
-      }
-
-      return "";
-    };
+    return (
+      user.email ||
+      user.phoneNumber ||
+      ""
+    );
+  };
 
 
-  const getInitial =
-    () => {
-      const name =
-        getUserName();
+  const getUserInitial = () => {
+    const name = getUserName();
 
-      if (!name) {
-        return "U";
-      }
-
-      return name
-        .charAt(0)
-        .toUpperCase();
-    };
+    return name
+      .charAt(0)
+      .toUpperCase();
+  };
 
 
   /* =========================================================
-     PROFILE IMAGE
-  ========================================================= */
+     PROGRESS
+     ========================================================= */
 
-  const handleProfileImage =
-    (event) => {
-      const file =
-        event.target.files?.[0];
-
-      if (!file) return;
-
-      if (
-        !file.type.startsWith(
-          "image/"
-        )
-      ) {
-        return;
-      }
-
-      const reader =
-        new FileReader();
-
-      reader.onload = () => {
-        const image =
-          reader.result;
-
-        setProfileImage(
-          image
-        );
-
-        try {
-          localStorage.setItem(
-            "skillsensai_profile_image",
-            image
-          );
-        } catch (error) {
-          console.error(
-            "Could not save profile image:",
-            error
-          );
-        }
-      };
-
-      reader.readAsDataURL(file);
-
-      event.target.value = "";
-    };
-
-
-  /* =========================================================
-     CHARACTER IMAGE
-  ========================================================= */
-
-  const handleCharacterUpload =
-    (event) => {
-      const file =
-        event.target.files?.[0];
-
-      if (!file) return;
-
-      if (
-        !file.type.startsWith(
-          "image/"
-        )
-      ) {
-        return;
-      }
-
-      const reader =
-        new FileReader();
-
-      reader.onload = () => {
-        const image =
-          reader.result;
-
-        setCustomCharacter(
-          image
-        );
-
-        setSelectedCharacter(
-          "custom"
-        );
-
-        try {
-          localStorage.setItem(
-            "skillsensai_custom_character",
-            image
-          );
-
-          localStorage.setItem(
-            "skillsensai_character",
-            "custom"
-          );
-        } catch (error) {
-          console.error(
-            "Could not save character:",
-            error
-          );
-        }
-      };
-
-      reader.readAsDataURL(file);
-
-      event.target.value = "";
-    };
-
-
-  /* =========================================================
-     CHARACTER SELECTION
-  ========================================================= */
-
-  const handleCharacterSelect =
-    (characterId) => {
-      setSelectedCharacter(
-        characterId
-      );
-
-      try {
-        localStorage.setItem(
-          "skillsensai_character",
-          characterId
-        );
-      } catch (error) {
-        console.error(
-          "Could not save character:",
-          error
-        );
-      }
-    };
-
-
-  const getCharacterImage =
-    () => {
-      if (
-        selectedCharacter ===
-        "custom"
-      ) {
-        return (
-          customCharacter ||
-          "/samurai.png"
-        );
-      }
-
-      const character =
-        defaultCharacters.find(
-          (item) =>
-            item.id ===
-            selectedCharacter
-        );
-
-      return (
-        character?.image ||
-        "/samurai.png"
-      );
-    };
-
-
-  /* =========================================================
-     LESSON PERCENTAGE
-  ========================================================= */
-
-  const lessonPercentage =
-    TOTAL_LESSONS > 0
-      ? Math.min(
-          100,
-          Math.round(
-            (lessonsLearned /
-              TOTAL_LESSONS) *
-              100
-          )
-        )
-      : 0;
+  const lessonPercentage = Math.min(
+    100,
+    Math.round(
+      (lessonsLearned / TOTAL_LESSONS) * 100
+    )
+  );
 
 
   /* =========================================================
      SKILL PROGRESS
-  ========================================================= */
+     ========================================================= */
 
-  const getSkillProgress =
-    (skill) => {
-      if (
-        skill.name ===
-        "Music"
-      ) {
-        return {
-          completed:
-            lessonsLearned,
-          total:
-            skill.lessons,
-          percentage:
-            skill.lessons > 0
-              ? Math.min(
-                  100,
-                  Math.round(
-                    (lessonsLearned /
-                      skill.lessons) *
-                      100
-                  )
-                )
-              : 0,
-        };
-      }
+  const getSkillProgress = (skillId) => {
+    if (skillId === "music") {
+      return Math.min(
+        100,
+        Math.round(
+          (lessonsLearned / TOTAL_LESSONS) * 100
+        )
+      );
+    }
 
-      if (
-        skill.name ===
-        "Martial Arts"
-      ) {
-        return {
-          completed: 0,
-          total: skill.lessons,
-          percentage: 0,
-        };
-      }
+    if (skillId === "martial") {
+      return 0;
+    }
 
-      return {
-        completed: 0,
-        total: skill.lessons,
-        percentage: 0,
-      };
-    };
+    return 0;
+  };
 
 
   /* =========================================================
-     SKILL NAVIGATION
-  ========================================================= */
+     NAVIGATION
+     ========================================================= */
 
-  const handleSkillClick =
-    (skill) => {
-      if (!skill.active) {
-        return;
-      }
+  const handleSkillClick = (skill) => {
+    if (!skill.active) return;
 
-      navigate(skill.path);
-    };
+    navigate(skill.route);
+  };
 
 
   /* =========================================================
-     BULB
-  ========================================================= */
+     BULB / THEME
 
-  const handleBulbClick =
-    (event) => {
-      event.preventDefault();
-      event.stopPropagation();
+     ON  -> DARK
+     OFF -> LIGHT
+     ========================================================= */
 
-      setBulbOn(
-        (current) =>
-          !current
+  const handleBulbClick = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const nextTheme =
+      theme === "light"
+        ? "dark"
+        : "light";
+
+    setTheme(nextTheme);
+
+    /*
+      Immediately synchronize bulb.
+    */
+    setBulbOn(nextTheme === "dark");
+
+    try {
+      localStorage.setItem(
+        "skillsensai_theme",
+        nextTheme
+      );
+    } catch {
+      // Ignore localStorage errors.
+    }
+  };
+
+
+  /* =========================================================
+     PROFILE IMAGE UPLOAD
+     ========================================================= */
+
+  const handleProfileImageUpload = (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const image = reader.result;
+
+      setProfileImage(image);
+
+      try {
+        localStorage.setItem(
+          "skillsensai_profile_image",
+          image
+        );
+      } catch {
+        // Ignore localStorage errors.
+      }
+    };
+
+    reader.readAsDataURL(file);
+
+    event.target.value = "";
+  };
+
+
+  /* =========================================================
+     CHARACTER IMAGE
+     ========================================================= */
+
+  const getCharacterImage = () => {
+    if (customCharacter) {
+      return customCharacter;
+    }
+
+    const character = defaultCharacters.find(
+      (item) => item.id === selectedCharacter
+    );
+
+    return character?.image || "/samurai.png";
+  };
+
+
+  /* =========================================================
+     SELECT CHARACTER
+     ========================================================= */
+
+  const handleCharacterSelect = (characterId) => {
+    setSelectedCharacter(characterId);
+
+    /*
+      Selecting a built-in character removes the
+      custom uploaded character from active use.
+    */
+    setCustomCharacter("");
+
+    try {
+      localStorage.setItem(
+        "skillsensai_character",
+        characterId
       );
 
-      setTheme(
-        (currentTheme) => {
-          const nextTheme =
-            currentTheme ===
-            "light"
-              ? "dark"
-              : "light";
-
-          try {
-            localStorage.setItem(
-              "skillsensai_theme",
-              nextTheme
-            );
-          } catch {
-            // Ignore.
-          }
-
-          return nextTheme;
-        }
+      localStorage.removeItem(
+        "skillsensai_custom_character"
       );
-    };
+    } catch {
+      // Ignore localStorage errors.
+    }
+  };
 
 
   /* =========================================================
-     THEME TOGGLE
-  ========================================================= */
+     CUSTOM CHARACTER UPLOAD
+     ========================================================= */
 
-  const handleThemeToggle =
-    (event) => {
-      event.preventDefault();
-      event.stopPropagation();
+  const handleCharacterUpload = (event) => {
+    const file = event.target.files?.[0];
 
-      setTheme(
-        (current) =>
-          current ===
-          "light"
-            ? "dark"
-            : "light"
-      );
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const image = reader.result;
+
+      setCustomCharacter(image);
+
+      try {
+        localStorage.setItem(
+          "skillsensai_custom_character",
+          image
+        );
+      } catch {
+        // Ignore localStorage errors.
+      }
     };
+
+    reader.readAsDataURL(file);
+
+    event.target.value = "";
+  };
 
 
   /* =========================================================
-     OPEN ACCOUNT TAB
-  ========================================================= */
+     OPEN ACCOUNT
+     ========================================================= */
 
-  const openAccountTab =
-    (tab) => {
-      setAccountTab(tab);
-      setSelectedSkill(null);
-    };
+  const openAccount = () => {
+    if (!user) {
+      setLoginOpen(true);
+      return;
+    }
+
+    setProfileOpen((previous) => !previous);
+  };
+
+
+  /* =========================================================
+     CHARACTER
+     ========================================================= */
+
+  const activeCharacter =
+    defaultCharacters.find(
+      (item) => item.id === selectedCharacter
+    );
 
 
   /* =========================================================
      RENDER
-  ========================================================= */
+     ========================================================= */
 
   return (
     <div
@@ -1191,72 +721,106 @@ export default function Home() {
       }`}
     >
 
+      {/* =====================================================
+          ROOM BACKGROUND
+          ===================================================== */}
+
       <div className="room-background">
+
+        <div className="room-wall" />
+        <div className="room-floor" />
+        <div className="room-corner-glow" />
 
 
         {/* =================================================
-            TOP LOGIN / PROFILE
-        ================================================= */}
+            CEILING
+            ================================================= */}
+
+        <div className="ceiling">
+
+          {/* Fan intentionally hidden by Home.css */}
+
+        </div>
+
+
+        {/* =================================================
+            LIGHT BULB
+            ================================================= */}
+
+        <div
+          className={`hanging-bulb ${
+            bulbOn
+              ? "bulb-on"
+              : "bulb-off"
+          }`}
+          onClick={handleBulbClick}
+          role="button"
+          tabIndex={0}
+          title={
+            bulbOn
+              ? "Turn off light — Light theme"
+              : "Turn on light — Dark theme"
+          }
+          onKeyDown={(event) => {
+            if (
+              event.key === "Enter" ||
+              event.key === " "
+            ) {
+              handleBulbClick(event);
+            }
+          }}
+        >
+          <div className="bulb-wire" />
+
+          <div className="bulb-button">
+            <Lightbulb size={26} />
+
+            <div className="bulb-glass" />
+          </div>
+        </div>
+
+
+        {/* =================================================
+            LOGIN / PROFILE
+            ================================================= */}
 
         <div className="room-login">
 
           {!user ? (
             <button
-              type="button"
               className="login-button"
-              onClick={openLogin}
+              onClick={() => {
+                setLoginError("");
+                setLoginOpen(true);
+              }}
             >
-              <LogIn size={18} />
-
-              <span>
-                Login
-              </span>
+              Login
             </button>
           ) : (
-
             <div className="profile-area">
 
               <button
-                type="button"
                 className="profile-button"
-                onClick={(event) => {
-                  event.preventDefault();
-                  event.stopPropagation();
-
-                  setProfileOpen(
-                    (current) =>
-                      !current
-                  );
-
-                  setSelectedSkill(
-                    null
-                  );
-                }}
+                onClick={openAccount}
               >
 
-                <span className="profile-avatar">
-
-                  {profileImage ||
-                  user.photoURL ? (
+                <div className="profile-avatar">
+                  {profileImage ? (
                     <img
-                      src={
-                        profileImage ||
-                        user.photoURL
-                      }
-                      alt={getUserName()}
+                      src={profileImage}
+                      alt="Profile"
                     />
                   ) : (
-                    getInitial()
+                    getUserInitial()
                   )}
-
-                </span>
+                </div>
 
                 <span className="profile-name">
                   {getUserName()}
                 </span>
 
                 <ChevronDown
-                  size={16}
+                  size={17}
                   className={
                     profileOpen
                       ? "profile-chevron-open"
@@ -1268,37 +832,28 @@ export default function Home() {
 
 
               {/* =================================================
-                  ACCOUNT PANEL
-              ================================================= */}
+                  ACCOUNT DROPDOWN
+                  ================================================= */}
 
               {profileOpen && (
+                <div className="account-dropdown">
 
-                <div className="profile-dropdown account-dropdown">
+                  {/* HEADER */}
 
-
-                  {/* -------------------------------------------
-                      ACCOUNT HEADER
-                  ------------------------------------------- */}
-
-                  <div className="account-panel-header">
+                  <div className="account-header">
 
                     <div className="account-header-avatar">
 
-                      {profileImage ||
-                      user.photoURL ? (
+                      {profileImage ? (
                         <img
-                          src={
-                            profileImage ||
-                            user.photoURL
-                          }
-                          alt={getUserName()}
+                          src={profileImage}
+                          alt="Profile"
                         />
                       ) : (
-                        getInitial()
+                        getUserInitial()
                       )}
 
                     </div>
-
 
                     <div className="account-header-info">
 
@@ -1315,81 +870,50 @@ export default function Home() {
                   </div>
 
 
-                  {/* -------------------------------------------
-                      ACCOUNT TABS
-                  ------------------------------------------- */}
+                  {/* TABS */}
 
                   <div className="account-tabs">
 
                     <button
-                      type="button"
                       className={
-                        accountTab ===
-                        "profile"
-                          ? "account-tab active"
-                          : "account-tab"
+                        accountTab === "profile"
+                          ? "active"
+                          : ""
                       }
                       onClick={() =>
-                        openAccountTab(
-                          "profile"
-                        )
+                        setAccountTab("profile")
                       }
                     >
-                      <User
-                        size={16}
-                      />
-
-                      <span>
-                        Profile
-                      </span>
+                      <User size={16} />
+                      Profile
                     </button>
 
-
                     <button
-                      type="button"
                       className={
-                        accountTab ===
-                        "skills"
-                          ? "account-tab active"
-                          : "account-tab"
+                        accountTab === "skills"
+                          ? "active"
+                          : ""
                       }
                       onClick={() =>
-                        openAccountTab(
-                          "skills"
-                        )
+                        setAccountTab("skills")
                       }
                     >
-                      <Target
-                        size={16}
-                      />
-
-                      <span>
-                        Skills
-                      </span>
+                      <Award size={16} />
+                      Skills
                     </button>
 
-
                     <button
-                      type="button"
                       className={
-                        accountTab ===
-                        "character"
-                          ? "account-tab active"
-                          : "account-tab"
+                        accountTab === "character"
+                          ? "active"
+                          : ""
                       }
                       onClick={() =>
-                        openAccountTab(
-                          "character"
-                        )
+                        setAccountTab("character")
                       }
                     >
-                      <Award
-                        size={16}
-                      />
-
-                      <span>
-                        Character
-                      </span>
+                      <Sparkles size={16} />
+                      Character
                     </button>
 
                   </div>
@@ -1397,96 +921,69 @@ export default function Home() {
 
                   {/* =================================================
                       PROFILE TAB
-                  ================================================= */}
+                      ================================================= */}
 
-                  {accountTab ===
-                    "profile" && (
+                  {accountTab === "profile" && (
+                    <div className="account-content">
 
-                    <div className="account-panel-content">
+                      <div className="profile-main-card">
 
-                      <div className="account-profile-photo-section">
+                        <div className="large-profile-avatar-wrapper">
 
-                        <div className="large-profile-avatar">
+                          <div className="large-profile-avatar">
 
-                          {profileImage ||
-                          user.photoURL ? (
-                            <img
-                              src={
-                                profileImage ||
-                                user.photoURL
-                              }
-                              alt={getUserName()}
-                            />
-                          ) : (
-                            getInitial()
-                          )}
+                            {profileImage ? (
+                              <img
+                                src={profileImage}
+                                alt="Profile"
+                              />
+                            ) : (
+                              getUserInitial()
+                            )}
+
+                          </div>
+
+
+                          <button
+                            className="profile-camera-button"
+                            title="Change profile picture"
+                            onClick={() =>
+                              profileInputRef.current?.click()
+                            }
+                          >
+                            <Camera size={16} />
+                          </button>
 
                         </div>
 
 
-                        <button
-                          type="button"
-                          className="profile-camera-button"
-                          onClick={() =>
-                            profileImageInputRef.current?.click()
-                          }
-                          title="Change profile picture"
-                        >
-                          <Camera
-                            size={16}
-                          />
-                        </button>
+                        <h3>
+                          {getUserName()}
+                        </h3>
+
+                        <p>
+                          {getUserContact()}
+                        </p>
 
 
                         <input
-                          ref={
-                            profileImageInputRef
-                          }
+                          ref={profileInputRef}
                           type="file"
                           accept="image/*"
                           hidden
                           onChange={
-                            handleProfileImage
+                            handleProfileImageUpload
                           }
                         />
 
                       </div>
 
 
-                      <div className="account-name-section">
+                      {/* STATS */}
 
-                        <span className="account-label">
-                          Your Name
-                        </span>
-
-                        <strong>
-                          {getUserName()}
-                        </strong>
-
-                      </div>
-
-
-                      <div className="account-contact-section">
-
-                        <span className="account-label">
-                          Account
-                        </span>
-
-                        <span>
-                          {getUserContact() ||
-                            "Connected account"}
-                        </span>
-
-                      </div>
-
-
-                      <div className="account-stat-grid">
+                      <div className="account-stats">
 
                         <div className="account-stat">
-
-                          <BookOpen
-                            size={18}
-                          />
 
                           <strong>
                             {lessonsLearned}
@@ -1501,9 +998,18 @@ export default function Home() {
 
                         <div className="account-stat">
 
-                          <Trophy
-                            size={18}
-                          />
+                          <strong>
+                            2
+                          </strong>
+
+                          <span>
+                            Skills
+                          </span>
+
+                        </div>
+
+
+                        <div className="account-stat">
 
                           <strong>
                             {lessonPercentage}%
@@ -1518,12 +1024,14 @@ export default function Home() {
                       </div>
 
 
-                      <div className="account-progress-section">
+                      {/* PROGRESS */}
 
-                        <div className="account-progress-heading">
+                      <div className="account-progress">
+
+                        <div className="account-progress-top">
 
                           <span>
-                            Overall Learning
+                            Overall Learning Progress
                           </span>
 
                           <strong>
@@ -1532,11 +1040,9 @@ export default function Home() {
 
                         </div>
 
-
                         <div className="account-progress-bar">
 
                           <div
-                            className="account-progress-fill"
                             style={{
                               width: `${lessonPercentage}%`,
                             }}
@@ -1547,40 +1053,37 @@ export default function Home() {
                       </div>
 
 
+                      {/* CHARACTER BUTTON */}
+
                       <button
-                        type="button"
-                        className="account-settings-button"
+                        className="account-action-button"
                         onClick={() =>
-                          openAccountTab(
-                            "character"
-                          )
+                          setAccountTab("character")
                         }
                       >
-                        <Settings
+
+                        <Settings size={17} />
+
+                        Customize Character
+
+                        <ChevronRight
                           size={17}
                         />
-
-                        <span>
-                          Customize Character
-                        </span>
 
                       </button>
 
 
-                      <button
-                        type="button"
-                        className="logout-button"
-                        onClick={
-                          handleLogout
-                        }
-                      >
-                        <LogOut
-                          size={17}
-                        />
+                      {/* LOGOUT */}
 
-                        <span>
-                          Logout
-                        </span>
+                      <button
+                        className="logout-button"
+                        onClick={handleLogout}
+                      >
+
+                        <LogOut size={17} />
+
+                        Logout
+
                       </button>
 
                     </div>
@@ -1589,17 +1092,13 @@ export default function Home() {
 
                   {/* =================================================
                       SKILLS TAB
-                  ================================================= */}
+                      ================================================= */}
 
-                  {accountTab ===
-                    "skills" && (
-
-                    <div className="account-panel-content">
+                  {accountTab === "skills" && (
+                    <div className="account-content">
 
                       {!selectedSkill ? (
-
                         <>
-
                           <div className="account-section-title">
 
                             <div>
@@ -1608,7 +1107,7 @@ export default function Home() {
                               </h3>
 
                               <p>
-                                Track everything you are learning.
+                                Skills you are currently learning
                               </p>
                             </div>
 
@@ -1622,264 +1121,179 @@ export default function Home() {
                                 (skill) =>
                                   skill.active
                               )
-                              .map(
-                                (skill) => {
-                                  const Icon =
-                                    skill.icon;
+                              .map((skill) => {
 
-                                  const progress =
-                                    getSkillProgress(
-                                      skill
-                                    );
+                                const Icon =
+                                  skill.icon;
 
-                                  return (
+                                const progress =
+                                  getSkillProgress(
+                                    skill.id
+                                  );
 
-                                    <button
-                                      key={
-                                        skill.name
-                                      }
-                                      type="button"
-                                      className={`account-skill-card skill-card-${skill.color}`}
-                                      onClick={() =>
-                                        setSelectedSkill(
-                                          skill
-                                        )
-                                      }
-                                    >
+                                return (
+                                  <button
+                                    key={skill.id}
+                                    className={`account-skill-card ${skill.color}`}
+                                    onClick={() =>
+                                      setSelectedSkill(
+                                        skill.id
+                                      )
+                                    }
+                                  >
 
-                                      <div className="account-skill-icon">
-                                        <Icon
-                                          size={21}
-                                        />
-                                      </div>
+                                    <div className="account-skill-icon">
 
-
-                                      <div className="account-skill-info">
-
-                                        <div className="account-skill-title-row">
-
-                                          <strong>
-                                            {skill.name}
-                                          </strong>
-
-                                          <span>
-                                            {
-                                              progress.percentage
-                                            }%
-                                          </span>
-
-                                        </div>
-
-
-                                        <div className="account-skill-progress">
-
-                                          <div
-                                            style={{
-                                              width: `${progress.percentage}%`,
-                                            }}
-                                          />
-
-                                        </div>
-
-
-                                        <small>
-                                          {
-                                            progress.completed
-                                          } /{" "}
-                                          {
-                                            progress.total
-                                          }{" "}
-                                          lessons
-                                        </small>
-
-                                      </div>
-
-
-                                      <ChevronDown
-                                        size={17}
-                                        className="skill-card-arrow"
+                                      <Icon
+                                        size={22}
                                       />
 
-                                    </button>
+                                    </div>
 
-                                  );
-                                }
-                              )}
+
+                                    <div className="account-skill-info">
+
+                                      <strong>
+                                        {skill.name}
+                                      </strong>
+
+                                      <span>
+                                        {progress}% complete
+                                      </span>
+
+                                      <div className="account-skill-progress">
+
+                                        <div
+                                          style={{
+                                            width: `${progress}%`,
+                                          }}
+                                        />
+
+                                      </div>
+
+                                    </div>
+
+
+                                    <ChevronRight
+                                      size={18}
+                                    />
+
+                                  </button>
+                                );
+                              })}
 
                           </div>
 
 
-                          <div className="coming-skills-account">
+                          <div className="account-skills-note">
 
-                            <Sparkles
-                              size={16}
-                            />
+                            <BookOpen size={17} />
 
                             <span>
-                              More skills will appear here as they become available.
+                              More skills will be available soon.
                             </span>
 
                           </div>
-
                         </>
-
                       ) : (
+                        (() => {
 
-                        <>
+                          const skill =
+                            skills.find(
+                              (item) =>
+                                item.id ===
+                                selectedSkill
+                            );
 
-                          <button
-                            type="button"
-                            className="account-back-button"
-                            onClick={() =>
-                              setSelectedSkill(
-                                null
-                              )
-                            }
-                          >
-                            ← Back to Skills
-                          </button>
+                          const progress =
+                            getSkillProgress(
+                              selectedSkill
+                            );
 
+                          const Icon =
+                            skill?.icon ||
+                            Sparkles;
 
-                          <div className="selected-skill-detail">
+                          return (
+                            <div className="skill-detail">
 
-                            <div
-                              className={`selected-skill-icon skill-${selectedSkill.color}`}
-                            >
-                              {React.createElement(
-                                selectedSkill.icon,
-                                {
-                                  size: 30,
+                              <button
+                                className="account-back-button"
+                                onClick={() =>
+                                  setSelectedSkill(
+                                    null
+                                  )
                                 }
-                              )}
-                            </div>
+                              >
+                                ← Back to Skills
+                              </button>
 
 
-                            <h3>
-                              {selectedSkill.name}
-                            </h3>
+                              <div className="skill-detail-icon">
 
-                            <p>
-                              {
-                                selectedSkill.description
-                              }
-                            </p>
-
-
-                            <div className="selected-skill-stat">
-
-                              <div>
-
-                                <span>
-                                  Lessons Completed
-                                </span>
-
-                                <strong>
-                                  {
-                                    getSkillProgress(
-                                      selectedSkill
-                                    ).completed
-                                  }
-                                </strong>
+                                <Icon size={30} />
 
                               </div>
 
 
-                              <div>
+                              <h3>
+                                {skill?.name}
+                              </h3>
 
-                                <span>
-                                  Total Lessons
-                                </span>
-
-                                <strong>
-                                  {
-                                    getSkillProgress(
-                                      selectedSkill
-                                    ).total
-                                  }
-                                </strong>
-
-                              </div>
+                              <p>
+                                Your learning progress
+                              </p>
 
 
-                              <div>
+                              <div className="skill-detail-progress">
 
-                                <span>
-                                  Completion
-                                </span>
+                                <div className="skill-detail-progress-top">
 
-                                <strong>
-                                  {
-                                    getSkillProgress(
-                                      selectedSkill
-                                    ).percentage
-                                  }%
-                                </strong>
+                                  <span>
+                                    Progress
+                                  </span>
 
-                              </div>
+                                  <strong>
+                                    {progress}%
+                                  </strong>
 
-                            </div>
+                                </div>
 
 
-                            <div className="selected-skill-progress">
+                                <div className="account-progress-bar">
 
-                              <div className="selected-skill-progress-header">
+                                  <div
+                                    style={{
+                                      width: `${progress}%`,
+                                    }}
+                                  />
 
-                                <span>
-                                  Your Progress
-                                </span>
-
-                                <strong>
-                                  {
-                                    getSkillProgress(
-                                      selectedSkill
-                                    ).percentage
-                                  }%
-                                </strong>
+                                </div>
 
                               </div>
 
 
-                              <div className="selected-skill-progress-bar">
+                              <button
+                                className="skill-continue-button"
+                                onClick={() =>
+                                  navigate(
+                                    skill.route
+                                  )
+                                }
+                              >
 
-                                <div
-                                  style={{
-                                    width: `${
-                                      getSkillProgress(
-                                        selectedSkill
-                                      ).percentage
-                                    }%`,
-                                  }}
+                                Continue Learning
+
+                                <ChevronRight
+                                  size={18}
                                 />
 
-                              </div>
+                              </button>
 
                             </div>
+                          );
 
-
-                            <button
-                              type="button"
-                              className="open-skill-button"
-                              onClick={() =>
-                                navigate(
-                                  selectedSkill.path
-                                )
-                              }
-                            >
-
-                              <span>
-                                Continue Learning
-                              </span>
-
-                              <ArrowRight
-                                size={17}
-                              />
-
-                            </button>
-
-                          </div>
-
-                        </>
-
+                        })()
                       )}
 
                     </div>
@@ -1888,185 +1302,137 @@ export default function Home() {
 
                   {/* =================================================
                       CHARACTER TAB
-                  ================================================= */}
+                      ================================================= */}
 
-                  {accountTab ===
-                    "character" && (
-
-                    <div className="account-panel-content">
+                  {accountTab === "character" && (
+                    <div className="account-content">
 
                       <div className="account-section-title">
 
                         <div>
+
                           <h3>
                             Change Character
                           </h3>
 
                           <p>
-                            Choose who represents your learning journey.
+                            Choose how your learner appears
                           </p>
+
                         </div>
 
                       </div>
 
 
-                      <div className="character-preview-card">
+                      {/* PREVIEW */}
 
-                        <div className="character-preview-glow" />
+                      <div className="character-preview">
 
                         <img
                           src={getCharacterImage()}
-                          alt="Selected SkillSensAI character"
+                          alt="Selected character"
                         />
 
                       </div>
 
+
+                      {/* CHARACTER GRID */}
 
                       <div className="character-grid">
 
                         {defaultCharacters.map(
-                          (character) => (
+                          (character) => {
 
-                            <button
-                              type="button"
-                              key={
-                                character.id
-                              }
-                              className={`character-option ${
-                                selectedCharacter ===
-                                character.id
-                                  ? "selected"
-                                  : ""
-                              }`}
-                              onClick={() =>
-                                handleCharacterSelect(
-                                  character.id
-                                )
-                              }
-                            >
+                            const isSelected =
+                              !customCharacter &&
+                              selectedCharacter ===
+                                character.id;
 
-                              <div className="character-option-image">
-
-                                <img
-                                  src={
-                                    character.image
-                                  }
-                                  alt={
-                                    character.name
-                                  }
-                                />
-
-                              </div>
-
-
-                              <strong>
-                                {
-                                  character.name
+                            return (
+                              <button
+                                key={character.id}
+                                className={`character-option ${
+                                  isSelected
+                                    ? "selected"
+                                    : ""
+                                }`}
+                                onClick={() =>
+                                  handleCharacterSelect(
+                                    character.id
+                                  )
                                 }
-                              </strong>
+                              >
 
-                              <span>
-                                {
-                                  character.description
-                                }
-                              </span>
+                                <div className="character-option-image">
 
-
-                              {selectedCharacter ===
-                                character.id && (
-
-                                <div className="character-selected-check">
-                                  <Check
-                                    size={14}
+                                  <img
+                                    src={
+                                      character.image
+                                    }
+                                    alt={
+                                      character.name
+                                    }
                                   />
+
+                                  {isSelected && (
+                                    <span className="character-check">
+                                      <Check
+                                        size={15}
+                                      />
+                                    </span>
+                                  )}
+
                                 </div>
 
-                              )}
 
-                            </button>
+                                <strong>
+                                  {character.name}
+                                </strong>
 
-                          )
-                        )}
+                                <span>
+                                  {character.description}
+                                </span>
 
-
-                        {customCharacter && (
-
-                          <button
-                            type="button"
-                            className={`character-option ${
-                              selectedCharacter ===
-                              "custom"
-                                ? "selected"
-                                : ""
-                            }`}
-                            onClick={() =>
-                              handleCharacterSelect(
-                                "custom"
-                              )
-                            }
-                          >
-
-                            <div className="character-option-image">
-
-                              <img
-                                src={
-                                  customCharacter
-                                }
-                                alt="Custom character"
-                              />
-
-                            </div>
-
-                            <strong>
-                              My Character
-                            </strong>
-
-                            <span>
-                              Your uploaded character
-                            </span>
-
-
-                            {selectedCharacter ===
-                              "custom" && (
-
-                              <div className="character-selected-check">
-                                <Check
-                                  size={14}
-                                />
-                              </div>
-
-                            )}
-
-                          </button>
-
+                              </button>
+                            );
+                          }
                         )}
 
                       </div>
 
 
+                      {/* CUSTOM CHARACTER */}
+
                       <button
-                        type="button"
-                        className="upload-character-button"
+                        className={`character-upload-button ${
+                          customCharacter
+                            ? "selected"
+                            : ""
+                        }`}
                         onClick={() =>
-                          characterImageInputRef.current?.click()
+                          characterInputRef.current?.click()
                         }
                       >
 
-                        <Upload
-                          size={18}
-                        />
+                        <Upload size={18} />
 
-                        <span>
-                          Upload Character
-                        </span>
+                        <div>
+
+                          <strong>
+                            Upload Your Character
+                          </strong>
+
+                          <span>
+                            PNG or JPG image
+                          </span>
+
+                        </div>
 
                       </button>
 
 
                       <input
-                        ref={
-                          characterImageInputRef
-                        }
+                        ref={characterInputRef}
                         type="file"
                         accept="image/*"
                         hidden
@@ -2075,25 +1441,10 @@ export default function Home() {
                         }
                       />
 
-
-                      <div className="character-info-note">
-
-                        <Sparkles
-                          size={16}
-                        />
-
-                        <span>
-                          Your selected character will appear on the Home screen.
-                        </span>
-
-                      </div>
-
                     </div>
                   )}
 
-
                 </div>
-
               )}
 
             </div>
@@ -2102,113 +1453,48 @@ export default function Home() {
         </div>
 
 
-        {/* =================================================
-            HANGING BULB
-        ================================================= */}
-
-        <div className="hanging-bulb">
-
-          <div className="bulb-wire" />
-
-          <button
-            type="button"
-            className={`bulb-button ${
-              bulbOn
-                ? "bulb-on"
-                : "bulb-off"
-            }`}
-            onClick={
-              handleBulbClick
-            }
-            onMouseDown={(event) =>
-              event.stopPropagation()
-            }
-            aria-label={
-              bulbOn
-                ? "Turn light off"
-                : "Turn light on"
-            }
-            title={
-              bulbOn
-                ? "Turn light off"
-                : "Turn light on"
-            }
-          >
-
-            <span className="bulb-neck" />
-
-            <span className="bulb-glass">
-
-              {bulbOn ? (
-                <Lightbulb
-                  size={20}
-                />
-              ) : (
-                <LightbulbOff
-                  size={20}
-                />
-              )}
-
-            </span>
-
-          </button>
-
-        </div>
-
-
-        {/* =================================================
-            MAIN CONTENT
-        ================================================= */}
+        {/* =====================================================
+            MAIN HOME CONTENT
+            ===================================================== */}
 
         <main className="home-content">
 
-
           {/* =================================================
-              ROOM / SKILLS AREA
-          ================================================= */}
+              SKILLS ROOM
+              ================================================= */}
 
           <section className="skills-room">
-
 
             {/* SOFA */}
 
             <div className="room-sofa">
 
               <div className="sofa-back" />
-
               <div className="sofa-seat" />
 
-              <div className="sofa-arm sofa-arm-left" />
+              <div className="sofa-arm left" />
+              <div className="sofa-arm right" />
 
-              <div className="sofa-arm sofa-arm-right" />
-
-              <div className="sofa-leg sofa-leg-left" />
-
-              <div className="sofa-leg sofa-leg-right" />
+              <div className="sofa-leg left" />
+              <div className="sofa-leg right" />
 
             </div>
 
 
             {/* RUG */}
 
-            <div className="room-rug">
-              <div className="rug-pattern" />
-            </div>
+            <div className="room-rug" />
 
 
             {/* PLANT */}
 
             <div className="room-plant">
 
-              <div className="plant-pot">
-                <div className="plant-pot-top" />
-                <div className="plant-pot-body" />
-              </div>
+              <div className="plant-pot" />
 
-              <div className="plant-stem plant-stem-1" />
-              <div className="plant-stem plant-stem-2" />
-              <div className="plant-stem plant-stem-3" />
-              <div className="plant-stem plant-stem-4" />
+              <div className="plant-stem stem-one" />
+              <div className="plant-stem stem-two" />
+              <div className="plant-stem stem-three" />
 
               <div className="plant-leaf plant-leaf-1" />
               <div className="plant-leaf plant-leaf-2" />
@@ -2220,80 +1506,63 @@ export default function Home() {
             </div>
 
 
-            {/* CHARACTER SHADOW */}
+            {/* CHARACTER */}
 
             <div className="character-shadow" />
 
-
-            {/* CHARACTER */}
-
             <div className="samurai-container">
 
+              <div className="samurai-aura" />
+
               <img
+                className="samurai-image"
                 src={getCharacterImage()}
                 alt="SkillSensAI character"
-                className="samurai-image"
               />
 
             </div>
 
 
-            {/* SKILLS ORBIT */}
+            {/* =================================================
+                SKILL ORBIT
+                ================================================= */}
 
             <div className="skills-orbit">
 
-              {skills.map(
-                (skill, index) => {
+              {skills.map((skill, index) => {
 
-                  const Icon =
-                    skill.icon;
+                const Icon = skill.icon;
 
-                  return (
-                    <button
-                      key={
-                        skill.name
-                      }
-                      type="button"
-                      className={[
-                        "skill-circle",
-                        `skill-${skill.color}`,
-                        `skill-position-${
-                          index + 1
-                        }`,
-                        skill.active
-                          ? "skill-active"
-                          : "skill-disabled",
-                      ].join(" ")}
-                      onClick={() =>
-                        handleSkillClick(
-                          skill
-                        )
-                      }
-                      disabled={
-                        !skill.active
-                      }
-                    >
+                return (
+                  <button
+                    key={skill.id}
+                    className={`skill-circle skill-${index + 1} ${skill.color} ${
+                      skill.active
+                        ? "skill-active"
+                        : "skill-inactive"
+                    }`}
+                    onClick={() =>
+                      handleSkillClick(skill)
+                    }
+                    disabled={!skill.active}
+                  >
 
-                      <Icon
-                        className="skill-icon"
-                        size={25}
-                      />
+                    <Icon size={25} />
 
-                      <span className="skill-name">
-                        {skill.name}
+                    <span className="skill-name">
+                      {skill.name}
+                    </span>
+
+                    {!skill.active && (
+                      <span className="coming-soon">
+                        Coming Soon
                       </span>
+                    )}
 
-                      {!skill.active && (
-                        <span className="coming-soon">
-                          Coming Soon
-                        </span>
-                      )}
+                  </button>
+                );
 
-                    </button>
-                  );
-
-                }
-              )}
+              })}
 
             </div>
 
@@ -2301,114 +1570,129 @@ export default function Home() {
 
 
           {/* =================================================
+              INTRO
+              ================================================= */}
+
+          <section className="home-intro">
+
+            <div className="home-eyebrow">
+              AI-POWERED SKILL LEARNING
+            </div>
+
+            <h1>
+              Learn skills.
+              <span> Build mastery.</span>
+            </h1>
+
+            <p>
+              Learn at your own pace with AI-powered
+              guidance, expert knowledge and practical
+              experience.
+            </p>
+
+          </section>
+
+
+          {/* =================================================
               LEARNING FLOW
-          ================================================= */}
+              ================================================= */}
 
           <section className="learning-flow">
 
-            <h2 className="flow-heading">
-              Learn. Practice. Master.
-            </h2>
+            <div className="flow-card flow-learn">
 
-
-            <div className="flow-cards">
-
-
-              <div className="flow-card flow-learn">
-
-                <div className="flow-card-icon">
-                  <BookOpen
-                    size={25}
-                  />
-                </div>
-
-                <div>
-
-                  <h3>
-                    Learn
-                  </h3>
-
-                  <p>
-                    Learn skills step by step
-                    with guided lessons.
-                  </p>
-
-                </div>
-
+              <div className="flow-icon">
+                <BookOpen size={24} />
               </div>
 
+              <div>
 
-              <ArrowRight
-                className="flow-arrow"
-                size={24}
-              />
+                <span>
+                  STEP 01
+                </span>
 
+                <h3>
+                  Learn
+                </h3>
 
-              <div className="flow-card flow-practice">
-
-                <div className="flow-card-icon">
-                  <Target
-                    size={25}
-                  />
-                </div>
-
-                <div>
-
-                  <h3>
-                    Practice
-                  </h3>
-
-                  <p>
-                    Practice what you learn
-                    with real activities.
-                  </p>
-
-                </div>
-
-              </div>
-
-
-              <ArrowRight
-                className="flow-arrow"
-                size={24}
-              />
-
-
-              <div className="flow-card flow-master">
-
-                <div className="flow-card-icon">
-                  <Trophy
-                    size={25}
-                  />
-                </div>
-
-                <div>
-
-                  <h3>
-                    Master
-                  </h3>
-
-                  <p>
-                    Improve your skills and
-                    become confident.
-                  </p>
-
-                </div>
+                <p>
+                  Understand the fundamentals through
+                  structured lessons.
+                </p>
 
               </div>
 
             </div>
 
 
-            <div className="home-bottom-note">
+            <div className="flow-arrow">
+              <ChevronRight size={24} />
+            </div>
 
-              <ShieldCheck
-                size={17}
-              />
+
+            <div className="flow-card flow-practice">
+
+              <div className="flow-icon">
+                <Video size={24} />
+              </div>
+
+              <div>
+
+                <span>
+                  STEP 02
+                </span>
+
+                <h3>
+                  Practice
+                </h3>
+
+                <p>
+                  Apply what you learn through
+                  real-world practice.
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <div className="flow-arrow">
+              <ChevronRight size={24} />
+            </div>
+
+
+            <div className="flow-card flow-master">
+
+              <div className="flow-icon">
+                <Award size={24} />
+              </div>
+
+              <div>
+
+                <span>
+                  STEP 03
+                </span>
+
+                <h3>
+                  Master
+                </h3>
+
+                <p>
+                  Get AI feedback and continuously
+                  improve your skills.
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <div className="learning-flow-note">
+
+              <Sparkles size={16} />
 
               <span>
-                Your learning journey is
-                personalized to your pace.
+                Learn → Practice → Get AI Feedback → Master
               </span>
 
             </div>
@@ -2417,390 +1701,217 @@ export default function Home() {
 
         </main>
 
+      </div>
 
-        {/* =================================================
-            LOGIN MODAL
-        ================================================= */}
 
-        {loginOpen && (
+      {/* =====================================================
+          LOGIN MODAL
+          ===================================================== */}
 
-          <div
-            className="login-overlay"
-            onMouseDown={(event) => {
+      {loginOpen && (
+        <div
+          className="login-overlay"
+          onClick={(event) => {
+            if (
+              event.target ===
+              event.currentTarget
+            ) {
+              setLoginOpen(false);
+            }
+          }}
+        >
 
-              if (
-                event.target ===
-                event.currentTarget
-              ) {
-                closeLogin();
+          <div className="login-modal">
+
+            <button
+              className="login-close"
+              onClick={() =>
+                setLoginOpen(false)
               }
-
-            }}
-          >
-
-            <div className="login-modal">
+            >
+              ×
+            </button>
 
 
-              <button
-                type="button"
-                className="login-close"
-                onClick={
-                  closeLogin
-                }
-                aria-label="Close login"
-                disabled={
-                  loading
-                }
-              >
-                <X size={20} />
-              </button>
+            <div className="login-header">
 
-
-              <div className="login-modal-icon">
-                <User size={27} />
+              <div className="login-logo">
+                <Sparkles size={25} />
               </div>
 
-
-              <div className="login-modal-header">
-
-                <h2>
-                  Welcome to SkillSensAI
-                </h2>
-
-                <p>
-                  Sign in to continue your
-                  learning journey.
-                </p>
-
-              </div>
-
-
-              <div className="login-tabs">
-
-                <button
-                  type="button"
-                  className={
-                    loginMethod ===
-                    "google"
-                      ? "login-tab-active"
-                      : ""
-                  }
-                  onClick={() => {
-
-                    if (loading)
-                      return;
-
-                    setLoginMethod(
-                      "google"
-                    );
-
-                    setLoginError("");
-
-                  }}
-                >
-                  Google
-                </button>
-
-
-                <button
-                  type="button"
-                  className={
-                    loginMethod ===
-                    "phone"
-                      ? "login-tab-active"
-                      : ""
-                  }
-                  onClick={() => {
-
-                    if (loading)
-                      return;
-
-                    setLoginMethod(
-                      "phone"
-                    );
-
-                    setLoginError("");
-
-                  }}
-                >
-                  Phone
-                </button>
-
-              </div>
-
-
-              {loginMethod ===
-                "google" && (
-
-                <div className="login-method-content">
-
-                  <button
-                    type="button"
-                    className="google-login-button"
-                    onClick={
-                      handleGoogleLogin
-                    }
-                    disabled={
-                      loading
-                    }
-                  >
-
-                    {loading ? (
-                      <Loader2
-                        className="login-spinner"
-                        size={20}
-                      />
-                    ) : (
-                      <span className="google-symbol">
-                        G
-                      </span>
-                    )}
-
-                    <span>
-                      {loading
-                        ? "Signing in..."
-                        : "Continue with Google"}
-                    </span>
-
-                  </button>
-
-
-                  <div className="login-security-note">
-
-                    <ShieldCheck
-                      size={16}
-                    />
-
-                    <span>
-                      Your account is
-                      securely handled by
-                      Firebase Authentication.
-                    </span>
-
-                  </div>
-
-                </div>
-              )}
-
-
-              {loginMethod ===
-                "phone" && (
-
-                <div className="login-method-content">
-
-                  {phoneStep ===
-                  "phone" ? (
-                    <>
-
-                      <label
-                        className="login-input-label"
-                        htmlFor="phone-number"
-                      >
-                        Mobile Number
-                      </label>
-
-
-                      <div className="login-phone-input">
-
-                        <Phone
-                          size={18}
-                        />
-
-                        <input
-                          id="phone-number"
-                          type="tel"
-                          value={
-                            phoneNumber
-                          }
-                          onChange={
-                            handlePhoneChange
-                          }
-                          placeholder="+91 9876543210"
-                          maxLength={
-                            14
-                          }
-                          disabled={
-                            loading
-                          }
-                        />
-
-                      </div>
-
-
-                      <button
-                        type="button"
-                        className="phone-login-button"
-                        onClick={
-                          handleSendOtp
-                        }
-                        disabled={
-                          loading
-                        }
-                      >
-
-                        {loading ? (
-                          <>
-                            <Loader2
-                              className="login-spinner"
-                              size={18}
-                            />
-
-                            Sending OTP...
-                          </>
-                        ) : (
-                          <>
-                            <Phone
-                              size={18}
-                            />
-
-                            Send OTP
-                          </>
-                        )}
-
-                      </button>
-
-                    </>
-                  ) : (
-                    <>
-
-                      <label
-                        className="login-input-label"
-                        htmlFor="otp"
-                      >
-                        Enter OTP
-                      </label>
-
-
-                      <div className="otp-input-wrapper">
-
-                        <input
-                          id="otp"
-                          type="text"
-                          inputMode="numeric"
-                          autoComplete="one-time-code"
-                          value={otp}
-                          onChange={(event) =>
-                            setOtp(
-                              event.target.value
-                                .replace(
-                                  /\D/g,
-                                  ""
-                                )
-                                .slice(
-                                  0,
-                                  6
-                                )
-                            )
-                          }
-                          placeholder="6-digit OTP"
-                          maxLength={
-                            6
-                          }
-                          disabled={
-                            loading
-                          }
-                        />
-
-                      </div>
-
-
-                      <button
-                        type="button"
-                        className="phone-login-button"
-                        onClick={
-                          handleVerifyOtp
-                        }
-                        disabled={
-                          loading
-                        }
-                      >
-
-                        {loading ? (
-                          <>
-                            <Loader2
-                              className="login-spinner"
-                              size={18}
-                            />
-
-                            Verifying...
-                          </>
-                        ) : (
-                          <>
-                            <ShieldCheck
-                              size={18}
-                            />
-
-                            Verify OTP
-                          </>
-                        )}
-
-                      </button>
-
-
-                      <button
-                        type="button"
-                        className="change-number-button"
-                        onClick={() => {
-
-                          if (loading)
-                            return;
-
-                          setPhoneStep(
-                            "phone"
-                          );
-
-                          setOtp("");
-
-                          setConfirmationResult(
-                            null
-                          );
-
-                          setLoginError("");
-
-                        }}
-                      >
-                        Change number
-                      </button>
-
-                    </>
-                  )}
-
-
-                  <div
-                    id="recaptcha-container"
-                  />
-
-
-                  <div className="login-security-note">
-
-                    <ShieldCheck
-                      size={16}
-                    />
-
-                    <span>
-                      Your phone number is
-                      used only for secure
-                      authentication.
-                    </span>
-
-                  </div>
-
-                </div>
-              )}
-
-
-              {loginError && (
-                <div className="login-error">
-                  {loginError}
-                </div>
-              )}
+              <h2>
+                Welcome to SkillSensAI
+              </h2>
+
+              <p>
+                Sign in and start learning.
+              </p>
 
             </div>
 
-          </div>
-        )}
 
-      </div>
+            {/* METHOD TABS */}
+
+            <div className="login-method-tabs">
+
+              <button
+                className={
+                  loginMethod === "google"
+                    ? "active"
+                    : ""
+                }
+                onClick={() => {
+                  setLoginMethod("google");
+                  setLoginError("");
+                }}
+              >
+                Google
+              </button>
+
+              <button
+                className={
+                  loginMethod === "phone"
+                    ? "active"
+                    : ""
+                }
+                onClick={() => {
+                  setLoginMethod("phone");
+                  setLoginError("");
+                }}
+              >
+                Phone
+              </button>
+
+            </div>
+
+
+            {/* GOOGLE */}
+
+            {loginMethod === "google" && (
+              <div className="login-method-content">
+
+                <button
+                  className="google-login-button"
+                  onClick={handleGoogleLogin}
+                  disabled={loading}
+                >
+
+                  <span className="google-logo">
+                    G
+                  </span>
+
+                  {loading
+                    ? "Signing in..."
+                    : "Continue with Google"}
+
+                </button>
+
+              </div>
+            )}
+
+
+            {/* PHONE */}
+
+            {loginMethod === "phone" && (
+              <div className="login-method-content">
+
+                {phoneStep === "phone" ? (
+                  <>
+                    <label>
+                      Phone Number
+                    </label>
+
+                    <input
+                      type="tel"
+                      placeholder="+91 9876543210"
+                      value={phoneNumber}
+                      onChange={(event) =>
+                        setPhoneNumber(
+                          event.target.value
+                        )
+                      }
+                    />
+
+                    <button
+                      className="phone-login-button"
+                      onClick={handleSendOtp}
+                      disabled={loading}
+                    >
+                      {loading
+                        ? "Sending OTP..."
+                        : "Send OTP"}
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <label>
+                      Enter OTP
+                    </label>
+
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={6}
+                      placeholder="Enter 6-digit OTP"
+                      value={otp}
+                      onChange={(event) =>
+                        setOtp(
+                          event.target.value
+                            .replace(/\D/g, "")
+                        )
+                      }
+                    />
+
+                    <button
+                      className="phone-login-button"
+                      onClick={handleVerifyOtp}
+                      disabled={loading}
+                    >
+                      {loading
+                        ? "Verifying..."
+                        : "Verify OTP"}
+                    </button>
+
+                    <button
+                      className="back-to-phone"
+                      onClick={() => {
+                        setPhoneStep("phone");
+                        setOtp("");
+                        setLoginError("");
+                      }}
+                    >
+                      Change phone number
+                    </button>
+                  </>
+                )}
+
+                <div
+                  id="recaptcha-container"
+                />
+
+              </div>
+            )}
+
+
+            {/* ERROR */}
+
+            {loginError && (
+              <div className="login-error">
+                {loginError}
+              </div>
+            )}
+
+
+            <div className="login-footer">
+              By continuing, you agree to use
+              SkillSensAI responsibly.
+            </div>
+
+          </div>
+
+        </div>
+      )}
+
     </div>
   );
 }
