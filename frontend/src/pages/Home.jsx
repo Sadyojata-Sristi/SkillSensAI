@@ -22,6 +22,11 @@ import {
   Trophy,
   ArrowRight,
   Loader2,
+  Camera,
+  Upload,
+  Check,
+  Settings,
+  Award,
 } from "lucide-react";
 
 import {
@@ -50,6 +55,9 @@ const skills = [
     color: "music",
     active: true,
     path: "/music",
+    description:
+      "Learn singing, pitch, rhythm and musical expression.",
+    lessons: 15,
   },
   {
     name: "Martial Arts",
@@ -57,30 +65,45 @@ const skills = [
     color: "martial",
     active: true,
     path: "/martial-arts",
+    description:
+      "Build discipline, technique, movement and confidence.",
+    lessons: 10,
   },
   {
     name: "Dance",
     icon: Dumbbell,
     color: "dance",
     active: false,
+    description:
+      "Dance lessons will be available soon.",
+    lessons: 0,
   },
   {
     name: "Art",
     icon: Palette,
     color: "art",
     active: false,
+    description:
+      "Creative art learning will be available soon.",
+    lessons: 0,
   },
   {
     name: "Coding",
     icon: Code2,
     color: "coding",
     active: false,
+    description:
+      "Practical coding lessons will be available soon.",
+    lessons: 0,
   },
   {
     name: "More",
     icon: Sparkles,
     color: "more",
     active: false,
+    description:
+      "More skills are coming soon.",
+    lessons: 0,
   },
 ];
 
@@ -93,11 +116,44 @@ const TOTAL_LESSONS = 15;
 
 
 /* =========================================================
+   CHARACTER OPTIONS
+   =========================================================
+   
+   For now we use the existing samurai image.
+
+   Later, when you upload your character images into /public,
+   we can simply add their filenames here.
+========================================================= */
+
+const defaultCharacters = [
+  {
+    id: "samurai",
+    name: "Samurai",
+    image: "/samurai.png",
+    description: "Your original SkillSensAI warrior.",
+  },
+  {
+    id: "singer",
+    name: "Singer",
+    image: "/samurai.png",
+    description: "Music character — image can be replaced later.",
+  },
+  {
+    id: "fighter",
+    name: "Fighter",
+    image: "/samurai.png",
+    description: "Martial Arts character — image can be replaced later.",
+  },
+];
+
+
+/* =========================================================
    HOME
    ========================================================= */
 
 export default function Home() {
   const navigate = useNavigate();
+
 
   /* -------------------------------------------------------
      THEME
@@ -130,6 +186,28 @@ export default function Home() {
 
 
   /* -------------------------------------------------------
+     ACCOUNT PANEL
+  ------------------------------------------------------- */
+
+  const [accountTab, setAccountTab] = useState("profile");
+
+  const [profileImage, setProfileImage] = useState(null);
+
+  const [selectedCharacter, setSelectedCharacter] =
+    useState("samurai");
+
+  const [customCharacter, setCustomCharacter] =
+    useState(null);
+
+  const [selectedSkill, setSelectedSkill] =
+    useState(null);
+
+  const profileImageInputRef = useRef(null);
+
+  const characterImageInputRef = useRef(null);
+
+
+  /* -------------------------------------------------------
      PHONE LOGIN
   ------------------------------------------------------- */
 
@@ -137,9 +215,11 @@ export default function Home() {
 
   const [otp, setOtp] = useState("");
 
-  const [confirmationResult, setConfirmationResult] = useState(null);
+  const [confirmationResult, setConfirmationResult] =
+    useState(null);
 
-  const [phoneStep, setPhoneStep] = useState("phone");
+  const [phoneStep, setPhoneStep] =
+    useState("phone");
 
   const recaptchaRef = useRef(null);
 
@@ -148,7 +228,8 @@ export default function Home() {
      PROGRESS
   ------------------------------------------------------- */
 
-  const [lessonsLearned, setLessonsLearned] = useState(0);
+  const [lessonsLearned, setLessonsLearned] =
+    useState(0);
 
 
   /* -------------------------------------------------------
@@ -159,12 +240,58 @@ export default function Home() {
 
 
   /* =========================================================
+     LOAD ACCOUNT SETTINGS
+  ========================================================= */
+
+  useEffect(() => {
+    try {
+      const savedProfileImage =
+        localStorage.getItem(
+          "skillsensai_profile_image"
+        );
+
+      if (savedProfileImage) {
+        setProfileImage(savedProfileImage);
+      }
+
+      const savedCharacter =
+        localStorage.getItem(
+          "skillsensai_character"
+        );
+
+      if (savedCharacter) {
+        setSelectedCharacter(savedCharacter);
+      }
+
+      const savedCustomCharacter =
+        localStorage.getItem(
+          "skillsensai_custom_character"
+        );
+
+      if (savedCustomCharacter) {
+        setCustomCharacter(
+          savedCustomCharacter
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Could not load account settings:",
+        error
+      );
+    }
+  }, []);
+
+
+  /* =========================================================
      THEME
   ========================================================= */
 
   useEffect(() => {
     try {
-      localStorage.setItem("skillsensai_theme", theme);
+      localStorage.setItem(
+        "skillsensai_theme",
+        theme
+      );
     } catch {
       // Ignore localStorage errors.
     }
@@ -184,24 +311,31 @@ export default function Home() {
 
   /* =========================================================
      FIREBASE AUTH STATE
-     ========================================================= */
+  ========================================================= */
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(
-      auth,
-      (currentUser) => {
-        console.log("SkillSensAI auth state:", currentUser);
+    const unsubscribe =
+      onAuthStateChanged(
+        auth,
+        (currentUser) => {
+          console.log(
+            "SkillSensAI auth state:",
+            currentUser
+          );
 
-        setUser(currentUser);
+          setUser(currentUser);
 
-        if (!currentUser) {
-          setProfileOpen(false);
+          if (!currentUser) {
+            setProfileOpen(false);
+          }
+        },
+        (error) => {
+          console.error(
+            "Firebase auth state error:",
+            error
+          );
         }
-      },
-      (error) => {
-        console.error("Firebase auth state error:", error);
-      }
-    );
+      );
 
     return () => unsubscribe();
   }, []);
@@ -209,21 +343,36 @@ export default function Home() {
 
   /* =========================================================
      LOAD REAL PROGRESS
-     ========================================================= */
+  ========================================================= */
 
   const loadProgress = () => {
     try {
-      const completed = getLessonsLearned();
+      const completed =
+        getLessonsLearned();
 
-      const numericValue = Number(completed);
+      const numericValue =
+        Number(completed);
 
-      if (Number.isFinite(numericValue)) {
-        setLessonsLearned(Math.max(0, numericValue));
+      if (
+        Number.isFinite(
+          numericValue
+        )
+      ) {
+        setLessonsLearned(
+          Math.max(
+            0,
+            numericValue
+          )
+        );
       } else {
         setLessonsLearned(0);
       }
     } catch (error) {
-      console.error("Could not load lesson progress:", error);
+      console.error(
+        "Could not load lesson progress:",
+        error
+      );
+
       setLessonsLearned(0);
     }
   };
@@ -262,16 +411,25 @@ export default function Home() {
 
   /* =========================================================
      CLOSE PROFILE WHEN CLICKING OUTSIDE
-     ========================================================= */
+  ========================================================= */
 
   useEffect(() => {
-    const handleOutsideClick = (event) => {
-      if (!event.target.closest(".profile-area")) {
-        setProfileOpen(false);
-      }
-    };
+    const handleOutsideClick =
+      (event) => {
+        if (
+          !event.target.closest(
+            ".profile-area"
+          )
+        ) {
+          setProfileOpen(false);
+          setSelectedSkill(null);
+        }
+      };
 
-    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener(
+      "mousedown",
+      handleOutsideClick
+    );
 
     return () => {
       document.removeEventListener(
@@ -312,343 +470,566 @@ export default function Home() {
      GOOGLE LOGIN
   ========================================================= */
 
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-    setLoginError("");
+  const handleGoogleLogin =
+    async () => {
+      setLoading(true);
+      setLoginError("");
 
-    try {
-      const provider = new GoogleAuthProvider();
+      try {
+        const provider =
+          new GoogleAuthProvider();
 
-      provider.setCustomParameters({
-        prompt: "select_account",
-      });
-
-      const result = await signInWithPopup(
-        auth,
-        provider
-      );
-
-      console.log(
-        "Google login successful:",
-        result.user
-      );
-
-      /*
-       * Update immediately so the Home page changes
-       * without waiting for another render cycle.
-       */
-      setUser(result.user);
-
-      setLoginOpen(false);
-      setProfileOpen(true);
-
-      loadProgress();
-    } catch (error) {
-      console.error("Google login error:", error);
-
-      if (error?.code === "auth/popup-closed-by-user") {
-        setLoginError("Login window was closed.");
-      } else if (
-        error?.code === "auth/popup-blocked"
-      ) {
-        setLoginError(
-          "Your browser blocked the login popup. Please allow popups for SkillSensAI."
+        provider.setCustomParameters(
+          {
+            prompt:
+              "select_account",
+          }
         );
-      } else if (
-        error?.code === "auth/unauthorized-domain"
-      ) {
-        setLoginError(
-          "This website is not authorized for Firebase login."
+
+        const result =
+          await signInWithPopup(
+            auth,
+            provider
+          );
+
+        console.log(
+          "Google login successful:",
+          result.user
         );
-      } else {
-        setLoginError(
-          error?.message ||
-            "Google login failed. Please try again."
+
+        setUser(result.user);
+
+        setLoginOpen(false);
+        setProfileOpen(true);
+        setAccountTab("profile");
+
+        loadProgress();
+
+      } catch (error) {
+        console.error(
+          "Google login error:",
+          error
         );
+
+        if (
+          error?.code ===
+          "auth/popup-closed-by-user"
+        ) {
+          setLoginError(
+            "Login window was closed."
+          );
+        } else if (
+          error?.code ===
+          "auth/popup-blocked"
+        ) {
+          setLoginError(
+            "Your browser blocked the login popup. Please allow popups for SkillSensAI."
+          );
+        } else if (
+          error?.code ===
+          "auth/unauthorized-domain"
+        ) {
+          setLoginError(
+            "This website is not authorized for Firebase login."
+          );
+        } else {
+          setLoginError(
+            error?.message ||
+              "Google login failed. Please try again."
+          );
+        }
+      } finally {
+        setLoading(false);
       }
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
 
   /* =========================================================
      PHONE NUMBER FORMAT
   ========================================================= */
 
-  const formatPhoneNumber = (value) => {
-    let digits = value.replace(/\D/g, "");
+  const formatPhoneNumber =
+    (value) => {
+      let digits =
+        value.replace(
+          /\D/g,
+          ""
+        );
 
-    if (digits.startsWith("91")) {
-      digits = digits.substring(2);
-    }
+      if (
+        digits.startsWith("91")
+      ) {
+        digits =
+          digits.substring(2);
+      }
 
-    digits = digits.substring(0, 10);
+      digits =
+        digits.substring(
+          0,
+          10
+        );
 
-    if (!digits) {
-      return "";
-    }
+      if (!digits) {
+        return "";
+      }
 
-    return `+91 ${digits}`;
-  };
+      return `+91 ${digits}`;
+    };
 
 
-  const handlePhoneChange = (event) => {
-    const formatted = formatPhoneNumber(
-      event.target.value
-    );
+  const handlePhoneChange =
+    (event) => {
+      const formatted =
+        formatPhoneNumber(
+          event.target.value
+        );
 
-    setPhoneNumber(formatted);
-  };
+      setPhoneNumber(
+        formatted
+      );
+    };
 
 
   /* =========================================================
      PHONE OTP
   ========================================================= */
 
-  const handleSendOtp = async () => {
-    setLoginError("");
+  const handleSendOtp =
+    async () => {
+      setLoginError("");
 
-    const digits = phoneNumber.replace(/\D/g, "");
-
-    if (digits.length !== 10) {
-      setLoginError(
-        "Please enter a valid 10-digit Indian mobile number."
-      );
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      /*
-       * Clear any previous verifier.
-       */
-      if (recaptchaRef.current) {
-        try {
-          recaptchaRef.current.clear();
-        } catch {
-          // Ignore cleanup error.
-        }
-
-        recaptchaRef.current = null;
-      }
-
-      const verifier = new RecaptchaVerifier(
-        auth,
-        "recaptcha-container",
-        {
-          size: "invisible",
-        }
-      );
-
-      recaptchaRef.current = verifier;
-
-      const fullPhoneNumber = `+91${digits}`;
-
-      const result =
-        await signInWithPhoneNumber(
-          auth,
-          fullPhoneNumber,
-          verifier
+      const digits =
+        phoneNumber.replace(
+          /\D/g,
+          ""
         );
-
-      setConfirmationResult(result);
-      setPhoneStep("otp");
-      setOtp("");
-
-    } catch (error) {
-      console.error(
-        "Phone OTP error:",
-        error
-      );
 
       if (
-        error?.code ===
-        "auth/billing-not-enabled"
+        digits.length !==
+        10
       ) {
         setLoginError(
-          "Phone authentication requires Firebase billing to be enabled."
+          "Please enter a valid 10-digit Indian mobile number."
         );
-      } else if (
-        error?.code ===
-        "auth/invalid-phone-number"
-      ) {
-        setLoginError(
-          "The phone number is invalid."
-        );
-      } else if (
-        error?.code ===
-        "auth/too-many-requests"
-      ) {
-        setLoginError(
-          "Too many attempts. Please try again later."
-        );
-      } else {
-        setLoginError(
-          error?.message ||
-            "Could not send OTP."
-        );
+
+        return;
       }
 
-      if (recaptchaRef.current) {
-        try {
-          recaptchaRef.current.clear();
-        } catch {
-          // Ignore.
+      setLoading(true);
+
+      try {
+        if (
+          recaptchaRef.current
+        ) {
+          try {
+            recaptchaRef.current.clear();
+          } catch {
+            // Ignore.
+          }
+
+          recaptchaRef.current =
+            null;
         }
 
-        recaptchaRef.current = null;
+        const verifier =
+          new RecaptchaVerifier(
+            auth,
+            "recaptcha-container",
+            {
+              size: "invisible",
+            }
+          );
+
+        recaptchaRef.current =
+          verifier;
+
+        const fullPhoneNumber =
+          `+91${digits}`;
+
+        const result =
+          await signInWithPhoneNumber(
+            auth,
+            fullPhoneNumber,
+            verifier
+          );
+
+        setConfirmationResult(
+          result
+        );
+
+        setPhoneStep("otp");
+        setOtp("");
+
+      } catch (error) {
+        console.error(
+          "Phone OTP error:",
+          error
+        );
+
+        if (
+          error?.code ===
+          "auth/billing-not-enabled"
+        ) {
+          setLoginError(
+            "Phone authentication requires Firebase billing to be enabled."
+          );
+        } else if (
+          error?.code ===
+          "auth/invalid-phone-number"
+        ) {
+          setLoginError(
+            "The phone number is invalid."
+          );
+        } else if (
+          error?.code ===
+          "auth/too-many-requests"
+        ) {
+          setLoginError(
+            "Too many attempts. Please try again later."
+          );
+        } else {
+          setLoginError(
+            error?.message ||
+              "Could not send OTP."
+          );
+        }
+
+        if (
+          recaptchaRef.current
+        ) {
+          try {
+            recaptchaRef.current.clear();
+          } catch {
+            // Ignore.
+          }
+
+          recaptchaRef.current =
+            null;
+        }
+      } finally {
+        setLoading(false);
       }
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
 
   /* =========================================================
      VERIFY OTP
   ========================================================= */
 
-  const handleVerifyOtp = async () => {
-    if (!confirmationResult) {
-      setLoginError(
-        "Please request a new OTP."
-      );
-      return;
-    }
-
-    if (otp.length < 6) {
-      setLoginError(
-        "Please enter the 6-digit OTP."
-      );
-      return;
-    }
-
-    setLoading(true);
-    setLoginError("");
-
-    try {
-      const result =
-        await confirmationResult.confirm(
-          otp
-        );
-
-      console.log(
-        "Phone login successful:",
-        result.user
-      );
-
-      setUser(result.user);
-
-      setLoginOpen(false);
-      setProfileOpen(true);
-
-      setPhoneStep("phone");
-      setOtp("");
-      setConfirmationResult(null);
-
-      loadProgress();
-
-    } catch (error) {
-      console.error(
-        "OTP verification error:",
-        error
-      );
-
+  const handleVerifyOtp =
+    async () => {
       if (
-        error?.code ===
-        "auth/invalid-verification-code"
+        !confirmationResult
       ) {
         setLoginError(
-          "Incorrect OTP. Please try again."
+          "Please request a new OTP."
         );
-      } else {
-        setLoginError(
-          error?.message ||
-            "OTP verification failed."
-        );
+
+        return;
       }
-    } finally {
-      setLoading(false);
-    }
-  };
+
+      if (
+        otp.length < 6
+      ) {
+        setLoginError(
+          "Please enter the 6-digit OTP."
+        );
+
+        return;
+      }
+
+      setLoading(true);
+      setLoginError("");
+
+      try {
+        const result =
+          await confirmationResult.confirm(
+            otp
+          );
+
+        console.log(
+          "Phone login successful:",
+          result.user
+        );
+
+        setUser(result.user);
+
+        setLoginOpen(false);
+        setProfileOpen(true);
+        setAccountTab("profile");
+
+        setPhoneStep("phone");
+        setOtp("");
+        setConfirmationResult(
+          null
+        );
+
+        loadProgress();
+
+      } catch (error) {
+        console.error(
+          "OTP verification error:",
+          error
+        );
+
+        if (
+          error?.code ===
+          "auth/invalid-verification-code"
+        ) {
+          setLoginError(
+            "Incorrect OTP. Please try again."
+          );
+        } else {
+          setLoginError(
+            error?.message ||
+              "OTP verification failed."
+          );
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
 
 
   /* =========================================================
      LOGOUT
   ========================================================= */
 
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
+  const handleLogout =
+    async () => {
+      try {
+        await signOut(auth);
 
-      setUser(null);
-      setProfileOpen(false);
-      setLoginOpen(false);
+        setUser(null);
+        setProfileOpen(false);
+        setLoginOpen(false);
+        setSelectedSkill(null);
 
-    } catch (error) {
-      console.error(
-        "Logout error:",
-        error
-      );
-    }
-  };
+      } catch (error) {
+        console.error(
+          "Logout error:",
+          error
+        );
+      }
+    };
 
 
   /* =========================================================
      USER DISPLAY
   ========================================================= */
 
-  const getUserName = () => {
-    if (!user) {
+  const getUserName =
+    () => {
+      if (!user) {
+        return "Learner";
+      }
+
+      if (user.displayName) {
+        return user.displayName;
+      }
+
+      if (user.phoneNumber) {
+        return user.phoneNumber;
+      }
+
+      if (user.email) {
+        return user.email.split(
+          "@"
+        )[0];
+      }
+
       return "Learner";
-    }
-
-    if (user.displayName) {
-      return user.displayName;
-    }
-
-    if (user.phoneNumber) {
-      return user.phoneNumber;
-    }
-
-    if (user.email) {
-      return user.email.split("@")[0];
-    }
-
-    return "Learner";
-  };
+    };
 
 
-  const getUserContact = () => {
-    if (!user) {
+  const getUserContact =
+    () => {
+      if (!user) {
+        return "";
+      }
+
+      if (user.email) {
+        return user.email;
+      }
+
+      if (user.phoneNumber) {
+        return user.phoneNumber;
+      }
+
       return "";
-    }
-
-    if (user.email) {
-      return user.email;
-    }
-
-    if (user.phoneNumber) {
-      return user.phoneNumber;
-    }
-
-    return "";
-  };
+    };
 
 
-  const getInitial = () => {
-    const name = getUserName();
+  const getInitial =
+    () => {
+      const name =
+        getUserName();
 
-    if (!name) {
-      return "U";
-    }
+      if (!name) {
+        return "U";
+      }
 
-    return name
-      .charAt(0)
-      .toUpperCase();
-  };
+      return name
+        .charAt(0)
+        .toUpperCase();
+    };
+
+
+  /* =========================================================
+     PROFILE IMAGE
+  ========================================================= */
+
+  const handleProfileImage =
+    (event) => {
+      const file =
+        event.target.files?.[0];
+
+      if (!file) return;
+
+      if (
+        !file.type.startsWith(
+          "image/"
+        )
+      ) {
+        return;
+      }
+
+      const reader =
+        new FileReader();
+
+      reader.onload = () => {
+        const image =
+          reader.result;
+
+        setProfileImage(
+          image
+        );
+
+        try {
+          localStorage.setItem(
+            "skillsensai_profile_image",
+            image
+          );
+        } catch (error) {
+          console.error(
+            "Could not save profile image:",
+            error
+          );
+        }
+      };
+
+      reader.readAsDataURL(file);
+
+      event.target.value = "";
+    };
+
+
+  /* =========================================================
+     CHARACTER IMAGE
+  ========================================================= */
+
+  const handleCharacterUpload =
+    (event) => {
+      const file =
+        event.target.files?.[0];
+
+      if (!file) return;
+
+      if (
+        !file.type.startsWith(
+          "image/"
+        )
+      ) {
+        return;
+      }
+
+      const reader =
+        new FileReader();
+
+      reader.onload = () => {
+        const image =
+          reader.result;
+
+        setCustomCharacter(
+          image
+        );
+
+        setSelectedCharacter(
+          "custom"
+        );
+
+        try {
+          localStorage.setItem(
+            "skillsensai_custom_character",
+            image
+          );
+
+          localStorage.setItem(
+            "skillsensai_character",
+            "custom"
+          );
+        } catch (error) {
+          console.error(
+            "Could not save character:",
+            error
+          );
+        }
+      };
+
+      reader.readAsDataURL(file);
+
+      event.target.value = "";
+    };
+
+
+  /* =========================================================
+     CHARACTER SELECTION
+  ========================================================= */
+
+  const handleCharacterSelect =
+    (characterId) => {
+      setSelectedCharacter(
+        characterId
+      );
+
+      try {
+        localStorage.setItem(
+          "skillsensai_character",
+          characterId
+        );
+      } catch (error) {
+        console.error(
+          "Could not save character:",
+          error
+        );
+      }
+    };
+
+
+  const getCharacterImage =
+    () => {
+      if (
+        selectedCharacter ===
+        "custom"
+      ) {
+        return (
+          customCharacter ||
+          "/samurai.png"
+        );
+      }
+
+      const character =
+        defaultCharacters.find(
+          (item) =>
+            item.id ===
+            selectedCharacter
+        );
+
+      return (
+        character?.image ||
+        "/samurai.png"
+      );
+    };
 
 
   /* =========================================================
@@ -669,62 +1050,132 @@ export default function Home() {
 
 
   /* =========================================================
+     SKILL PROGRESS
+  ========================================================= */
+
+  const getSkillProgress =
+    (skill) => {
+      if (
+        skill.name ===
+        "Music"
+      ) {
+        return {
+          completed:
+            lessonsLearned,
+          total:
+            skill.lessons,
+          percentage:
+            skill.lessons > 0
+              ? Math.min(
+                  100,
+                  Math.round(
+                    (lessonsLearned /
+                      skill.lessons) *
+                      100
+                  )
+                )
+              : 0,
+        };
+      }
+
+      if (
+        skill.name ===
+        "Martial Arts"
+      ) {
+        return {
+          completed: 0,
+          total: skill.lessons,
+          percentage: 0,
+        };
+      }
+
+      return {
+        completed: 0,
+        total: skill.lessons,
+        percentage: 0,
+      };
+    };
+
+
+  /* =========================================================
      SKILL NAVIGATION
   ========================================================= */
 
-  const handleSkillClick = (skill) => {
-    if (!skill.active) {
-      return;
-    }
+  const handleSkillClick =
+    (skill) => {
+      if (!skill.active) {
+        return;
+      }
 
-    navigate(skill.path);
-  };
+      navigate(skill.path);
+    };
 
 
   /* =========================================================
      BULB
   ========================================================= */
 
-const handleBulbClick = (event) => {
-  event.preventDefault();
-  event.stopPropagation();
+  const handleBulbClick =
+    (event) => {
+      event.preventDefault();
+      event.stopPropagation();
 
-  setBulbOn((current) => !current);
-
-  setTheme((currentTheme) => {
-    const nextTheme =
-      currentTheme === "light"
-        ? "dark"
-        : "light";
-
-    try {
-      localStorage.setItem(
-        "skillsensai_theme",
-        nextTheme
+      setBulbOn(
+        (current) =>
+          !current
       );
-    } catch {
-      // Ignore localStorage errors.
-    }
 
-    return nextTheme;
-  });
-};
+      setTheme(
+        (currentTheme) => {
+          const nextTheme =
+            currentTheme ===
+            "light"
+              ? "dark"
+              : "light";
+
+          try {
+            localStorage.setItem(
+              "skillsensai_theme",
+              nextTheme
+            );
+          } catch {
+            // Ignore.
+          }
+
+          return nextTheme;
+        }
+      );
+    };
 
 
   /* =========================================================
      THEME TOGGLE
   ========================================================= */
 
-  const handleThemeToggle = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
+  const handleThemeToggle =
+    (event) => {
+      event.preventDefault();
+      event.stopPropagation();
 
-    setTheme((current) =>
-      current === "light"
-        ? "dark"
-        : "light"
-    );
-  };
+      setTheme(
+        (current) =>
+          current ===
+          "light"
+            ? "dark"
+            : "light"
+      );
+    };
+
+
+  /* =========================================================
+     OPEN ACCOUNT TAB
+  ========================================================= */
+
+  const openAccountTab =
+    (tab) => {
+      setAccountTab(tab);
+      setSelectedSkill(null);
+    };
 
 
   /* =========================================================
@@ -739,7 +1190,9 @@ const handleBulbClick = (event) => {
           : "skillsensai-light-theme"
       }`}
     >
+
       <div className="room-background">
+
 
         {/* =================================================
             TOP LOGIN / PROFILE
@@ -754,9 +1207,13 @@ const handleBulbClick = (event) => {
               onClick={openLogin}
             >
               <LogIn size={18} />
-              <span>Login</span>
+
+              <span>
+                Login
+              </span>
             </button>
           ) : (
+
             <div className="profile-area">
 
               <button
@@ -767,20 +1224,31 @@ const handleBulbClick = (event) => {
                   event.stopPropagation();
 
                   setProfileOpen(
-                    (current) => !current
+                    (current) =>
+                      !current
+                  );
+
+                  setSelectedSkill(
+                    null
                   );
                 }}
               >
 
                 <span className="profile-avatar">
-                  {user.photoURL ? (
+
+                  {profileImage ||
+                  user.photoURL ? (
                     <img
-                      src={user.photoURL}
+                      src={
+                        profileImage ||
+                        user.photoURL
+                      }
                       alt={getUserName()}
                     />
                   ) : (
                     getInitial()
                   )}
+
                 </span>
 
                 <span className="profile-name">
@@ -795,26 +1263,44 @@ const handleBulbClick = (event) => {
                       : ""
                   }
                 />
+
               </button>
 
 
+              {/* =================================================
+                  ACCOUNT PANEL
+              ================================================= */}
+
               {profileOpen && (
-                <div className="profile-dropdown">
 
-                  <div className="profile-dropdown-header">
+                <div className="profile-dropdown account-dropdown">
 
-                    <div className="profile-dropdown-avatar">
-                      {user.photoURL ? (
+
+                  {/* -------------------------------------------
+                      ACCOUNT HEADER
+                  ------------------------------------------- */}
+
+                  <div className="account-panel-header">
+
+                    <div className="account-header-avatar">
+
+                      {profileImage ||
+                      user.photoURL ? (
                         <img
-                          src={user.photoURL}
+                          src={
+                            profileImage ||
+                            user.photoURL
+                          }
                           alt={getUserName()}
                         />
                       ) : (
                         getInitial()
                       )}
+
                     </div>
 
-                    <div className="profile-dropdown-info">
+
+                    <div className="account-header-info">
 
                       <strong>
                         {getUserName()}
@@ -829,49 +1315,785 @@ const handleBulbClick = (event) => {
                   </div>
 
 
-                  <div className="profile-progress">
+                  {/* -------------------------------------------
+                      ACCOUNT TABS
+                  ------------------------------------------- */}
 
-                    <div className="profile-progress-icon">
-                      <BookOpen size={17} />
-                    </div>
+                  <div className="account-tabs">
 
-                    <div className="profile-progress-text">
+                    <button
+                      type="button"
+                      className={
+                        accountTab ===
+                        "profile"
+                          ? "account-tab active"
+                          : "account-tab"
+                      }
+                      onClick={() =>
+                        openAccountTab(
+                          "profile"
+                        )
+                      }
+                    >
+                      <User
+                        size={16}
+                      />
 
                       <span>
-                        Lessons Learned
+                        Profile
                       </span>
+                    </button>
 
-                      <strong>
-                        {lessonsLearned}
-                      </strong>
+
+                    <button
+                      type="button"
+                      className={
+                        accountTab ===
+                        "skills"
+                          ? "account-tab active"
+                          : "account-tab"
+                      }
+                      onClick={() =>
+                        openAccountTab(
+                          "skills"
+                        )
+                      }
+                    >
+                      <Target
+                        size={16}
+                      />
+
+                      <span>
+                        Skills
+                      </span>
+                    </button>
+
+
+                    <button
+                      type="button"
+                      className={
+                        accountTab ===
+                        "character"
+                          ? "account-tab active"
+                          : "account-tab"
+                      }
+                      onClick={() =>
+                        openAccountTab(
+                          "character"
+                        )
+                      }
+                    >
+                      <Award
+                        size={16}
+                      />
+
+                      <span>
+                        Character
+                      </span>
+                    </button>
+
+                  </div>
+
+
+                  {/* =================================================
+                      PROFILE TAB
+                  ================================================= */}
+
+                  {accountTab ===
+                    "profile" && (
+
+                    <div className="account-panel-content">
+
+                      <div className="account-profile-photo-section">
+
+                        <div className="large-profile-avatar">
+
+                          {profileImage ||
+                          user.photoURL ? (
+                            <img
+                              src={
+                                profileImage ||
+                                user.photoURL
+                              }
+                              alt={getUserName()}
+                            />
+                          ) : (
+                            getInitial()
+                          )}
+
+                        </div>
+
+
+                        <button
+                          type="button"
+                          className="profile-camera-button"
+                          onClick={() =>
+                            profileImageInputRef.current?.click()
+                          }
+                          title="Change profile picture"
+                        >
+                          <Camera
+                            size={16}
+                          />
+                        </button>
+
+
+                        <input
+                          ref={
+                            profileImageInputRef
+                          }
+                          type="file"
+                          accept="image/*"
+                          hidden
+                          onChange={
+                            handleProfileImage
+                          }
+                        />
+
+                      </div>
+
+
+                      <div className="account-name-section">
+
+                        <span className="account-label">
+                          Your Name
+                        </span>
+
+                        <strong>
+                          {getUserName()}
+                        </strong>
+
+                      </div>
+
+
+                      <div className="account-contact-section">
+
+                        <span className="account-label">
+                          Account
+                        </span>
+
+                        <span>
+                          {getUserContact() ||
+                            "Connected account"}
+                        </span>
+
+                      </div>
+
+
+                      <div className="account-stat-grid">
+
+                        <div className="account-stat">
+
+                          <BookOpen
+                            size={18}
+                          />
+
+                          <strong>
+                            {lessonsLearned}
+                          </strong>
+
+                          <span>
+                            Lessons
+                          </span>
+
+                        </div>
+
+
+                        <div className="account-stat">
+
+                          <Trophy
+                            size={18}
+                          />
+
+                          <strong>
+                            {lessonPercentage}%
+                          </strong>
+
+                          <span>
+                            Progress
+                          </span>
+
+                        </div>
+
+                      </div>
+
+
+                      <div className="account-progress-section">
+
+                        <div className="account-progress-heading">
+
+                          <span>
+                            Overall Learning
+                          </span>
+
+                          <strong>
+                            {lessonPercentage}%
+                          </strong>
+
+                        </div>
+
+
+                        <div className="account-progress-bar">
+
+                          <div
+                            className="account-progress-fill"
+                            style={{
+                              width: `${lessonPercentage}%`,
+                            }}
+                          />
+
+                        </div>
+
+                      </div>
+
+
+                      <button
+                        type="button"
+                        className="account-settings-button"
+                        onClick={() =>
+                          openAccountTab(
+                            "character"
+                          )
+                        }
+                      >
+                        <Settings
+                          size={17}
+                        />
+
+                        <span>
+                          Customize Character
+                        </span>
+
+                      </button>
+
+
+                      <button
+                        type="button"
+                        className="logout-button"
+                        onClick={
+                          handleLogout
+                        }
+                      >
+                        <LogOut
+                          size={17}
+                        />
+
+                        <span>
+                          Logout
+                        </span>
+                      </button>
 
                     </div>
-
-                  </div>
-
-
-                  <div className="profile-progress-bar">
-
-                    <div
-                      className="profile-progress-fill"
-                      style={{
-                        width: `${lessonPercentage}%`,
-                      }}
-                    />
-
-                  </div>
+                  )}
 
 
-                  <button
-                    type="button"
-                    className="logout-button"
-                    onClick={handleLogout}
-                  >
-                    <LogOut size={17} />
-                    <span>Logout</span>
-                  </button>
+                  {/* =================================================
+                      SKILLS TAB
+                  ================================================= */}
+
+                  {accountTab ===
+                    "skills" && (
+
+                    <div className="account-panel-content">
+
+                      {!selectedSkill ? (
+
+                        <>
+
+                          <div className="account-section-title">
+
+                            <div>
+                              <h3>
+                                My Skills
+                              </h3>
+
+                              <p>
+                                Track everything you are learning.
+                              </p>
+                            </div>
+
+                          </div>
+
+
+                          <div className="account-skills-list">
+
+                            {skills
+                              .filter(
+                                (skill) =>
+                                  skill.active
+                              )
+                              .map(
+                                (skill) => {
+                                  const Icon =
+                                    skill.icon;
+
+                                  const progress =
+                                    getSkillProgress(
+                                      skill
+                                    );
+
+                                  return (
+
+                                    <button
+                                      key={
+                                        skill.name
+                                      }
+                                      type="button"
+                                      className={`account-skill-card skill-card-${skill.color}`}
+                                      onClick={() =>
+                                        setSelectedSkill(
+                                          skill
+                                        )
+                                      }
+                                    >
+
+                                      <div className="account-skill-icon">
+                                        <Icon
+                                          size={21}
+                                        />
+                                      </div>
+
+
+                                      <div className="account-skill-info">
+
+                                        <div className="account-skill-title-row">
+
+                                          <strong>
+                                            {skill.name}
+                                          </strong>
+
+                                          <span>
+                                            {
+                                              progress.percentage
+                                            }%
+                                          </span>
+
+                                        </div>
+
+
+                                        <div className="account-skill-progress">
+
+                                          <div
+                                            style={{
+                                              width: `${progress.percentage}%`,
+                                            }}
+                                          />
+
+                                        </div>
+
+
+                                        <small>
+                                          {
+                                            progress.completed
+                                          } /{" "}
+                                          {
+                                            progress.total
+                                          }{" "}
+                                          lessons
+                                        </small>
+
+                                      </div>
+
+
+                                      <ChevronDown
+                                        size={17}
+                                        className="skill-card-arrow"
+                                      />
+
+                                    </button>
+
+                                  );
+                                }
+                              )}
+
+                          </div>
+
+
+                          <div className="coming-skills-account">
+
+                            <Sparkles
+                              size={16}
+                            />
+
+                            <span>
+                              More skills will appear here as they become available.
+                            </span>
+
+                          </div>
+
+                        </>
+
+                      ) : (
+
+                        <>
+
+                          <button
+                            type="button"
+                            className="account-back-button"
+                            onClick={() =>
+                              setSelectedSkill(
+                                null
+                              )
+                            }
+                          >
+                            ← Back to Skills
+                          </button>
+
+
+                          <div className="selected-skill-detail">
+
+                            <div
+                              className={`selected-skill-icon skill-${selectedSkill.color}`}
+                            >
+                              {React.createElement(
+                                selectedSkill.icon,
+                                {
+                                  size: 30,
+                                }
+                              )}
+                            </div>
+
+
+                            <h3>
+                              {selectedSkill.name}
+                            </h3>
+
+                            <p>
+                              {
+                                selectedSkill.description
+                              }
+                            </p>
+
+
+                            <div className="selected-skill-stat">
+
+                              <div>
+
+                                <span>
+                                  Lessons Completed
+                                </span>
+
+                                <strong>
+                                  {
+                                    getSkillProgress(
+                                      selectedSkill
+                                    ).completed
+                                  }
+                                </strong>
+
+                              </div>
+
+
+                              <div>
+
+                                <span>
+                                  Total Lessons
+                                </span>
+
+                                <strong>
+                                  {
+                                    getSkillProgress(
+                                      selectedSkill
+                                    ).total
+                                  }
+                                </strong>
+
+                              </div>
+
+
+                              <div>
+
+                                <span>
+                                  Completion
+                                </span>
+
+                                <strong>
+                                  {
+                                    getSkillProgress(
+                                      selectedSkill
+                                    ).percentage
+                                  }%
+                                </strong>
+
+                              </div>
+
+                            </div>
+
+
+                            <div className="selected-skill-progress">
+
+                              <div className="selected-skill-progress-header">
+
+                                <span>
+                                  Your Progress
+                                </span>
+
+                                <strong>
+                                  {
+                                    getSkillProgress(
+                                      selectedSkill
+                                    ).percentage
+                                  }%
+                                </strong>
+
+                              </div>
+
+
+                              <div className="selected-skill-progress-bar">
+
+                                <div
+                                  style={{
+                                    width: `${
+                                      getSkillProgress(
+                                        selectedSkill
+                                      ).percentage
+                                    }%`,
+                                  }}
+                                />
+
+                              </div>
+
+                            </div>
+
+
+                            <button
+                              type="button"
+                              className="open-skill-button"
+                              onClick={() =>
+                                navigate(
+                                  selectedSkill.path
+                                )
+                              }
+                            >
+
+                              <span>
+                                Continue Learning
+                              </span>
+
+                              <ArrowRight
+                                size={17}
+                              />
+
+                            </button>
+
+                          </div>
+
+                        </>
+
+                      )}
+
+                    </div>
+                  )}
+
+
+                  {/* =================================================
+                      CHARACTER TAB
+                  ================================================= */}
+
+                  {accountTab ===
+                    "character" && (
+
+                    <div className="account-panel-content">
+
+                      <div className="account-section-title">
+
+                        <div>
+                          <h3>
+                            Change Character
+                          </h3>
+
+                          <p>
+                            Choose who represents your learning journey.
+                          </p>
+                        </div>
+
+                      </div>
+
+
+                      <div className="character-preview-card">
+
+                        <div className="character-preview-glow" />
+
+                        <img
+                          src={getCharacterImage()}
+                          alt="Selected SkillSensAI character"
+                        />
+
+                      </div>
+
+
+                      <div className="character-grid">
+
+                        {defaultCharacters.map(
+                          (character) => (
+
+                            <button
+                              type="button"
+                              key={
+                                character.id
+                              }
+                              className={`character-option ${
+                                selectedCharacter ===
+                                character.id
+                                  ? "selected"
+                                  : ""
+                              }`}
+                              onClick={() =>
+                                handleCharacterSelect(
+                                  character.id
+                                )
+                              }
+                            >
+
+                              <div className="character-option-image">
+
+                                <img
+                                  src={
+                                    character.image
+                                  }
+                                  alt={
+                                    character.name
+                                  }
+                                />
+
+                              </div>
+
+
+                              <strong>
+                                {
+                                  character.name
+                                }
+                              </strong>
+
+                              <span>
+                                {
+                                  character.description
+                                }
+                              </span>
+
+
+                              {selectedCharacter ===
+                                character.id && (
+
+                                <div className="character-selected-check">
+                                  <Check
+                                    size={14}
+                                  />
+                                </div>
+
+                              )}
+
+                            </button>
+
+                          )
+                        )}
+
+
+                        {customCharacter && (
+
+                          <button
+                            type="button"
+                            className={`character-option ${
+                              selectedCharacter ===
+                              "custom"
+                                ? "selected"
+                                : ""
+                            }`}
+                            onClick={() =>
+                              handleCharacterSelect(
+                                "custom"
+                              )
+                            }
+                          >
+
+                            <div className="character-option-image">
+
+                              <img
+                                src={
+                                  customCharacter
+                                }
+                                alt="Custom character"
+                              />
+
+                            </div>
+
+                            <strong>
+                              My Character
+                            </strong>
+
+                            <span>
+                              Your uploaded character
+                            </span>
+
+
+                            {selectedCharacter ===
+                              "custom" && (
+
+                              <div className="character-selected-check">
+                                <Check
+                                  size={14}
+                                />
+                              </div>
+
+                            )}
+
+                          </button>
+
+                        )}
+
+                      </div>
+
+
+                      <button
+                        type="button"
+                        className="upload-character-button"
+                        onClick={() =>
+                          characterImageInputRef.current?.click()
+                        }
+                      >
+
+                        <Upload
+                          size={18}
+                        />
+
+                        <span>
+                          Upload Character
+                        </span>
+
+                      </button>
+
+
+                      <input
+                        ref={
+                          characterImageInputRef
+                        }
+                        type="file"
+                        accept="image/*"
+                        hidden
+                        onChange={
+                          handleCharacterUpload
+                        }
+                      />
+
+
+                      <div className="character-info-note">
+
+                        <Sparkles
+                          size={16}
+                        />
+
+                        <span>
+                          Your selected character will appear on the Home screen.
+                        </span>
+
+                      </div>
+
+                    </div>
+                  )}
+
 
                 </div>
+
               )}
 
             </div>
@@ -895,7 +2117,9 @@ const handleBulbClick = (event) => {
                 ? "bulb-on"
                 : "bulb-off"
             }`}
-            onClick={handleBulbClick}
+            onClick={
+              handleBulbClick
+            }
             onMouseDown={(event) =>
               event.stopPropagation()
             }
@@ -916,9 +2140,13 @@ const handleBulbClick = (event) => {
             <span className="bulb-glass">
 
               {bulbOn ? (
-                <Lightbulb size={20} />
+                <Lightbulb
+                  size={20}
+                />
               ) : (
-                <LightbulbOff size={20} />
+                <LightbulbOff
+                  size={20}
+                />
               )}
 
             </span>
@@ -942,32 +2170,33 @@ const handleBulbClick = (event) => {
           <section className="skills-room">
 
 
-            {/* ---------------------------------------------
-                SOFA
-            --------------------------------------------- */}
+            {/* SOFA */}
 
             <div className="room-sofa">
+
               <div className="sofa-back" />
+
               <div className="sofa-seat" />
+
               <div className="sofa-arm sofa-arm-left" />
+
               <div className="sofa-arm sofa-arm-right" />
+
               <div className="sofa-leg sofa-leg-left" />
+
               <div className="sofa-leg sofa-leg-right" />
+
             </div>
 
 
-            {/* ---------------------------------------------
-                RUG
-            --------------------------------------------- */}
+            {/* RUG */}
 
             <div className="room-rug">
               <div className="rug-pattern" />
             </div>
 
 
-            {/* ---------------------------------------------
-                PLANT
-            --------------------------------------------- */}
+            {/* PLANT */}
 
             <div className="room-plant">
 
@@ -991,21 +2220,17 @@ const handleBulbClick = (event) => {
             </div>
 
 
-            {/* ---------------------------------------------
-                CHARACTER SHADOW
-            --------------------------------------------- */}
+            {/* CHARACTER SHADOW */}
 
             <div className="character-shadow" />
 
 
-            {/* ---------------------------------------------
-                SAMURAI
-            --------------------------------------------- */}
+            {/* CHARACTER */}
 
             <div className="samurai-container">
 
               <img
-                src="/samurai.png"
+                src={getCharacterImage()}
                 alt="SkillSensAI character"
                 className="samurai-image"
               />
@@ -1013,24 +2238,28 @@ const handleBulbClick = (event) => {
             </div>
 
 
-            {/* ---------------------------------------------
-                SKILLS ORBIT
-            --------------------------------------------- */}
+            {/* SKILLS ORBIT */}
 
             <div className="skills-orbit">
 
               {skills.map(
                 (skill, index) => {
-                  const Icon = skill.icon;
+
+                  const Icon =
+                    skill.icon;
 
                   return (
                     <button
-                      key={skill.name}
+                      key={
+                        skill.name
+                      }
                       type="button"
                       className={[
                         "skill-circle",
                         `skill-${skill.color}`,
-                        `skill-position-${index + 1}`,
+                        `skill-position-${
+                          index + 1
+                        }`,
                         skill.active
                           ? "skill-active"
                           : "skill-disabled",
@@ -1062,6 +2291,7 @@ const handleBulbClick = (event) => {
 
                     </button>
                   );
+
                 }
               )}
 
@@ -1084,17 +2314,16 @@ const handleBulbClick = (event) => {
             <div className="flow-cards">
 
 
-              {/* -------------------------------------------
-                  LEARN
-              ------------------------------------------- */}
-
               <div className="flow-card flow-learn">
 
                 <div className="flow-card-icon">
-                  <BookOpen size={25} />
+                  <BookOpen
+                    size={25}
+                  />
                 </div>
 
                 <div>
+
                   <h3>
                     Learn
                   </h3>
@@ -1103,14 +2332,11 @@ const handleBulbClick = (event) => {
                     Learn skills step by step
                     with guided lessons.
                   </p>
+
                 </div>
 
               </div>
 
-
-              {/* -------------------------------------------
-                  ARROW
-              ------------------------------------------- */}
 
               <ArrowRight
                 className="flow-arrow"
@@ -1118,17 +2344,16 @@ const handleBulbClick = (event) => {
               />
 
 
-              {/* -------------------------------------------
-                  PRACTICE
-              ------------------------------------------- */}
-
               <div className="flow-card flow-practice">
 
                 <div className="flow-card-icon">
-                  <Target size={25} />
+                  <Target
+                    size={25}
+                  />
                 </div>
 
                 <div>
+
                   <h3>
                     Practice
                   </h3>
@@ -1137,14 +2362,11 @@ const handleBulbClick = (event) => {
                     Practice what you learn
                     with real activities.
                   </p>
+
                 </div>
 
               </div>
 
-
-              {/* -------------------------------------------
-                  ARROW
-              ------------------------------------------- */}
 
               <ArrowRight
                 className="flow-arrow"
@@ -1152,17 +2374,16 @@ const handleBulbClick = (event) => {
               />
 
 
-              {/* -------------------------------------------
-                  MASTER
-              ------------------------------------------- */}
-
               <div className="flow-card flow-master">
 
                 <div className="flow-card-icon">
-                  <Trophy size={25} />
+                  <Trophy
+                    size={25}
+                  />
                 </div>
 
                 <div>
+
                   <h3>
                     Master
                   </h3>
@@ -1171,6 +2392,7 @@ const handleBulbClick = (event) => {
                     Improve your skills and
                     become confident.
                   </p>
+
                 </div>
 
               </div>
@@ -1178,13 +2400,11 @@ const handleBulbClick = (event) => {
             </div>
 
 
-            {/* ---------------------------------------------
-                PROGRESS NOTE
-            --------------------------------------------- */}
-
             <div className="home-bottom-note">
 
-              <ShieldCheck size={17} />
+              <ShieldCheck
+                size={17}
+              />
 
               <span>
                 Your learning journey is
@@ -1203,48 +2423,43 @@ const handleBulbClick = (event) => {
         ================================================= */}
 
         {loginOpen && (
+
           <div
             className="login-overlay"
             onMouseDown={(event) => {
+
               if (
                 event.target ===
                 event.currentTarget
               ) {
                 closeLogin();
               }
+
             }}
           >
 
             <div className="login-modal">
 
 
-              {/* -------------------------------------------
-                  CLOSE
-              ------------------------------------------- */}
-
               <button
                 type="button"
                 className="login-close"
-                onClick={closeLogin}
+                onClick={
+                  closeLogin
+                }
                 aria-label="Close login"
-                disabled={loading}
+                disabled={
+                  loading
+                }
               >
                 <X size={20} />
               </button>
 
 
-              {/* -------------------------------------------
-                  ICON
-              ------------------------------------------- */}
-
               <div className="login-modal-icon">
                 <User size={27} />
               </div>
 
-
-              {/* -------------------------------------------
-                  HEADER
-              ------------------------------------------- */}
 
               <div className="login-modal-header">
 
@@ -1260,26 +2475,27 @@ const handleBulbClick = (event) => {
               </div>
 
 
-              {/* -------------------------------------------
-                  LOGIN TABS
-              ------------------------------------------- */}
-
               <div className="login-tabs">
 
                 <button
                   type="button"
                   className={
-                    loginMethod === "google"
+                    loginMethod ===
+                    "google"
                       ? "login-tab-active"
                       : ""
                   }
                   onClick={() => {
-                    if (loading) return;
+
+                    if (loading)
+                      return;
 
                     setLoginMethod(
                       "google"
                     );
+
                     setLoginError("");
+
                   }}
                 >
                   Google
@@ -1289,17 +2505,22 @@ const handleBulbClick = (event) => {
                 <button
                   type="button"
                   className={
-                    loginMethod === "phone"
+                    loginMethod ===
+                    "phone"
                       ? "login-tab-active"
                       : ""
                   }
                   onClick={() => {
-                    if (loading) return;
+
+                    if (loading)
+                      return;
 
                     setLoginMethod(
                       "phone"
                     );
+
                     setLoginError("");
+
                   }}
                 >
                   Phone
@@ -1308,11 +2529,9 @@ const handleBulbClick = (event) => {
               </div>
 
 
-              {/* -------------------------------------------
-                  GOOGLE LOGIN
-              ------------------------------------------- */}
+              {loginMethod ===
+                "google" && (
 
-              {loginMethod === "google" && (
                 <div className="login-method-content">
 
                   <button
@@ -1321,7 +2540,9 @@ const handleBulbClick = (event) => {
                     onClick={
                       handleGoogleLogin
                     }
-                    disabled={loading}
+                    disabled={
+                      loading
+                    }
                   >
 
                     {loading ? (
@@ -1362,15 +2583,15 @@ const handleBulbClick = (event) => {
               )}
 
 
-              {/* -------------------------------------------
-                  PHONE LOGIN
-              ------------------------------------------- */}
+              {loginMethod ===
+                "phone" && (
 
-              {loginMethod === "phone" && (
                 <div className="login-method-content">
 
-                  {phoneStep === "phone" ? (
+                  {phoneStep ===
+                  "phone" ? (
                     <>
+
                       <label
                         className="login-input-label"
                         htmlFor="phone-number"
@@ -1378,9 +2599,12 @@ const handleBulbClick = (event) => {
                         Mobile Number
                       </label>
 
+
                       <div className="login-phone-input">
 
-                        <Phone size={18} />
+                        <Phone
+                          size={18}
+                        />
 
                         <input
                           id="phone-number"
@@ -1392,8 +2616,12 @@ const handleBulbClick = (event) => {
                             handlePhoneChange
                           }
                           placeholder="+91 9876543210"
-                          maxLength={14}
-                          disabled={loading}
+                          maxLength={
+                            14
+                          }
+                          disabled={
+                            loading
+                          }
                         />
 
                       </div>
@@ -1405,7 +2633,9 @@ const handleBulbClick = (event) => {
                         onClick={
                           handleSendOtp
                         }
-                        disabled={loading}
+                        disabled={
+                          loading
+                        }
                       >
 
                         {loading ? (
@@ -1428,15 +2658,18 @@ const handleBulbClick = (event) => {
                         )}
 
                       </button>
+
                     </>
                   ) : (
                     <>
+
                       <label
                         className="login-input-label"
                         htmlFor="otp"
                       >
                         Enter OTP
                       </label>
+
 
                       <div className="otp-input-wrapper">
 
@@ -1460,8 +2693,12 @@ const handleBulbClick = (event) => {
                             )
                           }
                           placeholder="6-digit OTP"
-                          maxLength={6}
-                          disabled={loading}
+                          maxLength={
+                            6
+                          }
+                          disabled={
+                            loading
+                          }
                         />
 
                       </div>
@@ -1473,7 +2710,9 @@ const handleBulbClick = (event) => {
                         onClick={
                           handleVerifyOtp
                         }
-                        disabled={loading}
+                        disabled={
+                          loading
+                        }
                       >
 
                         {loading ? (
@@ -1502,16 +2741,22 @@ const handleBulbClick = (event) => {
                         type="button"
                         className="change-number-button"
                         onClick={() => {
-                          if (loading) return;
+
+                          if (loading)
+                            return;
 
                           setPhoneStep(
                             "phone"
                           );
+
                           setOtp("");
+
                           setConfirmationResult(
                             null
                           );
+
                           setLoginError("");
+
                         }}
                       >
                         Change number
@@ -1543,10 +2788,6 @@ const handleBulbClick = (event) => {
                 </div>
               )}
 
-
-              {/* -------------------------------------------
-                  ERROR
-              ------------------------------------------- */}
 
               {loginError && (
                 <div className="login-error">
