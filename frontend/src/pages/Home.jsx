@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -35,44 +35,70 @@ import {
 } from "firebase/auth";
 
 import { auth } from "../firebase";
-
-import {
-  getLessonsLearned,
-} from "../utils/progress";
+import { getLessonsLearned } from "../utils/progress";
 
 import "./Home.css";
 
 
 /* =========================================================
-   CONSTANTS
-========================================================= */
+   SKILLS
+   ========================================================= */
 
-const THEME_KEY = "skillsensai_theme";
-
-const getSavedTheme = () => {
-  try {
-    const saved = localStorage.getItem(THEME_KEY);
-
-    if (saved === "light" || saved === "dark") {
-      return saved;
-    }
-  } catch (error) {
-    console.error(error);
-  }
-
-  return "dark";
-};
+const skills = [
+  {
+    name: "Music",
+    icon: Music,
+    color: "blue",
+    path: "/music",
+    active: true,
+  },
+  {
+    name: "Martial Arts",
+    icon: Swords,
+    color: "red",
+    path: "/martial-arts",
+    active: true,
+  },
+  {
+    name: "Dance",
+    icon: Dumbbell,
+    color: "pink",
+    path: "#",
+    active: false,
+  },
+  {
+    name: "Art",
+    icon: Palette,
+    color: "orange",
+    path: "#",
+    active: false,
+  },
+  {
+    name: "Coding",
+    icon: Code2,
+    color: "green",
+    path: "#",
+    active: false,
+  },
+  {
+    name: "More Skills",
+    icon: Sparkles,
+    color: "purple",
+    path: "#",
+    active: false,
+  },
+];
 
 
 /* =========================================================
    GLOBAL THEME
-========================================================= */
+   ========================================================= */
 
 const applyGlobalTheme = (theme) => {
-  const root = document.documentElement;
+  const html = document.documentElement;
   const body = document.body;
 
-  root.classList.remove(
+  html.classList.remove(
     "skillsensai-light-theme",
     "skillsensai-dark-theme"
   );
@@ -82,46 +108,26 @@ const applyGlobalTheme = (theme) => {
     "skillsensai-dark-theme"
   );
 
-  const themeClass =
-    theme === "light"
-      ? "skillsensai-light-theme"
-      : "skillsensai-dark-theme";
-
-  root.classList.add(themeClass);
-  body.classList.add(themeClass);
-
-  root.setAttribute("data-theme", theme);
-  body.setAttribute("data-theme", theme);
-
-  try {
-    localStorage.setItem(THEME_KEY, theme);
-  } catch (error) {
-    console.error(error);
-  };
-
-  window.dispatchEvent(
-    new CustomEvent("skillsensai-theme-changed", {
-      detail: { theme },
-    })
-  );
+  html.classList.add(`skillsensai-${theme}-theme`);
+  body.classList.add(`skillsensai-${theme}-theme`);
 };
 
 
 /* =========================================================
    HOME
-========================================================= */
+   ========================================================= */
 
-function Home() {
+export default function Home() {
   const navigate = useNavigate();
 
-  /* -------------------------------------------------------
+  /* -----------------------------------------
      AUTH
-  ------------------------------------------------------- */
+  ----------------------------------------- */
 
   const [user, setUser] = useState(null);
-  const [authLoading, setAuthLoading] = useState(true);
-
+  const [showProfile, setShowProfile] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+
   const [loginMethod, setLoginMethod] = useState("google");
 
   const [phoneNumber, setPhoneNumber] = useState("+91 ");
@@ -130,145 +136,113 @@ function Home() {
   const [confirmationResult, setConfirmationResult] =
     useState(null);
 
-  const [loginLoading, setLoginLoading] = useState(false);
-  const [loginError, setLoginError] = useState("");
-
-  const recaptchaRef = useRef(null);
-
-
-  /* -------------------------------------------------------
-     THEME
-  ------------------------------------------------------- */
-
-  const [theme, setTheme] = useState(getSavedTheme);
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authMessage, setAuthMessage] = useState("");
+  const [authError, setAuthError] = useState("");
 
 
-  /* -------------------------------------------------------
+  /* -----------------------------------------
      PROGRESS
-  ------------------------------------------------------- */
+  ----------------------------------------- */
 
   const [lessonsLearned, setLessonsLearned] = useState(0);
 
 
-  /* -------------------------------------------------------
+  /* -----------------------------------------
+     THEME
+  ----------------------------------------- */
+
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("skillsensai_theme") || "light";
+  });
+
+
+  /* =========================================================
      AUTH LISTENER
-  ------------------------------------------------------- */
+  ========================================================= */
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(
-      auth,
-      (currentUser) => {
-        setUser(currentUser);
-        setAuthLoading(false);
-      }
-    );
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
 
     return () => unsubscribe();
   }, []);
 
 
-  /* -------------------------------------------------------
-     INITIAL THEME
-  ------------------------------------------------------- */
+  /* =========================================================
+     THEME
+  ========================================================= */
 
   useEffect(() => {
     applyGlobalTheme(theme);
-
-    const handleThemeChange = (event) => {
-      if (
-        event.detail?.theme === "light" ||
-        event.detail?.theme === "dark"
-      ) {
-        setTheme(event.detail.theme);
-      }
-    };
-
-    window.addEventListener(
-      "skillsensai-theme-changed",
-      handleThemeChange
-    );
-
-    return () => {
-      window.removeEventListener(
-        "skillsensai-theme-changed",
-        handleThemeChange
-      );
-    };
+    localStorage.setItem("skillsensai_theme", theme);
   }, [theme]);
 
 
-  /* -------------------------------------------------------
-     PROGRESS LISTENER
-  ------------------------------------------------------- */
+  /* =========================================================
+     LOAD PROGRESS
+  ========================================================= */
 
   useEffect(() => {
-    const updateProgress = () => {
+    const loadProgress = () => {
       try {
-        const lessons = getLessonsLearned();
+        const learned = getLessonsLearned();
         setLessonsLearned(
-          Array.isArray(lessons) ? lessons.length : 0
+          Array.isArray(learned) ? learned.length : Number(learned) || 0
         );
       } catch (error) {
-        console.error(error);
+        console.error("Unable to load progress:", error);
         setLessonsLearned(0);
       }
     };
 
-    updateProgress();
+    loadProgress();
 
     window.addEventListener(
       "skillsensai-progress-updated",
-      updateProgress
+      loadProgress
     );
 
     window.addEventListener(
       "storage",
-      updateProgress
+      loadProgress
     );
 
     return () => {
       window.removeEventListener(
         "skillsensai-progress-updated",
-        updateProgress
+        loadProgress
       );
 
       window.removeEventListener(
         "storage",
-        updateProgress
+        loadProgress
       );
     };
   }, []);
 
 
   /* =========================================================
-     LOGIN
+     THEME TOGGLE
   ========================================================= */
 
-  const openLogin = () => {
-    setLoginError("");
-    setLoginMethod("google");
-    setShowLogin(true);
+  const toggleTheme = () => {
+    setTheme((previous) =>
+      previous === "light" ? "dark" : "light"
+    );
   };
 
 
-  const closeLogin = () => {
-    if (loginLoading) return;
-
-    setShowLogin(false);
-    setLoginError("");
-    setOtp("");
-    setConfirmationResult(null);
-  };
-
-
-  /* -------------------------------------------------------
+  /* =========================================================
      GOOGLE LOGIN
-  ------------------------------------------------------- */
+  ========================================================= */
 
   const handleGoogleLogin = async () => {
     try {
-      setLoginLoading(true);
-      setLoginError("");
+      setAuthLoading(true);
+      setAuthError("");
+      setAuthMessage("");
 
       const provider = new GoogleAuthProvider();
 
@@ -279,245 +253,208 @@ function Home() {
       await signInWithPopup(auth, provider);
 
       setShowLogin(false);
+      setShowProfile(false);
     } catch (error) {
       console.error("Google login error:", error);
 
-      if (error.code === "auth/popup-closed-by-user") {
-        setLoginError("Login window was closed.");
-      } else if (
-        error.code === "auth/popup-blocked"
-      ) {
-        setLoginError(
-          "Your browser blocked the login popup."
-        );
-      } else {
-        setLoginError(
-          error.message || "Google login failed."
-        );
-      }
+      setAuthError(
+        error?.message ||
+          "Google sign-in failed. Please try again."
+      );
     } finally {
-      setLoginLoading(false);
+      setAuthLoading(false);
     }
   };
 
 
-  /* -------------------------------------------------------
-     PHONE FORMAT
-  ------------------------------------------------------- */
+  /* =========================================================
+     PHONE NUMBER FORMAT
+  ========================================================= */
 
-  const formatPhoneNumber = (value) => {
-    let cleaned = value.replace(/[^\d+]/g, "");
+  const handlePhoneChange = (event) => {
+    let value = event.target.value;
 
-    if (!cleaned.startsWith("+91")) {
-      cleaned = "+91" + cleaned.replace(/^\+?91/, "");
+    value = value.replace(/[^\d+ ]/g, "");
+
+    if (!value.startsWith("+91")) {
+      const digits = value.replace(/\D/g, "");
+      value = `+91 ${digits}`;
     }
 
-    let digits = cleaned
+    const digitsAfterCode = value
       .replace("+91", "")
       .replace(/\D/g, "")
       .slice(0, 10);
 
-    return `+91 ${digits}`;
+    setPhoneNumber(`+91 ${digitsAfterCode}`);
   };
 
 
-  const handlePhoneChange = (event) => {
-    setPhoneNumber(
-      formatPhoneNumber(event.target.value)
-    );
-  };
+  /* =========================================================
+     SEND OTP
+  ========================================================= */
 
-
-  /* -------------------------------------------------------
-     PHONE LOGIN
-  ------------------------------------------------------- */
-
-  const handleSendOtp = async () => {
+  const sendOtp = async () => {
     try {
-      setLoginLoading(true);
-      setLoginError("");
+      setAuthLoading(true);
+      setAuthError("");
+      setAuthMessage("");
 
-      const digits = phoneNumber
-        .replace("+91", "")
-        .replace(/\D/g, "");
+      const cleanNumber =
+        "+91" +
+        phoneNumber
+          .replace("+91", "")
+          .replace(/\D/g, "");
 
-      if (digits.length !== 10) {
-        setLoginError(
+      if (cleanNumber.length !== 13) {
+        setAuthError(
           "Please enter a valid 10-digit Indian mobile number."
         );
-
-        setLoginLoading(false);
+        setAuthLoading(false);
         return;
       }
 
-      if (!recaptchaRef.current) {
-        recaptchaRef.current =
-          new RecaptchaVerifier(
-            auth,
-            "recaptcha-container",
-            {
-              size: "invisible",
-            }
-          );
+      if (!window.recaptchaVerifier) {
+        window.recaptchaVerifier = new RecaptchaVerifier(
+          auth,
+          "recaptcha-container",
+          {
+            size: "invisible",
+          }
+        );
       }
 
-      const confirmation =
-        await signInWithPhoneNumber(
-          auth,
-          `+91${digits}`,
-          recaptchaRef.current
-        );
+      const result = await signInWithPhoneNumber(
+        auth,
+        cleanNumber,
+        window.recaptchaVerifier
+      );
 
-      setConfirmationResult(confirmation);
-      setLoginError("");
+      setConfirmationResult(result);
+
+      setAuthMessage(
+        "OTP sent successfully. Check your phone."
+      );
     } catch (error) {
-      console.error("Phone login error:", error);
+      console.error("Phone authentication error:", error);
 
-      setLoginError(
-        error.message ||
+      setAuthError(
+        error?.message ||
           "Unable to send OTP. Please try again."
       );
 
-      try {
-        if (recaptchaRef.current) {
-          recaptchaRef.current.clear();
+      if (window.recaptchaVerifier) {
+        try {
+          window.recaptchaVerifier.clear();
+        } catch {
+          // Ignore cleanup errors.
         }
 
-        recaptchaRef.current = null;
-      } catch {}
+        window.recaptchaVerifier = null;
+      }
     } finally {
-      setLoginLoading(false);
+      setAuthLoading(false);
     }
   };
 
 
-  /* -------------------------------------------------------
+  /* =========================================================
      VERIFY OTP
-  ------------------------------------------------------- */
+  ========================================================= */
 
-  const handleVerifyOtp = async () => {
-    if (!confirmationResult) return;
+  const verifyOtp = async () => {
+    if (!confirmationResult) {
+      setAuthError("Please request an OTP first.");
+      return;
+    }
 
     try {
-      setLoginLoading(true);
-      setLoginError("");
-
-      if (!otp || otp.length < 6) {
-        setLoginError(
-          "Please enter the 6-digit OTP."
-        );
-
-        setLoginLoading(false);
-        return;
-      }
+      setAuthLoading(true);
+      setAuthError("");
+      setAuthMessage("");
 
       await confirmationResult.confirm(otp);
 
       setShowLogin(false);
-      setOtp("");
       setConfirmationResult(null);
+      setOtp("");
+      setPhoneNumber("+91 ");
     } catch (error) {
-      console.error("OTP error:", error);
+      console.error("OTP verification error:", error);
 
-      setLoginError(
+      setAuthError(
         "Invalid OTP. Please check the code and try again."
       );
     } finally {
-      setLoginLoading(false);
+      setAuthLoading(false);
     }
   };
 
 
-  /* -------------------------------------------------------
+  /* =========================================================
      LOGOUT
-  ------------------------------------------------------- */
+  ========================================================= */
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      setShowProfile(false);
     } catch (error) {
       console.error("Logout error:", error);
     }
   };
 
 
-  /* -------------------------------------------------------
-     THEME TOGGLE
-  ------------------------------------------------------- */
+  /* =========================================================
+     OPEN LOGIN
+  ========================================================= */
 
-  const toggleTheme = () => {
-    const nextTheme =
-      theme === "dark"
-        ? "light"
-        : "dark";
-
-    setTheme(nextTheme);
-    applyGlobalTheme(nextTheme);
+  const openLogin = () => {
+    setAuthError("");
+    setAuthMessage("");
+    setLoginMethod("google");
+    setShowLogin(true);
   };
 
 
   /* =========================================================
-     SKILLS
+     CLOSE LOGIN
   ========================================================= */
 
-  const skills = [
-    {
-      id: "music",
-      name: "Music",
-      icon: Music,
-      color: "music",
-      active: true,
-      path: "/music",
-    },
+  const closeLogin = () => {
+    if (authLoading) return;
 
-    {
-      id: "martial",
-      name: "Martial Arts",
-      icon: Swords,
-      color: "martial",
-      active: true,
-      path: "/martial-arts",
-    },
+    setShowLogin(false);
+    setAuthError("");
+    setAuthMessage("");
+    setConfirmationResult(null);
+    setOtp("");
+  };
 
-    {
-      id: "dance",
-      name: "Dance",
-      icon: Dumbbell,
-      color: "dance",
-      active: false,
-    },
 
-    {
-      id: "art",
-      name: "Art",
-      icon: Palette,
-      color: "art",
-      active: false,
-    },
-
-    {
-      id: "coding",
-      name: "Coding",
-      icon: Code2,
-      color: "coding",
-      active: false,
-    },
-
-    {
-      id: "more",
-      name: "More",
-      icon: Sparkles,
-      color: "more",
-      active: false,
-    },
-  ];
-
+  /* =========================================================
+     SKILL CLICK
+  ========================================================= */
 
   const handleSkillClick = (skill) => {
-    if (!skill.active) return;
+    if (!skill.active) {
+      setAuthMessage(`${skill.name} is coming soon.`);
+      setAuthError("");
+      return;
+    }
 
     navigate(skill.path);
   };
+
+
+  /* =========================================================
+     DISPLAY USER NAME
+  ========================================================= */
+
+  const displayName =
+    user?.displayName ||
+    user?.phoneNumber ||
+    "Learner";
 
 
   /* =========================================================
@@ -533,34 +470,148 @@ function Home() {
 
       <div className="room-background">
 
-        <div className="room-wall" />
+        {/* WALL */}
+        <div className="room-wall">
+          <div className="wall-highlight" />
+          <div className="wall-panel-left" />
+          <div className="wall-panel-right" />
+        </div>
 
-        <div className="room-floor" />
 
-        <div className="room-corner-glow" />
+        {/* FLOOR */}
+        <div className="room-floor">
+          <div className="floor-perspective" />
+        </div>
 
-        {/* CEILING */}
+
+        {/* ===================================================
+            CEILING
+        =================================================== */}
+
         <div className="ceiling">
 
-          <div className="ceiling-line" />
+          <div className="ceiling-border" />
 
-          {/* FAN */}
           <div className="ceiling-fan">
 
-            <div className="fan-rod" />
+            <div className="fan-ceiling-mount" />
 
-            <div className="fan-motor">
+            <div className="fan-downrod">
               <span />
             </div>
 
+            <div className="fan-canopy">
+              <span />
+            </div>
+
+            <div className="fan-motor">
+              <div className="fan-motor-top" />
+              <div className="fan-motor-body" />
+              <div className="fan-motor-bottom" />
+            </div>
+
             <div className="fan-blades">
-              <span className="blade blade-one" />
-              <span className="blade blade-two" />
-              <span className="blade blade-three" />
-              <span className="blade blade-four" />
+
+              <span className="real-blade blade-one">
+                <i />
+              </span>
+
+              <span className="real-blade blade-two">
+                <i />
+              </span>
+
+              <span className="real-blade blade-three">
+                <i />
+              </span>
+
+              <span className="real-blade blade-four">
+                <i />
+              </span>
+
             </div>
 
           </div>
+
+        </div>
+
+
+        {/* ===================================================
+            SOFA
+        =================================================== */}
+
+        <div className="living-sofa">
+
+          <div className="sofa-back">
+            <div className="sofa-back-seam" />
+          </div>
+
+          <div className="sofa-seat">
+            <div className="seat-cushion cushion-left" />
+            <div className="seat-cushion cushion-center" />
+            <div className="seat-cushion cushion-right" />
+          </div>
+
+          <div className="sofa-arm sofa-arm-left" />
+          <div className="sofa-arm sofa-arm-right" />
+
+          <div className="sofa-leg sofa-leg-left" />
+          <div className="sofa-leg sofa-leg-right" />
+
+          <div className="sofa-pillow pillow-one" />
+          <div className="sofa-pillow pillow-two" />
+
+        </div>
+
+
+        {/* ===================================================
+            FLOOR RUG
+        =================================================== */}
+
+        <div className="living-rug">
+          <div className="rug-inner">
+            <div className="rug-pattern">
+              <span />
+              <span />
+              <span />
+              <span />
+            </div>
+          </div>
+        </div>
+
+
+        {/* ===================================================
+            SMALL COFFEE TABLE
+        =================================================== */}
+
+        <div className="coffee-table">
+          <div className="table-top">
+            <div className="table-reflection" />
+          </div>
+
+          <div className="table-leg table-leg-left" />
+          <div className="table-leg table-leg-right" />
+        </div>
+
+
+        {/* ===================================================
+            SIDE PLANT
+        =================================================== */}
+
+        <div className="room-plant">
+
+          <div className="plant-pot">
+            <span />
+          </div>
+
+          <div className="plant-stem stem-one" />
+          <div className="plant-stem stem-two" />
+          <div className="plant-stem stem-three" />
+
+          <div className="plant-leaf leaf-one" />
+          <div className="plant-leaf leaf-two" />
+          <div className="plant-leaf leaf-three" />
+          <div className="plant-leaf leaf-four" />
+          <div className="plant-leaf leaf-five" />
 
         </div>
 
@@ -574,38 +625,25 @@ function Home() {
           <div className="bulb-wire" />
 
           <button
-            type="button"
             className={`bulb-button ${
               theme === "light"
                 ? "bulb-on"
                 : "bulb-off"
             }`}
             onClick={toggleTheme}
-            aria-label={
-              theme === "dark"
-                ? "Turn on light"
-                : "Turn off light"
-            }
-            title={
-              theme === "dark"
-                ? "Turn on light"
-                : "Turn off light"
-            }
+            aria-label="Toggle theme"
           >
+
             <span className="bulb-neck" />
 
             <span className="bulb-glass">
+
               {theme === "light" ? (
-                <Lightbulb
-                  size={27}
-                  strokeWidth={1.8}
-                />
+                <Lightbulb size={24} />
               ) : (
-                <LightbulbOff
-                  size={27}
-                  strokeWidth={1.8}
-                />
+                <LightbulbOff size={24} />
               )}
+
             </span>
 
           </button>
@@ -613,109 +651,133 @@ function Home() {
         </div>
 
 
-        {/* LOGIN */}
+        {/* ===================================================
+            LOGIN / PROFILE
+        =================================================== */}
+
         <div className="room-login">
 
-          {authLoading ? (
-            <div className="auth-loading">
-              <Loader2
-                size={18}
-                className="spin"
-              />
-            </div>
-          ) : user ? (
-
-            <div className="profile-area">
+          {!user ? (
+            <button
+              className="login-button"
+              onClick={openLogin}
+            >
+              <LogIn size={17} />
+              <span>Login</span>
+            </button>
+          ) : (
+            <div className="profile-wrapper">
 
               <button
-                type="button"
                 className="profile-button"
+                onClick={() =>
+                  setShowProfile((previous) => !previous)
+                }
               >
+
                 <span className="profile-avatar">
+
                   {user.photoURL ? (
                     <img
                       src={user.photoURL}
-                      alt=""
+                      alt={displayName}
                     />
                   ) : (
                     <User size={17} />
                   )}
+
                 </span>
 
                 <span className="profile-name">
-                  {user.displayName ||
-                    user.phoneNumber ||
-                    "Learner"}
+                  {displayName}
                 </span>
 
                 <ChevronDown size={16} />
+
               </button>
 
-              <button
-                type="button"
-                className="logout-button"
-                onClick={handleLogout}
-              >
-                <LogOut size={16} />
-                Sign out
-              </button>
+
+              {showProfile && (
+                <div className="profile-dropdown">
+
+                  <div className="profile-dropdown-header">
+
+                    <div className="profile-large-avatar">
+
+                      {user.photoURL ? (
+                        <img
+                          src={user.photoURL}
+                          alt={displayName}
+                        />
+                      ) : (
+                        <User size={22} />
+                      )}
+
+                    </div>
+
+                    <div>
+                      <strong>{displayName}</strong>
+
+                      <span>
+                        {user.email ||
+                          user.phoneNumber ||
+                          "SkillSensAI Learner"}
+                      </span>
+                    </div>
+
+                  </div>
+
+
+                  <div className="profile-divider" />
+
+
+                  <button
+                    className="profile-logout"
+                    onClick={handleLogout}
+                  >
+                    <LogOut size={17} />
+                    Sign Out
+                  </button>
+
+                </div>
+              )}
 
             </div>
-
-          ) : (
-
-            <button
-              type="button"
-              className="login-button"
-              onClick={openLogin}
-            >
-              <LogIn size={18} />
-              <span>Login</span>
-            </button>
-
           )}
 
         </div>
 
 
-        {/* =================================================
-            MAIN ROOM CONTENT
-        ================================================= */}
+        {/* ===================================================
+            MAIN CONTENT
+        =================================================== */}
 
         <main className="home-content">
 
-          {/* SMALL INTRO */}
+          {/* INTRO — KEPT SMALL SO CHARACTER REMAINS MAIN FOCUS */}
+
           <section className="home-intro">
 
-            <div className="brand-small">
-              <span>Skill</span>
-              <strong>SensAI</strong>
+            <div className="brand-name">
+              <span className="brand-skill">Skill</span>
+              <span className="brand-sensai">SensAI</span>
             </div>
 
-            <h1>
-              Learn.
-              <span> Practice.</span>
-              <strong> Master.</strong>
-            </h1>
-
             <p>
-              Your skills. Your pace. Your AI coach.
+              Learn. Practice. Analyze. Improve.
             </p>
 
           </section>
 
 
           {/* =================================================
-              CENTRAL CHARACTER + SKILLS
+              MAIN CHARACTER + SKILLS
           ================================================= */}
 
           <section className="skills-room">
 
-            {/* SOFT FLOOR SHADOW */}
             <div className="character-shadow" />
 
-
-            {/* CENTER CHARACTER */}
             <div className="samurai-container">
 
               <div className="samurai-aura" />
@@ -729,7 +791,8 @@ function Home() {
             </div>
 
 
-            {/* SKILLS */}
+            {/* SKILL ORBIT */}
+
             <div className="skills-orbit">
 
               {skills.map((skill, index) => {
@@ -738,26 +801,21 @@ function Home() {
 
                 return (
                   <button
-                    key={skill.id}
-                    type="button"
-                    className={`skill-circle skill-${skill.color} skill-position-${index + 1} ${
-                      skill.active
-                        ? "skill-active"
-                        : "skill-coming"
-                    }`}
+                    key={skill.name}
+                    className={`
+                      skill-circle
+                      skill-${skill.color}
+                      skill-position-${index + 1}
+                      ${skill.active ? "skill-active" : "skill-coming"}
+                    `}
                     onClick={() =>
                       handleSkillClick(skill)
                     }
-                    disabled={!skill.active}
+                    aria-label={skill.name}
                   >
 
-                    <span className="skill-circle-glow" />
-
                     <span className="skill-icon">
-                      <Icon
-                        size={25}
-                        strokeWidth={2}
-                      />
+                      <Icon size={24} />
                     </span>
 
                     <span className="skill-name">
@@ -780,75 +838,113 @@ function Home() {
 
 
           {/* =================================================
-              LEARN / PRACTICE / MASTER
+              LEARNING TEXT — DIRECTLY BELOW SAMURAI + SKILLS
           ================================================= */}
 
           <section className="learning-flow">
 
-            <div className="flow-heading">
-              <span>Your journey</span>
+            <div className="learning-flow-heading">
+
+              <span>
+                YOUR LEARNING JOURNEY
+              </span>
+
               <h2>
                 Learn. Practice. Master.
               </h2>
+
+              <p>
+                Build your skill step by step with
+                SkillSensAI.
+              </p>
+
             </div>
 
 
-            <div className="flow-cards">
+            <div className="learning-flow-cards">
+
+              {/* LEARN */}
 
               <div className="flow-card flow-learn">
 
                 <div className="flow-icon">
-                  <BookOpen size={23} />
+                  <BookOpen size={21} />
                 </div>
 
                 <div>
-                  <span>01</span>
-                  <h3>Learn</h3>
+                  <span className="flow-number">
+                    01
+                  </span>
+
+                  <h3>
+                    Learn
+                  </h3>
+
                   <p>
-                    Start with guided lessons
-                    designed for your level.
+                    Follow structured lessons and
+                    understand the fundamentals.
                   </p>
                 </div>
 
               </div>
 
 
-              <div className="flow-line" />
+              <div className="flow-arrow">
+                <ArrowRight size={19} />
+              </div>
 
+
+              {/* PRACTICE */}
 
               <div className="flow-card flow-practice">
 
                 <div className="flow-icon">
-                  <Target size={23} />
+                  <Target size={21} />
                 </div>
 
                 <div>
-                  <span>02</span>
-                  <h3>Practice</h3>
+                  <span className="flow-number">
+                    02
+                  </span>
+
+                  <h3>
+                    Practice
+                  </h3>
+
                   <p>
-                    Record, upload and practice
-                    with AI-powered feedback.
+                    Record yourself and practise
+                    what you have learned.
                   </p>
                 </div>
 
               </div>
 
 
-              <div className="flow-line" />
+              <div className="flow-arrow">
+                <ArrowRight size={19} />
+              </div>
 
+
+              {/* MASTER */}
 
               <div className="flow-card flow-master">
 
                 <div className="flow-icon">
-                  <Trophy size={23} />
+                  <Trophy size={21} />
                 </div>
 
                 <div>
-                  <span>03</span>
-                  <h3>Master</h3>
+                  <span className="flow-number">
+                    03
+                  </span>
+
+                  <h3>
+                    Master
+                  </h3>
+
                   <p>
-                    Track your progress and
-                    improve one step at a time.
+                    Improve through AI feedback and
+                    track your progress.
                   </p>
                 </div>
 
@@ -858,35 +954,31 @@ function Home() {
 
 
             {/* PROGRESS */}
+
             <div className="home-progress">
 
-              <div className="progress-top">
+              <div className="home-progress-top">
 
                 <span>
-                  Your progress
+                  Lessons learned
                 </span>
 
                 <strong>
-                  {lessonsLearned} lessons learned
+                  {lessonsLearned}
                 </strong>
 
               </div>
 
-              <div className="progress-track">
-
+              <div className="home-progress-track">
                 <div
-                  className="progress-fill"
+                  className="home-progress-fill"
                   style={{
-                    width:
-                      lessonsLearned > 0
-                        ? `${Math.min(
-                            lessonsLearned * 10,
-                            100
-                          )}%`
-                        : "0%",
+                    width: `${Math.min(
+                      lessonsLearned * 10,
+                      100
+                    )}%`,
                   }}
                 />
-
               </div>
 
             </div>
@@ -894,6 +986,22 @@ function Home() {
           </section>
 
         </main>
+
+
+        {/* COMING SOON MESSAGE */}
+
+        {authMessage && !showLogin && (
+          <div className="home-toast">
+            <Sparkles size={17} />
+            <span>{authMessage}</span>
+
+            <button
+              onClick={() => setAuthMessage("")}
+            >
+              <X size={15} />
+            </button>
+          </div>
+        )}
 
 
         {/* ===================================================
@@ -906,7 +1014,8 @@ function Home() {
             className="login-overlay"
             onMouseDown={(event) => {
               if (
-                event.target === event.currentTarget
+                event.target === event.currentTarget &&
+                !authLoading
               ) {
                 closeLogin();
               }
@@ -916,10 +1025,10 @@ function Home() {
             <div className="login-modal">
 
               <button
-                type="button"
                 className="login-close"
                 onClick={closeLogin}
-                disabled={loginLoading}
+                disabled={authLoading}
+                aria-label="Close"
               >
                 <X size={20} />
               </button>
@@ -927,26 +1036,27 @@ function Home() {
 
               <div className="login-header">
 
-                <div className="login-shield">
-                  <ShieldCheck size={27} />
+                <div className="login-logo">
+                  <Sparkles size={25} />
                 </div>
 
                 <h2>
-                  Welcome to SkillSensAI
+                  Welcome to{" "}
+                  <span>SkillSensAI</span>
                 </h2>
 
                 <p>
-                  Sign in to save your learning
-                  progress.
+                  Sign in to save your learning progress.
                 </p>
 
               </div>
 
 
+              {/* METHOD SWITCH */}
+
               <div className="login-tabs">
 
                 <button
-                  type="button"
                   className={
                     loginMethod === "google"
                       ? "login-tab active"
@@ -954,7 +1064,8 @@ function Home() {
                   }
                   onClick={() => {
                     setLoginMethod("google");
-                    setLoginError("");
+                    setAuthError("");
+                    setAuthMessage("");
                   }}
                 >
                   <Mail size={17} />
@@ -962,7 +1073,6 @@ function Home() {
                 </button>
 
                 <button
-                  type="button"
                   className={
                     loginMethod === "phone"
                       ? "login-tab active"
@@ -970,7 +1080,8 @@ function Home() {
                   }
                   onClick={() => {
                     setLoginMethod("phone");
-                    setLoginError("");
+                    setAuthError("");
+                    setAuthMessage("");
                   }}
                 >
                   <Phone size={17} />
@@ -981,18 +1092,18 @@ function Home() {
 
 
               {/* GOOGLE */}
+
               {loginMethod === "google" && (
 
                 <div className="login-method">
 
                   <button
-                    type="button"
                     className="google-login-button"
                     onClick={handleGoogleLogin}
-                    disabled={loginLoading}
+                    disabled={authLoading}
                   >
 
-                    {loginLoading ? (
+                    {authLoading ? (
                       <Loader2
                         size={20}
                         className="spin"
@@ -1007,81 +1118,81 @@ function Home() {
                       Continue with Google
                     </span>
 
-                    {!loginLoading && (
-                      <ArrowRight size={18} />
-                    )}
-
                   </button>
 
-                  <small>
-                    Your Google account will be used
-                    securely through Firebase.
-                  </small>
+
+                  <div className="login-security">
+
+                    <ShieldCheck size={16} />
+
+                    <span>
+                      Secure authentication powered by
+                      Firebase
+                    </span>
+
+                  </div>
 
                 </div>
-
               )}
 
 
               {/* PHONE */}
+
               {loginMethod === "phone" && (
 
                 <div className="login-method">
 
+                  <label>
+                    Mobile Number
+                  </label>
+
+                  <div className="phone-input-wrapper">
+
+                    <Phone size={18} />
+
+                    <input
+                      type="tel"
+                      value={phoneNumber}
+                      onChange={handlePhoneChange}
+                      placeholder="+91 9876543210"
+                      disabled={
+                        authLoading ||
+                        Boolean(confirmationResult)
+                      }
+                    />
+
+                  </div>
+
+
                   {!confirmationResult ? (
 
-                    <>
+                    <button
+                      className="otp-button"
+                      onClick={sendOtp}
+                      disabled={authLoading}
+                    >
 
-                      <label>
-                        Mobile number
-                      </label>
+                      {authLoading ? (
+                        <>
+                          <Loader2
+                            size={18}
+                            className="spin"
+                          />
+                          Sending...
+                        </>
+                      ) : (
+                        <>
+                          Send OTP
+                          <ArrowRight size={18} />
+                        </>
+                      )}
 
-                      <div className="phone-input-wrap">
-
-                        <Phone size={18} />
-
-                        <input
-                          type="tel"
-                          value={phoneNumber}
-                          onChange={handlePhoneChange}
-                          placeholder="+91 9876543210"
-                          disabled={loginLoading}
-                        />
-
-                      </div>
-
-
-                      <button
-                        type="button"
-                        className="otp-button"
-                        onClick={handleSendOtp}
-                        disabled={loginLoading}
-                      >
-
-                        {loginLoading ? (
-                          <>
-                            <Loader2
-                              size={18}
-                              className="spin"
-                            />
-                            Sending...
-                          </>
-                        ) : (
-                          <>
-                            Send OTP
-                            <ArrowRight size={18} />
-                          </>
-                        )}
-
-                      </button>
-
-                    </>
+                    </button>
 
                   ) : (
 
                     <>
-
-                      <label>
+                      <label className="otp-label">
                         Enter OTP
                       </label>
 
@@ -1098,19 +1209,20 @@ function Home() {
                               .slice(0, 6)
                           )
                         }
-                        placeholder="000000"
-                        disabled={loginLoading}
+                        placeholder="••••••"
+                        disabled={authLoading}
                       />
 
-
                       <button
-                        type="button"
                         className="otp-button"
-                        onClick={handleVerifyOtp}
-                        disabled={loginLoading}
+                        onClick={verifyOtp}
+                        disabled={
+                          authLoading ||
+                          otp.length !== 6
+                        }
                       >
 
-                        {loginLoading ? (
+                        {authLoading ? (
                           <>
                             <Loader2
                               size={18}
@@ -1121,41 +1233,45 @@ function Home() {
                         ) : (
                           <>
                             Verify OTP
-                            <ShieldCheck
-                              size={18}
-                            />
+                            <ShieldCheck size={18} />
                           </>
                         )}
 
                       </button>
 
-
-                      <button
-                        type="button"
-                        className="change-number"
-                        onClick={() => {
-                          setConfirmationResult(
-                            null
-                          );
-                          setOtp("");
-                          setLoginError("");
-                        }}
-                      >
-                        Change number
-                      </button>
-
                     </>
-
                   )}
 
-                </div>
 
+                  <div className="login-security">
+
+                    <ShieldCheck size={16} />
+
+                    <span>
+                      Your phone number is securely
+                      authenticated with Firebase.
+                    </span>
+
+                  </div>
+
+                </div>
               )}
 
 
-              {loginError && (
+              {/* ERROR */}
+
+              {authError && (
                 <div className="login-error">
-                  {loginError}
+                  {authError}
+                </div>
+              )}
+
+
+              {/* MESSAGE */}
+
+              {authMessage && (
+                <div className="login-success">
+                  {authMessage}
                 </div>
               )}
 
@@ -1164,15 +1280,9 @@ function Home() {
                 id="recaptcha-container"
               />
 
-              <p className="login-footer">
-                Secure authentication powered by
-                Firebase.
-              </p>
-
             </div>
 
           </div>
-
         )}
 
       </div>
@@ -1180,6 +1290,3 @@ function Home() {
     </div>
   );
 }
-
-
-export default Home;
