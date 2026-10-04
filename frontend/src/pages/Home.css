@@ -3057,3 +3057,47 @@ body.skillsensai-dark-theme {
     font-size: 7px;
   }
 }
+
+/* =========================================================
+   FINAL HOME PAGE — SMALL POSITION FIXES
+   ========================================================= */
+
+/* Move hanging light slightly to the left */
+.hanging-bulb {
+  right: 105px;
+}
+
+
+/* Keep the light fully clickable */
+.bulb-button {
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   KEEP ONLY ONE LEARNING JOURNEY SECTION
+   ========================================================= */
+
+/*
+   The main Learn / Practice / Master section should remain.
+   If an older duplicate section exists in the page, hide only
+   the duplicate if it has the duplicate-flow class.
+*/
+
+.duplicate-learning-flow {
+  display: none !important;
+}
+
+
+/* Responsive light position */
+@media (max-width: 900px) {
+  .hanging-bulb {
+    right: 60px;
+  }
+}
+
+@media (max-width: 600px) {
+  .hanging-bulb {
+    right: 40px;
+  }
+}
