@@ -1,6 +1,6 @@
 /* =========================================================
    SKILLSENSAI HOME
-   COHESIVE LEARNING ROOM
+   SAME DESIGN — COMPACT ROOM VERSION
    ========================================================= */
 
 * {
@@ -22,7 +22,7 @@
 }
 
 /* =========================================================
-   GLOBAL THEME
+   THEME
    ========================================================= */
 
 :root {
@@ -35,9 +35,6 @@
 
   --glass: rgba(255, 255, 255, 0.64);
   --glass-border: rgba(255, 255, 255, 0.72);
-
-  --shadow-soft:
-    0 20px 60px rgba(75, 57, 39, 0.12);
 
   --purple: #7658f6;
   --purple-dark: #5b43d4;
@@ -54,9 +51,6 @@ body.skillsensai-dark-theme {
 
   --glass: rgba(37, 32, 28, 0.72);
   --glass-border: rgba(255, 255, 255, 0.1);
-
-  --shadow-soft:
-    0 25px 70px rgba(0, 0, 0, 0.38);
 }
 
 body.skillsensai-light-theme {
@@ -68,7 +62,7 @@ body.skillsensai-dark-theme {
 }
 
 /* =========================================================
-   ROOM BACKGROUND
+   ROOM
    ========================================================= */
 
 .room-background {
@@ -81,8 +75,8 @@ body.skillsensai-dark-theme {
     linear-gradient(
       180deg,
       var(--room-wall) 0%,
-      var(--room-wall) 58%,
-      var(--room-floor) 58%,
+      var(--room-wall) 59%,
+      var(--room-floor) 59%,
       var(--room-floor) 100%
     );
 
@@ -103,7 +97,7 @@ body.skillsensai-dark-theme {
     radial-gradient(
       circle at 50% 15%,
       rgba(255, 255, 255, 0.48),
-      transparent 36%
+      transparent 38%
     ),
     linear-gradient(
       180deg,
@@ -114,8 +108,9 @@ body.skillsensai-dark-theme {
 
 .room-floor {
   z-index: -4;
-  top: 58%;
+  top: 59%;
   bottom: 0;
+
   background:
     linear-gradient(
       180deg,
@@ -134,26 +129,32 @@ body.skillsensai-dark-theme {
 .room-corner-glow {
   position: absolute;
   z-index: -3;
+
   top: 0;
   left: 50%;
-  width: 900px;
-  height: 620px;
+
+  width: 850px;
+  height: 560px;
+
   transform: translateX(-50%);
+
   pointer-events: none;
 
-  background: radial-gradient(
-    ellipse,
-    rgba(255, 244, 218, 0.28),
-    transparent 70%
-  );
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(255, 244, 218, 0.28),
+      transparent 70%
+    );
 }
 
 .skillsensai-dark-theme .room-corner-glow {
-  background: radial-gradient(
-    ellipse,
-    rgba(255, 188, 92, 0.06),
-    transparent 70%
-  );
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(255, 188, 92, 0.06),
+      transparent 70%
+    );
 }
 
 /* =========================================================
@@ -163,19 +164,24 @@ body.skillsensai-dark-theme {
 .ceiling {
   position: absolute;
   z-index: 5;
+
   top: 0;
   left: 0;
+
   width: 100%;
-  height: 150px;
+  height: 120px;
+
   pointer-events: none;
 }
 
 .ceiling-line {
   position: absolute;
+
   top: 0;
   left: 0;
+
   width: 100%;
-  height: 8px;
+  height: 7px;
 
   background:
     linear-gradient(
@@ -187,15 +193,18 @@ body.skillsensai-dark-theme {
 }
 
 /* =========================================================
-   REALISTIC PREMIUM CEILING FAN
+   CEILING FAN
    ========================================================= */
 
 .ceiling-fan {
   position: absolute;
-  top: 4px;
+
+  top: 2px;
   left: 50%;
-  width: 190px;
-  height: 135px;
+
+  width: 175px;
+  height: 120px;
+
   transform: translateX(-50%);
 
   perspective: 700px;
@@ -203,10 +212,13 @@ body.skillsensai-dark-theme {
 
 .fan-ceiling-mount {
   position: absolute;
+
   top: 0;
   left: 50%;
-  width: 44px;
-  height: 13px;
+
+  width: 42px;
+  height: 12px;
+
   transform: translateX(-50%);
 
   border-radius: 0 0 14px 14px;
@@ -225,10 +237,13 @@ body.skillsensai-dark-theme {
 
 .fan-rod {
   position: absolute;
+
   top: 9px;
   left: 50%;
-  width: 8px;
-  height: 57px;
+
+  width: 7px;
+  height: 48px;
+
   transform: translateX(-50%);
 
   border-radius: 8px;
@@ -240,15 +255,14 @@ body.skillsensai-dark-theme {
       #eee8df 48%,
       #75695d
     );
-
-  box-shadow:
-    2px 5px 8px rgba(38, 27, 19, 0.16);
 }
 
 .fan-rod span {
   position: absolute;
+
   left: 1px;
   top: 0;
+
   width: 2px;
   height: 100%;
 
@@ -258,10 +272,13 @@ body.skillsensai-dark-theme {
 .fan-motor {
   position: absolute;
   z-index: 5;
-  top: 58px;
+
+  top: 50px;
   left: 50%;
-  width: 48px;
-  height: 48px;
+
+  width: 46px;
+  height: 46px;
+
   transform: translateX(-50%);
 
   border-radius: 50%;
@@ -282,7 +299,9 @@ body.skillsensai-dark-theme {
 
 .fan-motor::before {
   content: "";
+
   position: absolute;
+
   inset: 7px;
 
   border-radius: 50%;
@@ -292,11 +311,15 @@ body.skillsensai-dark-theme {
 
 .fan-motor::after {
   content: "";
+
   position: absolute;
+
   left: 50%;
   top: 50%;
+
   width: 11px;
   height: 11px;
+
   transform: translate(-50%, -50%);
 
   border-radius: 50%;
@@ -316,9 +339,12 @@ body.skillsensai-dark-theme {
 .motor-middle,
 .motor-bottom {
   position: absolute;
+
   left: 50%;
+
   width: 25px;
   height: 3px;
+
   transform: translateX(-50%);
 
   border-radius: 10px;
@@ -341,10 +367,13 @@ body.skillsensai-dark-theme {
 .fan-blades {
   position: absolute;
   z-index: 2;
-  top: 82px;
+
+  top: 74px;
   left: 50%;
-  width: 190px;
+
+  width: 175px;
   height: 30px;
+
   transform: translate(-50%, -50%);
 
   animation: premiumFanSpin 9s linear infinite;
@@ -352,11 +381,12 @@ body.skillsensai-dark-theme {
 
 .blade {
   position: absolute;
+
   top: 50%;
   left: 50%;
 
-  width: 87px;
-  height: 20px;
+  width: 80px;
+  height: 18px;
 
   transform-origin: 8px 50%;
 
@@ -374,16 +404,17 @@ body.skillsensai-dark-theme {
   box-shadow:
     4px 6px 9px rgba(50, 36, 25, 0.18),
     inset 0 1px 1px rgba(255, 255, 255, 0.75);
-
-  opacity: 0.94;
 }
 
 .blade::after {
   content: "";
+
   position: absolute;
+
   top: 5px;
   left: 12px;
-  width: 66px;
+
+  width: 60px;
   height: 1px;
 
   background: rgba(255, 255, 255, 0.52);
@@ -416,25 +447,29 @@ body.skillsensai-dark-theme {
 }
 
 /* =========================================================
-   HANGING BULB
+   BULB
    ========================================================= */
 
 .hanging-bulb {
   position: absolute;
   z-index: 15;
-  top: 72px;
-  left: calc(50% + 185px);
+
+  top: 55px;
+  left: calc(50% + 170px);
 
   width: 50px;
-  height: 150px;
+  height: 130px;
 }
 
 .bulb-wire {
   position: absolute;
-  top: -72px;
+
+  top: -55px;
   left: 50%;
+
   width: 2px;
-  height: 72px;
+  height: 55px;
+
   transform: translateX(-50%);
 
   background:
@@ -450,21 +485,25 @@ body.skillsensai-dark-theme {
   position: relative;
 
   width: 50px;
-  height: 88px;
+  height: 80px;
 
   border: 0;
   padding: 0;
 
   background: transparent;
+
   cursor: pointer;
 }
 
 .bulb-neck {
   position: absolute;
+
   top: 0;
   left: 50%;
+
   width: 17px;
   height: 17px;
+
   transform: translateX(-50%);
 
   border-radius: 4px 4px 2px 2px;
@@ -479,6 +518,7 @@ body.skillsensai-dark-theme {
 
 .bulb-glass {
   position: absolute;
+
   top: 14px;
   left: 50%;
 
@@ -493,10 +533,6 @@ body.skillsensai-dark-theme {
   border-radius:
     48% 48% 45% 45% /
     42% 42% 58% 58%;
-
-  transition:
-    0.3s ease,
-    box-shadow 0.3s ease;
 
   color: #8a7557;
 }
@@ -513,7 +549,7 @@ body.skillsensai-dark-theme {
 
   box-shadow:
     0 0 22px rgba(255, 194, 78, 0.48),
-    0 0 70px rgba(255, 184, 59, 0.22);
+    0 0 65px rgba(255, 184, 59, 0.22);
 }
 
 .bulb-off .bulb-glass {
@@ -528,19 +564,22 @@ body.skillsensai-dark-theme {
 }
 
 /* =========================================================
-   LOGIN / PROFILE
+   LOGIN
    ========================================================= */
 
 .room-login {
   position: absolute;
+
   z-index: 100;
-  top: 28px;
-  right: 32px;
+
+  top: 22px;
+  right: 28px;
 }
 
 .login-button,
 .profile-button {
   border: 1px solid var(--glass-border);
+
   background: var(--glass);
 
   backdrop-filter: blur(16px);
@@ -557,7 +596,7 @@ body.skillsensai-dark-theme {
   align-items: center;
   gap: 8px;
 
-  padding: 11px 17px;
+  padding: 10px 16px;
 
   border-radius: 13px;
 
@@ -573,8 +612,6 @@ body.skillsensai-dark-theme {
 
 .login-button:hover {
   transform: translateY(-2px);
-  box-shadow:
-    0 14px 30px rgba(48, 35, 24, 0.15);
 }
 
 .profile-area {
@@ -601,9 +638,11 @@ body.skillsensai-dark-theme {
   height: 31px;
 
   overflow: hidden;
+
   border-radius: 50%;
 
   background: #7c5cfc;
+
   color: white;
 }
 
@@ -611,6 +650,7 @@ body.skillsensai-dark-theme {
 .profile-large-avatar img {
   width: 100%;
   height: 100%;
+
   object-fit: cover;
 }
 
@@ -618,6 +658,7 @@ body.skillsensai-dark-theme {
   max-width: 130px;
 
   overflow: hidden;
+
   text-overflow: ellipsis;
   white-space: nowrap;
 
@@ -631,6 +672,7 @@ body.skillsensai-dark-theme {
 
 .profile-dropdown {
   position: absolute;
+
   top: calc(100% + 10px);
   right: 0;
 
@@ -668,9 +710,11 @@ body.skillsensai-dark-theme {
   height: 44px;
 
   overflow: hidden;
+
   border-radius: 14px;
 
   background: #7658f6;
+
   color: white;
 }
 
@@ -689,10 +733,12 @@ body.skillsensai-dark-theme {
   max-width: 185px;
 
   overflow: hidden;
+
   text-overflow: ellipsis;
   white-space: nowrap;
 
   color: var(--room-muted);
+
   font-size: 11px;
 }
 
@@ -733,6 +779,7 @@ body.skillsensai-dark-theme {
   border-radius: 11px;
 
   background: rgba(118, 88, 246, 0.16);
+
   color: #7658f6;
 }
 
@@ -750,6 +797,7 @@ body.skillsensai-dark-theme {
   border-radius: 11px;
 
   background: rgba(230, 80, 80, 0.08);
+
   color: #c74b4b;
 
   font-size: 12px;
@@ -766,22 +814,29 @@ body.skillsensai-dark-theme {
   position: relative;
   z-index: 20;
 
-  width: min(1240px, calc(100% - 40px));
+  width: min(1200px, calc(100% - 36px));
 
   margin: 0 auto;
-  padding-top: 105px;
-  padding-bottom: 70px;
+
+  padding-top: 88px;
+  padding-bottom: 35px;
 }
 
 /* =========================================================
-   MAIN SKILL ROOM
+   COMPACT SKILL ROOM
    ========================================================= */
 
 .skills-room {
   position: relative;
 
   width: 100%;
-  min-height: 690px;
+
+  /*
+     Reduced from 690px.
+     This is the main change that reduces scrolling.
+  */
+  height: 570px;
+  min-height: 570px;
 
   overflow: visible;
 }
@@ -795,26 +850,28 @@ body.skillsensai-dark-theme {
   z-index: 2;
 
   left: 50%;
-  bottom: 86px;
+  bottom: 48px;
 
-  width: 570px;
-  height: 170px;
+  width: 520px;
+  height: 145px;
 
   transform: translateX(-50%);
 
   opacity: 0.82;
+
   pointer-events: none;
 }
 
 .sofa-back {
   position: absolute;
-  left: 35px;
+
+  left: 30px;
   top: 0;
 
-  width: 500px;
-  height: 105px;
+  width: 460px;
+  height: 90px;
 
-  border-radius: 34px 34px 12px 12px;
+  border-radius: 30px 30px 11px 11px;
 
   background:
     linear-gradient(
@@ -824,18 +881,18 @@ body.skillsensai-dark-theme {
     );
 
   box-shadow:
-    0 18px 25px rgba(62, 44, 29, 0.15);
+    0 15px 22px rgba(62, 44, 29, 0.15);
 }
 
 .sofa-cushion {
   position: absolute;
 
-  top: 16px;
+  top: 14px;
 
-  width: 145px;
-  height: 70px;
+  width: 132px;
+  height: 61px;
 
-  border-radius: 20px;
+  border-radius: 18px;
 
   background:
     linear-gradient(
@@ -843,32 +900,30 @@ body.skillsensai-dark-theme {
       #b7a58f,
       #8d7965
     );
-
-  box-shadow:
-    inset 0 2px 5px rgba(255, 255, 255, 0.16);
 }
 
 .sofa-cushion-one {
-  left: 22px;
+  left: 20px;
 }
 
 .sofa-cushion-two {
-  left: 178px;
+  left: 164px;
 }
 
 .sofa-cushion-three {
-  right: 22px;
+  right: 20px;
 }
 
 .sofa-seat {
   position: absolute;
-  left: 26px;
-  bottom: 22px;
 
-  width: 518px;
-  height: 65px;
+  left: 24px;
+  bottom: 18px;
 
-  border-radius: 18px 18px 26px 26px;
+  width: 472px;
+  height: 55px;
+
+  border-radius: 16px 16px 23px 23px;
 
   background:
     linear-gradient(
@@ -880,21 +935,23 @@ body.skillsensai-dark-theme {
 
 .sofa-seat span {
   position: absolute;
-  inset: 8px 20px;
 
-  border-radius: 13px;
+  inset: 7px 18px;
+
+  border-radius: 12px;
 
   border-top: 1px solid rgba(255, 255, 255, 0.14);
 }
 
 .sofa-arm {
   position: absolute;
-  bottom: 31px;
 
-  width: 45px;
-  height: 110px;
+  bottom: 25px;
 
-  border-radius: 17px;
+  width: 40px;
+  height: 95px;
+
+  border-radius: 15px;
 
   background:
     linear-gradient(
@@ -905,19 +962,20 @@ body.skillsensai-dark-theme {
 }
 
 .sofa-arm-left {
-  left: 3px;
+  left: 1px;
 }
 
 .sofa-arm-right {
-  right: 3px;
+  right: 1px;
 }
 
 .sofa-leg {
   position: absolute;
+
   bottom: 0;
 
-  width: 8px;
-  height: 28px;
+  width: 7px;
+  height: 24px;
 
   border-radius: 0 0 5px 5px;
 
@@ -925,15 +983,18 @@ body.skillsensai-dark-theme {
 }
 
 .sofa-leg-left {
-  left: 55px;
+  left: 50px;
 }
 
 .sofa-leg-right {
-  right: 55px;
+  right: 50px;
 }
 
 /* =========================================================
    RUG
+   IMPORTANT:
+   Moved DOWN + made slightly smaller so it doesn't overlap
+   the sofa.
    ========================================================= */
 
 .room-rug {
@@ -941,10 +1002,10 @@ body.skillsensai-dark-theme {
   z-index: 3;
 
   left: 50%;
-  bottom: 0;
+  bottom: -2px;
 
-  width: 650px;
-  height: 170px;
+  width: 590px;
+  height: 135px;
 
   transform: translateX(-50%);
 
@@ -959,14 +1020,16 @@ body.skillsensai-dark-theme {
     );
 
   box-shadow:
-    0 15px 20px rgba(64, 46, 30, 0.18);
+    0 12px 18px rgba(64, 46, 30, 0.18);
 }
 
 .rug-inner {
   position: absolute;
-  inset: 15px 25px;
+
+  inset: 12px 22px;
 
   border: 1px solid rgba(104, 81, 58, 0.18);
+
   border-radius: 50%;
 
   background:
@@ -985,26 +1048,29 @@ body.skillsensai-dark-theme {
   position: absolute;
   z-index: 7;
 
-  left: 42px;
-  bottom: 40px;
+  left: 35px;
+  bottom: 25px;
 
-  width: 130px;
-  height: 260px;
+  width: 115px;
+  height: 225px;
 
   pointer-events: none;
+
+  transform: scale(0.86);
+  transform-origin: bottom left;
 }
 
 .plant-pot {
   position: absolute;
   z-index: 3;
 
-  left: 34px;
+  left: 30px;
   bottom: 0;
 
-  width: 70px;
-  height: 72px;
+  width: 65px;
+  height: 67px;
 
-  border-radius: 8px 8px 24px 24px;
+  border-radius: 8px 8px 22px 22px;
 
   background:
     linear-gradient(
@@ -1014,18 +1080,19 @@ body.skillsensai-dark-theme {
     );
 
   box-shadow:
-    0 14px 18px rgba(54, 38, 25, 0.2);
+    0 12px 17px rgba(54, 38, 25, 0.2);
 }
 
 .plant-pot::before {
   content: "";
 
   position: absolute;
-  top: -8px;
+
+  top: -7px;
   left: -5px;
 
-  width: 80px;
-  height: 16px;
+  width: 75px;
+  height: 15px;
 
   border-radius: 50%;
 
@@ -1034,22 +1101,24 @@ body.skillsensai-dark-theme {
 
 .plant-pot span {
   position: absolute;
+
   top: 12px;
-  left: 12px;
+  left: 11px;
 
   width: 3px;
-  height: 48px;
+  height: 44px;
 
   background: rgba(255, 255, 255, 0.13);
 }
 
 .plant-stem {
   position: absolute;
-  bottom: 60px;
-  left: 67px;
+
+  bottom: 55px;
+  left: 62px;
 
   width: 5px;
-  height: 145px;
+  height: 125px;
 
   transform-origin: bottom;
 
@@ -1082,8 +1151,8 @@ body.skillsensai-dark-theme {
 .plant-leaf {
   position: absolute;
 
-  width: 53px;
-  height: 25px;
+  width: 48px;
+  height: 23px;
 
   border-radius:
     100% 0 100% 0;
@@ -1094,49 +1163,46 @@ body.skillsensai-dark-theme {
       #718b5d,
       #3f5b3d
     );
-
-  box-shadow:
-    inset 1px 1px rgba(255, 255, 255, 0.15);
 }
 
 .leaf-one {
-  top: 73px;
-  left: 8px;
+  top: 62px;
+  left: 5px;
   transform: rotate(-28deg);
 }
 
 .leaf-two {
-  top: 48px;
-  right: 3px;
+  top: 42px;
+  right: 1px;
   transform: rotate(21deg);
 }
 
 .leaf-three {
-  top: 100px;
-  left: 0;
+  top: 88px;
+  left: -1px;
   transform: rotate(-17deg);
 }
 
 .leaf-four {
-  top: 91px;
+  top: 80px;
   right: -5px;
   transform: rotate(31deg);
 }
 
 .leaf-five {
-  top: 18px;
-  left: 40px;
+  top: 14px;
+  left: 38px;
   transform: rotate(-8deg);
 }
 
 .leaf-six {
-  top: 132px;
+  top: 116px;
   right: -3px;
   transform: rotate(43deg);
 }
 
 /* =========================================================
-   CHARACTER
+   SAMURAI
    ========================================================= */
 
 .character-shadow {
@@ -1144,10 +1210,10 @@ body.skillsensai-dark-theme {
   z-index: 8;
 
   left: 50%;
-  bottom: 84px;
+  bottom: 49px;
 
-  width: 245px;
-  height: 50px;
+  width: 215px;
+  height: 42px;
 
   transform: translateX(-50%);
 
@@ -1155,7 +1221,7 @@ body.skillsensai-dark-theme {
 
   background: rgba(41, 29, 20, 0.22);
 
-  filter: blur(12px);
+  filter: blur(11px);
 }
 
 .samurai-container {
@@ -1163,10 +1229,10 @@ body.skillsensai-dark-theme {
   z-index: 12;
 
   left: 50%;
-  bottom: 86px;
+  bottom: 50px;
 
-  width: 350px;
-  height: 530px;
+  width: 315px;
+  height: 430px;
 
   transform: translateX(-50%);
 
@@ -1182,10 +1248,10 @@ body.skillsensai-dark-theme {
   z-index: -1;
 
   left: 50%;
-  bottom: 50px;
+  bottom: 35px;
 
-  width: 270px;
-  height: 390px;
+  width: 235px;
+  height: 320px;
 
   transform: translateX(-50%);
 
@@ -1194,7 +1260,7 @@ body.skillsensai-dark-theme {
   background:
     radial-gradient(
       ellipse,
-      rgba(118, 88, 246, 0.15),
+      rgba(118, 88, 246, 0.14),
       transparent 67%
     );
 
@@ -1208,15 +1274,15 @@ body.skillsensai-dark-theme {
   display: block;
 
   width: auto;
-  height: 500px;
-  max-width: 340px;
+  height: 405px;
+  max-width: 315px;
 
   object-fit: contain;
   object-position: center bottom;
 
   filter:
     drop-shadow(
-      0 25px 22px rgba(31, 23, 17, 0.24)
+      0 20px 20px rgba(31, 23, 17, 0.24)
     );
 
   animation: characterFloat 5s ease-in-out infinite;
@@ -1229,22 +1295,28 @@ body.skillsensai-dark-theme {
   }
 
   50% {
-    transform: translateY(-7px);
+    transform: translateY(-6px);
   }
 }
 
 /* =========================================================
-   SKILLS ORBIT
+   SKILLS
+   CLOSER TO SAMURAI
    ========================================================= */
 
 .skills-orbit {
   position: absolute;
+
   z-index: 25;
 
   inset: 0;
 
   pointer-events: none;
 }
+
+/*
+   All buttons are now EXACT circles.
+*/
 
 .skill-circle {
   position: absolute;
@@ -1254,19 +1326,26 @@ body.skillsensai-dark-theme {
   align-items: center;
   justify-content: center;
 
-  width: 118px;
-  height: 118px;
+  /*
+     Same width + height = perfect circle.
+  */
+  width: 96px;
+  height: 96px;
 
-  padding: 10px;
+  min-width: 96px;
+  min-height: 96px;
 
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  padding: 8px;
+
+  border: 1px solid rgba(255, 255, 255, 0.58);
+
   border-radius: 50%;
 
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 
   box-shadow:
-    0 14px 32px rgba(48, 34, 22, 0.15),
+    0 12px 28px rgba(48, 34, 22, 0.15),
     inset 0 1px rgba(255, 255, 255, 0.7);
 
   color: white;
@@ -1285,24 +1364,24 @@ body.skillsensai-dark-theme {
 
 .skill-circle:hover {
   transform:
-    translateY(-8px)
-    scale(1.07);
+    translateY(-6px)
+    scale(1.06);
 
   filter: brightness(1.07);
 
   box-shadow:
-    0 20px 42px rgba(48, 34, 22, 0.22),
-    0 0 28px rgba(255, 255, 255, 0.17);
+    0 18px 36px rgba(48, 34, 22, 0.2),
+    0 0 25px rgba(255, 255, 255, 0.16);
 }
 
 .skill-icon {
   display: grid;
   place-items: center;
 
-  width: 43px;
-  height: 43px;
+  width: 37px;
+  height: 37px;
 
-  margin-bottom: 7px;
+  margin-bottom: 5px;
 
   border-radius: 50%;
 
@@ -1313,12 +1392,12 @@ body.skillsensai-dark-theme {
 }
 
 .skill-name {
-  max-width: 95px;
+  max-width: 80px;
 
   text-align: center;
 
-  font-size: 12px;
-  line-height: 1.2;
+  font-size: 10px;
+  line-height: 1.15;
   font-weight: 800;
 
   text-shadow:
@@ -1326,9 +1405,9 @@ body.skillsensai-dark-theme {
 }
 
 .coming-soon {
-  margin-top: 4px;
+  margin-top: 3px;
 
-  font-size: 8px;
+  font-size: 7px;
   font-weight: 700;
 
   opacity: 0.72;
@@ -1352,51 +1431,69 @@ body.skillsensai-dark-theme {
   }
 
   50% {
-    margin-top: -7px;
+    margin-top: -5px;
   }
 }
 
 /* =========================================================
-   FIXED SKILL POSITIONS
-   Far enough away from the SAMURAI
+   NEW CLOSER POSITIONS
    ========================================================= */
 
+/*
+   Top two:
+   close enough to Samurai but not touching it.
+*/
+
 .skill-position-1 {
-  top: 105px;
-  left: 17%;
+  top: 145px;
+  left: calc(50% - 285px);
 }
 
 .skill-position-2 {
-  top: 105px;
-  right: 17%;
+  top: 145px;
+  right: calc(50% - 285px);
 }
 
+/*
+   Middle two:
+   closer to the character's sides.
+*/
+
 .skill-position-3 {
-  top: 315px;
-  left: 4%;
+  top: 270px;
+  left: calc(50% - 405px);
+
   animation-delay: -1.1s;
 }
 
 .skill-position-4 {
-  top: 315px;
-  right: 4%;
+  top: 270px;
+  right: calc(50% - 405px);
+
   animation-delay: -2.1s;
 }
 
+/*
+   Bottom two:
+   still above the rug.
+*/
+
 .skill-position-5 {
-  top: 510px;
-  left: 19%;
+  top: 405px;
+  left: calc(50% - 270px);
+
   animation-delay: -1.7s;
 }
 
 .skill-position-6 {
-  top: 510px;
-  right: 19%;
+  top: 405px;
+  right: calc(50% - 270px);
+
   animation-delay: -2.7s;
 }
 
 /* =========================================================
-   SKILL COLORS
+   COLORS
    ========================================================= */
 
 .skill-music {
@@ -1461,9 +1558,9 @@ body.skillsensai-dark-theme {
   position: relative;
   z-index: 40;
 
-  width: min(700px, 100%);
+  width: min(650px, 100%);
 
-  margin: 20px auto 0;
+  margin: 4px auto 0;
 
   text-align: center;
 }
@@ -1471,11 +1568,11 @@ body.skillsensai-dark-theme {
 .home-eyebrow {
   display: inline-block;
 
-  margin-bottom: 10px;
+  margin-bottom: 7px;
 
   color: #7658f6;
 
-  font-size: 10px;
+  font-size: 9px;
   letter-spacing: 0.2em;
   font-weight: 900;
 }
@@ -1485,8 +1582,10 @@ body.skillsensai-dark-theme {
 
   color: var(--room-text);
 
-  font-size: clamp(32px, 4vw, 52px);
+  font-size: clamp(28px, 3.5vw, 44px);
+
   line-height: 1.04;
+
   letter-spacing: -0.04em;
 }
 
@@ -1495,14 +1594,14 @@ body.skillsensai-dark-theme {
 }
 
 .home-intro p {
-  max-width: 580px;
+  max-width: 540px;
 
-  margin: 13px auto 0;
+  margin: 9px auto 0;
 
   color: var(--room-muted);
 
-  font-size: 14px;
-  line-height: 1.7;
+  font-size: 12px;
+  line-height: 1.55;
 }
 
 /* =========================================================
@@ -1513,10 +1612,11 @@ body.skillsensai-dark-theme {
   position: relative;
   z-index: 45;
 
-  margin-top: 46px;
-  padding: 32px 28px 38px;
+  margin-top: 28px;
 
-  border-radius: 28px;
+  padding: 24px 24px 27px;
+
+  border-radius: 24px;
 
   background:
     linear-gradient(
@@ -1531,7 +1631,7 @@ body.skillsensai-dark-theme {
   -webkit-backdrop-filter: blur(12px);
 
   box-shadow:
-    0 20px 55px rgba(58, 42, 27, 0.08);
+    0 16px 40px rgba(58, 42, 27, 0.07);
 }
 
 .skillsensai-dark-theme .learning-flow {
@@ -1552,15 +1652,16 @@ body.skillsensai-dark-theme {
 .flow-heading > span {
   color: #7658f6;
 
-  font-size: 10px;
+  font-size: 9px;
   letter-spacing: 0.18em;
   font-weight: 900;
 }
 
 .flow-heading h2 {
-  margin: 7px 0 4px;
+  margin: 5px 0 3px;
 
-  font-size: 25px;
+  font-size: 21px;
+
   letter-spacing: -0.025em;
 }
 
@@ -1569,16 +1670,17 @@ body.skillsensai-dark-theme {
 
   color: var(--room-muted);
 
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .flow-cards {
   display: grid;
+
   grid-template-columns: repeat(3, 1fr);
 
-  gap: 15px;
+  gap: 12px;
 
-  margin-top: 24px;
+  margin-top: 17px;
 }
 
 .flow-card {
@@ -1586,36 +1688,27 @@ body.skillsensai-dark-theme {
 
   display: flex;
   align-items: flex-start;
-  gap: 13px;
 
-  min-height: 145px;
+  gap: 11px;
 
-  padding: 19px;
+  min-height: 112px;
 
-  border-radius: 20px;
+  padding: 15px;
+
+  border-radius: 17px;
 
   background: rgba(255, 255, 255, 0.52);
 
   border: 1px solid rgba(255, 255, 255, 0.62);
 
   box-shadow:
-    0 10px 28px rgba(54, 40, 27, 0.07);
-
-  transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
+    0 8px 22px rgba(54, 40, 27, 0.07);
 }
 
 .skillsensai-dark-theme .flow-card {
   background: rgba(255, 255, 255, 0.045);
+
   border-color: rgba(255, 255, 255, 0.06);
-}
-
-.flow-card:hover {
-  transform: translateY(-4px);
-
-  box-shadow:
-    0 16px 34px rgba(54, 40, 27, 0.12);
 }
 
 .flow-card-icon {
@@ -1624,10 +1717,10 @@ body.skillsensai-dark-theme {
   display: grid;
   place-items: center;
 
-  width: 43px;
-  height: 43px;
+  width: 38px;
+  height: 38px;
 
-  border-radius: 13px;
+  border-radius: 11px;
 }
 
 .flow-learn .flow-card-icon {
@@ -1646,21 +1739,20 @@ body.skillsensai-dark-theme {
 }
 
 .flow-card > div:nth-child(2) {
-  padding-right: 16px;
+  padding-right: 10px;
 }
 
 .flow-card > div:nth-child(2) > span {
   color: var(--room-muted);
 
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 800;
-  letter-spacing: 0.1em;
 }
 
 .flow-card h3 {
-  margin: 2px 0 5px;
+  margin: 2px 0 4px;
 
-  font-size: 18px;
+  font-size: 15px;
 }
 
 .flow-card p {
@@ -1668,15 +1760,15 @@ body.skillsensai-dark-theme {
 
   color: var(--room-muted);
 
-  font-size: 11px;
-  line-height: 1.6;
+  font-size: 10px;
+  line-height: 1.5;
 }
 
 .flow-arrow {
   position: absolute;
 
-  right: 16px;
-  top: 21px;
+  right: 12px;
+  top: 17px;
 
   color: var(--room-muted);
 }
@@ -1685,13 +1777,14 @@ body.skillsensai-dark-theme {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 7px;
 
-  margin-top: 22px;
+  gap: 6px;
+
+  margin-top: 15px;
 
   color: var(--room-muted);
 
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .home-bottom-note svg {
@@ -1705,6 +1798,7 @@ body.skillsensai-dark-theme {
 .login-overlay {
   position: fixed;
   z-index: 5000;
+
   inset: 0;
 
   display: flex;
@@ -1727,6 +1821,7 @@ body.skillsensai-dark-theme {
   padding: 32px;
 
   border: 1px solid rgba(255, 255, 255, 0.7);
+
   border-radius: 26px;
 
   background:
@@ -1757,6 +1852,7 @@ body.skillsensai-dark-theme {
 
 .login-close {
   position: absolute;
+
   top: 14px;
   right: 14px;
 
@@ -1804,7 +1900,9 @@ body.skillsensai-dark-theme {
   color: #7658f6;
 
   font-size: 9px;
+
   letter-spacing: 0.17em;
+
   font-weight: 900;
 }
 
@@ -1812,6 +1910,7 @@ body.skillsensai-dark-theme {
   margin: 7px 0;
 
   font-size: 25px;
+
   line-height: 1.15;
 }
 
@@ -1825,6 +1924,7 @@ body.skillsensai-dark-theme {
   color: #80766b;
 
   font-size: 12px;
+
   line-height: 1.6;
 }
 
@@ -1834,11 +1934,13 @@ body.skillsensai-dark-theme {
 
 .login-tabs {
   display: grid;
+
   grid-template-columns: 1fr 1fr;
 
   gap: 7px;
 
   margin-top: 22px;
+
   padding: 5px;
 
   border-radius: 13px;
@@ -1850,6 +1952,7 @@ body.skillsensai-dark-theme {
   display: flex;
   align-items: center;
   justify-content: center;
+
   gap: 7px;
 
   padding: 10px;
@@ -1862,6 +1965,7 @@ body.skillsensai-dark-theme {
   color: #83796f;
 
   font-size: 12px;
+
   font-weight: 700;
 
   cursor: pointer;
@@ -1889,23 +1993,20 @@ body.skillsensai-dark-theme {
   display: flex;
   align-items: center;
   justify-content: center;
+
   gap: 10px;
 
   width: 100%;
 
   height: 48px;
 
-  border: 0;
   border-radius: 13px;
 
   font-size: 13px;
+
   font-weight: 800;
 
   cursor: pointer;
-
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
 }
 
 .google-login-button {
@@ -1914,19 +2015,20 @@ body.skillsensai-dark-theme {
   border: 1px solid #e3ddd6;
 
   color: #302a25;
-
-  box-shadow:
-    0 7px 18px rgba(44, 34, 26, 0.08);
 }
 
 .skillsensai-dark-theme .google-login-button {
   background: #312b26;
+
   border-color: #403830;
+
   color: #f7f3ed;
 }
 
 .phone-login-button {
   margin-top: 12px;
+
+  border: 0;
 
   background:
     linear-gradient(
@@ -1941,18 +2043,6 @@ body.skillsensai-dark-theme {
     0 10px 25px rgba(98, 69, 216, 0.22);
 }
 
-.google-login-button:hover,
-.phone-login-button:hover {
-  transform: translateY(-2px);
-}
-
-.google-login-button:disabled,
-.phone-login-button:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-  transform: none;
-}
-
 .google-symbol {
   display: grid;
   place-items: center;
@@ -1965,6 +2055,7 @@ body.skillsensai-dark-theme {
   color: #4285f4;
 
   font-size: 18px;
+
   font-weight: 900;
 }
 
@@ -1972,6 +2063,7 @@ body.skillsensai-dark-theme {
   display: flex;
   align-items: center;
   justify-content: center;
+
   gap: 6px;
 
   margin-top: 14px;
@@ -1979,12 +2071,15 @@ body.skillsensai-dark-theme {
   color: #8b8177;
 
   font-size: 10px;
+
   line-height: 1.5;
+
   text-align: center;
 }
 
 .login-security-note svg {
   flex: 0 0 auto;
+
   color: #7658f6;
 }
 
@@ -1994,12 +2089,14 @@ body.skillsensai-dark-theme {
   margin-bottom: 7px;
 
   font-size: 11px;
+
   font-weight: 800;
 }
 
 .login-phone-input {
   display: flex;
   align-items: center;
+
   gap: 9px;
 
   height: 48px;
@@ -2007,6 +2104,7 @@ body.skillsensai-dark-theme {
   padding: 0 13px;
 
   border: 1px solid #ddd5cd;
+
   border-radius: 13px;
 
   background: white;
@@ -2016,6 +2114,7 @@ body.skillsensai-dark-theme {
 
 .skillsensai-dark-theme .login-phone-input {
   border-color: #494038;
+
   background: #302a25;
 }
 
@@ -2044,6 +2143,7 @@ body.skillsensai-dark-theme {
   height: 62px;
 
   border: 1px solid #ddd5cd;
+
   border-radius: 13px;
 
   background: white;
@@ -2051,6 +2151,7 @@ body.skillsensai-dark-theme {
 
 .skillsensai-dark-theme .otp-input-wrapper {
   border-color: #494038;
+
   background: #302a25;
 }
 
@@ -2067,7 +2168,9 @@ body.skillsensai-dark-theme {
   color: #302a25;
 
   font-size: 23px;
+
   font-weight: 800;
+
   letter-spacing: 0.35em;
 }
 
@@ -2081,11 +2184,13 @@ body.skillsensai-dark-theme {
   margin: 11px auto 0;
 
   border: 0;
+
   background: transparent;
 
   color: #7658f6;
 
   font-size: 11px;
+
   font-weight: 700;
 
   cursor: pointer;
@@ -2093,6 +2198,7 @@ body.skillsensai-dark-theme {
 
 .login-error {
   margin-top: 13px;
+
   padding: 10px 12px;
 
   border-radius: 11px;
@@ -2102,6 +2208,7 @@ body.skillsensai-dark-theme {
   color: #c34d4d;
 
   font-size: 10px;
+
   line-height: 1.5;
 }
 
@@ -2120,219 +2227,159 @@ body.skillsensai-dark-theme {
 }
 
 /* =========================================================
-   RESPONSIVE
+   TABLET
    ========================================================= */
 
-@media (max-width: 1050px) {
+@media (max-width: 900px) {
+  .home-content {
+    width: min(100% - 28px, 760px);
+  }
+
   .skills-room {
-    min-height: 650px;
+    height: 590px;
+    min-height: 590px;
   }
 
   .samurai-container {
-    width: 310px;
+    width: 280px;
   }
 
   .samurai-image {
-    height: 460px;
-    max-width: 310px;
+    height: 390px;
+    max-width: 280px;
   }
 
   .skill-position-1 {
-    left: 10%;
+    left: calc(50% - 245px);
   }
 
   .skill-position-2 {
-    right: 10%;
+    right: calc(50% - 245px);
+  }
+
+  .skill-position-3 {
+    left: calc(50% - 330px);
+  }
+
+  .skill-position-4 {
+    right: calc(50% - 330px);
   }
 
   .skill-position-5 {
-    left: 13%;
+    left: calc(50% - 230px);
   }
 
   .skill-position-6 {
-    right: 13%;
+    right: calc(50% - 230px);
   }
 
   .room-plant {
-    left: 15px;
+    left: 8px;
+  }
+
+  .flow-cards {
+    gap: 10px;
   }
 }
 
-@media (max-width: 800px) {
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 650px) {
+  .room-background {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
   .home-content {
-    width: min(100% - 28px, 700px);
-    padding-top: 95px;
+    width: calc(100% - 18px);
+
+    padding-top: 80px;
   }
 
   .ceiling-fan {
-    left: 50%;
-    transform: translateX(-50%) scale(0.8);
+    transform:
+      translateX(-50%)
+      scale(0.75);
+
     transform-origin: top center;
   }
 
   .hanging-bulb {
     left: auto;
-    right: 100px;
+    right: 55px;
+
+    transform: scale(0.78);
+
+    transform-origin: top center;
   }
 
   .room-login {
-    top: 20px;
-    right: 18px;
-  }
-
-  .skills-room {
-    min-height: 700px;
-  }
-
-  .room-sofa {
-    width: 470px;
-    transform: translateX(-50%) scale(0.86);
-    transform-origin: bottom center;
-  }
-
-  .room-rug {
-    width: 560px;
-  }
-
-  .room-plant {
-    left: -4px;
-    transform: scale(0.8);
-    transform-origin: bottom left;
-  }
-
-  .samurai-container {
-    bottom: 100px;
-    width: 280px;
-    height: 450px;
-  }
-
-  .samurai-image {
-    height: 420px;
-    max-width: 280px;
-  }
-
-  .skill-circle {
-    width: 96px;
-    height: 96px;
-  }
-
-  .skill-icon {
-    width: 36px;
-    height: 36px;
-  }
-
-  .skill-icon svg {
-    width: 20px;
-    height: 20px;
-  }
-
-  .skill-name {
-    font-size: 10px;
-  }
-
-  .skill-position-1 {
-    top: 105px;
-    left: 2%;
-  }
-
-  .skill-position-2 {
-    top: 105px;
-    right: 2%;
-  }
-
-  .skill-position-3 {
-    top: 285px;
-    left: 0;
-  }
-
-  .skill-position-4 {
-    top: 285px;
-    right: 0;
-  }
-
-  .skill-position-5 {
-    top: 465px;
-    left: 7%;
-  }
-
-  .skill-position-6 {
-    top: 465px;
-    right: 7%;
-  }
-
-  .flow-cards {
-    grid-template-columns: 1fr;
-  }
-
-  .flow-card {
-    min-height: 125px;
-  }
-}
-
-@media (max-width: 560px) {
-  .home-content {
-    width: calc(100% - 20px);
-    padding-top: 88px;
-  }
-
-  .room-login {
-    right: 10px;
+    top: 17px;
+    right: 12px;
   }
 
   .profile-name {
     display: none;
   }
 
-  .hanging-bulb {
-    right: 74px;
-    transform: scale(0.8);
-    transform-origin: top center;
-  }
-
   .skills-room {
-    min-height: 760px;
+    height: 590px;
+    min-height: 590px;
   }
 
   .room-sofa {
-    bottom: 95px;
-    width: 420px;
-    transform: translateX(-50%) scale(0.7);
+    bottom: 42px;
+
+    width: 430px;
+
+    transform:
+      translateX(-50%)
+      scale(0.7);
+
+    transform-origin: bottom center;
   }
 
   .room-rug {
-    bottom: 15px;
-    width: 440px;
-    height: 130px;
+    bottom: -5px;
+
+    width: 430px;
+    height: 105px;
   }
 
   .room-plant {
-    left: -10px;
-    bottom: 40px;
-    transform: scale(0.65);
+    left: -5px;
+    bottom: 23px;
+
+    transform: scale(0.6);
+
+    transform-origin: bottom left;
   }
 
   .samurai-container {
-    bottom: 145px;
-    width: 250px;
-    height: 390px;
+    bottom: 53px;
+
+    width: 230px;
+    height: 370px;
   }
 
   .samurai-image {
-    height: 370px;
-    max-width: 250px;
+    height: 350px;
+    max-width: 230px;
   }
 
   .skill-circle {
-    width: 82px;
-    height: 82px;
+    width: 78px;
+    height: 78px;
 
-    padding: 6px;
+    min-width: 78px;
+    min-height: 78px;
   }
 
   .skill-icon {
-    width: 30px;
-    height: 30px;
-    margin-bottom: 4px;
+    width: 29px;
+    height: 29px;
   }
 
   .skill-icon svg {
@@ -2341,7 +2388,8 @@ body.skillsensai-dark-theme {
   }
 
   .skill-name {
-    max-width: 70px;
+    max-width: 67px;
+
     font-size: 8px;
   }
 
@@ -2349,65 +2397,66 @@ body.skillsensai-dark-theme {
     font-size: 6px;
   }
 
+  /*
+     Mobile skill positions:
+     still around the character, not at the edges.
+  */
+
   .skill-position-1 {
-    top: 85px;
-    left: 1%;
+    top: 115px;
+    left: calc(50% - 155px);
   }
 
   .skill-position-2 {
-    top: 85px;
-    right: 1%;
+    top: 115px;
+    right: calc(50% - 155px);
   }
 
   .skill-position-3 {
-    top: 280px;
-    left: -1%;
+    top: 260px;
+    left: calc(50% - 175px);
   }
 
   .skill-position-4 {
-    top: 280px;
-    right: -1%;
+    top: 260px;
+    right: calc(50% - 175px);
   }
 
   .skill-position-5 {
-    top: 475px;
-    left: 2%;
+    top: 390px;
+    left: calc(50% - 145px);
   }
 
   .skill-position-6 {
-    top: 475px;
-    right: 2%;
+    top: 390px;
+    right: calc(50% - 145px);
   }
 
   .home-intro {
-    margin-top: 8px;
+    margin-top: 0;
+
     padding: 0 8px;
   }
 
   .home-intro h1 {
-    font-size: 32px;
+    font-size: 30px;
   }
 
   .home-intro p {
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .learning-flow {
-    margin-top: 30px;
-    padding: 24px 14px 28px;
-    border-radius: 22px;
+    margin-top: 24px;
+
+    padding: 21px 13px 25px;
   }
 
-  .flow-heading h2 {
-    font-size: 22px;
+  .flow-cards {
+    grid-template-columns: 1fr;
   }
 
   .flow-card {
-    padding: 15px;
-  }
-
-  .login-modal {
-    padding: 25px 20px;
-    border-radius: 22px;
+    min-height: 105px;
   }
 }
