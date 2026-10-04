@@ -1,35 +1,73 @@
 /* =========================================================
-   SKILLSENSAI — HOME PAGE
-   Premium Lavender / Violet Theme
-   ========================================================= */
-
-
-/* =========================================================
-   ROOT
+   SKILLSENSAI — ORBIT HOME
    ========================================================= */
 
 .home-page {
+  --bg: #050509;
+  --surface: rgba(255, 255, 255, 0.055);
+  --surface-hover: rgba(255, 255, 255, 0.09);
+  --text: #ffffff;
+  --muted: #a7a4b5;
+  --border: rgba(255, 255, 255, 0.12);
+  --purple: #8b6cff;
+  --purple-light: #a992ff;
+  --glow: rgba(139, 108, 255, 0.45);
+
   min-height: 100vh;
+  width: 100%;
+
+  position: relative;
+
+  overflow: hidden;
+
   background:
     radial-gradient(
-      circle at 15% 15%,
-      rgba(124, 92, 252, 0.12),
+      circle at center,
+      rgba(124, 92, 252, 0.10),
       transparent 30%
     ),
     radial-gradient(
-      circle at 85% 20%,
-      rgba(98, 69, 216, 0.10),
-      transparent 28%
-    ),
-    linear-gradient(
-      135deg,
-      #f8f6ff 0%,
-      #f1eeff 45%,
-      #faf9ff 100%
+      circle at 50% 50%,
+      #11101c 0%,
+      #07070c 50%,
+      #020204 100%
     );
 
-  color: #211a38;
-  overflow-x: hidden;
+  color: var(--text);
+
+  transition:
+    background 0.5s ease,
+    color 0.5s ease;
+}
+
+
+/* =========================================================
+   LIGHT MODE
+   ========================================================= */
+
+.home-page.light-theme {
+  --bg: #f6f3ff;
+  --surface: rgba(255, 255, 255, 0.72);
+  --surface-hover: rgba(255, 255, 255, 0.95);
+  --text: #211a35;
+  --muted: #756f82;
+  --border: rgba(98, 69, 216, 0.15);
+  --purple: #6d4ee8;
+  --purple-light: #876df2;
+  --glow: rgba(109, 78, 232, 0.30);
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(124, 92, 252, 0.12),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at center,
+      #ffffff 0%,
+      #f5f1ff 55%,
+      #ece7ff 100%
+    );
 }
 
 
@@ -38,24 +76,21 @@
    ========================================================= */
 
 .home-navbar {
-  position: sticky;
+  position: absolute;
+
   top: 0;
-  z-index: 1000;
+  left: 0;
 
   width: 100%;
-  min-height: 72px;
+
+  z-index: 100;
 
   display: flex;
+
   align-items: center;
   justify-content: space-between;
 
-  padding: 0 5%;
-
-  background: rgba(255, 255, 255, 0.82);
-  border-bottom: 1px solid rgba(124, 92, 252, 0.12);
-
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  padding: 22px 40px;
 
   box-sizing: border-box;
 }
@@ -72,18 +107,19 @@
   font-size: 25px;
   font-weight: 800;
 
-  letter-spacing: -0.8px;
+  letter-spacing: -1px;
 
   cursor: pointer;
+
   user-select: none;
 }
 
 .logo-skill {
-  color: #211a38;
+  color: var(--text);
 }
 
 .logo-sensai {
-  color: #7c5cfc;
+  color: var(--purple);
 }
 
 
@@ -94,12 +130,13 @@
 .home-nav-right {
   display: flex;
   align-items: center;
-  gap: 14px;
+
+  gap: 12px;
 }
 
 
 /* =========================================================
-   MINI PROGRESS
+   PROGRESS
    ========================================================= */
 
 .home-progress-mini {
@@ -109,17 +146,18 @@
 
   padding: 9px 14px;
 
-  border-radius: 999px;
+  border-radius: 50px;
 
-  color: #6245d8;
+  color: var(--purple);
 
-  background: rgba(124, 92, 252, 0.09);
-  border: 1px solid rgba(124, 92, 252, 0.15);
+  background: var(--surface);
 
-  font-size: 13px;
+  border: 1px solid var(--border);
+
+  font-size: 12px;
   font-weight: 700;
 
-  white-space: nowrap;
+  backdrop-filter: blur(15px);
 }
 
 
@@ -128,44 +166,48 @@
    ========================================================= */
 
 .home-login-button {
-  display: inline-flex;
+  height: 42px;
+
+  display: flex;
   align-items: center;
-  justify-content: center;
   gap: 8px;
 
-  padding: 10px 18px;
+  padding: 0 17px;
 
-  border: none;
+  border: 1px solid
+    rgba(139, 108, 255, 0.35);
+
   border-radius: 12px;
 
-  background: #6245d8;
+  background:
+    linear-gradient(
+      135deg,
+      #8b6cff,
+      #6245d8
+    );
+
   color: white;
 
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
 
   cursor: pointer;
 
   box-shadow:
-    0 8px 20px rgba(98, 69, 216, 0.20);
+    0 8px 25px
+    rgba(98, 69, 216, 0.25);
 
   transition:
     transform 0.2s ease,
-    box-shadow 0.2s ease,
-    background 0.2s ease;
+    box-shadow 0.2s ease;
 }
 
 .home-login-button:hover {
-  background: #563bc8;
-
   transform: translateY(-2px);
 
   box-shadow:
-    0 12px 25px rgba(98, 69, 216, 0.28);
-}
-
-.home-login-button:active {
-  transform: translateY(0);
+    0 12px 30px
+    rgba(139, 108, 255, 0.40);
 }
 
 
@@ -182,43 +224,35 @@
   align-items: center;
   gap: 8px;
 
-  padding: 6px 10px 6px 6px;
+  height: 42px;
 
-  border: 1px solid rgba(124, 92, 252, 0.14);
-  border-radius: 999px;
+  padding: 4px 10px 4px 5px;
 
-  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50px;
 
-  color: #29213f;
+  border: 1px solid var(--border);
+
+  background: var(--surface);
+
+  color: var(--text);
 
   cursor: pointer;
 
-  transition:
-    background 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.profile-button:hover {
-  background: white;
-
-  box-shadow:
-    0 7px 20px rgba(53, 37, 110, 0.10);
+  backdrop-filter: blur(15px);
 }
 
 .profile-avatar {
-  width: 34px;
-  height: 34px;
+  width: 33px;
+  height: 33px;
 
   border-radius: 50%;
 
   object-fit: cover;
-
-  display: block;
 }
 
 .profile-avatar-placeholder {
-  width: 34px;
-  height: 34px;
+  width: 33px;
+  height: 33px;
 
   border-radius: 50%;
 
@@ -226,24 +260,19 @@
   align-items: center;
   justify-content: center;
 
-  background:
-    linear-gradient(
-      135deg,
-      #7c5cfc,
-      #6245d8
-    );
+  background: var(--purple);
 
   color: white;
 }
 
 .profile-name {
-  max-width: 130px;
+  max-width: 120px;
 
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -255,59 +284,47 @@
 .profile-dropdown {
   position: absolute;
 
-  top: calc(100% + 10px);
+  top: 52px;
   right: 0;
 
-  width: 230px;
+  width: 220px;
 
   padding: 8px;
 
-  border-radius: 16px;
+  border-radius: 15px;
 
-  background: rgba(255, 255, 255, 0.97);
+  background: var(--surface-hover);
 
-  border: 1px solid rgba(124, 92, 252, 0.14);
+  border: 1px solid var(--border);
 
   box-shadow:
-    0 20px 45px rgba(39, 27, 84, 0.15);
+    0 20px 50px rgba(0, 0, 0, 0.25);
 
-  backdrop-filter: blur(16px);
-
-  animation: profileDropdown 0.18s ease-out;
-}
-
-@keyframes profileDropdown {
-  from {
-    opacity: 0;
-    transform: translateY(-5px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  backdrop-filter: blur(20px);
 }
 
 .profile-dropdown-header {
   display: flex;
   flex-direction: column;
+
   gap: 4px;
 
-  padding: 12px 12px 14px;
+  padding: 12px;
 
-  border-bottom: 1px solid rgba(124, 92, 252, 0.10);
+  border-bottom:
+    1px solid var(--border);
 }
 
 .profile-dropdown-header strong {
-  color: #251d3b;
+  color: var(--text);
 
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .profile-dropdown-header span {
-  color: #817a94;
+  color: var(--muted);
 
-  font-size: 12px;
+  font-size: 11px;
 
   overflow: hidden;
   text-overflow: ellipsis;
@@ -319,30 +336,31 @@
 
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
 
   margin-top: 5px;
 
-  padding: 11px 12px;
+  padding: 10px;
 
   border: none;
-  border-radius: 10px;
+
+  border-radius: 9px;
 
   background: transparent;
 
-  color: #d34d67;
-
-  font-size: 13px;
-  font-weight: 700;
+  color: #e96a83;
 
   cursor: pointer;
 
-  transition:
-    background 0.2s ease;
+  font-size: 12px;
+  font-weight: 700;
+
+  text-align: left;
 }
 
 .profile-logout:hover {
-  background: rgba(211, 77, 103, 0.08);
+  background:
+    rgba(233, 106, 131, 0.10);
 }
 
 
@@ -351,7 +369,9 @@
    ========================================================= */
 
 .home-main {
-  width: 100%;
+  min-height: 100vh;
+
+  position: relative;
 }
 
 
@@ -362,26 +382,15 @@
 .home-hero {
   position: relative;
 
-  max-width: 1250px;
+  width: 100%;
+  min-height: 100vh;
 
-  min-height: 610px;
-
-  margin: 0 auto;
-
-  padding:
-    75px
-    5%
-    65px;
-
-  display: grid;
-
-  grid-template-columns:
-    minmax(0, 1fr)
-    minmax(350px, 0.85fr);
+  display: flex;
 
   align-items: center;
+  justify-content: center;
 
-  box-sizing: border-box;
+  overflow: hidden;
 }
 
 
@@ -390,95 +399,99 @@
    ========================================================= */
 
 .home-hero-content {
-  position: relative;
-  z-index: 3;
+  position: absolute;
 
-  max-width: 650px;
+  top: 130px;
+
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  z-index: 20;
+
+  text-align: center;
+
+  pointer-events: none;
 }
 
 .home-eyebrow {
-  margin: 0 0 16px;
+  margin: 0 0 12px;
 
-  color: #7354e7;
+  color: var(--purple);
 
-  font-size: 12px;
+  font-size: 10px;
+
   font-weight: 800;
 
-  letter-spacing: 2.2px;
+  letter-spacing: 3px;
 }
 
 .home-hero h1 {
   margin: 0;
 
-  color: #211a38;
+  font-size: clamp(36px, 5vw, 60px);
 
-  font-size:
-    clamp(48px, 6vw, 82px);
+  line-height: 1;
 
-  line-height: 0.98;
-
-  letter-spacing: -4px;
+  letter-spacing: -3px;
 
   font-weight: 850;
+
+  color: var(--text);
 }
 
 .home-hero h1 span {
-  display: block;
-
-  color: #7c5cfc;
+  color: var(--purple);
 }
 
 .home-description {
-  max-width: 570px;
+  width: 430px;
 
-  margin: 28px 0 0;
+  max-width: 85vw;
 
-  color: #6f687f;
+  margin: 15px auto 0;
 
-  font-size: 17px;
+  color: var(--muted);
 
-  line-height: 1.75;
+  font-size: 13px;
+
+  line-height: 1.6;
 }
 
-
-/* =========================================================
-   HERO ACTIONS
-   ========================================================= */
-
 .home-hero-actions {
-  display: flex;
-  align-items: center;
+  margin-top: 20px;
 
-  margin-top: 32px;
+  pointer-events: auto;
 }
 
 .hero-primary-button {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 9px;
+  gap: 8px;
 
-  padding: 14px 22px;
+  padding: 11px 18px;
 
   border: none;
-  border-radius: 13px;
+
+  border-radius: 10px;
 
   background:
     linear-gradient(
       135deg,
-      #7c5cfc,
+      var(--purple),
       #6245d8
     );
 
   color: white;
 
-  font-size: 14px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
 
   cursor: pointer;
 
   box-shadow:
-    0 14px 30px rgba(98, 69, 216, 0.24);
+    0 10px 25px
+    rgba(124, 92, 252, 0.25);
 
   transition:
     transform 0.2s ease,
@@ -486,95 +499,162 @@
 }
 
 .hero-primary-button:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
 
   box-shadow:
-    0 18px 35px rgba(98, 69, 216, 0.30);
-}
-
-.hero-primary-button:active {
-  transform: translateY(0);
+    0 15px 35px
+    rgba(124, 92, 252, 0.40);
 }
 
 
 /* =========================================================
-   CHARACTER
+   CENTER CHARACTER
    ========================================================= */
 
 .home-character {
-  position: relative;
+  position: absolute;
 
-  min-height: 510px;
+  left: 50%;
+  top: 52%;
+
+  transform: translate(-50%, -50%);
+
+  width: 400px;
+  height: 500px;
 
   display: flex;
+
   align-items: center;
   justify-content: center;
+
+  z-index: 8;
+
+  pointer-events: none;
 }
+
+
+/* =========================================================
+   CHARACTER GLOW
+   ========================================================= */
 
 .character-glow {
   position: absolute;
 
-  width: 390px;
-  height: 390px;
+  width: 330px;
+  height: 330px;
 
   border-radius: 50%;
 
   background:
     radial-gradient(
       circle,
-      rgba(124, 92, 252, 0.27),
-      rgba(124, 92, 252, 0.08) 45%,
+      rgba(139, 108, 255, 0.30),
+      rgba(139, 108, 255, 0.10) 40%,
       transparent 72%
     );
 
-  filter: blur(10px);
+  filter: blur(12px);
 
   animation:
-    characterGlow 4s ease-in-out infinite;
+    centralGlow 4s ease-in-out infinite;
 }
 
-@keyframes characterGlow {
+@keyframes centralGlow {
+
   0%,
   100% {
-    transform: scale(0.96);
-    opacity: 0.75;
+    transform: scale(0.94);
+    opacity: 0.65;
   }
 
   50% {
-    transform: scale(1.06);
+    transform: scale(1.08);
     opacity: 1;
   }
 }
 
+
+/* =========================================================
+   SAMURAI
+   ========================================================= */
+
 .samurai-image {
   position: relative;
-  z-index: 2;
 
-  width: min(430px, 90%);
+  z-index: 3;
 
-  max-height: 510px;
+  width: 360px;
+
+  max-width: 90vw;
+
+  max-height: 500px;
 
   object-fit: contain;
 
   filter:
     drop-shadow(
       0 25px 35px
-      rgba(47, 32, 102, 0.18)
+      rgba(0, 0, 0, 0.35)
     );
 
   animation:
-    samuraiFloat 4.5s ease-in-out infinite;
+    samuraiFloat 5s ease-in-out infinite;
 }
 
 @keyframes samuraiFloat {
+
   0%,
   100% {
     transform: translateY(0);
   }
 
   50% {
-    transform: translateY(-12px);
+    transform: translateY(-10px);
   }
+}
+
+
+/* =========================================================
+   ORBIT RINGS
+   ========================================================= */
+
+.home-hero::before,
+.home-hero::after {
+  content: "";
+
+  position: absolute;
+
+  left: 50%;
+  top: 52%;
+
+  transform:
+    translate(-50%, -50%);
+
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+.home-hero::before {
+  width: 650px;
+  height: 650px;
+
+  border:
+    1px solid
+    rgba(139, 108, 255, 0.12);
+
+  box-shadow:
+    0 0 50px
+    rgba(139, 108, 255, 0.04);
+}
+
+.home-hero::after {
+  width: 830px;
+  height: 830px;
+
+  border:
+    1px solid
+    rgba(139, 108, 255, 0.055);
 }
 
 
@@ -583,129 +663,188 @@
    ========================================================= */
 
 .skills-section {
-  max-width: 1250px;
+  position: absolute;
 
-  margin: 0 auto;
+  inset: 0;
 
-  padding:
-    65px
-    5%
-    90px;
+  width: 100%;
+  height: 100%;
+
+  pointer-events: none;
+
+  z-index: 15;
 }
-
-
-/* =========================================================
-   SKILLS HEADING
-   ========================================================= */
 
 .skills-heading {
-  text-align: center;
-
-  margin-bottom: 40px;
-}
-
-.skills-heading p {
-  margin: 0 0 8px;
-
-  color: #7c5cfc;
-
-  font-size: 11px;
-  font-weight: 800;
-
-  letter-spacing: 2px;
-}
-
-.skills-heading h2 {
-  margin: 0;
-
-  color: #261e3e;
-
-  font-size:
-    clamp(30px, 4vw, 44px);
-
-  line-height: 1.1;
-
-  letter-spacing: -1.5px;
-}
-
-.skills-heading span {
-  display: block;
-
-  margin-top: 12px;
-
-  color: #827b91;
-
-  font-size: 14px;
+  display: none;
 }
 
 
 /* =========================================================
-   SKILLS GRID
+   SKILLS GRID = ORBIT
    ========================================================= */
 
 .skills-grid {
-  display: grid;
+  position: absolute;
 
-  grid-template-columns:
-    repeat(3, minmax(0, 1fr));
+  left: 50%;
+  top: 52%;
 
-  gap: 18px;
+  width: 700px;
+  height: 700px;
+
+  transform:
+    translate(-50%, -50%);
+
+  pointer-events: none;
 }
 
 
 /* =========================================================
-   SKILL CARD
+   INDIVIDUAL SKILL CIRCLE
    ========================================================= */
 
 .skill-card {
-  position: relative;
+  position: absolute;
 
-  min-height: 190px;
+  width: 125px;
+  height: 125px;
+
+  padding: 12px;
 
   display: flex;
-  align-items: flex-start;
 
-  gap: 16px;
+  flex-direction: column;
 
-  padding: 24px;
+  align-items: center;
+  justify-content: center;
 
-  border-radius: 20px;
+  text-align: center;
 
-  border: 1px solid
-    rgba(124, 92, 252, 0.12);
+  border-radius: 50%;
+
+  border:
+    1px solid
+    rgba(139, 108, 255, 0.20);
 
   background:
-    rgba(255, 255, 255, 0.78);
+    rgba(255, 255, 255, 0.045);
 
-  color: #281f42;
+  color: var(--text);
 
-  text-align: left;
+  backdrop-filter: blur(15px);
+
+  box-shadow:
+    0 10px 35px
+    rgba(0, 0, 0, 0.18);
+
+  pointer-events: auto;
 
   cursor: pointer;
 
-  box-shadow:
-    0 8px 25px
-    rgba(53, 38, 102, 0.055);
+  transform-origin: center;
 
   transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease,
-    border-color 0.25s ease;
+    transform 0.35s ease,
+    box-shadow 0.35s ease,
+    border-color 0.35s ease,
+    background 0.35s ease;
+
+  animation:
+    skillFloat 4s ease-in-out infinite;
 }
 
-.skill-card:not(:disabled):hover {
-  transform: translateY(-6px);
 
-  border-color:
-    rgba(124, 92, 252, 0.30);
+/* =========================================================
+   ORBIT POSITIONS
+   ========================================================= */
 
-  box-shadow:
-    0 18px 40px
-    rgba(53, 38, 102, 0.11);
+/*
+   1 — TOP
+*/
+
+.skill-card:nth-child(1) {
+  left: 287px;
+  top: 0;
+
+  animation-delay: 0s;
 }
 
-.skill-card:disabled {
-  cursor: default;
+
+/*
+   2 — TOP RIGHT
+*/
+
+.skill-card:nth-child(2) {
+  right: 25px;
+  top: 135px;
+
+  animation-delay: 0.7s;
+}
+
+
+/*
+   3 — BOTTOM RIGHT
+*/
+
+.skill-card:nth-child(3) {
+  right: 25px;
+  bottom: 135px;
+
+  animation-delay: 1.4s;
+}
+
+
+/*
+   4 — BOTTOM
+*/
+
+.skill-card:nth-child(4) {
+  left: 287px;
+  bottom: 0;
+
+  animation-delay: 2.1s;
+}
+
+
+/*
+   5 — BOTTOM LEFT
+*/
+
+.skill-card:nth-child(5) {
+  left: 25px;
+  bottom: 135px;
+
+  animation-delay: 2.8s;
+}
+
+
+/*
+   6 — TOP LEFT
+*/
+
+.skill-card:nth-child(6) {
+  left: 25px;
+  top: 135px;
+
+  animation-delay: 3.5s;
+}
+
+
+/* =========================================================
+   LEVITATION
+   ========================================================= */
+
+@keyframes skillFloat {
+
+  0%,
+  100% {
+    margin-top: 0;
+  }
+
+  50% {
+    margin-top: -9px;
+  }
 }
 
 
@@ -714,63 +853,118 @@
    ========================================================= */
 
 .skill-card-icon {
-  flex: 0 0 auto;
-
-  width: 52px;
-  height: 52px;
+  width: 46px;
+  height: 46px;
 
   display: flex;
+
   align-items: center;
   justify-content: center;
 
-  border-radius: 15px;
+  border-radius: 50%;
 
-  color: #6245d8;
+  color: var(--purple);
 
   background:
-    rgba(124, 92, 252, 0.10);
-}
+    rgba(139, 108, 255, 0.10);
 
-.skill-music .skill-card-icon {
-  color: #6245d8;
-  background:
-    rgba(124, 92, 252, 0.12);
-}
-
-.skill-martial .skill-card-icon {
-  color: #b34464;
-  background:
-    rgba(179, 68, 100, 0.10);
+  transition:
+    transform 0.3s ease,
+    background 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 
 /* =========================================================
-   SKILL CONTENT
+   SKILL TEXT
    ========================================================= */
 
-.skill-card-content {
-  min-width: 0;
-
-  padding-top: 2px;
-}
-
 .skill-card-content h3 {
-  margin: 0;
+  margin: 7px 0 0;
 
-  color: #29213f;
+  color: var(--text);
 
-  font-size: 18px;
+  font-size: 12px;
+
   font-weight: 800;
 }
 
 .skill-card-content p {
-  margin: 8px 0 0;
+  display: none;
+}
 
-  color: #7c758b;
 
-  font-size: 13px;
+/* =========================================================
+   ACTIVE HOVER
+   ========================================================= */
 
-  line-height: 1.6;
+.skill-card:not(:disabled):hover {
+  transform: scale(1.13);
+
+  border-color:
+    rgba(139, 108, 255, 0.70);
+
+  background:
+    rgba(139, 108, 255, 0.13);
+
+  box-shadow:
+    0 0 20px
+    rgba(139, 108, 255, 0.35),
+    0 0 55px
+    rgba(139, 108, 255, 0.16);
+
+  animation-play-state: paused;
+}
+
+.skill-card:not(:disabled):hover
+.skill-card-icon {
+  transform: scale(1.08);
+
+  background:
+    rgba(139, 108, 255, 0.20);
+
+  box-shadow:
+    0 0 20px
+    rgba(139, 108, 255, 0.25);
+}
+
+
+/* =========================================================
+   MUSIC
+   ========================================================= */
+
+.skill-music {
+  border-color:
+    rgba(139, 108, 255, 0.32);
+}
+
+
+/* =========================================================
+   MARTIAL ARTS
+   ========================================================= */
+
+.skill-martial {
+  border-color:
+    rgba(215, 75, 100, 0.25);
+}
+
+.skill-martial .skill-card-icon {
+  color: #e45b76;
+
+  background:
+    rgba(228, 91, 118, 0.10);
+}
+
+.skill-martial:not(:disabled):hover {
+  border-color:
+    rgba(228, 91, 118, 0.70);
+
+  background:
+    rgba(228, 91, 118, 0.12);
+
+  box-shadow:
+    0 0 25px
+    rgba(228, 91, 118, 0.30);
 }
 
 
@@ -778,388 +972,336 @@
    COMING SOON
    ========================================================= */
 
-.coming-soon-badge {
-  position: absolute;
-
-  top: 15px;
-  right: 15px;
-
-  padding: 5px 8px;
-
-  border-radius: 999px;
-
-  background:
-    rgba(124, 92, 252, 0.08);
-
-  color: #8a80a2;
-
-  font-size: 9px;
-  font-weight: 800;
-
-  letter-spacing: 0.3px;
-}
-
-
-/* =========================================================
-   DISABLED CARDS
-   ========================================================= */
-
 .skill-coming {
-  opacity: 0.68;
+  opacity: 0.48;
 
-  background:
-    rgba(255, 255, 255, 0.58);
+  cursor: default;
+
+  border-color:
+    rgba(255, 255, 255, 0.08);
 }
 
 .skill-coming .skill-card-icon {
-  color: #91899f;
+  color: #85818e;
 
   background:
-    rgba(145, 137, 159, 0.10);
+    rgba(255, 255, 255, 0.045);
+}
+
+.coming-soon-badge {
+  position: absolute;
+
+  bottom: 16px;
+
+  font-size: 7px;
+
+  color: var(--muted);
+
+  letter-spacing: 0.5px;
+
+  text-transform: uppercase;
 }
 
 
 /* =========================================================
-   VALUE SECTION
+   LIGHT MODE — ORBIT
    ========================================================= */
 
-.home-value-section {
-  max-width: 1250px;
-
-  margin: 0 auto;
-
-  padding:
-    75px
-    5%
-    110px;
-
-  border-top:
-    1px solid rgba(124, 92, 252, 0.10);
-
-  box-sizing: border-box;
-}
-
-.home-value-section > div:first-child > span {
-  color: #7c5cfc;
-
-  font-size: 11px;
-  font-weight: 800;
-
-  letter-spacing: 2px;
-}
-
-.home-value-section h2 {
-  margin: 12px 0 0;
-
-  color: #271f3e;
-
-  font-size:
-    clamp(30px, 4vw, 48px);
-
-  line-height: 1.12;
-
-  letter-spacing: -1.7px;
-}
-
-
-/* =========================================================
-   VALUE GRID
-   ========================================================= */
-
-.home-value-grid {
-  display: grid;
-
-  grid-template-columns:
-    repeat(4, minmax(0, 1fr));
-
-  gap: 16px;
-
-  margin-top: 45px;
-}
-
-.home-value-card {
-  padding: 24px;
-
-  border-radius: 18px;
-
+.home-page.light-theme
+.skill-card {
   background:
-    rgba(255, 255, 255, 0.72);
+    rgba(255, 255, 255, 0.68);
 
-  border:
-    1px solid rgba(124, 92, 252, 0.10);
-
-  box-shadow:
-    0 7px 22px
-    rgba(53, 38, 102, 0.045);
-
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.home-value-card:hover {
-  transform: translateY(-4px);
+  border-color:
+    rgba(98, 69, 216, 0.14);
 
   box-shadow:
-    0 14px 30px
-    rgba(53, 38, 102, 0.08);
+    0 10px 35px
+    rgba(67, 45, 140, 0.08);
 }
 
-.home-value-card strong {
-  display: block;
+.home-page.light-theme
+.skill-card:not(:disabled):hover {
+  background:
+    rgba(255, 255, 255, 0.95);
 
-  color: #6245d8;
+  border-color:
+    rgba(109, 78, 232, 0.55);
 
-  font-size: 18px;
-  font-weight: 800;
+  box-shadow:
+    0 0 25px
+    rgba(109, 78, 232, 0.25),
+    0 15px 40px
+    rgba(67, 45, 140, 0.12);
 }
 
-.home-value-card p {
-  margin: 9px 0 0;
-
-  color: #7c758b;
-
-  font-size: 13px;
-
-  line-height: 1.65;
+.home-page.light-theme
+.skill-coming {
+  opacity: 0.55;
 }
 
 
 /* =========================================================
-   TABLET
+   LIGHT MODE — ORBIT RINGS
    ========================================================= */
 
-@media (max-width: 1000px) {
+.home-page.light-theme::before {
+  border-color:
+    rgba(109, 78, 232, 0.14);
+}
 
-  .home-hero {
-    grid-template-columns: 1fr;
-
-    text-align: center;
-
-    padding-top: 55px;
-  }
-
-  .home-hero-content {
-    max-width: 720px;
-    margin: 0 auto;
-  }
-
-  .home-description {
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .home-hero-actions {
-    justify-content: center;
-  }
-
-  .home-character {
-    min-height: 420px;
-
-    margin-top: 10px;
-  }
-
-  .samurai-image {
-    width: min(360px, 75%);
-  }
-
-  .skills-grid {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-  }
-
-  .home-value-grid {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-  }
-
+.home-page.light-theme::after {
+  border-color:
+    rgba(109, 78, 232, 0.07);
 }
 
 
 /* =========================================================
-   MOBILE
+   RESPONSIVE — TABLET
    ========================================================= */
 
-@media (max-width: 700px) {
+@media (max-width: 900px) {
 
   .home-navbar {
-    min-height: 64px;
-
-    padding: 0 16px;
-  }
-
-  .home-logo {
-    font-size: 21px;
+    padding: 18px 22px;
   }
 
   .home-progress-mini {
     display: none;
   }
 
-  .home-login-button {
-    padding: 9px 13px;
+  .home-hero::before {
+    width: 550px;
+    height: 550px;
+  }
 
-    font-size: 13px;
+  .home-hero::after {
+    width: 700px;
+    height: 700px;
+  }
+
+  .skills-grid {
+    width: 590px;
+    height: 590px;
+  }
+
+  .skill-card {
+    width: 105px;
+    height: 105px;
+  }
+
+  .skill-card:nth-child(1),
+  .skill-card:nth-child(4) {
+    left: 242px;
+  }
+
+  .skill-card:nth-child(2),
+  .skill-card:nth-child(3) {
+    right: 15px;
+  }
+
+  .skill-card:nth-child(5),
+  .skill-card:nth-child(6) {
+    left: 15px;
+  }
+
+  .skill-card:nth-child(2),
+  .skill-card:nth-child(6) {
+    top: 115px;
+  }
+
+  .skill-card:nth-child(3),
+  .skill-card:nth-child(5) {
+    bottom: 115px;
+  }
+
+  .home-character {
+    transform:
+      translate(-50%, -50%)
+      scale(0.85);
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+   ========================================================= */
+
+@media (max-width: 650px) {
+
+  .home-navbar {
+    padding: 16px;
+  }
+
+  .home-logo {
+    font-size: 21px;
+  }
+
+  .home-login-button {
+    height: 38px;
+
+    padding: 0 12px;
+
+    font-size: 11px;
   }
 
   .profile-name {
     display: none;
   }
 
-  .profile-button {
-    padding-right: 6px;
-  }
-
-  .profile-dropdown {
-    right: -4px;
-  }
-
-
-  /* HERO */
-
   .home-hero {
-    min-height: auto;
-
-    padding:
-      55px
-      20px
-      45px;
+    min-height: 100vh;
   }
 
-  .home-eyebrow {
-    font-size: 10px;
-
-    letter-spacing: 1.7px;
+  .home-hero-content {
+    top: 105px;
   }
 
   .home-hero h1 {
-    font-size:
-      clamp(44px, 14vw, 64px);
+    font-size: 38px;
 
-    letter-spacing: -3px;
+    letter-spacing: -2px;
   }
 
   .home-description {
-    margin-top: 22px;
+    font-size: 11px;
 
-    font-size: 15px;
-
-    line-height: 1.65;
-  }
-
-  .home-hero-actions {
-    margin-top: 27px;
-  }
-
-  .hero-primary-button {
-    width: 100%;
-
-    padding: 14px 18px;
+    width: 330px;
   }
 
   .home-character {
-    min-height: 340px;
+    top: 53%;
 
-    margin-top: 10px;
+    transform:
+      translate(-50%, -50%)
+      scale(0.65);
   }
 
-  .character-glow {
-    width: 280px;
-    height: 280px;
+  .home-hero::before {
+    width: 400px;
+    height: 400px;
   }
 
-  .samurai-image {
-    width: min(310px, 85%);
-  }
-
-
-  /* SKILLS */
-
-  .skills-section {
-    padding:
-      45px
-      20px
-      70px;
-  }
-
-  .skills-heading {
-    margin-bottom: 28px;
-  }
-
-  .skills-heading h2 {
-    font-size: 30px;
+  .home-hero::after {
+    width: 500px;
+    height: 500px;
   }
 
   .skills-grid {
-    grid-template-columns: 1fr;
-
-    gap: 13px;
+    width: 440px;
+    height: 440px;
   }
 
   .skill-card {
-    min-height: 150px;
+    width: 78px;
+    height: 78px;
 
-    padding: 20px;
+    padding: 5px;
   }
 
-
-  /* VALUE */
-
-  .home-value-section {
-    padding:
-      55px
-      20px
-      75px;
+  .skill-card-icon {
+    width: 29px;
+    height: 29px;
   }
 
-  .home-value-section h2 {
-    font-size: 31px;
+  .skill-card-icon svg {
+    width: 17px;
+    height: 17px;
   }
 
-  .home-value-grid {
-    grid-template-columns: 1fr;
+  .skill-card-content h3 {
+    font-size: 8px;
+  }
 
-    margin-top: 32px;
+  .coming-soon-badge {
+    display: none;
+  }
+
+  .skill-card:nth-child(1),
+  .skill-card:nth-child(4) {
+    left: 181px;
+  }
+
+  .skill-card:nth-child(2),
+  .skill-card:nth-child(3) {
+    right: 10px;
+  }
+
+  .skill-card:nth-child(5),
+  .skill-card:nth-child(6) {
+    left: 10px;
+  }
+
+  .skill-card:nth-child(2),
+  .skill-card:nth-child(6) {
+    top: 82px;
+  }
+
+  .skill-card:nth-child(3),
+  .skill-card:nth-child(5) {
+    bottom: 82px;
   }
 
 }
 
 
 /* =========================================================
-   SMALL PHONES
+   VERY SMALL PHONES
    ========================================================= */
 
 @media (max-width: 420px) {
 
-  .home-navbar {
-    padding: 0 12px;
-  }
-
-  .home-logo {
-    font-size: 19px;
-  }
-
-  .home-login-button {
-    padding: 8px 11px;
-  }
-
-  .home-hero {
-    padding-left: 16px;
-    padding-right: 16px;
+  .home-hero-content {
+    top: 95px;
   }
 
   .home-hero h1 {
-    font-size: 44px;
+    font-size: 32px;
   }
 
-  .skills-section {
-    padding-left: 16px;
-    padding-right: 16px;
+  .home-description {
+    width: 280px;
   }
 
-  .home-value-section {
-    padding-left: 16px;
-    padding-right: 16px;
+  .home-character {
+    transform:
+      translate(-50%, -50%)
+      scale(0.55);
+  }
+
+  .skills-grid {
+    width: 370px;
+    height: 370px;
+  }
+
+  .skill-card {
+    width: 68px;
+    height: 68px;
+  }
+
+  .skill-card:nth-child(1),
+  .skill-card:nth-child(4) {
+    left: 151px;
+  }
+
+  .skill-card:nth-child(2),
+  .skill-card:nth-child(3) {
+    right: 5px;
+  }
+
+  .skill-card:nth-child(5),
+  .skill-card:nth-child(6) {
+    left: 5px;
+  }
+
+  .skill-card:nth-child(2),
+  .skill-card:nth-child(6) {
+    top: 70px;
+  }
+
+  .skill-card:nth-child(3),
+  .skill-card:nth-child(5) {
+    bottom: 70px;
   }
 
 }
