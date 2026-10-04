@@ -1285,7 +1285,7 @@ body.skillsensai-dark-theme {
       0 20px 20px rgba(31, 23, 17, 0.24)
     );
 
-  animation: characterFloat 5s ease-in-out infinite;
+  animation: none !important;
 }
 
 @keyframes characterFloat {
