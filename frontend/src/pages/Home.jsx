@@ -685,12 +685,30 @@ export default function Home() {
      BULB
   ========================================================= */
 
-  const handleBulbClick = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
+const handleBulbClick = (event) => {
+  event.preventDefault();
+  event.stopPropagation();
 
-    setBulbOn((current) => !current);
-  };
+  setBulbOn((current) => !current);
+
+  setTheme((currentTheme) => {
+    const nextTheme =
+      currentTheme === "light"
+        ? "dark"
+        : "light";
+
+    try {
+      localStorage.setItem(
+        "skillsensai_theme",
+        nextTheme
+      );
+    } catch {
+      // Ignore localStorage errors.
+    }
+
+    return nextTheme;
+  });
+};
 
 
   /* =========================================================
