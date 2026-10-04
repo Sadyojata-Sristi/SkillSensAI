@@ -1,11 +1,17 @@
 /* =========================================================
-   SKILLSENSAI — PROGRESS UTILITY
+   SKILLSENSAI — CENTRAL PROGRESS SYSTEM
    ========================================================= */
 
 const STORAGE_KEY = "skillsensai_progress";
+const MUSIC_LESSONS_KEY = "skillsensai_music_lessons";
+
+const EMPTY_PROGRESS = {
+  completedLessons: [],
+  lessonsLearned: [],
+};
 
 /* ---------------------------------------------------------
-   INTERNAL HELPERS
+   SAFE LOCAL STORAGE READ
 --------------------------------------------------------- */
 
 const readProgress = () => {
@@ -14,8 +20,9 @@ const readProgress = () => {
 
     if (!saved) {
       return {
-        completedLessons: [],
-        lessonsLearned: [],
+        ...EMPTY_PROGRESS,
+        completedLessons: readLegacyMusicLessons(),
+        lessonsLearned: readLegacyMusicLessons(),
       };
     }
 
@@ -37,21 +44,71 @@ const readProgress = () => {
     );
 
     return {
-      completedLessons: [],
-      lessonsLearned: [],
+      ...EMPTY_PROGRESS,
+      completedLessons: readLegacyMusicLessons(),
+      lessonsLearned: readLegacyMusicLessons(),
     };
   }
 };
+
+/* ---------------------------------------------------------
+   READ OLD MUSIC PROGRESS
+--------------------------------------------------------- */
+
+const readLegacyMusicLessons = () => {
+  try {
+    const saved = localStorage.getItem(MUSIC_LESSONS_KEY);
+
+    if (!saved) return [];
+
+    const parsed = JSON.parse(saved);
+
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    console.error(
+      "Unable to read legacy music progress:",
+      error
+    );
+
+    return [];
+  }
+};
+
+/* ---------------------------------------------------------
+   SAVE CENTRAL PROGRESS
+--------------------------------------------------------- */
 
 const saveProgress = (progress) => {
   try {
     localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify(progress)
+      JSON.stringify({
+        completedLessons: [
+          ...new Set(progress.completedLessons),
+        ],
+
+        lessonsLearned: [
+          ...new Set(progress.lessonsLearned),
+        ],
+      })
+    );
+
+    /*
+      Keep the existing Music page compatible with the
+      central progress system.
+    */
+
+    localStorage.setItem(
+      MUSIC_LESSONS_KEY,
+      JSON.stringify([
+        ...new Set(progress.completedLessons),
+      ])
     );
 
     window.dispatchEvent(
-      new CustomEvent("skillsensai-progress-updated")
+      new CustomEvent(
+        "skillsensai-progress-updated"
+      )
     );
   } catch (error) {
     console.error(
@@ -61,34 +118,139 @@ const saveProgress = (progress) => {
   }
 };
 
-/* ---------------------------------------------------------
+/* =========================================================
    COMPLETED LESSONS
---------------------------------------------------------- */
+========================================================= */
 
 export const getCompletedLessons = () => {
-  return readProgress().completedLessons;
+  const progress = readProgress();
+
+  /*
+    If central progress is empty but the old Music progress
+    exists, automatically migrate it.
+  */
+
+  if (
+    progress.completedLessons.length === 0
+  ) {
+    const legacy = readLegacyMusicLessons();
+
+    if (legacy.length > 0) {
+      const migrated = {
+        completedLessons: legacy,
+        lessonsLearned:
+          progress.lessonsLearned.length > 0
+            ? progress.lessonsLearned
+            : legacy,
+      };
+
+      saveProgress(migrated);
+
+      return legacy;
+    }
+  }
+
+  return progress.completedLessons;
 };
 
 export const isLessonCompleted = (lessonId) => {
-  return getCompletedLessons().includes(lessonId);
+  return getCompletedLessons().includes(
+    lessonId
+  );
 };
 
 export const completeLesson = (lessonId) => {
   const progress = readProgress();
 
-  if (progress.completedLessons.includes(lessonId)) {
+  /*
+    Also include old Music progress so we don't lose
+    existing completed lessons.
+  */
+
+  const legacy = readLegacyMusicLessons();
+
+  const completedLessons = [
+    ...new Set([
+      ...progress.completedLessons,
+      ...legacy,
+    ]),
+  ];
+
+  if (completedLessons.includes(lessonId)) {
     return false;
   }
 
-  progress.completedLessons = [
-    ...progress.completedLessons,
+  completedLessons.push(lessonId);
+
+  const lessonsLearned = [
+    ...new Set([
+      ...progress.lessonsLearned,
+      lessonId,
+    ]),
+  ];
+
+  saveProgress({
+    completedLessons,
+    lessonsLearned,
+  });
+
+  return true;
+};
+
+/* =========================================================
+   LESSONS LEARNED
+========================================================= */
+
+export const getLessonsLearned = () => {
+  const progress = readProgress();
+
+  if (progress.lessonsLearned.length > 0) {
+    return progress.lessonsLearned;
+  }
+
+  /*
+    Backward compatibility:
+    Existing Music completions count as learned lessons.
+  */
+
+  const legacy = readLegacyMusicLessons();
+
+  return legacy;
+};
+
+export const isLessonLearned = (lessonId) => {
+  return getLessonsLearned().includes(
+    lessonId
+  );
+};
+
+export const markLessonLearned = (lessonId) => {
+  const progress = readProgress();
+
+  if (
+    progress.lessonsLearned.includes(
+      lessonId
+    )
+  ) {
+    return false;
+  }
+
+  progress.lessonsLearned = [
+    ...progress.lessonsLearned,
     lessonId,
   ];
 
-  /* Keep both progress systems synchronized */
-  if (!progress.lessonsLearned.includes(lessonId)) {
-    progress.lessonsLearned = [
-      ...progress.lessonsLearned,
+  /*
+    A learned lesson is also considered completed.
+  */
+
+  if (
+    !progress.completedLessons.includes(
+      lessonId
+    )
+  ) {
+    progress.completedLessons = [
+      ...progress.completedLessons,
       lessonId,
     ];
   }
@@ -98,56 +260,36 @@ export const completeLesson = (lessonId) => {
   return true;
 };
 
-/* ---------------------------------------------------------
-   LESSONS LEARNED
---------------------------------------------------------- */
+/* =========================================================
+   GENERAL PROGRESS
+========================================================= */
 
-/*
-   This function fixes the recent Home.jsx build error:
+export const getProgress = () => {
+  return {
+    completedLessons:
+      getCompletedLessons(),
 
-   getLessonsLearned is not exported by progress.js
-*/
-
-export const getLessonsLearned = () => {
-  return readProgress().lessonsLearned;
+    lessonsLearned:
+      getLessonsLearned(),
+  };
 };
 
-export const isLessonLearned = (lessonId) => {
-  return getLessonsLearned().includes(lessonId);
+export const getLessonProgress = () => {
+  return getCompletedLessons();
 };
 
-export const markLessonLearned = (lessonId) => {
-  const progress = readProgress();
-
-  if (progress.lessonsLearned.includes(lessonId)) {
-    return false;
-  }
-
-  progress.lessonsLearned = [
-    ...progress.lessonsLearned,
-    lessonId,
-  ];
-
-  saveProgress(progress);
-
-  return true;
-};
-
-/* ---------------------------------------------------------
+/* =========================================================
    RESET
---------------------------------------------------------- */
+========================================================= */
 
 export const resetProgress = () => {
   try {
-    localStorage.removeItem(STORAGE_KEY);
-
-    /* Also clear old SkillSensAI progress keys */
     localStorage.removeItem(
-      "skillsensai_music_lessons"
+      STORAGE_KEY
     );
 
     localStorage.removeItem(
-      "skillsensensai_music_lessons"
+      MUSIC_LESSONS_KEY
     );
 
     localStorage.removeItem(
@@ -159,7 +301,9 @@ export const resetProgress = () => {
     );
 
     window.dispatchEvent(
-      new CustomEvent("skillsensai-progress-updated")
+      new CustomEvent(
+        "skillsensai-progress-updated"
+      )
     );
   } catch (error) {
     console.error(
@@ -167,16 +311,4 @@ export const resetProgress = () => {
       error
     );
   }
-};
-
-/* ---------------------------------------------------------
-   OPTIONAL ALIASES
---------------------------------------------------------- */
-
-export const getProgress = () => {
-  return readProgress();
-};
-
-export const getLessonProgress = () => {
-  return getCompletedLessons();
 };
