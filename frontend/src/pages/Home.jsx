@@ -15,7 +15,6 @@ import {
   ChevronDown,
   User,
   Phone,
-  Mail,
   X,
   ShieldCheck,
   BookOpen,
@@ -39,32 +38,6 @@ import { getLessonsLearned } from "../utils/progress";
 
 import "./Home.css";
 
-/* =========================================================
-   THEME HELPER
-   ========================================================= */
-
-const applyGlobalTheme = (theme) => {
-  const root = document.documentElement;
-  const body = document.body;
-
-  root.classList.remove(
-    "skillsensai-light-theme",
-    "skillsensai-dark-theme"
-  );
-
-  body.classList.remove(
-    "skillsensai-light-theme",
-    "skillsensai-dark-theme"
-  );
-
-  const className =
-    theme === "dark"
-      ? "skillsensai-dark-theme"
-      : "skillsensai-light-theme";
-
-  root.classList.add(className);
-  body.classList.add(className);
-};
 
 /* =========================================================
    SKILLS
@@ -111,6 +84,14 @@ const skills = [
   },
 ];
 
+
+/* =========================================================
+   TOTAL LESSONS
+   ========================================================= */
+
+const TOTAL_LESSONS = 15;
+
+
 /* =========================================================
    HOME
    ========================================================= */
@@ -118,166 +99,179 @@ const skills = [
 export default function Home() {
   const navigate = useNavigate();
 
-  /* =======================================================
+  /* -------------------------------------------------------
      THEME
-     ======================================================= */
+  ------------------------------------------------------- */
 
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem("skillsensai_theme") || "light";
+    try {
+      return localStorage.getItem("skillsensai_theme") || "light";
+    } catch {
+      return "light";
+    }
   });
 
-  /* =======================================================
+
+  /* -------------------------------------------------------
      AUTH
-     ======================================================= */
+  ------------------------------------------------------- */
 
   const [user, setUser] = useState(null);
+
   const [profileOpen, setProfileOpen] = useState(false);
 
-  /* =======================================================
-     LOGIN
-     ======================================================= */
-
   const [loginOpen, setLoginOpen] = useState(false);
+
   const [loginMethod, setLoginMethod] = useState("google");
 
+  const [loading, setLoading] = useState(false);
+
+  const [loginError, setLoginError] = useState("");
+
+
+  /* -------------------------------------------------------
+     PHONE LOGIN
+  ------------------------------------------------------- */
+
   const [phoneNumber, setPhoneNumber] = useState("");
+
   const [otp, setOtp] = useState("");
 
-  const [confirmationResult, setConfirmationResult] =
-    useState(null);
+  const [confirmationResult, setConfirmationResult] = useState(null);
 
   const [phoneStep, setPhoneStep] = useState("phone");
 
-  const [loading, setLoading] = useState(false);
-  const [loginError, setLoginError] = useState("");
-
   const recaptchaRef = useRef(null);
 
-  /* =======================================================
+
+  /* -------------------------------------------------------
      PROGRESS
-     ======================================================= */
+  ------------------------------------------------------- */
 
   const [lessonsLearned, setLessonsLearned] = useState(0);
 
-  /* =======================================================
-     LIGHT BULB
-     ======================================================= */
+
+  /* -------------------------------------------------------
+     BULB
+  ------------------------------------------------------- */
 
   const [bulbOn, setBulbOn] = useState(true);
 
-  /* =======================================================
-     APPLY THEME
-     ======================================================= */
+
+  /* =========================================================
+     THEME
+  ========================================================= */
 
   useEffect(() => {
-    applyGlobalTheme(theme);
+    try {
+      localStorage.setItem("skillsensai_theme", theme);
+    } catch {
+      // Ignore localStorage errors.
+    }
+
+    document.body.classList.remove(
+      "skillsensai-light-theme",
+      "skillsensai-dark-theme"
+    );
+
+    document.body.classList.add(
+      theme === "dark"
+        ? "skillsensai-dark-theme"
+        : "skillsensai-light-theme"
+    );
   }, [theme]);
 
-  /* =======================================================
-     THEME TOGGLE
-     ======================================================= */
 
-  const toggleTheme = () => {
-    setTheme((currentTheme) => {
-      const nextTheme =
-        currentTheme === "light" ? "dark" : "light";
-
-      applyGlobalTheme(nextTheme);
-
-      localStorage.setItem(
-        "skillsensai_theme",
-        nextTheme
-      );
-
-      return nextTheme;
-    });
-  };
-
-  /* =======================================================
-     FIREBASE AUTH LISTENER
-     ======================================================= */
+  /* =========================================================
+     FIREBASE AUTH STATE
+     ========================================================= */
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(
       auth,
       (currentUser) => {
+        console.log("SkillSensAI auth state:", currentUser);
+
         setUser(currentUser);
+
+        if (!currentUser) {
+          setProfileOpen(false);
+        }
+      },
+      (error) => {
+        console.error("Firebase auth state error:", error);
       }
     );
 
     return () => unsubscribe();
   }, []);
 
-  /* =======================================================
-     LOAD PROGRESS
-     ======================================================= */
 
-  useEffect(() => {
-    const loadProgress = () => {
-      try {
-        const value = getLessonsLearned();
+  /* =========================================================
+     LOAD REAL PROGRESS
+     ========================================================= */
 
-        if (typeof value === "number") {
-          setLessonsLearned(value);
-        } else {
-          setLessonsLearned(0);
-        }
-      } catch (error) {
-        console.error(
-          "Unable to load lesson progress:",
-          error
-        );
+  const loadProgress = () => {
+    try {
+      const completed = getLessonsLearned();
 
+      const numericValue = Number(completed);
+
+      if (Number.isFinite(numericValue)) {
+        setLessonsLearned(Math.max(0, numericValue));
+      } else {
         setLessonsLearned(0);
       }
-    };
+    } catch (error) {
+      console.error("Could not load lesson progress:", error);
+      setLessonsLearned(0);
+    }
+  };
 
+
+  useEffect(() => {
     loadProgress();
 
-    window.addEventListener(
-      "storage",
-      loadProgress
-    );
+    const handleProgressUpdate = () => {
+      loadProgress();
+    };
 
     window.addEventListener(
       "skillsensai-progress-updated",
-      loadProgress
+      handleProgressUpdate
+    );
+
+    window.addEventListener(
+      "storage",
+      handleProgressUpdate
     );
 
     return () => {
       window.removeEventListener(
-        "storage",
-        loadProgress
+        "skillsensai-progress-updated",
+        handleProgressUpdate
       );
 
       window.removeEventListener(
-        "skillsensai-progress-updated",
-        loadProgress
+        "storage",
+        handleProgressUpdate
       );
     };
   }, []);
 
-  /* =======================================================
+
+  /* =========================================================
      CLOSE PROFILE WHEN CLICKING OUTSIDE
-     ======================================================= */
+     ========================================================= */
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
-      const profileArea =
-        document.querySelector(".profile-area");
-
-      if (
-        profileArea &&
-        !profileArea.contains(event.target)
-      ) {
+      if (!event.target.closest(".profile-area")) {
         setProfileOpen(false);
       }
     };
 
-    document.addEventListener(
-      "mousedown",
-      handleOutsideClick
-    );
+    document.addEventListener("mousedown", handleOutsideClick);
 
     return () => {
       document.removeEventListener(
@@ -287,38 +281,36 @@ export default function Home() {
     };
   }, []);
 
-  /* =======================================================
-     OPEN LOGIN
-     ======================================================= */
+
+  /* =========================================================
+     LOGIN MODAL
+  ========================================================= */
 
   const openLogin = () => {
     setLoginError("");
     setLoginMethod("google");
     setPhoneStep("phone");
-    setPhoneNumber("");
     setOtp("");
     setConfirmationResult(null);
     setLoginOpen(true);
+    setProfileOpen(false);
   };
 
-  /* =======================================================
-     CLOSE LOGIN
-     ======================================================= */
 
   const closeLogin = () => {
     if (loading) return;
 
     setLoginOpen(false);
     setLoginError("");
-    setPhoneNumber("");
+    setPhoneStep("phone");
     setOtp("");
     setConfirmationResult(null);
-    setPhoneStep("phone");
   };
 
-  /* =======================================================
+
+  /* =========================================================
      GOOGLE LOGIN
-     ======================================================= */
+  ========================================================= */
 
   const handleGoogleLogin = async () => {
     setLoading(true);
@@ -331,33 +323,42 @@ export default function Home() {
         prompt: "select_account",
       });
 
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(
+        auth,
+        provider
+      );
+
+      console.log(
+        "Google login successful:",
+        result.user
+      );
+
+      /*
+       * Update immediately so the Home page changes
+       * without waiting for another render cycle.
+       */
+      setUser(result.user);
 
       setLoginOpen(false);
-      setProfileOpen(false);
+      setProfileOpen(true);
+
+      loadProgress();
     } catch (error) {
       console.error("Google login error:", error);
 
-      if (
-        error?.code ===
-        "auth/popup-closed-by-user"
+      if (error?.code === "auth/popup-closed-by-user") {
+        setLoginError("Login window was closed.");
+      } else if (
+        error?.code === "auth/popup-blocked"
       ) {
         setLoginError(
-          "The Google sign-in window was closed."
+          "Your browser blocked the login popup. Please allow popups for SkillSensAI."
         );
       } else if (
-        error?.code ===
-        "auth/popup-blocked"
+        error?.code === "auth/unauthorized-domain"
       ) {
         setLoginError(
-          "Your browser blocked the Google sign-in popup. Please allow popups for this site."
-        );
-      } else if (
-        error?.code ===
-        "auth/unauthorized-domain"
-      ) {
-        setLoginError(
-          "This website is not authorized in Firebase Authentication."
+          "This website is not authorized for Firebase login."
         );
       } else {
         setLoginError(
@@ -370,25 +371,27 @@ export default function Home() {
     }
   };
 
-  /* =======================================================
+
+  /* =========================================================
      PHONE NUMBER FORMAT
-     ======================================================= */
+  ========================================================= */
 
   const formatPhoneNumber = (value) => {
-    let cleaned = value.replace(/\D/g, "");
+    let digits = value.replace(/\D/g, "");
 
-    if (cleaned.startsWith("91")) {
-      cleaned = cleaned.substring(2);
+    if (digits.startsWith("91")) {
+      digits = digits.substring(2);
     }
 
-    cleaned = cleaned.substring(0, 10);
+    digits = digits.substring(0, 10);
 
-    if (cleaned.length === 0) {
+    if (!digits) {
       return "";
     }
 
-    return `+91${cleaned}`;
+    return `+91 ${digits}`;
   };
+
 
   const handlePhoneChange = (event) => {
     const formatted = formatPhoneNumber(
@@ -396,59 +399,67 @@ export default function Home() {
     );
 
     setPhoneNumber(formatted);
-    setLoginError("");
   };
 
-  /* =======================================================
-     SEND OTP
-     ======================================================= */
 
-  const sendOTP = async () => {
-    if (!phoneNumber || phoneNumber.length !== 13) {
+  /* =========================================================
+     PHONE OTP
+  ========================================================= */
+
+  const handleSendOtp = async () => {
+    setLoginError("");
+
+    const digits = phoneNumber.replace(/\D/g, "");
+
+    if (digits.length !== 10) {
       setLoginError(
         "Please enter a valid 10-digit Indian mobile number."
       );
-
       return;
     }
 
     setLoading(true);
-    setLoginError("");
 
     try {
+      /*
+       * Clear any previous verifier.
+       */
       if (recaptchaRef.current) {
-        recaptchaRef.current.clear();
+        try {
+          recaptchaRef.current.clear();
+        } catch {
+          // Ignore cleanup error.
+        }
+
         recaptchaRef.current = null;
       }
 
-      recaptchaRef.current =
-        new RecaptchaVerifier(
-          auth,
-          "recaptcha-container",
-          {
-            size: "invisible",
-            callback: () => {},
-            "expired-callback": () => {
-              setLoginError(
-                "reCAPTCHA expired. Please try again."
-              );
-            },
-          }
-        );
+      const verifier = new RecaptchaVerifier(
+        auth,
+        "recaptcha-container",
+        {
+          size: "invisible",
+        }
+      );
+
+      recaptchaRef.current = verifier;
+
+      const fullPhoneNumber = `+91${digits}`;
 
       const result =
         await signInWithPhoneNumber(
           auth,
-          phoneNumber,
-          recaptchaRef.current
+          fullPhoneNumber,
+          verifier
         );
 
       setConfirmationResult(result);
       setPhoneStep("otp");
       setOtp("");
+
     } catch (error) {
       console.error(
-        "Phone authentication error:",
+        "Phone OTP error:",
         error
       );
 
@@ -457,7 +468,7 @@ export default function Home() {
         "auth/billing-not-enabled"
       ) {
         setLoginError(
-          "Phone authentication requires Firebase billing to be enabled. Google login is available without this."
+          "Phone authentication requires Firebase billing to be enabled."
         );
       } else if (
         error?.code ===
@@ -476,17 +487,15 @@ export default function Home() {
       } else {
         setLoginError(
           error?.message ||
-            "Unable to send OTP."
+            "Could not send OTP."
         );
       }
 
       if (recaptchaRef.current) {
         try {
           recaptchaRef.current.clear();
-        } catch (recaptchaError) {
-          console.error(
-            recaptchaError
-          );
+        } catch {
+          // Ignore.
         }
 
         recaptchaRef.current = null;
@@ -496,24 +505,23 @@ export default function Home() {
     }
   };
 
-  /* =======================================================
-     VERIFY OTP
-     ======================================================= */
 
-  const verifyOTP = async () => {
+  /* =========================================================
+     VERIFY OTP
+  ========================================================= */
+
+  const handleVerifyOtp = async () => {
     if (!confirmationResult) {
       setLoginError(
         "Please request a new OTP."
       );
-
       return;
     }
 
-    if (otp.length !== 6) {
+    if (otp.length < 6) {
       setLoginError(
         "Please enter the 6-digit OTP."
       );
-
       return;
     }
 
@@ -521,13 +529,27 @@ export default function Home() {
     setLoginError("");
 
     try {
-      await confirmationResult.confirm(otp);
+      const result =
+        await confirmationResult.confirm(
+          otp
+        );
+
+      console.log(
+        "Phone login successful:",
+        result.user
+      );
+
+      setUser(result.user);
 
       setLoginOpen(false);
+      setProfileOpen(true);
+
       setPhoneStep("phone");
-      setPhoneNumber("");
       setOtp("");
       setConfirmationResult(null);
+
+      loadProgress();
+
     } catch (error) {
       console.error(
         "OTP verification error:",
@@ -539,19 +561,12 @@ export default function Home() {
         "auth/invalid-verification-code"
       ) {
         setLoginError(
-          "Incorrect OTP. Please check the code and try again."
-        );
-      } else if (
-        error?.code ===
-        "auth/code-expired"
-      ) {
-        setLoginError(
-          "This OTP has expired. Please request a new one."
+          "Incorrect OTP. Please try again."
         );
       } else {
         setLoginError(
           error?.message ||
-            "Unable to verify OTP."
+            "OTP verification failed."
         );
       }
     } finally {
@@ -559,26 +574,19 @@ export default function Home() {
     }
   };
 
-  /* =======================================================
-     CHANGE PHONE NUMBER
-     ======================================================= */
 
-  const changePhoneNumber = () => {
-    setPhoneStep("phone");
-    setOtp("");
-    setConfirmationResult(null);
-    setLoginError("");
-  };
-
-  /* =======================================================
+  /* =========================================================
      LOGOUT
-     ======================================================= */
+  ========================================================= */
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
 
+      setUser(null);
       setProfileOpen(false);
+      setLoginOpen(false);
+
     } catch (error) {
       console.error(
         "Logout error:",
@@ -587,23 +595,82 @@ export default function Home() {
     }
   };
 
-  /* =======================================================
-     DISPLAY NAME
-     ======================================================= */
 
-  const displayName =
-    user?.displayName ||
-    user?.phoneNumber ||
-    "Learner";
+  /* =========================================================
+     USER DISPLAY
+  ========================================================= */
 
-  const displayContact =
-    user?.email ||
-    user?.phoneNumber ||
-    "SkillSensAI learner";
+  const getUserName = () => {
+    if (!user) {
+      return "Learner";
+    }
 
-  /* =======================================================
-     SKILL CLICK
-     ======================================================= */
+    if (user.displayName) {
+      return user.displayName;
+    }
+
+    if (user.phoneNumber) {
+      return user.phoneNumber;
+    }
+
+    if (user.email) {
+      return user.email.split("@")[0];
+    }
+
+    return "Learner";
+  };
+
+
+  const getUserContact = () => {
+    if (!user) {
+      return "";
+    }
+
+    if (user.email) {
+      return user.email;
+    }
+
+    if (user.phoneNumber) {
+      return user.phoneNumber;
+    }
+
+    return "";
+  };
+
+
+  const getInitial = () => {
+    const name = getUserName();
+
+    if (!name) {
+      return "U";
+    }
+
+    return name
+      .charAt(0)
+      .toUpperCase();
+  };
+
+
+  /* =========================================================
+     LESSON PERCENTAGE
+  ========================================================= */
+
+  const lessonPercentage =
+    TOTAL_LESSONS > 0
+      ? Math.min(
+          100,
+          Math.round(
+            (lessonsLearned /
+              TOTAL_LESSONS) *
+              100
+          )
+        )
+      : 0;
+
+
+  /* =========================================================
+     SKILL NAVIGATION
+  ========================================================= */
 
   const handleSkillClick = (skill) => {
     if (!skill.active) {
@@ -613,72 +680,51 @@ export default function Home() {
     navigate(skill.path);
   };
 
-  /* =======================================================
+
+  /* =========================================================
+     BULB
+  ========================================================= */
+
+  const handleBulbClick = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    setBulbOn((current) => !current);
+  };
+
+
+  /* =========================================================
+     THEME TOGGLE
+  ========================================================= */
+
+  const handleThemeToggle = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    setTheme((current) =>
+      current === "light"
+        ? "dark"
+        : "light"
+    );
+  };
+
+
+  /* =========================================================
      RENDER
-     ======================================================= */
+  ========================================================= */
 
   return (
-    <div className="home-page">
-      <main className="room-background">
+    <div
+      className={`home-page ${
+        theme === "dark"
+          ? "skillsensai-dark-theme"
+          : "skillsensai-light-theme"
+      }`}
+    >
+      <div className="room-background">
 
         {/* =================================================
-            ROOM BACKGROUND
-        ================================================= */}
-
-        <div className="room-wall" />
-        <div className="room-floor" />
-        <div className="room-corner-glow" />
-
-        {/* =================================================
-            CEILING
-        ================================================= */}
-
-        <div className="ceiling">
-          <div className="ceiling-line" />
-
-          {/* FAN IS INTENTIONALLY NOT RENDERED
-              BECAUSE HOME.CSS HIDES IT COMPLETELY */}
-
-          <div className="hanging-bulb">
-
-            <div className="bulb-wire" />
-
-            <button
-              type="button"
-              className={`bulb-button ${
-                bulbOn
-                  ? "bulb-on"
-                  : "bulb-off"
-              }`}
-              onClick={() =>
-                setBulbOn((current) => !current)
-              }
-              aria-label={
-                bulbOn
-                  ? "Turn light off"
-                  : "Turn light on"
-              }
-              title={
-                bulbOn
-                  ? "Turn light off"
-                  : "Turn light on"
-              }
-            >
-              <span className="bulb-neck" />
-
-              <span className="bulb-glass">
-                {bulbOn ? (
-                  <Lightbulb size={20} />
-                ) : (
-                  <LightbulbOff size={20} />
-                )}
-              </span>
-            </button>
-          </div>
-        </div>
-
-        {/* =================================================
-            LOGIN / PROFILE
+            TOP LOGIN / PROFILE
         ================================================= */}
 
         <div className="room-login">
@@ -689,8 +735,8 @@ export default function Home() {
               className="login-button"
               onClick={openLogin}
             >
-              <LogIn size={15} />
-              Login
+              <LogIn size={18} />
+              <span>Login</span>
             </button>
           ) : (
             <div className="profile-area">
@@ -698,30 +744,33 @@ export default function Home() {
               <button
                 type="button"
                 className="profile-button"
-                onClick={() =>
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+
                   setProfileOpen(
                     (current) => !current
-                  )
-                }
-                aria-expanded={profileOpen}
+                  );
+                }}
               >
+
                 <span className="profile-avatar">
                   {user.photoURL ? (
                     <img
                       src={user.photoURL}
-                      alt={displayName}
+                      alt={getUserName()}
                     />
                   ) : (
-                    <User size={16} />
+                    getInitial()
                   )}
                 </span>
 
                 <span className="profile-name">
-                  {displayName}
+                  {getUserName()}
                 </span>
 
                 <ChevronDown
-                  size={14}
+                  size={16}
                   className={
                     profileOpen
                       ? "profile-chevron-open"
@@ -730,59 +779,78 @@ export default function Home() {
                 />
               </button>
 
+
               {profileOpen && (
                 <div className="profile-dropdown">
 
                   <div className="profile-dropdown-header">
 
-                    <div className="profile-large-avatar">
+                    <div className="profile-dropdown-avatar">
                       {user.photoURL ? (
                         <img
                           src={user.photoURL}
-                          alt={displayName}
+                          alt={getUserName()}
                         />
                       ) : (
-                        <User size={20} />
+                        getInitial()
                       )}
                     </div>
 
-                    <div>
+                    <div className="profile-dropdown-info">
+
                       <strong>
-                        {displayName}
+                        {getUserName()}
                       </strong>
 
                       <span>
-                        {displayContact}
+                        {getUserContact()}
                       </span>
+
                     </div>
 
                   </div>
 
-                  <div className="profile-progress-mini">
 
-                    <div>
+                  <div className="profile-progress">
+
+                    <div className="profile-progress-icon">
+                      <BookOpen size={17} />
+                    </div>
+
+                    <div className="profile-progress-text">
+
                       <span>
-                        Lessons completed
+                        Lessons Learned
                       </span>
 
                       <strong>
                         {lessonsLearned}
                       </strong>
-                    </div>
 
-                    <div className="profile-mini-icon">
-                      <Trophy size={18} />
                     </div>
 
                   </div>
+
+
+                  <div className="profile-progress-bar">
+
+                    <div
+                      className="profile-progress-fill"
+                      style={{
+                        width: `${lessonPercentage}%`,
+                      }}
+                    />
+
+                  </div>
+
 
                   <button
                     type="button"
                     className="logout-button"
                     onClick={handleLogout}
                   >
-                    <LogOut size={15} />
-                    Logout
+                    <LogOut size={17} />
+                    <span>Logout</span>
                   </button>
 
                 </div>
@@ -793,113 +861,130 @@ export default function Home() {
 
         </div>
 
+
+        {/* =================================================
+            HANGING BULB
+        ================================================= */}
+
+        <div className="hanging-bulb">
+
+          <div className="bulb-wire" />
+
+          <button
+            type="button"
+            className={`bulb-button ${
+              bulbOn
+                ? "bulb-on"
+                : "bulb-off"
+            }`}
+            onClick={handleBulbClick}
+            onMouseDown={(event) =>
+              event.stopPropagation()
+            }
+            aria-label={
+              bulbOn
+                ? "Turn light off"
+                : "Turn light on"
+            }
+            title={
+              bulbOn
+                ? "Turn light off"
+                : "Turn light on"
+            }
+          >
+
+            <span className="bulb-neck" />
+
+            <span className="bulb-glass">
+
+              {bulbOn ? (
+                <Lightbulb size={20} />
+              ) : (
+                <LightbulbOff size={20} />
+              )}
+
+            </span>
+
+          </button>
+
+        </div>
+
+
         {/* =================================================
             MAIN CONTENT
         ================================================= */}
 
-        <div className="home-content">
+        <main className="home-content">
+
 
           {/* =================================================
-              INTRO
-          ================================================= */}
-
-          <section className="home-intro">
-
-            <span className="home-eyebrow">
-              AI-POWERED SKILL LEARNING
-            </span>
-
-            <h1>
-              Learn Skills.
-              <br />
-              <span>Become Your Best.</span>
-            </h1>
-
-            <p>
-              Learn practical skills at your own pace
-              with AI guidance, expert knowledge and
-              real-world practice.
-            </p>
-
-          </section>
-
-          {/* =================================================
-              SKILL ROOM
+              ROOM / SKILLS AREA
           ================================================= */}
 
           <section className="skills-room">
 
-            {/* =================================================
+
+            {/* ---------------------------------------------
                 SOFA
-            ================================================= */}
+            --------------------------------------------- */}
 
             <div className="room-sofa">
-
-              <div className="sofa-back">
-
-                <div className="sofa-cushion sofa-cushion-one" />
-                <div className="sofa-cushion sofa-cushion-two" />
-                <div className="sofa-cushion sofa-cushion-three" />
-
-              </div>
-
-              <div className="sofa-seat">
-                <span />
-              </div>
-
+              <div className="sofa-back" />
+              <div className="sofa-seat" />
               <div className="sofa-arm sofa-arm-left" />
               <div className="sofa-arm sofa-arm-right" />
-
               <div className="sofa-leg sofa-leg-left" />
               <div className="sofa-leg sofa-leg-right" />
-
             </div>
 
-            {/* =================================================
+
+            {/* ---------------------------------------------
                 RUG
-            ================================================= */}
+            --------------------------------------------- */}
 
             <div className="room-rug">
-              <div className="rug-inner" />
+              <div className="rug-pattern" />
             </div>
 
-            {/* =================================================
+
+            {/* ---------------------------------------------
                 PLANT
-            ================================================= */}
+            --------------------------------------------- */}
 
             <div className="room-plant">
 
-              <div className="plant-stem stem-one" />
-              <div className="plant-stem stem-two" />
-              <div className="plant-stem stem-three" />
-              <div className="plant-stem stem-four" />
-
-              <div className="plant-leaf leaf-one" />
-              <div className="plant-leaf leaf-two" />
-              <div className="plant-leaf leaf-three" />
-              <div className="plant-leaf leaf-four" />
-              <div className="plant-leaf leaf-five" />
-              <div className="plant-leaf leaf-six" />
-
               <div className="plant-pot">
-                <span />
+                <div className="plant-pot-top" />
+                <div className="plant-pot-body" />
               </div>
+
+              <div className="plant-stem plant-stem-1" />
+              <div className="plant-stem plant-stem-2" />
+              <div className="plant-stem plant-stem-3" />
+              <div className="plant-stem plant-stem-4" />
+
+              <div className="plant-leaf plant-leaf-1" />
+              <div className="plant-leaf plant-leaf-2" />
+              <div className="plant-leaf plant-leaf-3" />
+              <div className="plant-leaf plant-leaf-4" />
+              <div className="plant-leaf plant-leaf-5" />
+              <div className="plant-leaf plant-leaf-6" />
 
             </div>
 
-            {/* =================================================
+
+            {/* ---------------------------------------------
                 CHARACTER SHADOW
-            ================================================= */}
+            --------------------------------------------- */}
 
             <div className="character-shadow" />
 
-            {/* =================================================
+
+            {/* ---------------------------------------------
                 SAMURAI
-            ================================================= */}
+            --------------------------------------------- */}
 
             <div className="samurai-container">
-
-              <div className="samurai-aura" />
 
               <img
                 src="/samurai.png"
@@ -909,9 +994,10 @@ export default function Home() {
 
             </div>
 
-            {/* =================================================
-                SKILL ORBIT
-            ================================================= */}
+
+            {/* ---------------------------------------------
+                SKILLS ORBIT
+            --------------------------------------------- */}
 
             <div className="skills-orbit">
 
@@ -926,21 +1012,18 @@ export default function Home() {
                       className={[
                         "skill-circle",
                         `skill-${skill.color}`,
-                        `skill-position-${
-                          index + 1
-                        }`,
+                        `skill-position-${index + 1}`,
                         skill.active
                           ? "skill-active"
                           : "skill-disabled",
                       ].join(" ")}
                       onClick={() =>
-                        handleSkillClick(skill)
+                        handleSkillClick(
+                          skill
+                        )
                       }
-                      disabled={!skill.active}
-                      title={
-                        skill.active
-                          ? `Learn ${skill.name}`
-                          : `${skill.name} coming soon`
+                      disabled={
+                        !skill.active
                       }
                     >
 
@@ -968,120 +1051,107 @@ export default function Home() {
 
           </section>
 
+
           {/* =================================================
               LEARNING FLOW
           ================================================= */}
 
           <section className="learning-flow">
 
-            <div className="flow-heading">
+            <h2 className="flow-heading">
+              Learn. Practice. Master.
+            </h2>
 
-              <span>
-                YOUR JOURNEY
-              </span>
-
-              <h2>
-                Learn. Practice. Master.
-              </h2>
-
-              <p>
-                Turn your curiosity into real-world
-                skills.
-              </p>
-
-            </div>
 
             <div className="flow-cards">
 
-              {/* =================================================
+
+              {/* -------------------------------------------
                   LEARN
-              ================================================= */}
+              ------------------------------------------- */}
 
               <div className="flow-card flow-learn">
 
                 <div className="flow-card-icon">
-                  <BookOpen size={19} />
+                  <BookOpen size={25} />
                 </div>
 
                 <div>
-                  <span>
-                    STEP 01
-                  </span>
-
                   <h3>
                     Learn
                   </h3>
 
                   <p>
-                    Follow structured lessons
-                    designed around your pace
-                    and skill level.
+                    Learn skills step by step
+                    with guided lessons.
                   </p>
                 </div>
 
-                <ArrowRight
-                  size={15}
-                  className="flow-arrow"
-                />
-
               </div>
 
-              {/* =================================================
+
+              {/* -------------------------------------------
+                  ARROW
+              ------------------------------------------- */}
+
+              <ArrowRight
+                className="flow-arrow"
+                size={24}
+              />
+
+
+              {/* -------------------------------------------
                   PRACTICE
-              ================================================= */}
+              ------------------------------------------- */}
 
               <div className="flow-card flow-practice">
 
                 <div className="flow-card-icon">
-                  <Target size={19} />
+                  <Target size={25} />
                 </div>
 
                 <div>
-                  <span>
-                    STEP 02
-                  </span>
-
                   <h3>
                     Practice
                   </h3>
 
                   <p>
-                    Put your knowledge into
-                    practice with real activities
-                    and AI feedback.
+                    Practice what you learn
+                    with real activities.
                   </p>
                 </div>
 
-                <ArrowRight
-                  size={15}
-                  className="flow-arrow"
-                />
-
               </div>
 
-              {/* =================================================
+
+              {/* -------------------------------------------
+                  ARROW
+              ------------------------------------------- */}
+
+              <ArrowRight
+                className="flow-arrow"
+                size={24}
+              />
+
+
+              {/* -------------------------------------------
                   MASTER
-              ================================================= */}
+              ------------------------------------------- */}
 
               <div className="flow-card flow-master">
 
                 <div className="flow-card-icon">
-                  <Trophy size={19} />
+                  <Trophy size={25} />
                 </div>
 
                 <div>
-                  <span>
-                    STEP 03
-                  </span>
-
                   <h3>
                     Master
                   </h3>
 
                   <p>
-                    Build confidence through
-                    continuous practice and
-                    measurable progress.
+                    Improve your skills and
+                    become confident.
                   </p>
                 </div>
 
@@ -1089,16 +1159,26 @@ export default function Home() {
 
             </div>
 
+
+            {/* ---------------------------------------------
+                PROGRESS NOTE
+            --------------------------------------------- */}
+
             <div className="home-bottom-note">
-              <Sparkles size={13} />
+
+              <ShieldCheck size={17} />
+
               <span>
-                SkillSensAI grows with you.
+                Your learning journey is
+                personalized to your pace.
               </span>
+
             </div>
 
           </section>
 
-        </div>
+        </main>
+
 
         {/* =================================================
             LOGIN MODAL
@@ -1119,52 +1199,52 @@ export default function Home() {
 
             <div className="login-modal">
 
-              {/* CLOSE */}
+
+              {/* -------------------------------------------
+                  CLOSE
+              ------------------------------------------- */}
 
               <button
                 type="button"
                 className="login-close"
                 onClick={closeLogin}
-                disabled={loading}
                 aria-label="Close login"
+                disabled={loading}
               >
-                <X size={17} />
+                <X size={20} />
               </button>
 
-              {/* ICON */}
+
+              {/* -------------------------------------------
+                  ICON
+              ------------------------------------------- */}
 
               <div className="login-modal-icon">
-                {loginMethod === "google" ? (
-                  <Mail size={25} />
-                ) : (
-                  <Phone size={25} />
-                )}
+                <User size={27} />
               </div>
 
-              {/* HEADER */}
+
+              {/* -------------------------------------------
+                  HEADER
+              ------------------------------------------- */}
 
               <div className="login-modal-header">
 
-                <span>
-                  WELCOME TO SKILLSENSAI
-                </span>
-
                 <h2>
-                  Start your{" "}
-                  <strong>
-                    learning journey.
-                  </strong>
+                  Welcome to SkillSensAI
                 </h2>
 
                 <p>
-                  Sign in to save your progress,
-                  continue your lessons and build
-                  your skills.
+                  Sign in to continue your
+                  learning journey.
                 </p>
 
               </div>
 
-              {/* TABS */}
+
+              {/* -------------------------------------------
+                  LOGIN TABS
+              ------------------------------------------- */}
 
               <div className="login-tabs">
 
@@ -1181,13 +1261,12 @@ export default function Home() {
                     setLoginMethod(
                       "google"
                     );
-
                     setLoginError("");
                   }}
                 >
-                  <Mail size={14} />
                   Google
                 </button>
+
 
                 <button
                   type="button"
@@ -1202,19 +1281,18 @@ export default function Home() {
                     setLoginMethod(
                       "phone"
                     );
-
                     setLoginError("");
                   }}
                 >
-                  <Phone size={14} />
                   Phone
                 </button>
 
               </div>
 
-              {/* =================================================
-                  GOOGLE
-              ================================================= */}
+
+              {/* -------------------------------------------
+                  GOOGLE LOGIN
+              ------------------------------------------- */}
 
               {loginMethod === "google" && (
                 <div className="login-method-content">
@@ -1230,8 +1308,8 @@ export default function Home() {
 
                     {loading ? (
                       <Loader2
-                        size={18}
                         className="login-spinner"
+                        size={20}
                       />
                     ) : (
                       <span className="google-symbol">
@@ -1239,93 +1317,113 @@ export default function Home() {
                       </span>
                     )}
 
-                    {loading
-                      ? "Signing in..."
-                      : "Continue with Google"}
+                    <span>
+                      {loading
+                        ? "Signing in..."
+                        : "Continue with Google"}
+                    </span>
 
                   </button>
 
+
                   <div className="login-security-note">
+
                     <ShieldCheck
-                      size={13}
+                      size={16}
                     />
 
                     <span>
-                      Your account and progress
-                      are securely protected.
+                      Your account is
+                      securely handled by
+                      Firebase Authentication.
                     </span>
+
                   </div>
 
                 </div>
               )}
 
-              {/* =================================================
-                  PHONE
-              ================================================= */}
+
+              {/* -------------------------------------------
+                  PHONE LOGIN
+              ------------------------------------------- */}
 
               {loginMethod === "phone" && (
                 <div className="login-method-content">
 
                   {phoneStep === "phone" ? (
                     <>
-                      <label className="login-input-label">
+                      <label
+                        className="login-input-label"
+                        htmlFor="phone-number"
+                      >
                         Mobile Number
                       </label>
 
                       <div className="login-phone-input">
 
-                        <Phone size={16} />
+                        <Phone size={18} />
 
                         <input
+                          id="phone-number"
                           type="tel"
-                          inputMode="numeric"
-                          value={phoneNumber}
+                          value={
+                            phoneNumber
+                          }
                           onChange={
                             handlePhoneChange
                           }
                           placeholder="+91 9876543210"
-                          maxLength={13}
+                          maxLength={14}
                           disabled={loading}
                         />
 
                       </div>
 
+
                       <button
                         type="button"
                         className="phone-login-button"
-                        onClick={sendOTP}
+                        onClick={
+                          handleSendOtp
+                        }
                         disabled={loading}
                       >
 
                         {loading ? (
                           <>
                             <Loader2
-                              size={17}
                               className="login-spinner"
+                              size={18}
                             />
 
                             Sending OTP...
                           </>
                         ) : (
                           <>
-                            <Phone size={17} />
+                            <Phone
+                              size={18}
+                            />
 
                             Send OTP
                           </>
                         )}
 
                       </button>
-
                     </>
                   ) : (
                     <>
-                      <label className="login-input-label">
+                      <label
+                        className="login-input-label"
+                        htmlFor="otp"
+                      >
                         Enter OTP
                       </label>
 
                       <div className="otp-input-wrapper">
 
                         <input
+                          id="otp"
                           type="text"
                           inputMode="numeric"
                           autoComplete="one-time-code"
@@ -1333,29 +1431,38 @@ export default function Home() {
                           onChange={(event) =>
                             setOtp(
                               event.target.value
-                                .replace(/\D/g, "")
-                                .slice(0, 6)
+                                .replace(
+                                  /\D/g,
+                                  ""
+                                )
+                                .slice(
+                                  0,
+                                  6
+                                )
                             )
                           }
-                          placeholder="000000"
+                          placeholder="6-digit OTP"
                           maxLength={6}
                           disabled={loading}
                         />
 
                       </div>
 
+
                       <button
                         type="button"
                         className="phone-login-button"
-                        onClick={verifyOTP}
+                        onClick={
+                          handleVerifyOtp
+                        }
                         disabled={loading}
                       >
 
                         {loading ? (
                           <>
                             <Loader2
-                              size={17}
                               className="login-spinner"
+                              size={18}
                             />
 
                             Verifying...
@@ -1363,7 +1470,7 @@ export default function Home() {
                         ) : (
                           <>
                             <ShieldCheck
-                              size={17}
+                              size={18}
                             />
 
                             Verify OTP
@@ -1372,37 +1479,56 @@ export default function Home() {
 
                       </button>
 
+
                       <button
                         type="button"
                         className="change-number-button"
-                        onClick={
-                          changePhoneNumber
-                        }
-                        disabled={loading}
+                        onClick={() => {
+                          if (loading) return;
+
+                          setPhoneStep(
+                            "phone"
+                          );
+                          setOtp("");
+                          setConfirmationResult(
+                            null
+                          );
+                          setLoginError("");
+                        }}
                       >
-                        Change phone number
+                        Change number
                       </button>
 
                     </>
                   )}
 
+
+                  <div
+                    id="recaptcha-container"
+                  />
+
+
                   <div className="login-security-note">
+
                     <ShieldCheck
-                      size={13}
+                      size={16}
                     />
 
                     <span>
-                      Your phone number is used
-                      only for secure authentication.
+                      Your phone number is
+                      used only for secure
+                      authentication.
                     </span>
+
                   </div>
 
                 </div>
               )}
 
-              {/* =================================================
+
+              {/* -------------------------------------------
                   ERROR
-              ================================================= */}
+              ------------------------------------------- */}
 
               {loginError && (
                 <div className="login-error">
@@ -1415,13 +1541,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* =================================================
-            FIREBASE RECAPTCHA
-        ================================================= */}
-
-        <div id="recaptcha-container" />
-
-      </main>
+      </div>
     </div>
   );
 }
