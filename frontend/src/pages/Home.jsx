@@ -1,18 +1,30 @@
+/* =========================================================
+   SKILLSENSAI — HOME PAGE
+   Global Theme + Firebase Authentication + Skill Navigation
+   ========================================================= */
+
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
-  Music2,
+  Music,
   Swords,
-  Code2,
-  Palette,
   Dumbbell,
+  Palette,
+  Code2,
   Sparkles,
+  Lightbulb,
+  LightbulbOff,
   LogIn,
-  User,
   LogOut,
   ChevronDown,
+  User,
+  Phone,
+  Mail,
+  ArrowRight,
   Loader2,
+  X,
+  ShieldCheck,
 } from "lucide-react";
 
 import {
@@ -35,1133 +47,475 @@ import "./LoginModal.css";
 
 
 /* =========================================================
-   SKILLSENSAI — HOME PAGE
-   REAL FIREBASE AUTHENTICATION
+   SKILLS
    ========================================================= */
 
-function Home() {
-
-  const navigate = useNavigate();
-
-  /* =========================================================
-     AUTH
-     ========================================================= */
-
-  const [user, setUser] = useState(null);
-  const [showProfile, setShowProfile] = useState(false);
-
-  useEffect(() => {
-
-    const unsubscribe = onAuthStateChanged(
-      auth,
-      (currentUser) => {
-        setUser(currentUser);
-      }
-    );
-
-    return () => unsubscribe();
-
-  }, []);
-
-
-  /* =========================================================
-     LOGIN MODAL
-     ========================================================= */
-
-  const [showLogin, setShowLogin] = useState(false);
-
-
-  /* =========================================================
-     PROGRESS
-     ========================================================= */
-
-  const [lessonsLearned, setLessonsLearned] =
-    useState(() => getLessonsLearned());
-
-
-  useEffect(() => {
-
-    const updateProgress = () => {
-      setLessonsLearned(getLessonsLearned());
-    };
-
-    updateProgress();
-
-    window.addEventListener(
-      "skillsensai-progress-updated",
-      updateProgress
-    );
-
-    return () => {
-
-      window.removeEventListener(
-        "skillsensai-progress-updated",
-        updateProgress
-      );
-
-    };
-
-  }, []);
+const skills = [
+  {
+    id: "music",
+    name: "Music",
+    icon: Music,
+    active: true,
+    route: "/music",
+  },
+  {
+    id: "martial-arts",
+    name: "Martial Arts",
+    icon: Swords,
+    active: true,
+    route: "/martial-arts",
+  },
+  {
+    id: "dance",
+    name: "Dance",
+    icon: Dumbbell,
+    active: false,
+  },
+  {
+    id: "coding",
+    name: "Coding",
+    icon: Code2,
+    active: false,
+  },
+  {
+    id: "art",
+    name: "Art & Creativity",
+    icon: Palette,
+    active: false,
+  },
+  {
+    id: "more",
+    name: "More Skills",
+    icon: Sparkles,
+    active: false,
+  },
+];
 
 
-  /* =========================================================
-     CLOSE LOGIN WHEN AUTHENTICATED
-     ========================================================= */
+/* =========================================================
+   THEME HELPERS
+   ========================================================= */
 
-  useEffect(() => {
+const THEME_KEY = "skillsensai_theme";
 
-    if (user) {
-      setShowLogin(false);
+const getSavedTheme = () => {
+  try {
+    const saved = localStorage.getItem(THEME_KEY);
+
+    if (saved === "light" || saved === "dark") {
+      return saved;
     }
-
-  }, [user]);
-
-
-  /* =========================================================
-     LOGOUT
-     ========================================================= */
-
-  const handleLogout = async () => {
-
-    try {
-
-      await signOut(auth);
-
-      setShowProfile(false);
-
-    } catch (error) {
-
-      console.error(
-        "Logout failed:",
-        error
-      );
-
-      alert(
-        "Unable to sign out. Please try again."
-      );
-
-    }
-
-  };
-
-
-  /* =========================================================
-     SKILLS
-     ========================================================= */
-
-  const skills = [
-
-    {
-      id: "music",
-      title: "Music",
-      description:
-        "Learn singing, pitch, rhythm and improve through AI feedback.",
-      icon: <Music2 size={30} />,
-      className: "skill-music",
-      active: true,
-      route: "/music",
-    },
-
-    {
-      id: "martial-arts",
-      title: "Martial Arts",
-      description:
-        "Learn practical martial arts techniques step by step.",
-      icon: <Swords size={30} />,
-      className: "skill-martial",
-      active: true,
-      route: "/martial-arts",
-    },
-
-    {
-      id: "dance",
-      title: "Dance",
-      description:
-        "AI-assisted movement learning and practice.",
-      icon: <Dumbbell size={30} />,
-      className: "skill-coming",
-      active: false,
-    },
-
-    {
-      id: "coding",
-      title: "Coding",
-      description:
-        "Build practical coding skills with guided learning.",
-      icon: <Code2 size={30} />,
-      className: "skill-coming",
-      active: false,
-    },
-
-    {
-      id: "art",
-      title: "Art & Creativity",
-      description:
-        "Develop creative skills through practical learning.",
-      icon: <Palette size={30} />,
-      className: "skill-coming",
-      active: false,
-    },
-
-    {
-      id: "more",
-      title: "More Skills",
-      description:
-        "More skill categories are coming soon.",
-      icon: <Sparkles size={30} />,
-      className: "skill-coming",
-      active: false,
-    },
-
-  ];
-
-
-  /* =========================================================
-     SKILL CLICK
-     ========================================================= */
-
-  const handleSkillClick = (skill) => {
-
-    if (!skill.active) {
-      return;
-    }
-
-    navigate(skill.route);
-
-  };
-
-
-  /* =========================================================
-     RENDER
-     ========================================================= */
-
-  return (
-
-    <div className="home-page">
-
-      {/* =====================================================
-          NAVBAR
-          ===================================================== */}
-
-      <header className="home-navbar">
-
-        <div
-          className="home-logo"
-          onClick={() => navigate("/")}
-        >
-
-          <span className="logo-skill">
-            Skill
-          </span>
-
-          <span className="logo-sensai">
-            SensAI
-          </span>
-
-        </div>
-
-
-        <div className="home-nav-right">
-
-          {/* PROGRESS */}
-
-          <div className="home-progress-mini">
-
-            <Sparkles size={15} />
-
-            <span>
-              {lessonsLearned.length} learned
-            </span>
-
-          </div>
-
-
-          {/* USER */}
-
-          {user ? (
-
-            <div className="profile-wrapper">
-
-              <button
-                className="profile-button"
-                onClick={() =>
-                  setShowProfile(
-                    (previous) => !previous
-                  )
-                }
-              >
-
-                {user.photoURL ? (
-
-                  <img
-                    src={user.photoURL}
-                    alt="Profile"
-                    className="profile-avatar"
-                  />
-
-                ) : (
-
-                  <div className="profile-avatar-placeholder">
-                    <User size={18} />
-                  </div>
-
-                )}
-
-                <span className="profile-name">
-
-                  {user.displayName ||
-                    user.phoneNumber ||
-                    "User"}
-
-                </span>
-
-                <ChevronDown
-                  size={16}
-                />
-
-              </button>
-
-
-              {showProfile && (
-
-                <div className="profile-dropdown">
-
-                  <div className="profile-dropdown-header">
-
-                    <strong>
-                      {user.displayName ||
-                        "SkillSensAI User"}
-                    </strong>
-
-                    <span>
-                      {user.email ||
-                        user.phoneNumber ||
-                        ""}
-                    </span>
-
-                  </div>
-
-
-                  <button
-                    className="profile-logout"
-                    onClick={handleLogout}
-                  >
-
-                    <LogOut size={17} />
-
-                    Sign Out
-
-                  </button>
-
-                </div>
-
-              )}
-
-            </div>
-
-          ) : (
-
-            <button
-              className="home-login-button"
-              onClick={() =>
-                setShowLogin(true)
-              }
-            >
-
-              <LogIn size={18} />
-
-              Login
-
-            </button>
-
-          )}
-
-        </div>
-
-      </header>
-
-
-      {/* =====================================================
-          HERO
-          ===================================================== */}
-
-      <main className="home-main">
-
-        <section className="home-hero">
-
-          <div className="home-hero-content">
-
-            <p className="home-eyebrow">
-              AI-POWERED SKILL LEARNING
-            </p>
-
-
-            <h1>
-
-              Learn.
-
-              <span>
-                Practice.
-              </span>
-
-              Improve.
-
-            </h1>
-
-
-            <p className="home-description">
-
-              SkillSensAI helps you learn real-world
-              skills through guided lessons, practical
-              training and intelligent feedback.
-
-            </p>
-
-
-            <div className="home-hero-actions">
-
-              {!user && (
-
-                <button
-                  className="hero-primary-button"
-                  onClick={() =>
-                    setShowLogin(true)
-                  }
-                >
-
-                  <LogIn size={18} />
-
-                  Start Learning
-
-                </button>
-
-              )}
-
-              {user && (
-
-                <button
-                  className="hero-primary-button"
-                  onClick={() =>
-                    navigate("/music")
-                  }
-                >
-
-                  <Music2 size={18} />
-
-                  Continue Learning
-
-                </button>
-
-              )}
-
-            </div>
-
-          </div>
-
-
-          {/* =================================================
-              CHARACTER
-              ================================================= */}
-
-          <div className="home-character">
-
-            <div className="character-glow" />
-
-            <img
-              src="/samurai.png"
-              alt="SkillSensAI character"
-              className="samurai-image"
-            />
-
-          </div>
-
-        </section>
-
-
-        {/* =====================================================
-            SKILLS
-            ===================================================== */}
-
-        <section className="skills-section">
-
-          <div className="skills-heading">
-
-            <p>
-              EXPLORE SKILLS
-            </p>
-
-            <h2>
-              Choose Your Skill
-            </h2>
-
-            <span>
-              Learn at your own pace with
-              SkillSensAI.
-            </span>
-
-          </div>
-
-
-          <div className="skills-grid">
-
-            {skills.map((skill) => (
-
-              <button
-                key={skill.id}
-                className={`skill-card ${skill.className}`}
-                onClick={() =>
-                  handleSkillClick(skill)
-                }
-                disabled={!skill.active}
-              >
-
-                <div className="skill-card-icon">
-
-                  {skill.icon}
-
-                </div>
-
-
-                <div className="skill-card-content">
-
-                  <h3>
-                    {skill.title}
-                  </h3>
-
-                  <p>
-                    {skill.description}
-                  </p>
-
-                </div>
-
-
-                {!skill.active && (
-
-                  <span className="coming-soon-badge">
-                    Coming Soon
-                  </span>
-
-                )}
-
-              </button>
-
-            ))}
-
-          </div>
-
-        </section>
-
-
-        {/* =====================================================
-            VALUE PROPOSITION
-            ===================================================== */}
-
-        <section className="home-value-section">
-
-          <div>
-
-            <span>
-              WHY SKILLSENSAI?
-            </span>
-
-            <h2>
-              More than watching.
-              <br />
-              Start actually learning.
-            </h2>
-
-          </div>
-
-
-          <div className="home-value-grid">
-
-            <div className="home-value-card">
-
-              <strong>
-                Learn
-              </strong>
-
-              <p>
-                Structured lessons designed
-                for beginners.
-              </p>
-
-            </div>
-
-
-            <div className="home-value-card">
-
-              <strong>
-                Practice
-              </strong>
-
-              <p>
-                Record yourself or upload
-                your practice.
-              </p>
-
-            </div>
-
-
-            <div className="home-value-card">
-
-              <strong>
-                Analyze
-              </strong>
-
-              <p>
-                AI analyzes your performance
-                and identifies areas to improve.
-              </p>
-
-            </div>
-
-
-            <div className="home-value-card">
-
-              <strong>
-                Improve
-              </strong>
-
-              <p>
-                Track your progress and
-                keep building your skill.
-              </p>
-
-            </div>
-
-          </div>
-
-        </section>
-
-      </main>
-
-
-      {/* =====================================================
-          LOGIN MODAL
-          ===================================================== */}
-
-      {showLogin && (
-
-        <LoginModal
-          onClose={() =>
-            setShowLogin(false)
-          }
-        />
-
-      )}
-
-    </div>
-
+  } catch (error) {
+    console.error("Unable to read SkillSensAI theme:", error);
+  }
+
+  return "dark";
+};
+
+const applyGlobalTheme = (theme) => {
+  const root = document.documentElement;
+  const body = document.body;
+
+  root.classList.remove(
+    "skillsensai-light-theme",
+    "skillsensai-dark-theme"
   );
 
-}
+  body.classList.remove(
+    "skillsensai-light-theme",
+    "skillsensai-dark-theme"
+  );
+
+  const themeClass =
+    theme === "light"
+      ? "skillsensai-light-theme"
+      : "skillsensai-dark-theme";
+
+  root.classList.add(themeClass);
+  body.classList.add(themeClass);
+
+  root.setAttribute("data-theme", theme);
+  body.setAttribute("data-theme", theme);
+
+  try {
+    localStorage.setItem(THEME_KEY, theme);
+  } catch (error) {
+    console.error("Unable to save SkillSensAI theme:", error);
+  }
+
+  window.dispatchEvent(
+    new CustomEvent("skillsensai-theme-changed", {
+      detail: { theme },
+    })
+  );
+};
 
 
-/* ============================================================
+/* =========================================================
    LOGIN MODAL
-   REAL GOOGLE + PHONE OTP FIREBASE AUTH
-   ============================================================ */
+   ========================================================= */
 
 function LoginModal({ onClose }) {
+  const [activeTab, setActiveTab] = useState("google");
 
-  const [activeTab, setActiveTab] =
-    useState("google");
-
-  const [phoneNumber, setPhoneNumber] =
-    useState("");
-
-  const [otp, setOtp] =
-    useState("");
+  const [phone, setPhone] = useState("+91 ");
+  const [otp, setOtp] = useState("");
 
   const [confirmationResult, setConfirmationResult] =
     useState(null);
 
-  const [loading, setLoading] =
-    useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
-  const [errorMessage, setErrorMessage] =
-    useState("");
-
-  const recaptchaVerifierRef =
-    useRef(null);
+  const recaptchaVerifierRef = useRef(null);
 
 
-  /* =========================================================
+  /* ---------------------------------------------------------
      CLEANUP RECAPTCHA
-     ========================================================= */
+     --------------------------------------------------------- */
 
-  useEffect(() => {
-
-    return () => {
-
-      try {
-
-        if (recaptchaVerifierRef.current) {
-
-          recaptchaVerifierRef.current.clear();
-
-          recaptchaVerifierRef.current = null;
-
-        }
-
-      } catch (error) {
-
-        console.error(
-          "reCAPTCHA cleanup failed:",
-          error
-        );
-
+  const cleanupRecaptcha = () => {
+    try {
+      if (recaptchaVerifierRef.current) {
+        recaptchaVerifierRef.current.clear();
+        recaptchaVerifierRef.current = null;
       }
-
-    };
-
-  }, []);
-
-
-  /* =========================================================
-     RESET TAB STATE
-     ========================================================= */
-
-  const handleTabChange = (tab) => {
-
-    setActiveTab(tab);
-
-    setErrorMessage("");
-
-    setOtp("");
-
-    setConfirmationResult(null);
-
+    } catch (error) {
+      console.error("reCAPTCHA cleanup error:", error);
+    }
   };
 
 
-  /* =========================================================
+  useEffect(() => {
+    return () => {
+      cleanupRecaptcha();
+    };
+  }, []);
+
+
+  /* ---------------------------------------------------------
      GOOGLE LOGIN
-     ========================================================= */
+     --------------------------------------------------------- */
 
   const handleGoogleLogin = async () => {
-
     setLoading(true);
-    setErrorMessage("");
+    setError("");
+    setSuccessMessage("");
 
     try {
-
-      const provider =
-        new GoogleAuthProvider();
+      const provider = new GoogleAuthProvider();
 
       provider.setCustomParameters({
         prompt: "select_account",
       });
 
-      await signInWithPopup(
-        auth,
-        provider
-      );
+      await signInWithPopup(auth, provider);
 
-      onClose();
+      setSuccessMessage("Login successful!");
 
+      setTimeout(() => {
+        onClose();
+      }, 500);
     } catch (error) {
+      console.error("Google login error:", error);
 
-      console.error(
-        "Google login failed:",
-        error
-      );
-
-      if (
-        error.code ===
-        "auth/popup-closed-by-user"
-      ) {
-
-        setErrorMessage(
-          "Google sign-in was cancelled."
+      if (error?.code === "auth/popup-closed-by-user") {
+        setError("Google sign-in was cancelled.");
+      } else if (error?.code === "auth/popup-blocked") {
+        setError(
+          "The browser blocked the login popup. Please allow popups for SkillSensAI."
         );
-
-      } else if (
-        error.code ===
-        "auth/popup-blocked"
-      ) {
-
-        setErrorMessage(
-          "Your browser blocked the Google sign-in popup. Please allow popups for SkillSensAI."
-        );
-
       } else {
-
-        setErrorMessage(
-          error.message ||
-          "Google sign-in failed. Please try again."
+        setError(
+          error?.message ||
+            "Unable to sign in with Google. Please try again."
         );
-
       }
-
     } finally {
-
       setLoading(false);
-
     }
-
   };
 
 
-  /* =========================================================
-     PHONE NUMBER FORMAT
-     ========================================================= */
+  /* ---------------------------------------------------------
+     PHONE FORMAT
+     --------------------------------------------------------- */
 
-  const formatPhoneNumber = (value) => {
+  const formatIndianPhone = (value) => {
+    let cleaned = value.replace(/[^\d+]/g, "");
 
-    let cleaned =
-      value.replace(/\D/g, "");
+    if (!cleaned.startsWith("+91")) {
+      const digits = cleaned.replace(/\D/g, "");
 
-    /*
-      Automatically handle:
-
-      9876543210
-      919876543210
-      +919876543210
-    */
-
-    if (cleaned.startsWith("91")) {
-
-      cleaned =
-        cleaned.substring(2);
-
+      if (digits.startsWith("91")) {
+        cleaned = `+${digits}`;
+      } else {
+        cleaned = `+91${digits}`;
+      }
     }
 
-    cleaned =
-      cleaned.substring(0, 10);
+    const digitsAfterCode = cleaned
+      .replace("+91", "")
+      .replace(/\D/g, "")
+      .slice(0, 10);
 
-    if (!cleaned) {
-      return "";
+    if (digitsAfterCode.length === 0) {
+      return "+91 ";
     }
 
-    return `+91${cleaned}`;
-
+    return `+91 ${digitsAfterCode}`;
   };
 
-
-  /* =========================================================
-     PHONE INPUT
-     ========================================================= */
 
   const handlePhoneChange = (event) => {
+    const formatted = formatIndianPhone(event.target.value);
 
-    const formatted =
-      formatPhoneNumber(
-        event.target.value
-      );
-
-    setPhoneNumber(formatted);
-
-    setErrorMessage("");
-
+    setPhone(formatted);
+    setError("");
+    setSuccessMessage("");
   };
 
 
-  /* =========================================================
-     CREATE RECAPTCHA
-     ========================================================= */
+  /* ---------------------------------------------------------
+     SEND OTP
+     --------------------------------------------------------- */
 
-  const createRecaptcha = () => {
+  const handleSendOtp = async () => {
+    setError("");
+    setSuccessMessage("");
 
-    if (
-      recaptchaVerifierRef.current
-    ) {
+    const phoneNumber = phone.replace(/\s/g, "");
 
-      return recaptchaVerifierRef.current;
-
+    if (!/^\+91\d{10}$/.test(phoneNumber)) {
+      setError(
+        "Please enter a valid 10-digit Indian mobile number."
+      );
+      return;
     }
 
-    recaptchaVerifierRef.current =
-      new RecaptchaVerifier(
+    setLoading(true);
+
+    try {
+      cleanupRecaptcha();
+
+      recaptchaVerifierRef.current = new RecaptchaVerifier(
         auth,
         "recaptcha-container",
         {
           size: "invisible",
 
           callback: () => {
-            console.log(
-              "reCAPTCHA verified."
-            );
+            console.log("reCAPTCHA verified.");
           },
 
           "expired-callback": () => {
-
-            console.log(
-              "reCAPTCHA expired."
+            setError(
+              "reCAPTCHA expired. Please try sending the OTP again."
             );
-
           },
-
         }
       );
 
-    return recaptchaVerifierRef.current;
+      const appVerifier = recaptchaVerifierRef.current;
 
-  };
-
-
-  /* =========================================================
-     SEND OTP
-     ========================================================= */
-
-  const handleSendOTP = async () => {
-
-    setErrorMessage("");
-
-    const digits =
-      phoneNumber.replace(/\D/g, "");
-
-    if (digits.length !== 12) {
-
-      setErrorMessage(
-        "Please enter a valid 10-digit Indian mobile number."
+      const result = await signInWithPhoneNumber(
+        auth,
+        phoneNumber,
+        appVerifier
       );
-
-      return;
-
-    }
-
-    setLoading(true);
-
-    try {
-
-      const appVerifier =
-        createRecaptcha();
-
-      const result =
-        await signInWithPhoneNumber(
-          auth,
-          phoneNumber,
-          appVerifier
-        );
 
       setConfirmationResult(result);
 
       setOtp("");
 
-    } catch (error) {
-
-      console.error(
-        "Phone OTP failed:",
-        error
+      setSuccessMessage(
+        "OTP sent successfully to your mobile number."
       );
+    } catch (error) {
+      console.error("Phone login error:", error);
 
-      /*
-        Reset reCAPTCHA if Firebase
-        reports a reCAPTCHA problem.
-      */
+      cleanupRecaptcha();
 
-      try {
-
-        if (recaptchaVerifierRef.current) {
-
-          recaptchaVerifierRef.current.clear();
-
-          recaptchaVerifierRef.current =
-            null;
-
-        }
-
-      } catch (cleanupError) {
-
-        console.error(
-          "reCAPTCHA reset failed:",
-          cleanupError
-        );
-
-      }
-
-
-      if (
-        error.code ===
-        "auth/invalid-phone-number"
-      ) {
-
-        setErrorMessage(
-          "The phone number is invalid."
-        );
-
+      if (error?.code === "auth/invalid-phone-number") {
+        setError("The phone number is invalid.");
       } else if (
-        error.code ===
-        "auth/too-many-requests"
+        error?.code === "auth/too-many-requests"
       ) {
-
-        setErrorMessage(
+        setError(
           "Too many attempts. Please wait and try again."
         );
-
       } else if (
-        error.code ===
-        "auth/quota-exceeded"
+        error?.code === "auth/quota-exceeded"
       ) {
-
-        setErrorMessage(
-          "SMS quota exceeded for this Firebase project."
+        setError(
+          "SMS quota exceeded. Please try again later."
         );
-
       } else {
-
-        setErrorMessage(
-          error.message ||
-          "Unable to send OTP. Please try again."
+        setError(
+          error?.message ||
+            "Unable to send OTP. Please try again."
         );
-
       }
-
     } finally {
-
       setLoading(false);
-
     }
-
   };
 
 
-  /* =========================================================
+  /* ---------------------------------------------------------
      VERIFY OTP
-     ========================================================= */
+     --------------------------------------------------------- */
 
-  const handleVerifyOTP = async () => {
-
+  const handleVerifyOtp = async () => {
     if (!confirmationResult) {
-
-      setErrorMessage(
-        "Please request an OTP first."
-      );
-
+      setError("Please request an OTP first.");
       return;
-
     }
 
-    if (
-      otp.trim().length !== 6
-    ) {
-
-      setErrorMessage(
-        "Please enter the 6-digit OTP."
-      );
-
+    if (!/^\d{6}$/.test(otp.trim())) {
+      setError("Please enter the 6-digit OTP.");
       return;
-
     }
 
     setLoading(true);
-    setErrorMessage("");
+    setError("");
+    setSuccessMessage("");
 
     try {
+      await confirmationResult.confirm(otp.trim());
 
-      await confirmationResult.confirm(
-        otp.trim()
-      );
+      setSuccessMessage("Phone verification successful!");
 
-      onClose();
-
+      setTimeout(() => {
+        onClose();
+      }, 500);
     } catch (error) {
-
-      console.error(
-        "OTP verification failed:",
-        error
-      );
+      console.error("OTP verification error:", error);
 
       if (
-        error.code ===
-        "auth/invalid-verification-code"
+        error?.code === "auth/invalid-verification-code"
       ) {
-
-        setErrorMessage(
-          "Incorrect OTP. Please check the code and try again."
-        );
-
+        setError("Incorrect OTP. Please check and try again.");
       } else if (
-        error.code ===
-        "auth/code-expired"
+        error?.code === "auth/code-expired"
       ) {
-
-        setErrorMessage(
+        setError(
           "This OTP has expired. Please request a new one."
         );
-
-        setConfirmationResult(null);
-
       } else {
-
-        setErrorMessage(
-          error.message ||
-          "OTP verification failed."
+        setError(
+          error?.message ||
+            "Unable to verify OTP. Please try again."
         );
-
       }
-
     } finally {
-
       setLoading(false);
-
     }
-
   };
 
 
-  /* =========================================================
-     RENDER
-     ========================================================= */
+  /* ---------------------------------------------------------
+     CHANGE PHONE NUMBER
+     --------------------------------------------------------- */
+
+  const handleChangeNumber = () => {
+    setConfirmationResult(null);
+    setOtp("");
+    setError("");
+    setSuccessMessage("");
+
+    cleanupRecaptcha();
+  };
+
+
+  /* ---------------------------------------------------------
+     TAB SWITCH
+     --------------------------------------------------------- */
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+
+    setError("");
+    setSuccessMessage("");
+
+    if (tab === "google") {
+      setConfirmationResult(null);
+      setOtp("");
+      cleanupRecaptcha();
+    }
+  };
+
+
+  /* ---------------------------------------------------------
+     CLOSE ON ESCAPE
+     --------------------------------------------------------- */
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape" && !loading) {
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener(
+        "keydown",
+        handleKeyDown
+      );
+    };
+  }, [loading, onClose]);
+
 
   return (
-
     <div
       className="login-overlay"
       onMouseDown={(event) => {
-
         if (
-          event.target ===
-          event.currentTarget
+          event.target === event.currentTarget &&
+          !loading
         ) {
-
           onClose();
-
         }
-
       }}
     >
-
       <div className="login-modal">
 
         {/* CLOSE */}
-
         <button
           className="login-close"
           onClick={onClose}
           disabled={loading}
+          aria-label="Close login"
         >
-          ×
+          <X size={20} />
         </button>
 
 
         {/* HEADER */}
-
         <div className="login-header">
 
-          <div className="login-icon">
-            <Sparkles size={26} />
+          <div className="login-logo">
+            <Sparkles size={23} />
           </div>
 
-          <h2>
-            Welcome to SkillSensAI
-          </h2>
+          <h2>Welcome to SkillSensAI</h2>
 
           <p>
-            Sign in to save your learning
-            progress and continue your journey.
+            Learn skills at your pace with AI-powered
+            guidance.
           </p>
 
         </div>
 
 
         {/* TABS */}
-
         <div className="login-tabs">
 
           <button
+            type="button"
             className={
               activeTab === "google"
                 ? "login-tab active"
@@ -1172,10 +526,12 @@ function LoginModal({ onClose }) {
             }
             disabled={loading}
           >
+            <Mail size={17} />
             Google
           </button>
 
           <button
+            type="button"
             className={
               activeTab === "phone"
                 ? "login-tab active"
@@ -1186,6 +542,7 @@ function LoginModal({ onClose }) {
             }
             disabled={loading}
           >
+            <Phone size={17} />
             Phone
           </button>
 
@@ -1193,250 +550,835 @@ function LoginModal({ onClose }) {
 
 
         {/* ERROR */}
-
-        {errorMessage && (
-
-          <div className="login-error">
-
-            {errorMessage}
-
+        {error && (
+          <div className="login-message error">
+            {error}
           </div>
-
         )}
 
 
-        {/* ===================================================
-            GOOGLE
-            =================================================== */}
+        {/* SUCCESS */}
+        {successMessage && (
+          <div className="login-message success">
+            <ShieldCheck size={17} />
+            {successMessage}
+          </div>
+        )}
 
-        {activeTab === "google" ? (
 
-          <button
-            className="google-login-button"
-            onClick={handleGoogleLogin}
-            disabled={loading}
-          >
+        {/* GOOGLE */}
+        {activeTab === "google" && (
+          <div className="login-content">
 
-            {loading ? (
+            <button
+              className="google-login-button"
+              onClick={handleGoogleLogin}
+              disabled={loading}
+            >
 
-              <>
+              {loading ? (
                 <Loader2
-                  size={19}
-                  className="login-spinner"
+                  size={20}
+                  className="spin"
                 />
-
-                Signing in...
-
-              </>
-
-            ) : (
-
-              <>
-                <span className="google-g-icon">
+              ) : (
+                <span className="google-g">
                   G
                 </span>
+              )}
 
-                Continue with Google
+              <span>
+                {loading
+                  ? "Signing in..."
+                  : "Continue with Google"}
+              </span>
 
-              </>
+            </button>
 
-            )}
 
-          </button>
+            <div className="login-divider">
+              <span>Secure authentication</span>
+            </div>
 
-        ) : (
 
-          /* =================================================
-             PHONE
-             ================================================= */
+            <div className="login-security">
+              <ShieldCheck size={18} />
 
-          <div className="phone-login-container">
+              <span>
+                Your account is securely handled by
+                Firebase Authentication.
+              </span>
+            </div>
+
+          </div>
+        )}
+
+
+        {/* PHONE */}
+        {activeTab === "phone" && (
+          <div className="login-content">
 
             {!confirmationResult ? (
-
               <>
+                <label className="login-label">
+                  Mobile Number
+                </label>
 
-                <p className="phone-login-description">
+                <div className="login-input-wrapper">
 
-                  Enter your mobile number.
-                  We'll send you a verification
-                  code.
+                  <Phone size={18} />
 
-                </p>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={handlePhoneChange}
+                    placeholder="+91 9876543210"
+                    maxLength={15}
+                    disabled={loading}
+                  />
 
-
-                <input
-                  type="tel"
-                  value={
-                    phoneNumber
-                      ? phoneNumber
-                          .replace(
-                            "+91",
-                            "+91 "
-                          )
-                      : ""
-                  }
-                  onChange={
-                    handlePhoneChange
-                  }
-                  placeholder="+91 XXXXX XXXXX"
-                  className="phone-login-input"
-                  disabled={loading}
-                  maxLength={14}
-                />
+                </div>
 
 
                 <button
                   className="phone-login-button"
-                  onClick={
-                    handleSendOTP
-                  }
+                  onClick={handleSendOtp}
                   disabled={loading}
                 >
 
                   {loading ? (
-
                     <>
                       <Loader2
-                        size={18}
-                        className="login-spinner"
+                        size={19}
+                        className="spin"
                       />
 
                       Sending OTP...
-
                     </>
-
                   ) : (
-
-                    "Send OTP"
-
+                    <>
+                      Send OTP
+                      <ArrowRight size={18} />
+                    </>
                   )}
 
                 </button>
-
               </>
-
             ) : (
-
               <>
+                <label className="login-label">
+                  Enter OTP
+                </label>
 
-                <p className="phone-login-description">
-
-                  Enter the 6-digit OTP sent
-                  to{" "}
-
-                  <strong>
-                    {phoneNumber}
-                  </strong>
-
+                <p className="otp-description">
+                  We sent a 6-digit verification code
+                  to <strong>{phone}</strong>
                 </p>
 
 
-                <input
-                  type="text"
-                  value={otp}
-                  onChange={(event) => {
+                <div className="login-input-wrapper otp-input">
 
-                    const value =
-                      event.target.value
-                        .replace(/\D/g, "")
-                        .substring(0, 6);
+                  <ShieldCheck size={18} />
 
-                    setOtp(value);
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={otp}
+                    onChange={(event) =>
+                      setOtp(
+                        event.target.value
+                          .replace(/\D/g, "")
+                          .slice(0, 6)
+                      )
+                    }
+                    placeholder="Enter 6-digit OTP"
+                    maxLength={6}
+                    disabled={loading}
+                  />
 
-                    setErrorMessage("");
-
-                  }}
-                  placeholder="Enter OTP"
-                  className="phone-login-input otp-input"
-                  inputMode="numeric"
-                  maxLength={6}
-                  disabled={loading}
-                  autoFocus
-                />
+                </div>
 
 
                 <button
                   className="phone-login-button"
-                  onClick={
-                    handleVerifyOTP
-                  }
+                  onClick={handleVerifyOtp}
                   disabled={loading}
                 >
 
                   {loading ? (
-
                     <>
                       <Loader2
-                        size={18}
-                        className="login-spinner"
+                        size={19}
+                        className="spin"
                       />
 
                       Verifying...
-
                     </>
-
                   ) : (
-
-                    "Verify OTP"
-
+                    <>
+                      Verify & Continue
+                      <ArrowRight size={18} />
+                    </>
                   )}
 
                 </button>
 
 
                 <button
+                  type="button"
                   className="change-number-button"
-                  onClick={() => {
-
-                    setConfirmationResult(
-                      null
-                    );
-
-                    setOtp("");
-
-                    setErrorMessage("");
-
-                  }}
+                  onClick={handleChangeNumber}
                   disabled={loading}
                 >
-
                   Change phone number
-
                 </button>
 
               </>
-
             )}
 
 
-            {/* REQUIRED FOR FIREBASE PHONE AUTH */}
-
+            {/* Firebase reCAPTCHA */}
             <div
               id="recaptcha-container"
+              className="recaptcha-container"
             />
 
           </div>
-
         )}
 
 
         {/* FOOTER */}
+        <div className="login-footer">
 
-        <p className="login-footer">
+          <p>
+            By continuing, you agree to use
+            SkillSensAI responsibly.
+          </p>
 
-          By continuing, you agree to use
-          SkillSensAI responsibly.
-
-        </p>
+        </div>
 
       </div>
-
     </div>
-
   );
-
 }
 
 
-export default Home;
+/* =========================================================
+   HOME
+   ========================================================= */
+
+export default function Home() {
+  const navigate = useNavigate();
+
+  const [user, setUser] = useState(null);
+  const [showLogin, setShowLogin] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+
+  const [lessonsLearned, setLessonsLearned] =
+    useState(() => {
+      try {
+        return getLessonsLearned().length;
+      } catch {
+        return 0;
+      }
+    });
+
+
+  /* =======================================================
+     THEME STATE
+     ======================================================= */
+
+  const [theme, setTheme] = useState(getSavedTheme);
+
+
+  /* ---------------------------------------------------------
+     INITIAL GLOBAL THEME
+     --------------------------------------------------------- */
+
+  useEffect(() => {
+    applyGlobalTheme(theme);
+  }, []);
+
+
+  /* ---------------------------------------------------------
+     THEME TOGGLE
+     --------------------------------------------------------- */
+
+  const toggleTheme = () => {
+    setTheme((currentTheme) => {
+      const nextTheme =
+        currentTheme === "dark"
+          ? "light"
+          : "dark";
+
+      applyGlobalTheme(nextTheme);
+
+      return nextTheme;
+    });
+  };
+
+
+  /* ---------------------------------------------------------
+     FIREBASE AUTH LISTENER
+     --------------------------------------------------------- */
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (currentUser) => {
+        setUser(currentUser);
+
+        if (!currentUser) {
+          setShowProfile(false);
+        }
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
+
+
+  /* ---------------------------------------------------------
+     PROGRESS
+     --------------------------------------------------------- */
+
+  const updateLessonCount = () => {
+    try {
+      setLessonsLearned(
+        getLessonsLearned().length
+      );
+    } catch (error) {
+      console.error(
+        "Unable to update lesson progress:",
+        error
+      );
+    }
+  };
+
+
+  useEffect(() => {
+    updateLessonCount();
+
+    const handleProgressUpdate = () => {
+      updateLessonCount();
+    };
+
+    window.addEventListener(
+      "skillsensai-progress-updated",
+      handleProgressUpdate
+    );
+
+    return () => {
+      window.removeEventListener(
+        "skillsensai-progress-updated",
+        handleProgressUpdate
+      );
+    };
+  }, []);
+
+
+  /* ---------------------------------------------------------
+     GLOBAL THEME SYNC
+     --------------------------------------------------------- */
+
+  useEffect(() => {
+    const handleThemeChange = (event) => {
+      const nextTheme = event?.detail?.theme;
+
+      if (
+        nextTheme === "light" ||
+        nextTheme === "dark"
+      ) {
+        setTheme(nextTheme);
+      }
+    };
+
+    window.addEventListener(
+      "skillsensai-theme-changed",
+      handleThemeChange
+    );
+
+    return () => {
+      window.removeEventListener(
+        "skillsensai-theme-changed",
+        handleThemeChange
+      );
+    };
+  }, []);
+
+
+  /* ---------------------------------------------------------
+     NAVIGATION
+     --------------------------------------------------------- */
+
+  const handleSkillClick = (skill) => {
+    if (!skill.active) {
+      return;
+    }
+
+    navigate(skill.route);
+  };
+
+
+  /* ---------------------------------------------------------
+     LOGOUT
+     --------------------------------------------------------- */
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+
+      setShowProfile(false);
+      setUser(null);
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
+
+  /* ---------------------------------------------------------
+     PROFILE NAME
+     --------------------------------------------------------- */
+
+  const getDisplayName = () => {
+    if (!user) return "";
+
+    if (user.displayName) {
+      return user.displayName;
+    }
+
+    if (user.phoneNumber) {
+      return user.phoneNumber;
+    }
+
+    if (user.email) {
+      return user.email.split("@")[0];
+    }
+
+    return "Learner";
+  };
+
+
+  /* ---------------------------------------------------------
+     USER INITIAL
+     --------------------------------------------------------- */
+
+  const getUserInitial = () => {
+    const name = getDisplayName();
+
+    if (!name) return "U";
+
+    return name.charAt(0).toUpperCase();
+  };
+
+
+  /* =======================================================
+     RENDER
+     ======================================================= */
+
+  return (
+    <div
+      className={`home-page ${
+        theme === "light"
+          ? "light-theme"
+          : "dark-theme"
+      }`}
+    >
+
+      {/* ===================================================
+          NAVBAR
+          =================================================== */}
+
+      <header className="home-navbar">
+
+        {/* BRAND */}
+        <button
+          className="home-brand"
+          onClick={() => navigate("/")}
+          type="button"
+        >
+          <span className="brand-skill">
+            Skill
+          </span>
+
+          <span className="brand-sensai">
+            SensAI
+          </span>
+        </button>
+
+
+        {/* NAVBAR RIGHT */}
+        <div className="navbar-actions">
+
+          {/* LESSON PROGRESS */}
+          {user && (
+            <div className="navbar-progress">
+              <Sparkles size={16} />
+
+              <span>
+                {lessonsLearned}{" "}
+                {lessonsLearned === 1
+                  ? "Lesson"
+                  : "Lessons"}
+              </span>
+            </div>
+          )}
+
+
+          {/* LIGHT BULB THEME BUTTON */}
+          <button
+            type="button"
+            className={`theme-toggle ${
+              theme === "light"
+                ? "theme-toggle-on"
+                : ""
+            }`}
+            onClick={toggleTheme}
+            aria-label={
+              theme === "dark"
+                ? "Turn light mode on"
+                : "Turn dark mode on"
+            }
+            title={
+              theme === "dark"
+                ? "Turn on light mode"
+                : "Turn on dark mode"
+            }
+          >
+
+            {theme === "light" ? (
+              <Lightbulb
+                size={21}
+                strokeWidth={2.2}
+              />
+            ) : (
+              <LightbulbOff
+                size={21}
+                strokeWidth={2.2}
+              />
+            )}
+
+          </button>
+
+
+          {/* LOGIN */}
+          {!user && (
+            <button
+              type="button"
+              className="login-button"
+              onClick={() => {
+                setShowLogin(true);
+                setShowProfile(false);
+              }}
+            >
+              <LogIn size={17} />
+              <span>Login</span>
+            </button>
+          )}
+
+
+          {/* PROFILE */}
+          {user && (
+            <div className="profile-container">
+
+              <button
+                type="button"
+                className="profile-button"
+                onClick={() =>
+                  setShowProfile(
+                    (current) => !current
+                  )
+                }
+              >
+
+                <div className="profile-avatar">
+
+                  {user.photoURL ? (
+                    <img
+                      src={user.photoURL}
+                      alt={getDisplayName()}
+                    />
+                  ) : (
+                    <span>
+                      {getUserInitial()}
+                    </span>
+                  )}
+
+                </div>
+
+                <span className="profile-name">
+                  {getDisplayName()}
+                </span>
+
+                <ChevronDown
+                  size={16}
+                  className={
+                    showProfile
+                      ? "profile-chevron open"
+                      : "profile-chevron"
+                  }
+                />
+
+              </button>
+
+
+              {/* PROFILE DROPDOWN */}
+              {showProfile && (
+                <div className="profile-dropdown">
+
+                  <div className="profile-dropdown-header">
+
+                    <div className="profile-dropdown-avatar">
+
+                      {user.photoURL ? (
+                        <img
+                          src={user.photoURL}
+                          alt={getDisplayName()}
+                        />
+                      ) : (
+                        <User size={21} />
+                      )}
+
+                    </div>
+
+                    <div className="profile-details">
+
+                      <strong>
+                        {getDisplayName()}
+                      </strong>
+
+                      {user.email && (
+                        <span>
+                          {user.email}
+                        </span>
+                      )}
+
+                      {user.phoneNumber && (
+                        <span>
+                          {user.phoneNumber}
+                        </span>
+                      )}
+
+                    </div>
+
+                  </div>
+
+
+                  <div className="profile-dropdown-divider" />
+
+
+                  <button
+                    type="button"
+                    className="logout-button"
+                    onClick={handleLogout}
+                  >
+                    <LogOut size={17} />
+                    Sign Out
+                  </button>
+
+                </div>
+              )}
+
+            </div>
+          )}
+
+        </div>
+
+      </header>
+
+
+      {/* ===================================================
+          MAIN HERO
+          =================================================== */}
+
+      <main className="home-main">
+
+        <div className="hero-content">
+
+          <div className="hero-heading">
+
+            <span className="hero-small-text">
+              LEARN • PRACTICE • MASTER
+            </span>
+
+            <h1>
+              Your skills.
+              <br />
+              <span>Reimagined.</span>
+            </h1>
+
+            <p>
+              AI-powered learning that helps you
+              build real skills through practice,
+              feedback and experience.
+            </p>
+
+          </div>
+
+
+          {/* =================================================
+              SAMURAI + SKILL ORBIT
+              ================================================= */}
+
+          <div className="skills-stage">
+
+            {/* ORBIT RINGS */}
+            <div className="orbit-ring orbit-ring-one" />
+            <div className="orbit-ring orbit-ring-two" />
+            <div className="orbit-ring orbit-ring-three" />
+
+
+            {/* CENTER GLOW */}
+            <div className="center-glow" />
+
+
+            {/* CENTER SAMURAI */}
+            <div className="samurai-container">
+
+              <div className="samurai-glow" />
+
+              <img
+                src="/samurai.png"
+                alt="SkillSensAI learning guide"
+                className="samurai-image"
+              />
+
+            </div>
+
+
+            {/* SKILLS */}
+            <div className="skills-grid">
+
+              {skills.map((skill) => {
+                const Icon = skill.icon;
+
+                return (
+                  <button
+                    key={skill.id}
+                    type="button"
+                    className={`skill-card ${
+                      skill.active
+                        ? "active"
+                        : "coming-soon"
+                    }`}
+                    onClick={() =>
+                      handleSkillClick(skill)
+                    }
+                    disabled={!skill.active}
+                  >
+
+                    <span className="skill-icon">
+
+                      <Icon
+                        size={28}
+                        strokeWidth={1.8}
+                      />
+
+                    </span>
+
+
+                    <span className="skill-name">
+                      {skill.name}
+                    </span>
+
+
+                    {!skill.active && (
+                      <span className="coming-soon-label">
+                        Coming Soon
+                      </span>
+                    )}
+
+                  </button>
+                );
+              })}
+
+            </div>
+
+          </div>
+
+
+          {/* =================================================
+              BOTTOM VALUE SECTION
+              ================================================= */}
+
+          <section className="home-value-section">
+
+            <div className="value-card">
+
+              <div className="value-icon">
+                <Sparkles size={23} />
+              </div>
+
+              <div>
+                <h3>
+                  Learn by doing
+                </h3>
+
+                <p>
+                  Practice your skill, get AI
+                  feedback and improve step by step.
+                </p>
+              </div>
+
+            </div>
+
+
+            <div className="value-card">
+
+              <div className="value-icon">
+                <ArrowRight size={23} />
+              </div>
+
+              <div>
+                <h3>
+                  Learn at your pace
+                </h3>
+
+                <p>
+                  Build your skills through an
+                  experience designed around you.
+                </p>
+              </div>
+
+            </div>
+
+
+            <div className="value-card">
+
+              <div className="value-icon">
+                <ShieldCheck size={23} />
+              </div>
+
+              <div>
+                <h3>
+                  Real progress
+                </h3>
+
+                <p>
+                  Track your learning journey and
+                  turn practice into mastery.
+                </p>
+              </div>
+
+            </div>
+
+          </section>
+
+        </div>
+
+      </main>
+
+
+      {/* ===================================================
+          LOGIN MODAL
+          =================================================== */}
+
+      {showLogin && (
+        <LoginModal
+          onClose={() => setShowLogin(false)}
+        />
+      )}
+
+    </div>
+  );
+}
