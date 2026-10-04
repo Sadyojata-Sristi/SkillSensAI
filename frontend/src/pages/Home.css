@@ -1,11 +1,162 @@
 /* =========================================================
-   SKILLSENSAI — FINAL HOME PAGE FIXES
-   ONLY THE REQUESTED CHANGES
+   SKILLSENSAI — HOME PAGE
+   Complete Home.css
    ========================================================= */
 
 
 /* =========================================================
-   1. REMOVE CEILING FAN COMPLETELY
+   ROOT / PAGE
+   ========================================================= */
+
+.home-page {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  color: #1f1b2d;
+
+  background:
+    linear-gradient(
+      180deg,
+      #f4f0ff 0%,
+      #ebe5fb 45%,
+      #ddd5ef 100%
+    );
+}
+
+
+/* =========================================================
+   ROOM BACKGROUND
+   ========================================================= */
+
+.room-background {
+  position: fixed;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  overflow: hidden;
+
+  pointer-events: none;
+
+  z-index: 0;
+}
+
+.room-wall {
+  position: absolute;
+  inset: 0 0 42% 0;
+
+  background:
+    linear-gradient(
+      180deg,
+      #faf8ff 0%,
+      #f2edfb 55%,
+      #e8e0f5 100%
+    );
+}
+
+.room-floor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 43%;
+
+  background:
+    linear-gradient(
+      180deg,
+      #d9d1e5 0%,
+      #c9bfd7 100%
+    );
+
+  box-shadow:
+    inset 0 10px 25px rgba(68, 52, 90, 0.08);
+}
+
+.room-corner-glow {
+  position: absolute;
+
+  width: 65vw;
+  height: 65vw;
+
+  max-width: 850px;
+  max-height: 850px;
+
+  left: 50%;
+  top: 48%;
+
+  transform: translate(-50%, -50%);
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(156, 132, 230, 0.18) 0%,
+      rgba(156, 132, 230, 0.07) 38%,
+      transparent 72%
+    );
+
+  filter: blur(20px);
+}
+
+
+/* =========================================================
+   CEILING
+   ========================================================= */
+
+.ceiling {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+  right: 0;
+
+  height: 74px;
+
+  z-index: 100;
+
+  pointer-events: none;
+}
+
+.ceiling-line {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+
+  top: 58px;
+
+  height: 3px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(82, 68, 108, 0.18) 8%,
+      rgba(82, 68, 108, 0.3) 50%,
+      rgba(82, 68, 108, 0.18) 92%,
+      transparent 100%
+    );
+
+  box-shadow:
+    0 2px 5px rgba(54, 40, 75, 0.08);
+}
+
+
+/* =========================================================
+   REMOVE CEILING FAN COMPLETELY
    ========================================================= */
 
 .ceiling-fan,
@@ -23,9 +174,8 @@
 
 
 /* =========================================================
-   2. HANGING LIGHT
-      DIRECTLY BELOW THE CEILING LINE
-      CENTERED HORIZONTALLY
+   HANGING LIGHT
+   ATTACHED DIRECTLY BELOW CEILING LINE
    ========================================================= */
 
 .hanging-bulb {
@@ -47,23 +197,27 @@
 }
 
 
-/* Wire remains attached to the ceiling */
+/* Wire connected to ceiling */
 .bulb-wire {
   width: 2px;
   height: 52px;
 
-  background: linear-gradient(
-    to bottom,
-    rgba(20, 20, 30, 0.9),
-    rgba(80, 70, 100, 0.7)
-  );
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(20, 20, 30, 0.9),
+      rgba(80, 70, 100, 0.7)
+    );
 
   box-shadow:
     0 0 4px rgba(0, 0, 0, 0.25);
 }
 
 
-/* Clickable light button */
+/* =========================================================
+   LIGHT BUTTON
+   ========================================================= */
+
 .bulb-button {
   position: relative;
 
@@ -74,6 +228,7 @@
   margin: 0;
 
   border: 0;
+
   background: transparent;
 
   display: flex;
@@ -106,38 +261,639 @@
 }
 
 
+/* Bulb neck */
+.bulb-neck {
+  width: 16px;
+  height: 10px;
+
+  margin-top: 1px;
+
+  border-radius: 5px 5px 3px 3px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #6c6375,
+      #b4aabe,
+      #6c6375
+    );
+
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+
+/* Bulb glass */
+.bulb-glass {
+  width: 42px;
+  height: 42px;
+
+  margin-top: -1px;
+
+  border-radius:
+    50%
+    50%
+    46%
+    46%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition:
+    background 0.3s ease,
+    box-shadow 0.3s ease,
+    color 0.3s ease;
+}
+
+
+/* Light ON */
+.bulb-on .bulb-glass {
+  color: #7c5cfc;
+
+  background:
+    radial-gradient(
+      circle,
+      #fffdf0 0%,
+      #fff4a8 42%,
+      #f5d969 72%,
+      #d2ae43 100%
+    );
+
+  box-shadow:
+    0 0 12px rgba(255, 226, 108, 0.9),
+    0 0 30px rgba(255, 220, 90, 0.65),
+    0 0 70px rgba(255, 220, 90, 0.3);
+}
+
+
+/* Light OFF */
+.bulb-off .bulb-glass {
+  color: #77717f;
+
+  background:
+    radial-gradient(
+      circle,
+      #d7d3dc 0%,
+      #aaa3b1 65%,
+      #77717f 100%
+    );
+
+  box-shadow:
+    0 2px 7px rgba(0, 0, 0, 0.22);
+}
+
+
 /* =========================================================
-   3. KEEP LIGHT CENTERED ON MOBILE/TABLET
+   ROOM LOGIN
    ========================================================= */
 
-@media (max-width: 900px) {
-  .hanging-bulb {
-    top: 0;
-    left: 50%;
-    right: auto;
+.room-login {
+  position: absolute;
 
-    transform: translateX(-50%);
-  }
+  top: 24px;
+  right: 28px;
+
+  z-index: 3500;
 }
 
-@media (max-width: 600px) {
-  .hanging-bulb {
-    top: 0;
-    left: 50%;
-    right: auto;
 
-    transform: translateX(-50%);
-  }
+/* Login button */
+.login-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  min-height: 44px;
+
+  padding: 10px 18px;
+
+  border: 1px solid rgba(124, 92, 252, 0.25);
+
+  border-radius: 14px;
+
+  background:
+    rgba(255, 255, 255, 0.78);
+
+  color: #4f3a8d;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 8px 25px rgba(66, 46, 100, 0.12);
+
+  backdrop-filter: blur(14px);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.login-button:hover {
+  transform: translateY(-2px);
+
+  background: #ffffff;
+
+  box-shadow:
+    0 12px 30px rgba(66, 46, 100, 0.18);
 }
 
 
 /* =========================================================
-   4. KEEP SKILLS IN A TRUE CIRCULAR ORBIT
-      AROUND THE SAMURAI
+   PROFILE
+   ========================================================= */
+
+.profile-area {
+  position: relative;
+}
+
+.profile-button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  padding: 7px 11px 7px 7px;
+
+  border: 1px solid rgba(124, 92, 252, 0.22);
+
+  border-radius: 16px;
+
+  background:
+    rgba(255, 255, 255, 0.82);
+
+  cursor: pointer;
+
+  box-shadow:
+    0 8px 25px rgba(66, 46, 100, 0.12);
+
+  backdrop-filter: blur(14px);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.profile-button:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 12px 30px rgba(66, 46, 100, 0.18);
+}
+
+.profile-avatar {
+  width: 34px;
+  height: 34px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c5cfc,
+      #6245d8
+    );
+
+  color: white;
+
+  font-weight: 800;
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+.profile-name {
+  max-width: 130px;
+
+  overflow: hidden;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  color: #35284d;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.profile-button svg {
+  color: #71687d;
+}
+
+
+/* Profile dropdown */
+.profile-dropdown {
+  position: absolute;
+
+  top: calc(100% + 10px);
+  right: 0;
+
+  width: 280px;
+
+  padding: 16px;
+
+  border:
+    1px solid rgba(124, 92, 252, 0.18);
+
+  border-radius: 18px;
+
+  background:
+    rgba(255, 255, 255, 0.96);
+
+  box-shadow:
+    0 20px 50px rgba(47, 31, 71, 0.2);
+
+  backdrop-filter: blur(20px);
+
+  animation:
+    profileDrop 0.2s ease;
+}
+
+@keyframes profileDrop {
+  from {
+    opacity: 0;
+    transform: translateY(-7px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.profile-dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding-bottom: 14px;
+
+  border-bottom:
+    1px solid rgba(90, 72, 112, 0.1);
+}
+
+.profile-dropdown-avatar {
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c5cfc,
+      #6245d8
+    );
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: white;
+  font-weight: 800;
+}
+
+.profile-dropdown-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-dropdown-user {
+  min-width: 0;
+}
+
+.profile-dropdown-user strong {
+  display: block;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  color: #30253f;
+
+  font-size: 14px;
+}
+
+.profile-dropdown-user span {
+  display: block;
+
+  margin-top: 3px;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  color: #80768c;
+
+  font-size: 12px;
+}
+
+.profile-stat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 14px 2px;
+
+  color: #655b70;
+
+  font-size: 13px;
+}
+
+.profile-stat strong {
+  color: #6245d8;
+  font-size: 15px;
+}
+
+.logout-button {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 10px 14px;
+
+  border: 1px solid rgba(220, 70, 90, 0.18);
+
+  border-radius: 11px;
+
+  background: rgba(220, 70, 90, 0.07);
+
+  color: #b53f51;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.logout-button:hover {
+  background: rgba(220, 70, 90, 0.13);
+  transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   MAIN CONTENT
+   ========================================================= */
+
+.home-content {
+  position: relative;
+
+  z-index: 5;
+
+  width: 100%;
+
+  padding:
+    105px
+    30px
+    30px;
+}
+
+
+/* =========================================================
+   INTRO
+   ========================================================= */
+
+.home-intro {
+  position: relative;
+
+  z-index: 40;
+
+  max-width: 780px;
+
+  margin: 0 auto;
+
+  text-align: center;
+}
+
+.home-eyebrow {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 7px 13px;
+
+  border-radius: 999px;
+
+  background:
+    rgba(124, 92, 252, 0.09);
+
+  border:
+    1px solid rgba(124, 92, 252, 0.16);
+
+  color: #7051d2;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: 0.16em;
+}
+
+.home-intro h1 {
+  margin:
+    12px
+    0
+    8px;
+
+  color: #2b2239;
+
+  font-size: clamp(34px, 5vw, 58px);
+
+  line-height: 1.02;
+
+  letter-spacing: -0.045em;
+
+  font-weight: 900;
+}
+
+.home-intro h1 span {
+  color: #7c5cfc;
+}
+
+.home-intro p {
+  max-width: 620px;
+
+  margin: 0 auto;
+
+  color: #71677d;
+
+  font-size: 15px;
+
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   SKILLS ROOM
+   ========================================================= */
+
+.skills-room {
+  position: relative;
+
+  width: min(980px, 100%);
+
+  height: 560px;
+
+  margin:
+    10px
+    auto
+    0;
+
+  overflow: visible;
+}
+
+
+/* =========================================================
+   SAMURAI
+   ========================================================= */
+
+.samurai-container {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  transform:
+    translate(-50%, -50%);
+
+  z-index: 20;
+
+  width: 230px;
+  height: 360px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.samurai-aura {
+  position: absolute;
+
+  width: 260px;
+  height: 300px;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(124, 92, 252, 0.22) 0%,
+      rgba(124, 92, 252, 0.08) 40%,
+      transparent 72%
+    );
+
+  filter: blur(16px);
+
+  animation:
+    auraPulse 4s ease-in-out infinite;
+}
+
+@keyframes auraPulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.98);
+  }
+
+  50% {
+    opacity: 0.9;
+    transform: scale(1.04);
+  }
+}
+
+.samurai-image {
+  position: relative;
+
+  width: 215px;
+  height: 350px;
+
+  object-fit: contain;
+
+  z-index: 2;
+
+  filter:
+    drop-shadow(
+      0 20px 20px rgba(35, 22, 54, 0.25)
+    );
+
+  animation:
+    samuraiFloat 4.5s ease-in-out infinite;
+}
+
+@keyframes samuraiFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.character-shadow {
+  position: absolute;
+
+  left: 50%;
+  top: calc(50% + 175px);
+
+  transform:
+    translateX(-50%);
+
+  width: 210px;
+  height: 32px;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(42, 31, 53, 0.28),
+      transparent 70%
+    );
+
+  filter: blur(7px);
+
+  z-index: 18;
+}
+
+
+/* =========================================================
+   TRUE CIRCULAR SKILL ORBIT
    ========================================================= */
 
 .skills-orbit {
   position: absolute;
+
   inset: 0;
 
   z-index: 25;
@@ -169,7 +925,10 @@
 
   z-index: 30;
 
-  transform: translate(-50%, -50%);
+  transform:
+    translate(-50%, -50%);
+
+  cursor: pointer;
 
   transition:
     transform 0.25s ease,
@@ -212,39 +971,1392 @@
 
 
 /* =========================================================
-   5. KEEP CORRECT LAYERING
+   SKILL CIRCLE BASE
    ========================================================= */
 
-.samurai-container {
-  z-index: 20;
+.skill-circle {
+  border: 1px solid rgba(255, 255, 255, 0.65);
+
+  backdrop-filter: blur(14px);
+
+  box-shadow:
+    0 12px 28px rgba(52, 38, 73, 0.13);
 }
 
-.character-shadow {
-  z-index: 18;
+.skill-circle:hover:not(:disabled) {
+  transform:
+    translate(-50%, -50%)
+    scale(1.1);
+
+  filter: brightness(1.03);
+
+  box-shadow:
+    0 18px 38px rgba(52, 38, 73, 0.2);
 }
 
-.room-sofa,
-.room-rug,
-.room-plant {
-  z-index: 10;
+.skill-circle:active:not(:disabled) {
+  transform:
+    translate(-50%, -50%)
+    scale(0.97);
 }
 
 
 /* =========================================================
-   6. MOVE RUG DOWN
-      SO IT DOES NOT COVER THE SOFA
+   SKILL ICON
+   ========================================================= */
+
+.skill-icon {
+  width: 42px;
+  height: 42px;
+
+  margin-bottom: 5px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+}
+
+.skill-name {
+  font-size: 12px;
+
+  line-height: 1.1;
+
+  font-weight: 800;
+
+  text-align: center;
+
+  max-width: 82px;
+}
+
+.coming-soon {
+  margin-top: 3px;
+
+  font-size: 8px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+}
+
+
+/* =========================================================
+   MUSIC
+   ========================================================= */
+
+.skill-music {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(239, 235, 255, 0.96),
+      rgba(220, 211, 255, 0.92)
+    );
+
+  color: #6245d8;
+}
+
+.skill-music .skill-icon {
+  background:
+    rgba(124, 92, 252, 0.13);
+}
+
+
+/* =========================================================
+   MARTIAL ARTS
+   ========================================================= */
+
+.skill-martial {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 238, 238, 0.97),
+      rgba(255, 216, 220, 0.92)
+    );
+
+  color: #b33d53;
+}
+
+.skill-martial .skill-icon {
+  background:
+    rgba(195, 64, 86, 0.12);
+}
+
+
+/* =========================================================
+   DANCE
+   ========================================================= */
+
+.skill-dance {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(238, 247, 255, 0.96),
+      rgba(214, 232, 255, 0.9)
+    );
+
+  color: #3974b8;
+}
+
+
+/* =========================================================
+   ART
+   ========================================================= */
+
+.skill-art {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 244, 232, 0.97),
+      rgba(255, 229, 205, 0.92)
+    );
+
+  color: #b96a29;
+}
+
+
+/* =========================================================
+   CODING
+   ========================================================= */
+
+.skill-coding {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(235, 248, 242, 0.97),
+      rgba(210, 239, 224, 0.92)
+    );
+
+  color: #347b5c;
+}
+
+
+/* =========================================================
+   MORE
+   ========================================================= */
+
+.skill-more {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(244, 241, 248, 0.96),
+      rgba(226, 220, 235, 0.92)
+    );
+
+  color: #756c80;
+}
+
+
+/* =========================================================
+   DISABLED SKILLS
+   ========================================================= */
+
+.skill-disabled {
+  cursor: not-allowed;
+
+  opacity: 0.72;
+
+  filter: grayscale(0.15);
+}
+
+.skill-disabled:hover {
+  transform:
+    translate(-50%, -50%);
+}
+
+
+/* =========================================================
+   SOFA
+   ========================================================= */
+
+.room-sofa {
+  position: absolute;
+
+  left: 50%;
+  bottom: 12px;
+
+  transform:
+    translateX(-50%);
+
+  width: 570px;
+  height: 165px;
+
+  z-index: 10;
+
+  pointer-events: none;
+}
+
+
+/* Sofa back */
+.sofa-back {
+  position: absolute;
+
+  left: 38px;
+  right: 38px;
+  top: 10px;
+
+  height: 78px;
+
+  border-radius:
+    26px
+    26px
+    12px
+    12px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #9a8aaa,
+      #7f6d91
+    );
+
+  box-shadow:
+    inset 0 5px 8px rgba(255, 255, 255, 0.12),
+    0 16px 28px rgba(54, 40, 67, 0.17);
+}
+
+
+/* Cushions */
+.sofa-cushion {
+  position: absolute;
+
+  top: 12px;
+
+  width: 28%;
+
+  height: 54px;
+
+  border-radius: 17px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #b3a3bf,
+      #96849f
+    );
+
+  box-shadow:
+    inset 0 3px 5px rgba(255, 255, 255, 0.14);
+}
+
+.sofa-cushion-one {
+  left: 4%;
+}
+
+.sofa-cushion-two {
+  left: 36%;
+}
+
+.sofa-cushion-three {
+  right: 4%;
+}
+
+
+/* Sofa seat */
+.sofa-seat {
+  position: absolute;
+
+  left: 24px;
+  right: 24px;
+  top: 72px;
+
+  height: 62px;
+
+  border-radius:
+    18px
+    18px
+    14px
+    14px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #8d7b9d,
+      #71617e
+    );
+
+  box-shadow:
+    0 18px 30px rgba(49, 36, 60, 0.2);
+}
+
+.sofa-seat span {
+  position: absolute;
+
+  left: 8%;
+  right: 8%;
+  top: 7px;
+
+  height: 6px;
+
+  border-radius: 50%;
+
+  background:
+    rgba(255, 255, 255, 0.1);
+}
+
+
+/* Sofa arms */
+.sofa-arm {
+  position: absolute;
+
+  top: 61px;
+
+  width: 48px;
+  height: 82px;
+
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #867595,
+      #6e5e7c
+    );
+
+  box-shadow:
+    0 12px 20px rgba(49, 36, 60, 0.16);
+}
+
+.sofa-arm-left {
+  left: 0;
+}
+
+.sofa-arm-right {
+  right: 0;
+}
+
+
+/* Sofa legs */
+.sofa-leg {
+  position: absolute;
+
+  bottom: -4px;
+
+  width: 13px;
+  height: 18px;
+
+  border-radius: 0 0 6px 6px;
+
+  background:
+    #594d64;
+}
+
+.sofa-leg-left {
+  left: 65px;
+}
+
+.sofa-leg-right {
+  right: 65px;
+}
+
+
+/* =========================================================
+   RUG
    ========================================================= */
 
 .room-rug {
+  position: absolute;
+
+  left: 50%;
   bottom: -28px !important;
+
+  transform:
+    translateX(-50%);
+
+  width: 690px;
+  height: 155px;
+
+  z-index: 10;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(125, 107, 147, 0.38) 0%,
+      rgba(125, 107, 147, 0.2) 55%,
+      rgba(125, 107, 147, 0) 75%
+    );
+
+  pointer-events: none;
+}
+
+.rug-inner {
+  position: absolute;
+
+  inset: 12px 35px;
+
+  border-radius: 50%;
+
+  border:
+    2px solid rgba(124, 92, 252, 0.08);
+
+  box-shadow:
+    inset 0 0 30px rgba(80, 62, 100, 0.08);
 }
 
 
 /* =========================================================
-   7. RESPONSIVE CIRCULAR SKILLS
+   PLANT
+   ========================================================= */
+
+.room-plant {
+  position: absolute;
+
+  left: 35px;
+  bottom: 30px;
+
+  width: 145px;
+  height: 240px;
+
+  z-index: 10;
+
+  pointer-events: none;
+}
+
+
+/* Pot */
+.plant-pot {
+  position: absolute;
+
+  bottom: 0;
+  left: 40px;
+
+  width: 65px;
+  height: 72px;
+
+  border-radius:
+    8px
+    8px
+    18px
+    18px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #8b6571,
+      #b2818c,
+      #795461
+    );
+
+  box-shadow:
+    0 14px 20px rgba(54, 37, 50, 0.18);
+}
+
+.plant-pot span {
+  position: absolute;
+
+  top: -5px;
+  left: -5px;
+
+  width: 75px;
+  height: 13px;
+
+  border-radius: 50%;
+
+  background:
+    #72515c;
+}
+
+
+/* Stems */
+.plant-stem {
+  position: absolute;
+
+  width: 5px;
+
+  border-radius: 999px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #567956,
+      #385a3b
+    );
+
+  transform-origin: bottom center;
+}
+
+.stem-one {
+  left: 68px;
+  bottom: 60px;
+
+  height: 140px;
+
+  transform: rotate(-18deg);
+}
+
+.stem-two {
+  left: 72px;
+  bottom: 60px;
+
+  height: 150px;
+
+  transform: rotate(4deg);
+}
+
+.stem-three {
+  left: 72px;
+  bottom: 60px;
+
+  height: 130px;
+
+  transform: rotate(20deg);
+}
+
+.stem-four {
+  left: 62px;
+  bottom: 60px;
+
+  height: 115px;
+
+  transform: rotate(-34deg);
+}
+
+
+/* Leaves */
+.plant-leaf {
+  position: absolute;
+
+  width: 48px;
+  height: 23px;
+
+  border-radius:
+    100%
+    0
+    100%
+    0;
+
+  background:
+    linear-gradient(
+      135deg,
+      #71966a,
+      #426842
+    );
+
+  box-shadow:
+    0 5px 8px rgba(42, 69, 43, 0.12);
+}
+
+.leaf-one {
+  left: 30px;
+  top: 61px;
+
+  transform: rotate(-25deg);
+}
+
+.leaf-two {
+  left: 74px;
+  top: 42px;
+
+  transform: rotate(14deg);
+}
+
+.leaf-three {
+  left: 90px;
+  top: 79px;
+
+  transform: rotate(42deg);
+}
+
+.leaf-four {
+  left: 18px;
+  top: 100px;
+
+  transform: rotate(-45deg);
+}
+
+.leaf-five {
+  left: 72px;
+  top: 116px;
+
+  transform: rotate(18deg);
+}
+
+.leaf-six {
+  left: 35px;
+  top: 139px;
+
+  transform: rotate(-12deg);
+}
+
+
+/* =========================================================
+   LEARNING JOURNEY
+   ========================================================= */
+
+.learning-flow {
+  position: relative;
+
+  z-index: 60;
+
+  width: min(1080px, 100%);
+
+  margin:
+    22px
+    auto
+    0;
+
+  padding:
+    30px
+    0
+    15px;
+}
+
+.flow-heading {
+  text-align: center;
+
+  margin-bottom: 22px;
+}
+
+.flow-heading > span {
+  color: #795bd4;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.16em;
+}
+
+.flow-heading h2 {
+  margin:
+    6px
+    0
+    4px;
+
+  color: #30253f;
+
+  font-size: 25px;
+
+  font-weight: 900;
+
+  letter-spacing: -0.025em;
+}
+
+.flow-heading p {
+  margin: 0;
+
+  color: #81768d;
+
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   FLOW CARDS
+   ========================================================= */
+
+.flow-cards {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 14px;
+}
+
+.flow-card {
+  position: relative;
+
+  min-height: 130px;
+
+  padding: 20px;
+
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 13px;
+
+  border:
+    1px solid rgba(124, 92, 252, 0.1);
+
+  border-radius: 20px;
+
+  background:
+    rgba(255, 255, 255, 0.64);
+
+  box-shadow:
+    0 12px 30px rgba(57, 40, 75, 0.08);
+
+  backdrop-filter: blur(12px);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.flow-card:hover {
+  transform: translateY(-4px);
+
+  box-shadow:
+    0 18px 38px rgba(57, 40, 75, 0.13);
+}
+
+.flow-card-icon {
+  width: 45px;
+  height: 45px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+
+  color: #6245d8;
+
+  background:
+    rgba(124, 92, 252, 0.1);
+}
+
+.flow-card > div:nth-child(2) {
+  min-width: 0;
+}
+
+.flow-card span {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: #9a8da6;
+
+  font-size: 9px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.12em;
+}
+
+.flow-card h3 {
+  margin:
+    0
+    0
+    5px;
+
+  color: #33283f;
+
+  font-size: 18px;
+
+  font-weight: 850;
+}
+
+.flow-card p {
+  margin: 0;
+
+  color: #7c7187;
+
+  font-size: 11px;
+
+  line-height: 1.5;
+}
+
+.flow-arrow {
+  position: absolute;
+
+  right: 15px;
+  top: 20px;
+
+  color: #a79cb2;
+}
+
+.flow-practice .flow-card-icon {
+  color: #b05a67;
+
+  background:
+    rgba(207, 91, 108, 0.1);
+}
+
+.flow-master .flow-card-icon {
+  color: #a87822;
+
+  background:
+    rgba(224, 177, 65, 0.12);
+}
+
+
+/* =========================================================
+   BOTTOM NOTE
+   ========================================================= */
+
+.home-bottom-note {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  margin-top: 18px;
+
+  color: #8a7e96;
+
+  font-size: 11px;
+}
+
+.home-bottom-note svg {
+  color: #8a6ae8;
+}
+
+
+/* =========================================================
+   LOGIN MODAL
+   ========================================================= */
+
+.login-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 5000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background:
+    rgba(0, 0, 0, 0.78);
+
+  backdrop-filter: blur(12px);
+}
+
+.login-modal {
+  position: relative;
+
+  width: min(430px, 100%);
+
+  max-height: calc(100vh - 40px);
+
+  overflow-y: auto;
+
+  padding: 30px;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.12);
+
+  border-radius: 26px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #f6f1ff
+    );
+
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.35);
+
+  animation:
+    modalIn 0.25s ease;
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+
+/* Modal close */
+.login-close {
+  position: absolute;
+
+  top: 14px;
+  right: 14px;
+
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 0;
+
+  border-radius: 50%;
+
+  background:
+    rgba(80, 66, 100, 0.07);
+
+  color: #6f6579;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.login-close:hover {
+  background:
+    rgba(80, 66, 100, 0.13);
+
+  transform: rotate(90deg);
+}
+
+
+/* Modal header */
+.login-header {
+  text-align: center;
+
+  margin-bottom: 22px;
+}
+
+.login-shield {
+  width: 58px;
+  height: 58px;
+
+  margin: 0 auto 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 18px;
+
+  color: #6245d8;
+
+  background:
+    rgba(124, 92, 252, 0.11);
+}
+
+.login-header h2 {
+  margin:
+    0
+    0
+    6px;
+
+  color: #30243e;
+
+  font-size: 25px;
+
+  font-weight: 900;
+}
+
+.login-header p {
+  margin: 0;
+
+  color: #80748d;
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   LOGIN TABS
+   ========================================================= */
+
+.login-tabs {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 5px;
+
+  margin-bottom: 18px;
+
+  padding: 4px;
+
+  border-radius: 13px;
+
+  background:
+    rgba(116, 94, 140, 0.08);
+}
+
+.login-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 10px;
+
+  border: 0;
+
+  border-radius: 10px;
+
+  background: transparent;
+
+  color: #7c7187;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.login-tab.active {
+  background: #ffffff;
+
+  color: #6245d8;
+
+  box-shadow:
+    0 4px 12px rgba(56, 40, 75, 0.08);
+}
+
+
+/* =========================================================
+   GOOGLE LOGIN
+   ========================================================= */
+
+.google-login-button {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  padding: 13px 16px;
+
+  border:
+    1px solid rgba(75, 65, 85, 0.16);
+
+  border-radius: 13px;
+
+  background: #ffffff;
+
+  color: #352c3c;
+
+  font-size: 13px;
+  font-weight: 750;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 5px 14px rgba(52, 42, 64, 0.06);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.google-login-button:hover {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 9px 20px rgba(52, 42, 64, 0.1);
+}
+
+
+/* =========================================================
+   PHONE LOGIN
+   ========================================================= */
+
+.phone-form {
+  display: flex;
+  flex-direction: column;
+
+  gap: 11px;
+}
+
+.phone-input,
+.otp-input {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 13px 14px;
+
+  border:
+    1px solid rgba(86, 70, 104, 0.17);
+
+  border-radius: 12px;
+
+  outline: none;
+
+  background:
+    rgba(255, 255, 255, 0.9);
+
+  color: #30253a;
+
+  font-size: 13px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.phone-input:focus,
+.otp-input:focus {
+  border-color: rgba(124, 92, 252, 0.65);
+
+  box-shadow:
+    0 0 0 4px rgba(124, 92, 252, 0.08);
+}
+
+.phone-login-button,
+.verify-otp-button {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 13px 16px;
+
+  border: 0;
+
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c5cfc,
+      #6245d8
+    );
+
+  color: white;
+
+  font-size: 13px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 9px 22px rgba(98, 69, 216, 0.24);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.phone-login-button:hover,
+.verify-otp-button:hover {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 12px 27px rgba(98, 69, 216, 0.3);
+}
+
+.phone-login-button:disabled,
+.verify-otp-button:disabled,
+.google-login-button:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+
+  transform: none;
+}
+
+
+/* =========================================================
+   LOGIN ERROR
+   ========================================================= */
+
+.login-error {
+  margin-top: 12px;
+
+  padding: 10px 12px;
+
+  border-radius: 10px;
+
+  background:
+    rgba(207, 70, 90, 0.08);
+
+  border:
+    1px solid rgba(207, 70, 90, 0.12);
+
+  color: #b04455;
+
+  font-size: 11px;
+
+  line-height: 1.45;
+}
+
+
+/* =========================================================
+   SECURITY NOTE
+   ========================================================= */
+
+.login-security-note {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 8px;
+
+  margin-top: 18px;
+
+  padding-top: 15px;
+
+  border-top:
+    1px solid rgba(80, 65, 95, 0.1);
+
+  color: #8a8092;
+
+  font-size: 10px;
+
+  line-height: 1.45;
+}
+
+.login-security-note svg {
+  flex-shrink: 0;
+
+  color: #7c5cfc;
+}
+
+
+/* =========================================================
+   RECAPTCHA
+   ========================================================= */
+
+#recaptcha-container {
+  margin-top: 10px;
+
+  display: flex;
+  justify-content: center;
+}
+
+
+/* =========================================================
+   DARK THEME
+   ========================================================= */
+
+.skillsensai-dark-theme .home-page {
+  color: #f4efff;
+
+  background:
+    linear-gradient(
+      180deg,
+      #17131f 0%,
+      #211b2c 48%,
+      #18141f 100%
+    );
+}
+
+.skillsensai-dark-theme .room-wall {
+  background:
+    linear-gradient(
+      180deg,
+      #211b2c 0%,
+      #191521 100%
+    );
+}
+
+.skillsensai-dark-theme .room-floor {
+  background:
+    linear-gradient(
+      180deg,
+      #211b29 0%,
+      #141118 100%
+    );
+}
+
+.skillsensai-dark-theme .ceiling-line {
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(210, 198, 235, 0.15),
+      transparent
+    );
+}
+
+.skillsensai-dark-theme .home-intro h1,
+.skillsensai-dark-theme .flow-heading h2,
+.skillsensai-dark-theme .flow-card h3 {
+  color: #f3edff;
+}
+
+.skillsensai-dark-theme .home-intro p,
+.skillsensai-dark-theme .flow-heading p,
+.skillsensai-dark-theme .flow-card p {
+  color: #a9a0b7;
+}
+
+.skillsensai-dark-theme .login-button,
+.skillsensai-dark-theme .profile-button {
+  background:
+    rgba(37, 30, 48, 0.9);
+
+  border-color:
+    rgba(177, 154, 239, 0.2);
+
+  color: #e9e0ff;
+}
+
+.skillsensai-dark-theme .profile-name {
+  color: #e9e0ff;
+}
+
+.skillsensai-dark-theme .profile-dropdown {
+  background:
+    rgba(34, 28, 44, 0.98);
+
+  border-color:
+    rgba(177, 154, 239, 0.16);
+}
+
+.skillsensai-dark-theme .profile-dropdown-user strong {
+  color: #eee7f7;
+}
+
+.skillsensai-dark-theme .profile-dropdown-user span,
+.skillsensai-dark-theme .profile-stat {
+  color: #aaa0b5;
+}
+
+.skillsensai-dark-theme .flow-card {
+  background:
+    rgba(35, 29, 46, 0.72);
+
+  border-color:
+    rgba(177, 154, 239, 0.1);
+}
+
+.skillsensai-dark-theme .home-bottom-note {
+  color: #93899f;
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLET
    ========================================================= */
 
 @media (max-width: 900px) {
+
+  .hanging-bulb {
+    top: 0;
+    left: 50%;
+    right: auto;
+
+    transform:
+      translateX(-50%);
+  }
+
+  .home-content {
+    padding:
+      100px
+      18px
+      25px;
+  }
+
+  .skills-room {
+    height: 520px;
+  }
 
   .skill-circle {
     width: 82px;
@@ -283,14 +2395,90 @@
     top: calc(50% - 80px);
     left: calc(50% - 135px);
   }
+
+  .samurai-container {
+    width: 200px;
+    height: 320px;
+  }
+
+  .samurai-image {
+    width: 190px;
+    height: 315px;
+  }
+
+  .room-sofa {
+    width: 500px;
+  }
+
+  .room-rug {
+    width: 600px;
+  }
+
+  .room-plant {
+    left: 15px;
+  }
+
+  .flow-cards {
+    gap: 10px;
+  }
+
+  .flow-card {
+    padding: 16px;
+  }
 }
 
 
 /* =========================================================
-   SMALL MOBILE
+   RESPONSIVE — MOBILE
    ========================================================= */
 
 @media (max-width: 600px) {
+
+  .room-login {
+    top: 15px;
+    right: 15px;
+  }
+
+  .login-button {
+    min-height: 40px;
+
+    padding:
+      8px
+      13px;
+
+    font-size: 12px;
+  }
+
+  .profile-name {
+    display: none;
+  }
+
+  .profile-button {
+    padding: 5px;
+  }
+
+  .home-content {
+    padding:
+      90px
+      10px
+      20px;
+  }
+
+  .home-intro h1 {
+    font-size: 34px;
+  }
+
+  .home-intro p {
+    padding: 0 15px;
+
+    font-size: 13px;
+  }
+
+  .skills-room {
+    height: 440px;
+
+    margin-top: 5px;
+  }
 
   .skill-circle {
     width: 68px;
@@ -328,5 +2516,192 @@
   .skill-position-6 {
     top: calc(50% - 68px);
     left: calc(50% - 105px);
+  }
+
+  .skill-icon {
+    width: 30px;
+    height: 30px;
+
+    margin-bottom: 2px;
+  }
+
+  .skill-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .skill-name {
+    max-width: 60px;
+
+    font-size: 8px;
+  }
+
+  .coming-soon {
+    font-size: 6px;
+  }
+
+  .samurai-container {
+    width: 155px;
+    height: 260px;
+  }
+
+  .samurai-image {
+    width: 150px;
+    height: 255px;
+  }
+
+  .samurai-aura {
+    width: 190px;
+    height: 230px;
+  }
+
+  .character-shadow {
+    top: calc(50% + 125px);
+
+    width: 150px;
+  }
+
+  .room-sofa {
+    width: 370px;
+    height: 125px;
+
+    bottom: 5px;
+  }
+
+  .sofa-back {
+    left: 28px;
+    right: 28px;
+
+    height: 60px;
+  }
+
+  .sofa-seat {
+    left: 18px;
+    right: 18px;
+
+    top: 53px;
+
+    height: 50px;
+  }
+
+  .sofa-arm {
+    top: 46px;
+
+    width: 36px;
+    height: 64px;
+  }
+
+  .sofa-leg-left {
+    left: 48px;
+  }
+
+  .sofa-leg-right {
+    right: 48px;
+  }
+
+  .room-rug {
+    width: 430px;
+    height: 115px;
+
+    bottom: -22px !important;
+  }
+
+  .room-plant {
+    left: -20px;
+    bottom: 20px;
+
+    transform: scale(0.72);
+
+    transform-origin: bottom left;
+  }
+
+  .learning-flow {
+    padding-top: 10px;
+  }
+
+  .flow-cards {
+    grid-template-columns: 1fr;
+
+    gap: 10px;
+  }
+
+  .flow-card {
+    min-height: 95px;
+  }
+
+  .flow-arrow {
+    display: none;
+  }
+
+  .login-modal {
+    padding: 24px 18px;
+
+    border-radius: 22px;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 400px) {
+
+  .home-intro h1 {
+    font-size: 29px;
+  }
+
+  .skills-room {
+    height: 410px;
+  }
+
+  .skill-circle {
+    width: 62px;
+    height: 62px;
+
+    min-width: 62px;
+    min-height: 62px;
+  }
+
+  .skill-position-1 {
+    top: calc(50% - 125px);
+  }
+
+  .skill-position-2 {
+    top: calc(50% - 62px);
+    left: calc(50% + 92px);
+  }
+
+  .skill-position-3 {
+    top: calc(50% + 62px);
+    left: calc(50% + 92px);
+  }
+
+  .skill-position-4 {
+    top: calc(50% + 125px);
+  }
+
+  .skill-position-5 {
+    top: calc(50% + 62px);
+    left: calc(50% - 92px);
+  }
+
+  .skill-position-6 {
+    top: calc(50% - 62px);
+    left: calc(50% - 92px);
+  }
+
+  .samurai-container {
+    transform:
+      translate(-50%, -50%)
+      scale(0.9);
+  }
+
+  .room-sofa {
+    width: 330px;
+  }
+
+  .room-rug {
+    width: 390px;
   }
 }
