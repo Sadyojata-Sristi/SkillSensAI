@@ -23,6 +23,13 @@ import {
   BookOpen,
   Target,
   Trophy,
+  Camera,
+  Upload,
+  Settings,
+  ChevronRight,
+  Check,
+  PlayCircle,
+  Award,
 } from "lucide-react";
 
 import {
@@ -77,6 +84,16 @@ const skills = [
     color: "music",
     active: true,
     path: "/music",
+    description:
+      "Learn music from the fundamentals through structured lessons, practical exercises, recording and AI-powered feedback.",
+    features: [
+      "Learn From Scratch",
+      "Structured music lessons",
+      "Voice recording",
+      "Upload your practice",
+      "Pitch and accuracy feedback",
+      "Progress tracking",
+    ],
   },
   {
     name: "Martial Arts",
@@ -84,30 +101,92 @@ const skills = [
     color: "martial",
     active: true,
     path: "/martial-arts",
+    description:
+      "Build martial arts skills through guided lessons, practical training and progressive learning paths.",
+    features: [
+      "Boxing lessons",
+      "Karate lessons",
+      "Video-based learning",
+      "Record your practice",
+      "Upload practice videos",
+      "Progress tracking",
+    ],
   },
   {
     name: "Dance",
     icon: Dumbbell,
     color: "dance",
     active: false,
+    description:
+      "Dance learning will be available soon.",
+    features: [],
   },
   {
     name: "Art",
     icon: Palette,
     color: "art",
     active: false,
+    description:
+      "Creative art learning will be available soon.",
+    features: [],
   },
   {
     name: "Coding",
     icon: Code2,
     color: "coding",
     active: false,
+    description:
+      "Practical coding learning will be available soon.",
+    features: [],
   },
   {
     name: "More",
     icon: Sparkles,
     color: "more",
     active: false,
+    description:
+      "More skills are coming soon to SkillSensAI.",
+    features: [],
+  },
+];
+
+/* =========================================================
+   CHARACTER OPTIONS
+   =========================================================
+   Replace these image paths later when you upload your
+   actual character images.
+   ========================================================= */
+
+const characterOptions = [
+  {
+    id: "samurai",
+    name: "Samurai",
+    image: "/samurai.png",
+  },
+  {
+    id: "character-2",
+    name: "Musician",
+    image: "/characters/character-2.png",
+  },
+  {
+    id: "character-3",
+    name: "Fighter",
+    image: "/characters/character-3.png",
+  },
+  {
+    id: "character-4",
+    name: "Character 4",
+    image: "/characters/character-4.png",
+  },
+  {
+    id: "character-5",
+    name: "Character 5",
+    image: "/characters/character-5.png",
+  },
+  {
+    id: "character-6",
+    name: "Character 6",
+    image: "/characters/character-6.png",
   },
 ];
 
@@ -131,11 +210,8 @@ export default function Home() {
      ======================================================= */
 
   const [user, setUser] = useState(null);
-
   const [profileOpen, setProfileOpen] = useState(false);
-
   const [loginOpen, setLoginOpen] = useState(false);
-
   const [loginMethod, setLoginMethod] = useState("google");
 
   /* =======================================================
@@ -143,16 +219,11 @@ export default function Home() {
      ======================================================= */
 
   const [phoneNumber, setPhoneNumber] = useState("");
-
   const [otp, setOtp] = useState("");
-
   const [confirmationResult, setConfirmationResult] =
     useState(null);
-
   const [phoneStep, setPhoneStep] = useState("phone");
-
   const [loading, setLoading] = useState(false);
-
   const [loginError, setLoginError] = useState("");
 
   const recaptchaRef = useRef(null);
@@ -162,6 +233,51 @@ export default function Home() {
      ======================================================= */
 
   const [lessonsLearned, setLessonsLearned] = useState(0);
+
+  /* =======================================================
+     NEW PROFILE STATE
+     ======================================================= */
+
+  const [profilePanelOpen, setProfilePanelOpen] =
+    useState(false);
+
+  const [skillsPanelOpen, setSkillsPanelOpen] =
+    useState(false);
+
+  const [selectedSkill, setSelectedSkill] =
+    useState(null);
+
+  const [characterPanelOpen, setCharacterPanelOpen] =
+    useState(false);
+
+  const [customName, setCustomName] = useState(
+    localStorage.getItem("skillsensai_custom_name") || ""
+  );
+
+  const [editingName, setEditingName] = useState(false);
+
+  const [nameInput, setNameInput] = useState("");
+
+  const [profileImage, setProfileImage] = useState(
+    localStorage.getItem("skillsensai_profile_image") || ""
+  );
+
+  const [selectedCharacter, setSelectedCharacter] =
+    useState(
+      localStorage.getItem(
+        "skillsensai_character"
+      ) || "samurai"
+    );
+
+  const [temporaryCharacter, setTemporaryCharacter] =
+    useState(
+      localStorage.getItem(
+        "skillsensai_character"
+      ) || "samurai"
+    );
+
+  const profileImageInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
 
   /* =======================================================
      APPLY THEME
@@ -199,6 +315,7 @@ export default function Home() {
     const loadProgress = () => {
       try {
         const count = getLessonsLearned();
+
         setLessonsLearned(
           typeof count === "number" ? count : 0
         );
@@ -248,7 +365,10 @@ export default function Home() {
   useEffect(() => {
     const handleOutsideClick = (event) => {
       if (
-        !event.target.closest(".profile-area")
+        !event.target.closest(".profile-area") &&
+        !event.target.closest(
+          "[data-skillsensai-panel]"
+        )
       ) {
         setProfileOpen(false);
       }
@@ -451,10 +571,6 @@ export default function Home() {
 
       setLoading(true);
 
-      /* ---------------------------------------------
-         Clear old reCAPTCHA if one exists
-      --------------------------------------------- */
-
       if (recaptchaRef.current) {
         try {
           recaptchaRef.current.clear();
@@ -467,10 +583,6 @@ export default function Home() {
 
         recaptchaRef.current = null;
       }
-
-      /* ---------------------------------------------
-         Create Firebase reCAPTCHA
-      --------------------------------------------- */
 
       recaptchaRef.current =
         new RecaptchaVerifier(
@@ -492,10 +604,6 @@ export default function Home() {
         );
 
       await recaptchaRef.current.render();
-
-      /* ---------------------------------------------
-         Send OTP
-      --------------------------------------------- */
 
       const result =
         await signInWithPhoneNumber(
@@ -723,6 +831,7 @@ export default function Home() {
      ======================================================= */
 
   const displayName =
+    customName ||
     user?.displayName ||
     user?.phoneNumber ||
     "Learner";
@@ -735,6 +844,256 @@ export default function Home() {
     user?.email ||
     user?.phoneNumber ||
     "SkillSensAI learner";
+
+  /* =======================================================
+     CURRENT CHARACTER
+     ======================================================= */
+
+  const currentCharacter =
+    characterOptions.find(
+      (character) =>
+        character.id ===
+        selectedCharacter
+    ) ||
+    characterOptions[0];
+
+  /* =======================================================
+     PROFILE OPEN
+     ======================================================= */
+
+  const openProfilePanel = () => {
+    setProfileOpen(false);
+
+    setNameInput(displayName);
+
+    setEditingName(false);
+
+    setProfilePanelOpen(true);
+  };
+
+  /* =======================================================
+     SKILLS PANEL
+     ======================================================= */
+
+  const openSkillsPanel = () => {
+    setProfileOpen(false);
+
+    setSelectedSkill(null);
+
+    setSkillsPanelOpen(true);
+  };
+
+  /* =======================================================
+     SAVE NAME
+     ======================================================= */
+
+  const saveName = () => {
+    const trimmedName =
+      nameInput.trim();
+
+    if (!trimmedName) {
+      return;
+    }
+
+    setCustomName(trimmedName);
+
+    localStorage.setItem(
+      "skillsensai_custom_name",
+      trimmedName
+    );
+
+    setEditingName(false);
+  };
+
+  /* =======================================================
+     PROFILE IMAGE HANDLER
+     ======================================================= */
+
+  const handleProfileImageChange = (
+    event
+  ) => {
+    const file =
+      event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    if (
+      !file.type.startsWith("image/")
+    ) {
+      return;
+    }
+
+    if (
+      file.size >
+      5 * 1024 * 1024
+    ) {
+      alert(
+        "Please choose an image smaller than 5 MB."
+      );
+      return;
+    }
+
+    const reader =
+      new FileReader();
+
+    reader.onload = () => {
+      const imageData =
+        reader.result;
+
+      setProfileImage(imageData);
+
+      localStorage.setItem(
+        "skillsensai_profile_image",
+        imageData
+      );
+    };
+
+    reader.readAsDataURL(file);
+
+    event.target.value = "";
+  };
+
+  /* =======================================================
+     CHARACTER PANEL
+     ======================================================= */
+
+  const openCharacterPanel = () => {
+    setTemporaryCharacter(
+      selectedCharacter
+    );
+
+    setCharacterPanelOpen(true);
+  };
+
+  /* =======================================================
+     SAVE CHARACTER
+     ======================================================= */
+
+  const saveCharacter = () => {
+    setSelectedCharacter(
+      temporaryCharacter
+    );
+
+    localStorage.setItem(
+      "skillsensai_character",
+      temporaryCharacter
+    );
+
+    setCharacterPanelOpen(false);
+  };
+
+  /* =======================================================
+     CHARACTER IMAGE FALLBACK
+     ======================================================= */
+
+  const handleCharacterImageError = (
+    event
+  ) => {
+    event.currentTarget.src =
+      "/samurai.png";
+  };
+
+  /* =======================================================
+     PROFILE IMAGE
+     ======================================================= */
+
+  const profileImageSource =
+    profileImage ||
+    user?.photoURL ||
+    "";
+
+  /* =======================================================
+     INLINE PANEL STYLES
+     These do not affect the existing Home layout.
+     ======================================================= */
+
+  const panelOverlayStyle = {
+    position: "fixed",
+    inset: 0,
+    zIndex: 8000,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "20px",
+    background:
+      "rgba(12, 10, 25, 0.72)",
+    backdropFilter: "blur(12px)",
+  };
+
+  const panelStyle = {
+    position: "relative",
+    width: "min(520px, 100%)",
+    maxHeight: "90vh",
+    overflowY: "auto",
+    borderRadius: "28px",
+    padding: "28px",
+    background:
+      theme === "dark"
+        ? "rgba(29, 25, 47, 0.98)"
+        : "rgba(255, 255, 255, 0.98)",
+    color:
+      theme === "dark"
+        ? "#ffffff"
+        : "#171326",
+    boxShadow:
+      "0 30px 90px rgba(0,0,0,0.30)",
+    border:
+      theme === "dark"
+        ? "1px solid rgba(255,255,255,0.10)"
+        : "1px solid rgba(98,69,216,0.12)",
+  };
+
+  const panelCloseStyle = {
+    position: "absolute",
+    top: "18px",
+    right: "18px",
+    width: "38px",
+    height: "38px",
+    borderRadius: "50%",
+    border: "none",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+    background:
+      theme === "dark"
+        ? "rgba(255,255,255,0.08)"
+        : "#f1eeff",
+    color:
+      theme === "dark"
+        ? "#ffffff"
+        : "#6245d8",
+  };
+
+  const panelTitleStyle = {
+    margin: 0,
+    fontSize: "26px",
+    fontWeight: 800,
+    letterSpacing: "-0.5px",
+  };
+
+  const panelSubtitleStyle = {
+    margin: "7px 0 0",
+    fontSize: "14px",
+    lineHeight: 1.6,
+    opacity: 0.68,
+  };
+
+  const actionButtonStyle = {
+    width: "100%",
+    minHeight: "48px",
+    borderRadius: "14px",
+    border: "none",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "9px",
+    fontWeight: 700,
+    fontSize: "14px",
+  };
 
   /* =======================================================
      RENDER
@@ -761,10 +1120,9 @@ export default function Home() {
         <div className="ceiling">
           <div className="ceiling-line" />
 
-          {/* Fan elements intentionally remain in JSX
-              because your CSS hides them completely. */}
           <div className="ceiling-fan">
             <div className="fan-ceiling-mount" />
+
             <div className="fan-rod">
               <span />
             </div>
@@ -782,44 +1140,41 @@ export default function Home() {
               <div className="blade blade-four" />
             </div>
           </div>
-        </div>
 
-        {/* =================================================
-            HANGING LIGHT
-        ================================================= */}
+          {/* HANGING BULB MUST BE INSIDE CEILING */}
+          <div className="hanging-bulb">
+            <div className="bulb-wire" />
 
-        <div className="hanging-bulb">
-          <div className="bulb-wire" />
+            <button
+              type="button"
+              className={`bulb-button ${
+                theme === "light"
+                  ? "bulb-on"
+                  : "bulb-off"
+              }`}
+              onClick={toggleTheme}
+              aria-label={
+                theme === "light"
+                  ? "Turn lights off"
+                  : "Turn lights on"
+              }
+              title={
+                theme === "light"
+                  ? "Turn lights off"
+                  : "Turn lights on"
+              }
+            >
+              <span className="bulb-neck" />
 
-          <button
-            type="button"
-            className={`bulb-button ${
-              theme === "light"
-                ? "bulb-on"
-                : "bulb-off"
-            }`}
-            onClick={toggleTheme}
-            aria-label={
-              theme === "light"
-                ? "Turn lights off"
-                : "Turn lights on"
-            }
-            title={
-              theme === "light"
-                ? "Turn lights off"
-                : "Turn lights on"
-            }
-          >
-            <span className="bulb-neck" />
-
-            <span className="bulb-glass">
-              {theme === "light" ? (
-                <Lightbulb size={22} />
-              ) : (
-                <LightbulbOff size={22} />
-              )}
-            </span>
-          </button>
+              <span className="bulb-glass">
+                {theme === "light" ? (
+                  <Lightbulb size={22} />
+                ) : (
+                  <LightbulbOff size={22} />
+                )}
+              </span>
+            </button>
+          </div>
         </div>
 
         {/* =================================================
@@ -850,9 +1205,11 @@ export default function Home() {
                 aria-expanded={profileOpen}
               >
                 <span className="profile-avatar">
-                  {user.photoURL ? (
+                  {profileImageSource ? (
                     <img
-                      src={user.photoURL}
+                      src={
+                        profileImageSource
+                      }
                       alt={displayName}
                     />
                   ) : (
@@ -876,11 +1233,14 @@ export default function Home() {
 
               {profileOpen && (
                 <div className="profile-dropdown">
+
                   <div className="profile-dropdown-header">
                     <div className="profile-large-avatar">
-                      {user.photoURL ? (
+                      {profileImageSource ? (
                         <img
-                          src={user.photoURL}
+                          src={
+                            profileImageSource
+                          }
                           alt={displayName}
                         />
                       ) : (
@@ -915,16 +1275,100 @@ export default function Home() {
                     </div>
                   </div>
 
+                  {/* PROFILE */}
+
+                  <button
+                    type="button"
+                    onClick={
+                      openProfilePanel
+                    }
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      padding: "11px 12px",
+                      marginBottom: "5px",
+                      border: "none",
+                      borderRadius: "10px",
+                      background:
+                        "transparent",
+                      color: "inherit",
+                      cursor: "pointer",
+                      textAlign: "left",
+                    }}
+                  >
+                    <User size={17} />
+
+                    <span
+                      style={{
+                        flex: 1,
+                        fontWeight: 600,
+                      }}
+                    >
+                      Profile
+                    </span>
+
+                    <ChevronRight
+                      size={15}
+                    />
+                  </button>
+
+                  {/* MY SKILLS */}
+
+                  <button
+                    type="button"
+                    onClick={
+                      openSkillsPanel
+                    }
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      padding: "11px 12px",
+                      marginBottom: "7px",
+                      border: "none",
+                      borderRadius: "10px",
+                      background:
+                        "transparent",
+                      color: "inherit",
+                      cursor: "pointer",
+                      textAlign: "left",
+                    }}
+                  >
+                    <Award size={17} />
+
+                    <span
+                      style={{
+                        flex: 1,
+                        fontWeight: 600,
+                      }}
+                    >
+                      My Skills
+                    </span>
+
+                    <ChevronRight
+                      size={15}
+                    />
+                  </button>
+
+                  {/* LOGOUT */}
+
                   <button
                     type="button"
                     className="logout-button"
-                    onClick={handleLogout}
+                    onClick={
+                      handleLogout
+                    }
                   >
                     <LogOut size={15} />
+
                     <span>
                       Sign out
                     </span>
                   </button>
+
                 </div>
               )}
             </div>
@@ -933,10 +1377,6 @@ export default function Home() {
 
         {/* =================================================
             MAIN CONTENT
-
-            IMPORTANT:
-            Only the room itself is inside skills-room.
-            This matches your current CSS positions.
         ================================================= */}
 
         <div className="home-content">
@@ -969,9 +1409,7 @@ export default function Home() {
 
           <section className="skills-room">
 
-            {/* ===============================================
-                SOFA
-            =============================================== */}
+            {/* SOFA */}
 
             <div className="room-sofa">
               <div className="sofa-back">
@@ -991,20 +1429,15 @@ export default function Home() {
               <div className="sofa-leg sofa-leg-right" />
             </div>
 
-            {/* ===============================================
-                RUG
-            =============================================== */}
+            {/* RUG */}
 
             <div className="room-rug">
               <div className="rug-inner" />
             </div>
 
-            {/* ===============================================
-                PLANT
-            =============================================== */}
+            {/* PLANT */}
 
             <div className="room-plant">
-
               <div className="plant-stem stem-one" />
               <div className="plant-stem stem-two" />
               <div className="plant-stem stem-three" />
@@ -1020,41 +1453,34 @@ export default function Home() {
               <div className="plant-pot">
                 <span />
               </div>
-
             </div>
 
-            {/* ===============================================
-                CHARACTER SHADOW
-            =============================================== */}
+            {/* CHARACTER SHADOW */}
 
             <div className="character-shadow" />
 
-            {/* ===============================================
-                SAMURAI
-            =============================================== */}
+            {/* CHARACTER */}
 
             <div className="samurai-container">
-
               <div className="samurai-aura" />
 
               <img
-                src="/samurai.png"
-                alt="SkillSensAI learner"
+                src={
+                  currentCharacter.image
+                }
+                alt={
+                  currentCharacter.name
+                }
                 className="samurai-image"
+                onError={
+                  handleCharacterImageError
+                }
               />
-
             </div>
 
-            {/* ===============================================
-                SKILL ORBIT
-
-                This MUST stay inside .skills-room.
-                Your CSS positions all six buttons relative
-                to this room.
-            =============================================== */}
+            {/* SKILL ORBIT */}
 
             <div className="skills-orbit">
-
               {skills.map(
                 (skill, index) => {
                   const Icon =
@@ -1105,14 +1531,11 @@ export default function Home() {
                   );
                 }
               )}
-
             </div>
           </section>
 
           {/* =================================================
               LEARNING JOURNEY
-
-              Only ONE learning journey section.
           ================================================= */}
 
           <section className="learning-flow">
@@ -1134,10 +1557,7 @@ export default function Home() {
 
             <div className="flow-cards">
 
-              {/* LEARN */}
-
               <div className="flow-card flow-learn">
-
                 <div className="flow-card-icon">
                   <BookOpen size={24} />
                 </div>
@@ -1162,10 +1582,7 @@ export default function Home() {
                 />
               </div>
 
-              {/* PRACTICE */}
-
               <div className="flow-card flow-practice">
-
                 <div className="flow-card-icon">
                   <Target size={24} />
                 </div>
@@ -1190,10 +1607,7 @@ export default function Home() {
                 />
               </div>
 
-              {/* MASTER */}
-
               <div className="flow-card flow-master">
-
                 <div className="flow-card-icon">
                   <Trophy size={24} />
                 </div>
@@ -1211,7 +1625,6 @@ export default function Home() {
                     continuously improve.
                   </p>
                 </div>
-
               </div>
 
             </div>
@@ -1252,8 +1665,6 @@ export default function Home() {
               }
             >
 
-              {/* CLOSE */}
-
               <button
                 type="button"
                 className="login-close"
@@ -1262,8 +1673,6 @@ export default function Home() {
               >
                 <X size={18} />
               </button>
-
-              {/* HEADER */}
 
               <div className="login-modal-header">
 
@@ -1289,8 +1698,6 @@ export default function Home() {
                 </p>
 
               </div>
-
-              {/* TABS */}
 
               <div className="login-tabs">
 
@@ -1334,9 +1741,7 @@ export default function Home() {
 
               </div>
 
-              {/* =================================================
-                  GOOGLE
-              ================================================= */}
+              {/* GOOGLE */}
 
               {loginMethod ===
                 "google" && (
@@ -1371,9 +1776,7 @@ export default function Home() {
                 </div>
               )}
 
-              {/* =================================================
-                  PHONE
-              ================================================= */}
+              {/* PHONE */}
 
               {loginMethod ===
                 "phone" && (
@@ -1388,9 +1791,7 @@ export default function Home() {
 
                       <div className="login-phone-input">
 
-                        <Phone
-                          size={16}
-                        />
+                        <Phone size={16} />
 
                         <input
                           type="tel"
@@ -1434,7 +1835,6 @@ export default function Home() {
                           </>
                         )}
                       </button>
-
                     </>
                   ) : (
                     <>
@@ -1504,19 +1904,11 @@ export default function Home() {
                 </div>
               )}
 
-              {/* =================================================
-                  ERROR
-              ================================================= */}
-
               {loginError && (
                 <div className="login-error">
                   {loginError}
                 </div>
               )}
-
-              {/* =================================================
-                  SECURITY
-              ================================================= */}
 
               <div className="login-security-note">
                 <ShieldCheck size={13} />
@@ -1534,14 +1926,1520 @@ export default function Home() {
         )}
 
         {/* =================================================
-            INVISIBLE FIREBASE RECAPTCHA
-
-            Must exist in DOM for phone authentication.
+            FIREBASE RECAPTCHA
         ================================================= */}
 
         <div id="recaptcha-container" />
 
       </main>
+
+      {/* =====================================================
+          PROFILE PANEL
+          ===================================================== */}
+
+      {profilePanelOpen && (
+        <div
+          data-skillsensai-panel="profile"
+          style={panelOverlayStyle}
+          onMouseDown={(event) => {
+            if (
+              event.target ===
+              event.currentTarget
+            ) {
+              setProfilePanelOpen(false);
+            }
+          }}
+        >
+          <div
+            style={panelStyle}
+            onMouseDown={(event) =>
+              event.stopPropagation()
+            }
+          >
+
+            <button
+              type="button"
+              style={panelCloseStyle}
+              onClick={() =>
+                setProfilePanelOpen(false)
+              }
+              aria-label="Close profile"
+            >
+              <X size={18} />
+            </button>
+
+            <div
+              style={{
+                marginBottom: "25px",
+              }}
+            >
+              <h2 style={panelTitleStyle}>
+                Your Profile
+              </h2>
+
+              <p
+                style={
+                  panelSubtitleStyle
+                }
+              >
+                Manage your personal
+                information and your
+                SkillSensAI character.
+              </p>
+            </div>
+
+            {/* PROFILE PHOTO */}
+
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                marginBottom: "28px",
+              }}
+            >
+              <div
+                style={{
+                  position: "relative",
+                  width: "112px",
+                  height: "112px",
+                  borderRadius: "50%",
+                  padding: "4px",
+                  background:
+                    "linear-gradient(135deg, #7c5cfc, #6245d8)",
+                }}
+              >
+                <div
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    borderRadius: "50%",
+                    overflow: "hidden",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background:
+                      theme === "dark"
+                        ? "#302a49"
+                        : "#f1eeff",
+                  }}
+                >
+                  {profileImageSource ? (
+                    <img
+                      src={
+                        profileImageSource
+                      }
+                      alt={displayName}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                    />
+                  ) : (
+                    <User
+                      size={45}
+                      opacity={0.55}
+                    />
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    cameraInputRef.current?.click()
+                  }
+                  style={{
+                    position:
+                      "absolute",
+                    right: "-2px",
+                    bottom: "2px",
+                    width: "36px",
+                    height: "36px",
+                    borderRadius: "50%",
+                    border: "3px solid white",
+                    background:
+                      "#6245d8",
+                    color: "white",
+                    display: "flex",
+                    alignItems:
+                      "center",
+                    justifyContent:
+                      "center",
+                    cursor: "pointer",
+                  }}
+                  title="Take a profile photo"
+                >
+                  <Camera size={17} />
+                </button>
+              </div>
+
+              <input
+                ref={cameraInputRef}
+                type="file"
+                accept="image/*"
+                capture="user"
+                onChange={
+                  handleProfileImageChange
+                }
+                style={{
+                  display: "none",
+                }}
+              />
+
+              <input
+                ref={
+                  profileImageInputRef
+                }
+                type="file"
+                accept="image/*"
+                onChange={
+                  handleProfileImageChange
+                }
+                style={{
+                  display: "none",
+                }}
+              />
+
+              <div
+                style={{
+                  display: "flex",
+                  gap: "9px",
+                  marginTop: "15px",
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() =>
+                    cameraInputRef.current?.click()
+                  }
+                  style={{
+                    padding:
+                      "9px 13px",
+                    borderRadius:
+                      "10px",
+                    border:
+                      "1px solid rgba(124,92,252,0.22)",
+                    background:
+                      theme === "dark"
+                        ? "rgba(124,92,252,0.12)"
+                        : "#f7f4ff",
+                    color:
+                      theme === "dark"
+                        ? "#dcd4ff"
+                        : "#6245d8",
+                    cursor:
+                      "pointer",
+                    display: "flex",
+                    alignItems:
+                      "center",
+                    gap: "6px",
+                    fontWeight: 600,
+                    fontSize: "12px",
+                  }}
+                >
+                  <Camera size={14} />
+                  Camera
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    profileImageInputRef.current?.click()
+                  }
+                  style={{
+                    padding:
+                      "9px 13px",
+                    borderRadius:
+                      "10px",
+                    border:
+                      "1px solid rgba(124,92,252,0.22)",
+                    background:
+                      theme === "dark"
+                        ? "rgba(124,92,252,0.12)"
+                        : "#f7f4ff",
+                    color:
+                      theme === "dark"
+                        ? "#dcd4ff"
+                        : "#6245d8",
+                    cursor:
+                      "pointer",
+                    display: "flex",
+                    alignItems:
+                      "center",
+                    gap: "6px",
+                    fontWeight: 600,
+                    fontSize: "12px",
+                  }}
+                >
+                  <Upload size={14} />
+                  Upload
+                </button>
+              </div>
+            </div>
+
+            {/* NAME */}
+
+            <div
+              style={{
+                padding:
+                  "18px",
+                borderRadius:
+                  "17px",
+                marginBottom:
+                  "14px",
+                background:
+                  theme === "dark"
+                    ? "rgba(255,255,255,0.045)"
+                    : "#f8f6ff",
+                border:
+                  "1px solid rgba(124,92,252,0.10)",
+              }}
+            >
+              <div
+                style={{
+                  fontSize:
+                    "12px",
+                  fontWeight:
+                    700,
+                  opacity:
+                    0.55,
+                  marginBottom:
+                    "8px",
+                  textTransform:
+                    "uppercase",
+                  letterSpacing:
+                    "0.7px",
+                }}
+              >
+                Your Name
+              </div>
+
+              {!editingName ? (
+                <div
+                  style={{
+                    display:
+                      "flex",
+                    alignItems:
+                      "center",
+                    gap: "10px",
+                  }}
+                >
+                  <strong
+                    style={{
+                      flex: 1,
+                      fontSize:
+                        "17px",
+                    }}
+                  >
+                    {displayName}
+                  </strong>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setNameInput(
+                        displayName
+                      );
+                      setEditingName(
+                        true
+                      );
+                    }}
+                    style={{
+                      border:
+                        "none",
+                      background:
+                        "transparent",
+                      color:
+                        "#7c5cfc",
+                      cursor:
+                        "pointer",
+                      fontWeight:
+                        700,
+                      fontSize:
+                        "12px",
+                    }}
+                  >
+                    Change
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <input
+                    type="text"
+                    value={
+                      nameInput
+                    }
+                    onChange={(event) =>
+                      setNameInput(
+                        event
+                          .target
+                          .value
+                      )
+                    }
+                    autoFocus
+                    maxLength={40}
+                    style={{
+                      width:
+                        "100%",
+                      boxSizing:
+                        "border-box",
+                      padding:
+                        "12px 13px",
+                      borderRadius:
+                        "11px",
+                      border:
+                        "1px solid rgba(124,92,252,0.30)",
+                      outline:
+                        "none",
+                      background:
+                        theme ===
+                        "dark"
+                          ? "#211c35"
+                          : "white",
+                      color:
+                        "inherit",
+                      fontSize:
+                        "14px",
+                    }}
+                  />
+
+                  <div
+                    style={{
+                      display:
+                        "flex",
+                      gap: "8px",
+                      marginTop:
+                        "9px",
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={
+                        saveName
+                      }
+                      style={{
+                        padding:
+                          "8px 14px",
+                        border:
+                          "none",
+                        borderRadius:
+                          "9px",
+                        background:
+                          "#6245d8",
+                        color:
+                          "white",
+                        cursor:
+                          "pointer",
+                        fontWeight:
+                          700,
+                      }}
+                    >
+                      Save
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setEditingName(
+                          false
+                        )
+                      }
+                      style={{
+                        padding:
+                          "8px 14px",
+                        border:
+                          "none",
+                        borderRadius:
+                          "9px",
+                        background:
+                          theme ===
+                          "dark"
+                            ? "rgba(255,255,255,0.08)"
+                            : "#eae6f8",
+                        color:
+                          "inherit",
+                        cursor:
+                          "pointer",
+                        fontWeight:
+                          600,
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* ACCOUNT */}
+
+            <div
+              style={{
+                padding:
+                  "18px",
+                borderRadius:
+                  "17px",
+                marginBottom:
+                  "14px",
+                background:
+                  theme === "dark"
+                    ? "rgba(255,255,255,0.045)"
+                    : "#f8f6ff",
+                border:
+                  "1px solid rgba(124,92,252,0.10)",
+              }}
+            >
+              <div
+                style={{
+                  fontSize:
+                    "12px",
+                  fontWeight:
+                    700,
+                  opacity:
+                    0.55,
+                  marginBottom:
+                    "8px",
+                  textTransform:
+                    "uppercase",
+                  letterSpacing:
+                    "0.7px",
+                }}
+              >
+                Account
+              </div>
+
+              <div
+                style={{
+                  fontSize:
+                    "14px",
+                    lineHeight:
+                      1.6,
+                  opacity:
+                    0.75,
+                  wordBreak:
+                    "break-word",
+                }}
+              >
+                {displayContact}
+              </div>
+            </div>
+
+            {/* CHARACTER */}
+
+            <div
+              style={{
+                padding:
+                  "18px",
+                borderRadius:
+                  "17px",
+                background:
+                  theme === "dark"
+                    ? "rgba(255,255,255,0.045)"
+                    : "#f8f6ff",
+                border:
+                  "1px solid rgba(124,92,252,0.10)",
+              }}
+            >
+              <div
+                style={{
+                  display:
+                    "flex",
+                  alignItems:
+                    "center",
+                  marginBottom:
+                    "15px",
+                }}
+              >
+                <div
+                  style={{
+                    flex: 1,
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize:
+                        "12px",
+                      fontWeight:
+                        700,
+                      opacity:
+                        0.55,
+                      marginBottom:
+                        "5px",
+                      textTransform:
+                        "uppercase",
+                      letterSpacing:
+                        "0.7px",
+                    }}
+                  >
+                    Your Character
+                  </div>
+
+                  <strong>
+                    {
+                      currentCharacter.name
+                    }
+                  </strong>
+                </div>
+
+                <Settings
+                  size={19}
+                  opacity={0.5}
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={
+                  openCharacterPanel
+                }
+                style={{
+                  ...actionButtonStyle,
+                  background:
+                    "#6245d8",
+                  color: "white",
+                }}
+              >
+                <Sparkles
+                  size={17}
+                />
+                Change Character
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* =====================================================
+          MY SKILLS PANEL
+          ===================================================== */}
+
+      {skillsPanelOpen && (
+        <div
+          data-skillsensai-panel="skills"
+          style={panelOverlayStyle}
+          onMouseDown={(event) => {
+            if (
+              event.target ===
+              event.currentTarget
+            ) {
+              setSkillsPanelOpen(
+                false
+              );
+              setSelectedSkill(null);
+            }
+          }}
+        >
+          <div
+            style={panelStyle}
+            onMouseDown={(event) =>
+              event.stopPropagation()
+            }
+          >
+
+            <button
+              type="button"
+              style={panelCloseStyle}
+              onClick={() => {
+                setSkillsPanelOpen(
+                  false
+                );
+                setSelectedSkill(null);
+              }}
+              aria-label="Close skills"
+            >
+              <X size={18} />
+            </button>
+
+            {!selectedSkill ? (
+              <>
+                <div
+                  style={{
+                    marginBottom:
+                      "25px",
+                  }}
+                >
+                  <h2
+                    style={
+                      panelTitleStyle
+                    }
+                  >
+                    My Skills
+                  </h2>
+
+                  <p
+                    style={
+                      panelSubtitleStyle
+                    }
+                  >
+                    Skills you're
+                    currently learning
+                    with SkillSensAI.
+                  </p>
+                </div>
+
+                {/* MUSIC */}
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSelectedSkill(
+                      skills[0]
+                    )
+                  }
+                  style={{
+                    width:
+                      "100%",
+                    padding:
+                      "18px",
+                    borderRadius:
+                      "18px",
+                    border:
+                      "1px solid rgba(124,92,252,0.15)",
+                    background:
+                      theme ===
+                      "dark"
+                        ? "rgba(124,92,252,0.10)"
+                        : "#f8f6ff",
+                    color:
+                      "inherit",
+                    cursor:
+                      "pointer",
+                    display:
+                      "flex",
+                    alignItems:
+                      "center",
+                    gap: "15px",
+                    textAlign:
+                      "left",
+                    marginBottom:
+                      "12px",
+                  }}
+                >
+                  <div
+                    style={{
+                      width:
+                        "50px",
+                      height:
+                        "50px",
+                      flexShrink: 0,
+                      borderRadius:
+                        "15px",
+                      display:
+                        "flex",
+                      alignItems:
+                        "center",
+                      justifyContent:
+                        "center",
+                      background:
+                        "linear-gradient(135deg,#7c5cfc,#6245d8)",
+                      color:
+                        "white",
+                    }}
+                  >
+                    <Music
+                      size={24}
+                    />
+                  </div>
+
+                  <div
+                    style={{
+                      flex: 1,
+                    }}
+                  >
+                    <strong
+                      style={{
+                        display:
+                          "block",
+                        fontSize:
+                          "16px",
+                        marginBottom:
+                          "4px",
+                      }}
+                    >
+                      Music
+                    </strong>
+
+                    <span
+                      style={{
+                        fontSize:
+                          "12px",
+                        opacity:
+                          0.65,
+                      }}
+                    >
+                      {lessonsLearned}{" "}
+                      lesson
+                      {lessonsLearned ===
+                      1
+                        ? ""
+                        : "s"}{" "}
+                      learned
+                    </span>
+                  </div>
+
+                  <ChevronRight
+                    size={19}
+                    opacity={0.55}
+                  />
+                </button>
+
+                {/* MARTIAL ARTS */}
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSelectedSkill(
+                      skills[1]
+                    )
+                  }
+                  style={{
+                    width:
+                      "100%",
+                    padding:
+                      "18px",
+                    borderRadius:
+                      "18px",
+                    border:
+                      "1px solid rgba(124,92,252,0.15)",
+                    background:
+                      theme ===
+                      "dark"
+                        ? "rgba(124,92,252,0.10)"
+                        : "#f8f6ff",
+                    color:
+                      "inherit",
+                    cursor:
+                      "pointer",
+                    display:
+                      "flex",
+                    alignItems:
+                      "center",
+                    gap: "15px",
+                    textAlign:
+                      "left",
+                    marginBottom:
+                      "12px",
+                  }}
+                >
+                  <div
+                    style={{
+                      width:
+                        "50px",
+                      height:
+                        "50px",
+                      flexShrink: 0,
+                      borderRadius:
+                        "15px",
+                      display:
+                        "flex",
+                      alignItems:
+                        "center",
+                      justifyContent:
+                        "center",
+                      background:
+                        "linear-gradient(135deg,#e85b5b,#b83232)",
+                      color:
+                        "white",
+                    }}
+                  >
+                    <Swords
+                      size={24}
+                    />
+                  </div>
+
+                  <div
+                    style={{
+                      flex: 1,
+                    }}
+                  >
+                    <strong
+                      style={{
+                        display:
+                          "block",
+                        fontSize:
+                          "16px",
+                        marginBottom:
+                          "4px",
+                      }}
+                    >
+                      Martial Arts
+                    </strong>
+
+                    <span
+                      style={{
+                        fontSize:
+                          "12px",
+                        opacity:
+                          0.65,
+                      }}
+                    >
+                      Boxing +
+                      Karate
+                    </span>
+                  </div>
+
+                  <ChevronRight
+                    size={19}
+                    opacity={0.55}
+                  />
+                </button>
+
+                {/* COMING SOON */}
+
+                <div
+                  style={{
+                    marginTop:
+                      "20px",
+                    padding:
+                      "14px",
+                    borderRadius:
+                      "14px",
+                    background:
+                      theme ===
+                      "dark"
+                        ? "rgba(255,255,255,0.04)"
+                        : "#faf9fd",
+                    fontSize:
+                      "12px",
+                    opacity:
+                      0.6,
+                    display:
+                      "flex",
+                    alignItems:
+                      "center",
+                    gap: "8px",
+                  }}
+                >
+                  <Sparkles
+                    size={15}
+                  />
+                  More skills will
+                  become available
+                  soon.
+                </div>
+              </>
+            ) : (
+              <>
+                {/* BACK */}
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSelectedSkill(
+                      null
+                    )
+                  }
+                  style={{
+                    border:
+                      "none",
+                    background:
+                      "transparent",
+                    color:
+                      "#7c5cfc",
+                    cursor:
+                      "pointer",
+                    fontWeight:
+                      700,
+                    padding:
+                      "0",
+                    marginBottom:
+                      "18px",
+                    display:
+                      "flex",
+                    alignItems:
+                      "center",
+                    gap: "6px",
+                  }}
+                >
+                  ← Back to My Skills
+                </button>
+
+                {/* SKILL HEADER */}
+
+                <div
+                  style={{
+                    display:
+                      "flex",
+                    alignItems:
+                      "center",
+                    gap: "14px",
+                    marginBottom:
+                      "22px",
+                  }}
+                >
+                  <div
+                    style={{
+                      width:
+                        "58px",
+                      height:
+                        "58px",
+                      borderRadius:
+                        "17px",
+                      display:
+                        "flex",
+                      alignItems:
+                        "center",
+                      justifyContent:
+                        "center",
+                      background:
+                        selectedSkill.color ===
+                        "music"
+                          ? "linear-gradient(135deg,#7c5cfc,#6245d8)"
+                          : "linear-gradient(135deg,#e85b5b,#b83232)",
+                      color:
+                        "white",
+                    }}
+                  >
+                    {selectedSkill.name ===
+                    "Music" ? (
+                      <Music
+                        size={27}
+                      />
+                    ) : (
+                      <Swords
+                        size={27}
+                      />
+                    )}
+                  </div>
+
+                  <div>
+                    <h2
+                      style={{
+                        ...panelTitleStyle,
+                        fontSize:
+                          "23px",
+                      }}
+                    >
+                      {
+                        selectedSkill.name
+                      }
+                    </h2>
+
+                    <span
+                      style={{
+                        fontSize:
+                          "12px",
+                        opacity:
+                          0.6,
+                      }}
+                    >
+                      Currently
+                      learning
+                    </span>
+                  </div>
+                </div>
+
+                {/* DESCRIPTION */}
+
+                <p
+                  style={{
+                    fontSize:
+                      "14px",
+                    lineHeight:
+                      1.7,
+                    opacity:
+                      0.72,
+                    marginBottom:
+                      "22px",
+                  }}
+                >
+                  {
+                    selectedSkill.description
+                  }
+                </p>
+
+                {/* PROGRESS */}
+
+                <div
+                  style={{
+                    padding:
+                      "18px",
+                    borderRadius:
+                      "17px",
+                    background:
+                      theme ===
+                      "dark"
+                        ? "rgba(255,255,255,0.045)"
+                        : "#f8f6ff",
+                    marginBottom:
+                      "18px",
+                  }}
+                >
+                  <div
+                    style={{
+                      display:
+                        "flex",
+                      justifyContent:
+                        "space-between",
+                      alignItems:
+                        "center",
+                      marginBottom:
+                        "10px",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize:
+                          "13px",
+                        fontWeight:
+                          600,
+                      }}
+                    >
+                      Progress
+                    </span>
+
+                    <strong
+                      style={{
+                        color:
+                          "#7c5cfc",
+                      }}
+                    >
+                      {selectedSkill.name ===
+                      "Music"
+                        ? `${Math.min(
+                            lessonsLearned *
+                              10,
+                            100
+                          )}%`
+                        : "Learning"}
+                    </strong>
+                  </div>
+
+                  <div
+                    style={{
+                      width:
+                        "100%",
+                      height:
+                        "8px",
+                      borderRadius:
+                        "10px",
+                      overflow:
+                        "hidden",
+                      background:
+                        theme ===
+                        "dark"
+                          ? "rgba(255,255,255,0.10)"
+                          : "#e5e0f5",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width:
+                          selectedSkill.name ===
+                          "Music"
+                            ? `${Math.min(
+                                lessonsLearned *
+                                  10,
+                                100
+                              )}%`
+                            : "20%",
+                        height:
+                          "100%",
+                        borderRadius:
+                          "10px",
+                        background:
+                          "linear-gradient(90deg,#7c5cfc,#6245d8)",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* FEATURES */}
+
+                <div
+                  style={{
+                    fontSize:
+                      "12px",
+                    fontWeight:
+                      700,
+                    opacity:
+                      0.55,
+                    textTransform:
+                      "uppercase",
+                    letterSpacing:
+                      "0.7px",
+                    marginBottom:
+                      "10px",
+                  }}
+                >
+                  What's Included
+                </div>
+
+                <div
+                  style={{
+                    display:
+                      "flex",
+                    flexDirection:
+                      "column",
+                    gap: "9px",
+                  }}
+                >
+                  {selectedSkill.features.map(
+                    (feature) => (
+                      <div
+                        key={feature}
+                        style={{
+                          display:
+                            "flex",
+                          alignItems:
+                            "center",
+                          gap: "9px",
+                          padding:
+                            "10px 12px",
+                          borderRadius:
+                            "10px",
+                          background:
+                            theme ===
+                            "dark"
+                              ? "rgba(255,255,255,0.04)"
+                              : "#faf9fd",
+                          fontSize:
+                            "13px",
+                        }}
+                      >
+                        <Check
+                          size={15}
+                          color="#7c5cfc"
+                        />
+
+                        <span>
+                          {feature}
+                        </span>
+                      </div>
+                    )
+                  )}
+                </div>
+
+                {/* OPEN SKILL */}
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    navigate(
+                      selectedSkill.path
+                    )
+                  }
+                  style={{
+                    ...actionButtonStyle,
+                    marginTop:
+                      "22px",
+                    background:
+                      selectedSkill.name ===
+                      "Music"
+                        ? "#6245d8"
+                        : "#b83232",
+                    color:
+                      "white",
+                  }}
+                >
+                  <PlayCircle
+                    size={18}
+                  />
+                  Continue Learning
+                  <ArrowRight
+                    size={17}
+                  />
+                </button>
+              </>
+            )}
+
+          </div>
+        </div>
+      )}
+
+      {/* =====================================================
+          CHARACTER SELECTION PANEL
+          ===================================================== */}
+
+      {characterPanelOpen && (
+        <div
+          data-skillsensai-panel="character"
+          style={panelOverlayStyle}
+          onMouseDown={(event) => {
+            if (
+              event.target ===
+              event.currentTarget
+            ) {
+              setCharacterPanelOpen(
+                false
+              );
+            }
+          }}
+        >
+          <div
+            style={{
+              ...panelStyle,
+              width:
+                "min(700px, 100%)",
+            }}
+            onMouseDown={(event) =>
+              event.stopPropagation()
+            }
+          >
+
+            <button
+              type="button"
+              style={panelCloseStyle}
+              onClick={() =>
+                setCharacterPanelOpen(
+                  false
+                )
+              }
+              aria-label="Close character selection"
+            >
+              <X size={18} />
+            </button>
+
+            <div
+              style={{
+                marginBottom:
+                  "25px",
+              }}
+            >
+              <h2
+                style={
+                  panelTitleStyle
+                }
+              >
+                Choose Your Character
+              </h2>
+
+              <p
+                style={
+                  panelSubtitleStyle
+                }
+              >
+                Choose a character that
+                represents your learning
+                journey. Your selected
+                character will appear on
+                the SkillSensAI home page.
+              </p>
+            </div>
+
+            {/* CHARACTER GRID */}
+
+            <div
+              style={{
+                display:
+                  "grid",
+                gridTemplateColumns:
+                  "repeat(3, minmax(0, 1fr))",
+                gap: "14px",
+              }}
+            >
+              {characterOptions.map(
+                (character) => {
+                  const isSelected =
+                    temporaryCharacter ===
+                    character.id;
+
+                  return (
+                    <button
+                      key={
+                        character.id
+                      }
+                      type="button"
+                      onClick={() =>
+                        setTemporaryCharacter(
+                          character.id
+                        )
+                      }
+                      style={{
+                        position:
+                          "relative",
+                        minHeight:
+                          "190px",
+                        borderRadius:
+                          "20px",
+                        overflow:
+                          "hidden",
+                        border: isSelected
+                          ? "2px solid #7c5cfc"
+                          : "1px solid rgba(124,92,252,0.12)",
+                        background:
+                          theme ===
+                          "dark"
+                            ? "rgba(255,255,255,0.045)"
+                            : "#f8f6ff",
+                        color:
+                          "inherit",
+                        cursor:
+                          "pointer",
+                        padding:
+                          "10px",
+                        display:
+                          "flex",
+                        flexDirection:
+                          "column",
+                        alignItems:
+                          "center",
+                        justifyContent:
+                          "flex-end",
+                      }}
+                    >
+                      {/* SELECTED CHECK */}
+
+                      {isSelected && (
+                        <span
+                          style={{
+                            position:
+                              "absolute",
+                            top:
+                              "9px",
+                            right:
+                              "9px",
+                            zIndex:
+                              3,
+                            width:
+                              "27px",
+                            height:
+                              "27px",
+                            borderRadius:
+                              "50%",
+                            display:
+                              "flex",
+                            alignItems:
+                              "center",
+                            justifyContent:
+                              "center",
+                            background:
+                              "#6245d8",
+                            color:
+                              "white",
+                          }}
+                        >
+                          <Check
+                            size={15}
+                          />
+                        </span>
+                      )}
+
+                      {/* CHARACTER IMAGE */}
+
+                      <div
+                        style={{
+                          width:
+                            "100%",
+                          height:
+                            "135px",
+                          display:
+                            "flex",
+                          alignItems:
+                            "center",
+                          justifyContent:
+                            "center",
+                        }}
+                      >
+                        <img
+                          src={
+                            character.image
+                          }
+                          alt={
+                            character.name
+                          }
+                          onError={
+                            handleCharacterImageError
+                          }
+                          style={{
+                            maxWidth:
+                              "100%",
+                            maxHeight:
+                              "135px",
+                            objectFit:
+                              "contain",
+                            filter:
+                              "drop-shadow(0 10px 14px rgba(0,0,0,0.18))",
+                          }}
+                        />
+                      </div>
+
+                      <strong
+                        style={{
+                          fontSize:
+                            "13px",
+                          marginTop:
+                            "6px",
+                        }}
+                      >
+                        {
+                          character.name
+                        }
+                      </strong>
+                    </button>
+                  );
+                }
+              )}
+            </div>
+
+            {/* NOTE */}
+
+            <div
+              style={{
+                marginTop:
+                  "17px",
+                padding:
+                  "12px 14px",
+                borderRadius:
+                  "12px",
+                background:
+                  theme ===
+                  "dark"
+                    ? "rgba(124,92,252,0.10)"
+                    : "#f1eeff",
+                color:
+                  theme ===
+                  "dark"
+                    ? "#ddd5ff"
+                    : "#6245d8",
+                fontSize:
+                  "12px",
+                lineHeight:
+                  1.5,
+              }}
+            >
+              <Sparkles
+                size={14}
+                style={{
+                  verticalAlign:
+                    "middle",
+                  marginRight:
+                    "6px",
+                }}
+              />
+
+              Character images can be
+              replaced later with your
+              final SkillSensAI artwork.
+            </div>
+
+            {/* SAVE */}
+
+            <button
+              type="button"
+              onClick={
+                saveCharacter
+              }
+              style={{
+                ...actionButtonStyle,
+                marginTop:
+                  "18px",
+                background:
+                  "#6245d8",
+                color:
+                  "white",
+              }}
+            >
+              <Check size={18} />
+              Save Character
+            </button>
+
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
