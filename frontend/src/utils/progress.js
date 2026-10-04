@@ -1,202 +1,182 @@
-// =========================================
-// SKILLSENSAI — LESSON PROGRESS SYSTEM
-// =========================================
+/* =========================================================
+   SKILLSENSAI — PROGRESS UTILITY
+   ========================================================= */
 
-const STORAGE_KEY = "skillsensai_completed_lessons";
+const STORAGE_KEY = "skillsensai_progress";
 
-/**
- * Get all completed lesson IDs
- */
-export function getCompletedLessons() {
+/* ---------------------------------------------------------
+   INTERNAL HELPERS
+--------------------------------------------------------- */
+
+const readProgress = () => {
   try {
-    const savedProgress = localStorage.getItem(STORAGE_KEY);
+    const saved = localStorage.getItem(STORAGE_KEY);
 
-    if (!savedProgress) {
-      return [];
+    if (!saved) {
+      return {
+        completedLessons: [],
+        lessonsLearned: [],
+      };
     }
 
-    const parsedProgress = JSON.parse(savedProgress);
+    const parsed = JSON.parse(saved);
 
-    if (!Array.isArray(parsedProgress)) {
-      return [];
-    }
+    return {
+      completedLessons: Array.isArray(parsed.completedLessons)
+        ? parsed.completedLessons
+        : [],
 
-    return parsedProgress;
+      lessonsLearned: Array.isArray(parsed.lessonsLearned)
+        ? parsed.lessonsLearned
+        : [],
+    };
   } catch (error) {
     console.error(
-      "SkillSensAI: Unable to load lesson progress.",
+      "SkillSensAI progress could not be loaded:",
       error
     );
 
-    return [];
+    return {
+      completedLessons: [],
+      lessonsLearned: [],
+    };
   }
-}
+};
 
-/**
- * Get the number of lessons learned
- *
- * Used by Home.jsx
- */
-export function getLessonsLearned() {
-  return getCompletedLessons().length;
-}
+const saveProgress = (progress) => {
+  try {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(progress)
+    );
 
-/**
- * Get the total number of completed lessons
- */
-export function getCompletedLessonCount() {
-  return getCompletedLessons().length;
-}
-
-/**
- * Check whether a specific lesson is completed
- */
-export function isLessonCompleted(lessonId) {
-  if (!lessonId) {
-    return false;
+    window.dispatchEvent(
+      new CustomEvent("skillsensai-progress-updated")
+    );
+  } catch (error) {
+    console.error(
+      "SkillSensAI progress could not be saved:",
+      error
+    );
   }
+};
 
+/* ---------------------------------------------------------
+   COMPLETED LESSONS
+--------------------------------------------------------- */
+
+export const getCompletedLessons = () => {
+  return readProgress().completedLessons;
+};
+
+export const isLessonCompleted = (lessonId) => {
   return getCompletedLessons().includes(lessonId);
-}
+};
 
-/**
- * Mark a lesson as completed
- */
-export function completeLesson(lessonId) {
-  if (!lessonId) {
+export const completeLesson = (lessonId) => {
+  const progress = readProgress();
+
+  if (progress.completedLessons.includes(lessonId)) {
     return false;
   }
 
-  const completedLessons = getCompletedLessons();
-
-  // Prevent duplicate lessons
-  if (completedLessons.includes(lessonId)) {
-    return false;
-  }
-
-  const updatedLessons = [
-    ...completedLessons,
+  progress.completedLessons = [
+    ...progress.completedLessons,
     lessonId,
   ];
 
-  try {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(updatedLessons)
-    );
-
-    // Notify Home.jsx and other pages
-    window.dispatchEvent(
-      new Event("skillsensai-progress-updated")
-    );
-
-    return true;
-  } catch (error) {
-    console.error(
-      "SkillSensAI: Unable to save lesson progress.",
-      error
-    );
-
-    return false;
-  }
-}
-
-/**
- * Remove a specific completed lesson
- */
-export function uncompleteLesson(lessonId) {
-  if (!lessonId) {
-    return false;
+  /* Keep both progress systems synchronized */
+  if (!progress.lessonsLearned.includes(lessonId)) {
+    progress.lessonsLearned = [
+      ...progress.lessonsLearned,
+      lessonId,
+    ];
   }
 
-  const completedLessons = getCompletedLessons();
+  saveProgress(progress);
 
-  const updatedLessons = completedLessons.filter(
-    (id) => id !== lessonId
-  );
+  return true;
+};
 
-  try {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(updatedLessons)
-    );
+/* ---------------------------------------------------------
+   LESSONS LEARNED
+--------------------------------------------------------- */
 
-    window.dispatchEvent(
-      new Event("skillsensai-progress-updated")
-    );
+/*
+   This function fixes the recent Home.jsx build error:
 
-    return true;
-  } catch (error) {
-    console.error(
-      "SkillSensAI: Unable to update lesson progress.",
-      error
-    );
+   getLessonsLearned is not exported by progress.js
+*/
 
-    return false;
-  }
-}
+export const getLessonsLearned = () => {
+  return readProgress().lessonsLearned;
+};
 
-/**
- * Calculate progress percentage
- *
- * Example:
- * getProgressPercentage(15)
- *
- * 3 completed out of 15 = 20%
- */
-export function getProgressPercentage(totalLessons) {
-  if (!totalLessons || totalLessons <= 0) {
-    return 0;
-  }
+export const isLessonLearned = (lessonId) => {
+  return getLessonsLearned().includes(lessonId);
+};
 
-  const completedCount = getCompletedLessons().length;
+export const markLessonLearned = (lessonId) => {
+  const progress = readProgress();
 
-  return Math.min(
-    100,
-    Math.round(
-      (completedCount / totalLessons) * 100
-    )
-  );
-}
-
-/**
- * Check whether all supplied lessons are completed
- */
-export function areAllLessonsCompleted(
-  lessonIds = []
-) {
-  if (
-    !Array.isArray(lessonIds) ||
-    lessonIds.length === 0
-  ) {
+  if (progress.lessonsLearned.includes(lessonId)) {
     return false;
   }
 
-  const completedLessons = getCompletedLessons();
+  progress.lessonsLearned = [
+    ...progress.lessonsLearned,
+    lessonId,
+  ];
 
-  return lessonIds.every((lessonId) =>
-    completedLessons.includes(lessonId)
-  );
-}
+  saveProgress(progress);
 
-/**
- * Reset ALL lesson progress
- */
-export function resetProgress() {
+  return true;
+};
+
+/* ---------------------------------------------------------
+   RESET
+--------------------------------------------------------- */
+
+export const resetProgress = () => {
   try {
     localStorage.removeItem(STORAGE_KEY);
 
-    window.dispatchEvent(
-      new Event("skillsensai-progress-updated")
+    /* Also clear old SkillSensAI progress keys */
+    localStorage.removeItem(
+      "skillsensai_music_lessons"
     );
 
-    return true;
+    localStorage.removeItem(
+      "skillsensensai_music_lessons"
+    );
+
+    localStorage.removeItem(
+      "skillsensai_music_xp"
+    );
+
+    localStorage.removeItem(
+      "skillsensai_music_notes"
+    );
+
+    window.dispatchEvent(
+      new CustomEvent("skillsensai-progress-updated")
+    );
   } catch (error) {
     console.error(
-      "SkillSensAI: Unable to reset lesson progress.",
+      "Unable to reset SkillSensAI progress:",
       error
     );
-
-    return false;
   }
-}
+};
+
+/* ---------------------------------------------------------
+   OPTIONAL ALIASES
+--------------------------------------------------------- */
+
+export const getProgress = () => {
+  return readProgress();
+};
+
+export const getLessonProgress = () => {
+  return getCompletedLessons();
+};
