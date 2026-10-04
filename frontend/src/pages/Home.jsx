@@ -94,17 +94,13 @@ const applyGlobalTheme = (theme) => {
     "skillsensai-dark-theme"
   );
 
-  root.classList.add(
+  const themeClass =
     theme === "dark"
       ? "skillsensai-dark-theme"
-      : "skillsensai-light-theme"
-  );
+      : "skillsensai-light-theme";
 
-  body.classList.add(
-    theme === "dark"
-      ? "skillsensai-dark-theme"
-      : "skillsensai-light-theme"
-  );
+  root.classList.add(themeClass);
+  body.classList.add(themeClass);
 };
 
 export default function Home() {
@@ -118,9 +114,7 @@ export default function Home() {
 
   const [phoneNumber, setPhoneNumber] = useState("+91 ");
   const [otp, setOtp] = useState("");
-
-  const [confirmationResult, setConfirmationResult] =
-    useState(null);
+  const [confirmationResult, setConfirmationResult] = useState(null);
 
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
@@ -178,6 +172,7 @@ export default function Home() {
     setLoginError("");
     setOtp("");
     setConfirmationResult(null);
+    setLoginMethod("google");
     setShowLogin(true);
   };
 
@@ -351,18 +346,12 @@ export default function Home() {
     <div className="home-page">
       <div className="room-background">
 
-        {/* =====================================================
-            ROOM BACKGROUND
-        ===================================================== */}
-
+        {/* ROOM */}
         <div className="room-wall" />
         <div className="room-floor" />
         <div className="room-corner-glow" />
 
-        {/* =====================================================
-            CEILING
-        ===================================================== */}
-
+        {/* CEILING */}
         <div className="ceiling">
           <div className="ceiling-line" />
 
@@ -388,10 +377,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* =====================================================
-            HANGING LIGHT BULB
-        ===================================================== */}
-
+        {/* HANGING BULB */}
         <div className="hanging-bulb">
           <div className="bulb-wire" />
 
@@ -416,10 +402,7 @@ export default function Home() {
           </button>
         </div>
 
-        {/* =====================================================
-            LOGIN
-        ===================================================== */}
-
+        {/* LOGIN */}
         <div className="room-login">
           {!user ? (
             <button
@@ -517,36 +500,13 @@ export default function Home() {
           )}
         </div>
 
-        {/* =====================================================
-            MAIN HOME CONTENT
-        ===================================================== */}
-
+        {/* MAIN */}
         <main className="home-content">
 
-          {/* Small title remains above the main room */}
-          <section className="home-intro">
-            <span className="home-eyebrow">
-              AI-POWERED SKILL LEARNING
-            </span>
-
-            <h1>
-              Learn. Practice.{" "}
-              <span>Master.</span>
-            </h1>
-
-            <p>
-              Learn real-world skills with guided lessons,
-              practical training and intelligent feedback.
-            </p>
-          </section>
-
-          {/* ===================================================
-              MAIN CHARACTER + SKILLS
-          =================================================== */}
-
+          {/* MAIN ROOM */}
           <section className="skills-room">
 
-            {/* BACK SOFA */}
+            {/* SOFA */}
             <div className="room-sofa">
               <div className="sofa-back">
                 <span className="sofa-cushion sofa-cushion-one" />
@@ -565,7 +525,7 @@ export default function Home() {
               <div className="sofa-leg sofa-leg-right" />
             </div>
 
-            {/* FLOOR MAT / RUG */}
+            {/* RUG */}
             <div className="room-rug">
               <div className="rug-inner" />
             </div>
@@ -589,10 +549,9 @@ export default function Home() {
               <span className="plant-leaf leaf-six" />
             </div>
 
-            {/* CHARACTER SHADOW */}
+            {/* CHARACTER */}
             <div className="character-shadow" />
 
-            {/* SAMURAI */}
             <div className="samurai-container">
               <div className="samurai-aura" />
 
@@ -603,10 +562,7 @@ export default function Home() {
               />
             </div>
 
-            {/* =================================================
-                SKILLS ORBIT
-            ================================================= */}
-
+            {/* SKILLS */}
             <div className="skills-orbit">
               {skills.map((skill, index) => {
                 const Icon = skill.icon;
@@ -645,13 +601,25 @@ export default function Home() {
             </div>
           </section>
 
-          {/* ===================================================
-              TEXT / LEARNING FLOW
-              ALWAYS BELOW SAMURAI + RUG + PLANT
-          =================================================== */}
+          {/* TITLE BELOW CHARACTER */}
+          <section className="home-intro">
+            <span className="home-eyebrow">
+              AI-POWERED SKILL LEARNING
+            </span>
 
+            <h1>
+              Learn. Practice.{" "}
+              <span>Master.</span>
+            </h1>
+
+            <p>
+              Learn real-world skills with guided lessons,
+              practical training and intelligent feedback.
+            </p>
+          </section>
+
+          {/* LEARNING FLOW */}
           <section className="learning-flow">
-
             <div className="flow-heading">
               <span>YOUR LEARNING JOURNEY</span>
 
@@ -682,7 +650,10 @@ export default function Home() {
                   </p>
                 </div>
 
-                <ArrowRight className="flow-arrow" size={20} />
+                <ArrowRight
+                  className="flow-arrow"
+                  size={20}
+                />
               </div>
 
               <div className="flow-card flow-practice">
@@ -700,7 +671,10 @@ export default function Home() {
                   </p>
                 </div>
 
-                <ArrowRight className="flow-arrow" size={20} />
+                <ArrowRight
+                  className="flow-arrow"
+                  size={20}
+                />
               </div>
 
               <div className="flow-card flow-master">
@@ -723,6 +697,7 @@ export default function Home() {
 
             <div className="home-bottom-note">
               <Sparkles size={16} />
+
               <span>
                 Your progress grows with every practice.
               </span>
@@ -730,10 +705,7 @@ export default function Home() {
           </section>
         </main>
 
-        {/* =====================================================
-            LOGIN MODAL
-        ===================================================== */}
-
+        {/* LOGIN MODAL */}
         {showLogin && (
           <div
             className="login-overlay"
@@ -833,6 +805,7 @@ export default function Home() {
 
                   <div className="login-security-note">
                     <ShieldCheck size={15} />
+
                     <span>
                       Secure authentication powered by
                       Firebase.
@@ -937,6 +910,7 @@ export default function Home() {
 
                   <div className="login-security-note">
                     <ShieldCheck size={15} />
+
                     <span>
                       Your phone number is securely
                       verified by Firebase.
