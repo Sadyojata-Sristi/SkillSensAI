@@ -1,214 +1,274 @@
 /* =========================================================
    SKILLSENSAI HOME
-   SIMPLE LEARNING ROOM
-========================================================= */
+   LIVING ROOM / LEARNING ROOM
+   ========================================================= */
 
 
 /* =========================================================
-   GLOBAL RESET
-========================================================= */
+   GLOBAL
+   ========================================================= */
 
-* {
-  box-sizing: border-box;
-}
-
-html,
-body,
-#root {
-  margin: 0;
-  min-height: 100%;
+.home-page {
+  position: relative;
   width: 100%;
-}
+  min-height: 100vh;
+  overflow-x: hidden;
 
-body {
   font-family:
     Inter,
+    ui-sans-serif,
     system-ui,
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
-
-  overflow-x: hidden;
-}
-
-button,
-input {
-  font: inherit;
 }
 
 
 /* =========================================================
-   GLOBAL DARK / LIGHT
-========================================================= */
+   THEME VARIABLES
+   ========================================================= */
 
-html.skillsensai-dark-theme,
-body.skillsensai-dark-theme {
-  background: #08080c;
-  color: #ffffff;
+.skillsensai-light-theme {
+  --room-wall-top: #f7f3ff;
+  --room-wall-bottom: #e9e1f8;
+
+  --room-floor-top: #cbb99d;
+  --room-floor-bottom: #9f876c;
+
+  --room-text: #171522;
+  --room-muted: #696376;
+
+  --room-glass: rgba(255, 255, 255, 0.64);
+  --room-glass-border: rgba(255, 255, 255, 0.75);
+
+  --room-shadow: rgba(38, 28, 60, 0.18);
+
+  --sofa-main: #b9a48f;
+  --sofa-dark: #8e7864;
+  --sofa-light: #d7c7b5;
+
+  --rug-main: #8e7ba4;
+  --rug-light: #b9a8c8;
+
+  --wood-main: #684a34;
+  --wood-light: #987252;
+
+  --plant-pot: #8d6248;
+
+  --fan-metal: #4c4850;
+  --fan-blade: #7d7372;
+
+  --flow-bg: rgba(255, 255, 255, 0.78);
+  --flow-border: rgba(105, 85, 135, 0.15);
+
+  --brand-blue: #536dfe;
+  --brand-red: #d93655;
 }
 
-html.skillsensai-light-theme,
-body.skillsensai-light-theme {
-  background: #eee9df;
-  color: #211d1a;
-}
 
+.skillsensai-dark-theme {
+  --room-wall-top: #17151d;
+  --room-wall-bottom: #292331;
 
-/* =========================================================
-   HOME
-========================================================= */
+  --room-floor-top: #473a30;
+  --room-floor-bottom: #241d19;
 
-.home-page {
-  min-height: 100vh;
-  width: 100%;
-  position: relative;
-  overflow-x: hidden;
+  --room-text: #f8f6ff;
+  --room-muted: #b4adbd;
+
+  --room-glass: rgba(30, 26, 40, 0.72);
+  --room-glass-border: rgba(255, 255, 255, 0.09);
+
+  --room-shadow: rgba(0, 0, 0, 0.5);
+
+  --sofa-main: #554a43;
+  --sofa-dark: #332d29;
+  --sofa-light: #75675d;
+
+  --rug-main: #4a3e56;
+  --rug-light: #695b78;
+
+  --wood-main: #332318;
+  --wood-light: #624632;
+
+  --plant-pot: #50392d;
+
+  --fan-metal: #aaa4ad;
+  --fan-blade: #59535b;
+
+  --flow-bg: rgba(30, 27, 39, 0.82);
+  --flow-border: rgba(255, 255, 255, 0.09);
+
+  --brand-blue: #8295ff;
+  --brand-red: #ff6681;
 }
 
 
 /* =========================================================
    ROOM BACKGROUND
-========================================================= */
+   ========================================================= */
 
 .room-background {
   position: relative;
-  min-height: 100vh;
+
   width: 100%;
+  min-height: 100vh;
+
   overflow: hidden;
 
+  color: var(--room-text);
+
   background:
     linear-gradient(
       180deg,
-      #111217 0%,
-      #17181d 58%,
-      #242126 100%
-    );
-
-  transition:
-    background 0.5s ease,
-    color 0.5s ease;
-}
-
-
-/* LIGHT ROOM */
-
-.skillsensai-light-theme .room-background {
-  background:
-    linear-gradient(
-      180deg,
-      #f3eee5 0%,
-      #e8e0d4 58%,
-      #d5c9ba 100%
+      var(--room-wall-top) 0%,
+      var(--room-wall-bottom) 67%,
+      var(--room-floor-top) 67%,
+      var(--room-floor-bottom) 100%
     );
 }
 
 
 /* =========================================================
    WALL
-========================================================= */
+   ========================================================= */
 
 .room-wall {
   position: absolute;
-  inset: 0 0 18% 0;
 
-  background:
-    radial-gradient(
-      circle at 50% 50%,
-      rgba(255, 255, 255, 0.035),
-      transparent 55%
-    );
+  inset: 0 0 33% 0;
+
+  overflow: hidden;
 
   pointer-events: none;
 }
 
-.skillsensai-light-theme .room-wall {
-  background:
-    radial-gradient(
-      circle at 50% 45%,
-      rgba(255, 255, 255, 0.45),
-      transparent 58%
-    );
-}
-
-
-/* =========================================================
-   FLOOR
-========================================================= */
-
-.room-floor {
+.wall-highlight {
   position: absolute;
 
-  left: -10%;
-  right: -10%;
-  bottom: -10%;
-
-  height: 31%;
-
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255,255,255,0.015),
-      rgba(0,0,0,0.12)
-    );
-
-  border-top:
-    1px solid rgba(255,255,255,0.055);
-
-  transform:
-    perspective(600px)
-    rotateX(48deg);
-
-  transform-origin: top center;
-
-  pointer-events: none;
-}
-
-.skillsensai-light-theme .room-floor {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255,255,255,0.18),
-      rgba(70,55,45,0.07)
-    );
-
-  border-top:
-    1px solid rgba(80,65,50,0.12);
-}
-
-
-/* =========================================================
-   CORNER AMBIENCE
-========================================================= */
-
-.room-corner-glow {
-  position: absolute;
-
-  width: 600px;
-  height: 600px;
+  width: 65vw;
+  height: 45vw;
 
   left: 50%;
-  top: 45%;
+  top: -18vw;
 
-  transform:
-    translate(-50%, -50%);
+  transform: translateX(-50%);
 
   border-radius: 50%;
 
   background:
     radial-gradient(
-      circle,
-      rgba(123, 92, 252, 0.12),
+      ellipse,
+      rgba(255, 255, 255, 0.62),
       transparent 68%
     );
 
-  pointer-events: none;
+  filter: blur(10px);
+}
+
+.skillsensai-dark-theme .wall-highlight {
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(160, 136, 190, 0.08),
+      transparent 68%
+    );
+}
+
+
+/* subtle architectural panels */
+
+.wall-panel-left,
+.wall-panel-right {
+  position: absolute;
+
+  top: 8%;
+  bottom: 4%;
+
+  width: 16%;
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+
+  opacity: 0.45;
+}
+
+.wall-panel-left {
+  left: 2%;
+  border-right: 0;
+}
+
+.wall-panel-right {
+  right: 2%;
+  border-left: 0;
+}
+
+
+/* =========================================================
+   FLOOR
+   ========================================================= */
+
+.room-floor {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 33%;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      180deg,
+      var(--room-floor-top),
+      var(--room-floor-bottom)
+    );
+}
+
+.room-floor::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 74px,
+      rgba(255, 255, 255, 0.045) 75px,
+      transparent 76px
+    );
+
+  opacity: 0.7;
+}
+
+.floor-perspective {
+  position: absolute;
+
+  left: -10%;
+  right: -10%;
+  top: -10%;
+  bottom: 0;
+
+  background:
+    linear-gradient(
+      165deg,
+      transparent 45%,
+      rgba(0, 0, 0, 0.12) 45.5%,
+      transparent 46%
+    );
+
+  opacity: 0.35;
 }
 
 
 /* =========================================================
    CEILING
-========================================================= */
+   ========================================================= */
 
 .ceiling {
   position: absolute;
@@ -217,194 +277,322 @@ body.skillsensai-light-theme {
   right: 0;
   top: 0;
 
-  height: 88px;
-
-  background:
-    linear-gradient(
-      180deg,
-      rgba(0,0,0,0.3),
-      rgba(0,0,0,0.04)
-    );
-
-  border-bottom:
-    1px solid rgba(255,255,255,0.07);
-
-  z-index: 50;
+  height: 112px;
 
   pointer-events: none;
+
+  z-index: 15;
 }
 
-.skillsensai-light-theme .ceiling {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255,255,255,0.65),
-      rgba(255,255,255,0.12)
-    );
-
-  border-bottom:
-    1px solid rgba(80,65,50,0.12);
-}
-
-.ceiling-line {
+.ceiling-border {
   position: absolute;
 
   left: 0;
   right: 0;
-  bottom: 12px;
+  top: 0;
 
-  height: 1px;
+  height: 7px;
 
   background:
     linear-gradient(
       90deg,
       transparent,
-      rgba(255,255,255,0.12),
+      rgba(255,255,255,0.72),
       transparent
     );
+
+  opacity: 0.55;
 }
 
 
 /* =========================================================
-   CEILING FAN
-========================================================= */
+   REALISTIC CEILING FAN
+   ========================================================= */
 
 .ceiling-fan {
   position: absolute;
 
   left: 50%;
-  top: 0;
+  top: -2px;
 
-  width: 145px;
-  height: 100px;
+  width: 210px;
+  height: 128px;
 
-  transform:
-    translateX(-50%);
+  transform: translateX(-50%);
 
-  pointer-events: none;
+  filter:
+    drop-shadow(
+      0 9px 10px rgba(0, 0, 0, 0.13)
+    );
 }
 
-.fan-rod {
+
+/* ceiling mount */
+
+.fan-ceiling-mount {
   position: absolute;
 
   left: 50%;
   top: 0;
 
-  width: 4px;
-  height: 36px;
+  width: 58px;
+  height: 13px;
 
-  transform:
-    translateX(-50%);
+  transform: translateX(-50%);
+
+  border-radius: 0 0 12px 12px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #8b858d,
+      #464149
+    );
+
+  box-shadow:
+    inset 0 2px 2px rgba(255,255,255,0.35),
+    0 2px 5px rgba(0,0,0,0.2);
+}
+
+
+/* down rod */
+
+.fan-downrod {
+  position: absolute;
+
+  left: 50%;
+  top: 9px;
+
+  width: 12px;
+  height: 49px;
+
+  transform: translateX(-50%);
 
   background:
     linear-gradient(
       90deg,
-      #303137,
-      #777983,
-      #28292e
+      #474249,
+      #aaa4aa,
+      #4c474f
     );
 
-  border-radius: 3px;
+  border-radius: 5px;
 }
 
-.skillsensai-light-theme .fan-rod {
+.fan-downrod span {
+  position: absolute;
+
+  left: 2px;
+  top: 2px;
+
+  width: 2px;
+  height: 43px;
+
+  border-radius: 5px;
+
+  background: rgba(255,255,255,0.38);
+}
+
+
+/* canopy */
+
+.fan-canopy {
+  position: absolute;
+
+  left: 50%;
+  top: 48px;
+
+  width: 45px;
+  height: 25px;
+
+  transform: translateX(-50%);
+
+  border-radius: 50% 50% 42% 42%;
+
   background:
     linear-gradient(
-      90deg,
-      #aaa29a,
-      #eee9e0,
-      #958d85
+      180deg,
+      #aaa4ac,
+      #5c565e
     );
+
+  box-shadow:
+    inset 0 3px 3px rgba(255,255,255,0.4),
+    0 3px 7px rgba(0,0,0,0.25);
 }
+
+.fan-canopy span {
+  position: absolute;
+
+  left: 9px;
+  right: 9px;
+  top: 4px;
+
+  height: 5px;
+
+  border-radius: 50%;
+
+  background: rgba(255,255,255,0.25);
+}
+
+
+/* motor */
 
 .fan-motor {
   position: absolute;
 
   left: 50%;
-  top: 29px;
+  top: 62px;
 
-  width: 27px;
-  height: 27px;
+  width: 58px;
+  height: 38px;
 
-  transform:
-    translateX(-50%);
+  transform: translateX(-50%);
+
+  z-index: 5;
+}
+
+.fan-motor-top {
+  position: absolute;
+
+  left: 6px;
+  right: 6px;
+  top: 0;
+
+  height: 13px;
 
   border-radius: 50%;
 
   background:
-    radial-gradient(
-      circle at 35% 30%,
-      #92949a,
-      #3a3b40 60%,
-      #17181b
+    linear-gradient(
+      180deg,
+      #bcb6bd,
+      #67616a
+    );
+}
+
+.fan-motor-body {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  top: 7px;
+
+  height: 24px;
+
+  border-radius: 8px 8px 14px 14px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #504a52,
+      #9a949c 48%,
+      #49444c
     );
 
   box-shadow:
-    0 3px 8px rgba(0,0,0,0.35);
+    inset 0 2px 2px rgba(255,255,255,0.3),
+    0 3px 5px rgba(0,0,0,0.24);
 }
 
-.fan-motor span {
+.fan-motor-bottom {
   position: absolute;
 
-  left: 50%;
-  top: 50%;
+  left: 15px;
+  right: 15px;
+  bottom: 0;
 
-  width: 8px;
-  height: 8px;
-
-  transform:
-    translate(-50%, -50%);
+  height: 7px;
 
   border-radius: 50%;
 
-  background: #111216;
+  background:
+    linear-gradient(
+      180deg,
+      #9f99a1,
+      #4b464e
+    );
 }
+
+
+/* rotating blades */
 
 .fan-blades {
   position: absolute;
 
   left: 50%;
-  top: 42px;
+  top: 77px;
 
-  width: 0;
-  height: 0;
+  width: 170px;
+  height: 170px;
+
+  transform: translate(-50%, -50%);
 
   animation:
-    fanSpin 8s linear infinite;
+    realisticFanSpin 8s linear infinite;
+
+  z-index: 3;
 }
 
-.blade {
+.real-blade {
   position: absolute;
 
-  left: -9px;
-  top: -7px;
+  left: 50%;
+  top: 50%;
 
-  width: 78px;
-  height: 16px;
+  width: 79px;
+  height: 18px;
+
+  transform-origin: 0 50%;
 
   border-radius:
-    100% 15% 15% 100%;
+    100% 18% 18% 100%;
 
   background:
     linear-gradient(
-      90deg,
-      #36373d,
-      #66686e
+      180deg,
+      #aaa1a0 0%,
+      #746c6d 48%,
+      #4e494b 100%
     );
 
-  transform-origin:
-    9px 8px;
+  box-shadow:
+    inset 0 2px 2px rgba(255,255,255,0.28),
+    inset 0 -2px 2px rgba(0,0,0,0.2);
 
-  opacity: 0.9;
+  opacity: 0.94;
 }
 
-.skillsensai-light-theme .blade {
-  background:
-    linear-gradient(
-      90deg,
-      #a39c94,
-      #d0c9c0
-    );
+.real-blade::before {
+  content: "";
+
+  position: absolute;
+
+  left: 7px;
+  top: 4px;
+
+  width: 57px;
+  height: 3px;
+
+  border-radius: 50%;
+
+  background: rgba(255,255,255,0.19);
+
+  transform: rotate(-4deg);
+}
+
+.real-blade i {
+  position: absolute;
+
+  right: -4px;
+  top: 2px;
+
+  width: 10px;
+  height: 14px;
+
+  border-radius: 50%;
+
+  background: rgba(54,50,53,0.5);
 }
 
 .blade-one {
@@ -423,296 +611,221 @@ body.skillsensai-light-theme {
   transform: rotate(270deg);
 }
 
-@keyframes fanSpin {
+@keyframes realisticFanSpin {
   from {
-    transform: rotate(0deg);
+    transform:
+      translate(-50%, -50%)
+      rotate(0deg);
   }
 
   to {
-    transform: rotate(360deg);
+    transform:
+      translate(-50%, -50%)
+      rotate(360deg);
   }
 }
 
 
 /* =========================================================
    HANGING BULB
-========================================================= */
+   ========================================================= */
 
 .hanging-bulb {
   position: absolute;
 
-  top: 0;
-  left: calc(50% + 185px);
+  top: 16px;
+  right: 11%;
 
-  width: 64px;
-  height: 150px;
+  width: 75px;
+  height: 170px;
 
-  z-index: 60;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  pointer-events: none;
+  z-index: 25;
 }
 
 .bulb-wire {
-  width: 2px;
-  height: 66px;
+  position: absolute;
+
+  left: 50%;
+  top: 0;
+
+  width: 3px;
+  height: 88px;
+
+  transform: translateX(-50%);
+
+  border-radius: 4px;
 
   background:
     linear-gradient(
-      180deg,
-      #24252a,
-      #777980
-    );
-
-  box-shadow:
-    0 0 2px rgba(255,255,255,0.15);
-}
-
-.skillsensai-light-theme .bulb-wire {
-  background:
-    linear-gradient(
-      180deg,
-      #7f786f,
-      #a69e94
+      90deg,
+      #39343c,
+      #8e8790,
+      #39343c
     );
 }
 
 .bulb-button {
-  pointer-events: auto;
+  position: absolute;
 
-  position: relative;
+  left: 50%;
+  top: 79px;
 
-  width: 54px;
-  height: 68px;
+  width: 56px;
+  height: 70px;
+
+  transform: translateX(-50%);
 
   border: 0;
-  padding: 0;
-
-  background: transparent;
 
   cursor: pointer;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: transparent;
 
   transition:
-    transform 0.25s ease;
+    transform 0.25s ease,
+    filter 0.25s ease;
 }
 
 .bulb-button:hover {
-  transform: translateY(2px);
+  transform:
+    translateX(-50%)
+    scale(1.06);
 }
 
 .bulb-neck {
   position: absolute;
 
+  left: 50%;
   top: 0;
 
-  width: 18px;
-  height: 11px;
+  width: 24px;
+  height: 18px;
 
-  border-radius:
-    4px 4px 2px 2px;
+  transform: translateX(-50%);
+
+  border-radius: 4px 4px 8px 8px;
 
   background:
-    linear-gradient(
-      90deg,
-      #777980,
-      #b4b5b8,
-      #65666b
+    repeating-linear-gradient(
+      180deg,
+      #6e6870 0 3px,
+      #aaa4ac 3px 5px
     );
+
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.25);
 }
 
 .bulb-glass {
   position: absolute;
 
-  top: 9px;
+  left: 50%;
+  top: 12px;
 
-  width: 38px;
-  height: 46px;
+  width: 44px;
+  height: 52px;
 
-  border-radius:
-    48% 48% 45% 45%;
+  transform: translateX(-50%);
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  color: #777980;
+  border-radius:
+    50%
+    50%
+    45%
+    45%;
 
   background:
-    linear-gradient(
-      145deg,
-      rgba(255,255,255,0.22),
-      rgba(120,122,128,0.08)
+    radial-gradient(
+      circle at 35% 28%,
+      rgba(255,255,255,0.95),
+      rgba(255,236,163,0.86) 26%,
+      rgba(255,191,74,0.68) 60%,
+      rgba(255,157,37,0.3) 100%
     );
 
-  border:
-    1px solid rgba(255,255,255,0.15);
+  color: #ffb62e;
 
   box-shadow:
-    inset 0 0 12px rgba(255,255,255,0.04);
+    0 0 20px rgba(255,190,70,0.42);
 
   transition:
-    all 0.45s ease;
+    box-shadow 0.3s ease,
+    background 0.3s ease;
 }
 
-
-/* BULB ON */
-
-.bulb-on .bulb-glass {
-  color: #fff7c9;
-
+.bulb-off .bulb-glass {
   background:
     radial-gradient(
-      circle,
-      rgba(255,247,190,0.95),
-      rgba(255,207,76,0.58) 45%,
-      rgba(255,180,30,0.13) 75%
+      circle at 35% 28%,
+      rgba(255,255,255,0.7),
+      rgba(180,176,188,0.65) 50%,
+      rgba(90,85,96,0.55)
     );
 
-  border-color:
-    rgba(255,224,122,0.75);
+  color: #65606b;
 
   box-shadow:
-    0 0 10px rgba(255,219,108,0.9),
-    0 0 32px rgba(255,196,61,0.48),
-    0 0 75px rgba(255,190,40,0.25);
-}
-
-.bulb-on::after {
-  content: "";
-
-  position: absolute;
-
-  width: 105px;
-  height: 105px;
-
-  left: 50%;
-  top: 31px;
-
-  transform:
-    translateX(-50%);
-
-  border-radius: 50%;
-
-  background:
-    radial-gradient(
-      circle,
-      rgba(255,220,110,0.22),
-      transparent 70%
-    );
-
-  z-index: -1;
+    0 0 4px rgba(255,255,255,0.1);
 }
 
 
 /* =========================================================
    LOGIN
-========================================================= */
+   ========================================================= */
 
 .room-login {
   position: absolute;
 
-  top: 106px;
-  right: 34px;
+  right: 28px;
+  top: 24px;
 
   z-index: 100;
 }
 
-.login-button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  padding: 10px 17px;
-
-  border-radius: 999px;
-
-  border:
-    1px solid rgba(255,255,255,0.14);
-
-  background:
-    rgba(20,20,25,0.75);
-
-  color: #fff;
-
-  cursor: pointer;
-
-  backdrop-filter: blur(12px);
-
-  box-shadow:
-    0 8px 25px rgba(0,0,0,0.15);
-
-  transition:
-    all 0.25s ease;
-}
-
-.login-button:hover {
-  transform: translateY(-2px);
-
-  border-color:
-    rgba(150,130,255,0.45);
-
-  box-shadow:
-    0 10px 28px rgba(0,0,0,0.22);
-}
-
-.skillsensai-light-theme .login-button {
-  color: #262127;
-
-  background:
-    rgba(255,255,255,0.65);
-
-  border-color:
-    rgba(80,65,50,0.15);
-}
-
-
-/* PROFILE */
-
-.profile-area {
-  position: relative;
-}
-
+.login-button,
 .profile-button {
   display: flex;
   align-items: center;
   gap: 8px;
 
-  border: 1px solid rgba(255,255,255,0.13);
+  height: 42px;
 
-  border-radius: 999px;
+  padding: 0 16px;
 
-  padding: 6px 11px 6px 6px;
+  border-radius: 13px;
 
-  background:
-    rgba(20,20,25,0.76);
+  border: 1px solid var(--room-glass-border);
 
-  color: #fff;
+  color: var(--room-text);
+
+  background: var(--room-glass);
+
+  backdrop-filter: blur(14px);
+
+  box-shadow:
+    0 8px 25px rgba(0,0,0,0.08);
 
   cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.skillsensai-light-theme .profile-button {
-  background:
-    rgba(255,255,255,0.72);
+.login-button:hover,
+.profile-button:hover {
+  transform: translateY(-2px);
 
-  color: #29242a;
-
-  border-color:
-    rgba(80,65,50,0.13);
+  box-shadow:
+    0 12px 28px rgba(0,0,0,0.13);
 }
 
 .profile-avatar {
-  width: 30px;
-  height: 30px;
-
-  border-radius: 50%;
+  width: 26px;
+  height: 26px;
 
   overflow: hidden;
 
@@ -720,11 +833,13 @@ body.skillsensai-light-theme {
   align-items: center;
   justify-content: center;
 
-  background:
-    rgba(124,92,252,0.18);
+  border-radius: 50%;
+
+  background: rgba(124,92,252,0.16);
 }
 
-.profile-avatar img {
+.profile-avatar img,
+.profile-large-avatar img {
   width: 100%;
   height: 100%;
 
@@ -732,1048 +847,1439 @@ body.skillsensai-light-theme {
 }
 
 .profile-name {
-  max-width: 120px;
+  max-width: 130px;
 
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 
   font-size: 13px;
+  font-weight: 700;
 }
 
-.logout-button {
+.profile-wrapper {
+  position: relative;
+}
+
+.profile-dropdown {
   position: absolute;
 
   right: 0;
-  top: 43px;
+  top: calc(100% + 10px);
 
+  width: 255px;
+
+  padding: 12px;
+
+  border-radius: 17px;
+
+  border: 1px solid var(--room-glass-border);
+
+  background: var(--room-glass);
+
+  backdrop-filter: blur(20px);
+
+  box-shadow:
+    0 20px 55px rgba(0,0,0,0.17);
+
+  animation:
+    dropdownIn 0.18s ease;
+}
+
+@keyframes dropdownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.profile-dropdown-header {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 11px;
 
-  padding: 9px 12px;
-
-  border-radius: 10px;
-
-  border:
-    1px solid rgba(255,255,255,0.1);
-
-  background:
-    rgba(18,18,22,0.94);
-
-  color: #fff;
-
-  cursor: pointer;
-
-  opacity: 0;
-
-  pointer-events: none;
-
-  transform: translateY(-4px);
-
-  transition:
-    all 0.2s ease;
+  padding: 7px;
 }
 
-.profile-area:hover .logout-button {
-  opacity: 1;
-
-  pointer-events: auto;
-
-  transform: translateY(0);
-}
-
-.skillsensai-light-theme .logout-button {
-  background: #fff;
-
-  color: #29242a;
-
-  border-color:
-    rgba(80,65,50,0.14);
-}
-
-.auth-loading {
-  width: 40px;
-  height: 40px;
+.profile-large-avatar {
+  width: 42px;
+  height: 42px;
 
   display: flex;
   align-items: center;
   justify-content: center;
+
+  overflow: hidden;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  color: #6750d8;
+
+  background:
+    rgba(124,92,252,0.15);
 }
 
-.spin {
-  animation:
-    spin 1s linear infinite;
+.profile-dropdown-header strong {
+  display: block;
+
+  font-size: 14px;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+.profile-dropdown-header span {
+  display: block;
+
+  max-width: 160px;
+
+  margin-top: 3px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  color: var(--room-muted);
+
+  font-size: 11px;
+}
+
+.profile-divider {
+  height: 1px;
+
+  margin: 8px 0;
+
+  background:
+    var(--room-glass-border);
+}
+
+.profile-logout {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  padding: 10px;
+
+  border: 0;
+  border-radius: 10px;
+
+  color: #d13b55;
+
+  background: transparent;
+
+  cursor: pointer;
+
+  text-align: left;
+}
+
+.profile-logout:hover {
+  background: rgba(220, 50, 80, 0.08);
 }
 
 
 /* =========================================================
-   HOME CONTENT
-========================================================= */
+   MAIN CONTENT
+   ========================================================= */
 
 .home-content {
   position: relative;
 
-  z-index: 10;
+  z-index: 20;
 
-  width: min(1180px, 94vw);
-
-  min-height: 100vh;
+  width: min(1180px, 94%);
 
   margin: 0 auto;
 
   padding:
-    125px 0 90px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+    105px
+    0
+    70px;
 }
 
 
 /* =========================================================
    INTRO
-========================================================= */
+   ========================================================= */
 
 .home-intro {
-  text-align: center;
-
   position: relative;
 
-  z-index: 5;
+  text-align: center;
 
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
-.brand-small {
-  display: inline-flex;
-  gap: 2px;
+.brand-name {
+  font-size: clamp(27px, 3vw, 40px);
 
-  font-size: 16px;
-  font-weight: 700;
+  font-weight: 900;
 
-  letter-spacing: 0.4px;
+  letter-spacing: -1.7px;
 
-  opacity: 0.78;
+  line-height: 1;
 }
 
-.brand-small span {
-  color: #8d78e8;
+.brand-skill {
+  color: var(--brand-blue);
 }
 
-.brand-small strong {
-  color: #d44c58;
-}
-
-.home-intro h1 {
-  margin:
-    7px 0 4px;
-
-  font-size:
-    clamp(30px, 4vw, 46px);
-
-  line-height: 1.05;
-
-  letter-spacing: -1.8px;
-
-  color: #fff;
-}
-
-.skillsensai-light-theme .home-intro h1 {
-  color: #29232b;
-}
-
-.home-intro h1 span {
-  color: #a18aff;
-}
-
-.home-intro h1 strong {
-  color: #e0646c;
+.brand-sensai {
+  color: var(--brand-red);
 }
 
 .home-intro p {
-  margin: 0;
+  margin: 8px 0 0;
 
-  font-size: 14px;
+  color: var(--room-muted);
 
-  color:
-    rgba(255,255,255,0.57);
-}
+  font-size: 13px;
 
-.skillsensai-light-theme .home-intro p {
-  color:
-    rgba(50,42,38,0.58);
+  letter-spacing: 0.8px;
 }
 
 
 /* =========================================================
    SKILLS ROOM
-========================================================= */
+   ========================================================= */
 
 .skills-room {
   position: relative;
 
-  width: min(820px, 92vw);
+  width: min(850px, 100%);
 
-  height: 600px;
+  height: 590px;
 
-  margin-top: 2px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  margin: 0 auto;
 }
 
 
 /* =========================================================
-   CHARACTER SHADOW
-========================================================= */
+   RUG
+   ========================================================= */
 
-.character-shadow {
+.living-rug {
   position: absolute;
 
   left: 50%;
-  bottom: 52px;
+  bottom: 24px;
 
-  width: 220px;
-  height: 42px;
+  width: 650px;
+  height: 185px;
 
   transform:
-    translateX(-50%);
+    translateX(-50%)
+    perspective(700px)
+    rotateX(48deg);
 
   border-radius: 50%;
 
   background:
     radial-gradient(
       ellipse,
-      rgba(0,0,0,0.48),
-      transparent 72%
+      rgba(170,151,187,0.75),
+      rgba(112,94,128,0.65) 55%,
+      rgba(72,59,80,0.15) 75%,
+      transparent 76%
     );
 
-  filter: blur(7px);
+  filter:
+    drop-shadow(
+      0 15px 15px rgba(0,0,0,0.15)
+    );
 
-  z-index: 2;
+  z-index: 0;
 }
 
-.skillsensai-light-theme .character-shadow {
+.rug-inner {
+  position: absolute;
+
+  inset: 11px;
+
+  border-radius: 50%;
+
+  border: 2px solid rgba(255,255,255,0.23);
+
   background:
-    radial-gradient(
+    repeating-radial-gradient(
       ellipse,
-      rgba(50,40,35,0.22),
-      transparent 72%
+      transparent 0 17px,
+      rgba(255,255,255,0.08) 18px 20px
+    );
+}
+
+.rug-pattern {
+  position: absolute;
+
+  inset: 25px 100px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+
+  opacity: 0.35;
+}
+
+.rug-pattern span {
+  width: 28px;
+  height: 28px;
+
+  transform: rotate(45deg);
+
+  border:
+    1px solid rgba(255,255,255,0.45);
+}
+
+
+/* =========================================================
+   SOFA
+   ========================================================= */
+
+.living-sofa {
+  position: absolute;
+
+  left: 50%;
+  bottom: 75px;
+
+  width: 690px;
+  height: 220px;
+
+  transform: translateX(-50%);
+
+  z-index: 1;
+
+  filter:
+    drop-shadow(
+      0 17px 15px rgba(0,0,0,0.18)
+    );
+}
+
+.sofa-back {
+  position: absolute;
+
+  left: 60px;
+  right: 60px;
+  top: 20px;
+
+  height: 125px;
+
+  border-radius:
+    24px
+    24px
+    14px
+    14px;
+
+  background:
+    linear-gradient(
+      180deg,
+      var(--sofa-light),
+      var(--sofa-main)
+    );
+
+  box-shadow:
+    inset 0 4px 5px rgba(255,255,255,0.23),
+    inset 0 -9px 15px rgba(70,50,35,0.12);
+}
+
+.sofa-back-seam {
+  position: absolute;
+
+  left: 16px;
+  right: 16px;
+  bottom: 10px;
+
+  height: 1px;
+
+  background: rgba(80,60,45,0.16);
+}
+
+.sofa-seat {
+  position: absolute;
+
+  left: 44px;
+  right: 44px;
+  top: 120px;
+
+  height: 67px;
+
+  display: flex;
+  gap: 7px;
+
+  padding: 6px;
+
+  border-radius: 15px;
+
+  background: var(--sofa-dark);
+}
+
+.seat-cushion {
+  flex: 1;
+
+  border-radius: 11px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #d2c1ad,
+      #b29d86
+    );
+
+  box-shadow:
+    inset 0 3px 3px rgba(255,255,255,0.25),
+    0 3px 5px rgba(0,0,0,0.12);
+}
+
+.sofa-arm {
+  position: absolute;
+
+  top: 105px;
+
+  width: 65px;
+  height: 88px;
+
+  border-radius: 16px;
+
+  background:
+    linear-gradient(
+      180deg,
+      var(--sofa-light),
+      var(--sofa-main)
+    );
+}
+
+.sofa-arm-left {
+  left: 28px;
+}
+
+.sofa-arm-right {
+  right: 28px;
+}
+
+.sofa-leg {
+  position: absolute;
+
+  bottom: 7px;
+
+  width: 12px;
+  height: 33px;
+
+  border-radius: 2px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #3e2b1d,
+      var(--wood-main),
+      #3b291c
+    );
+}
+
+.sofa-leg-left {
+  left: 85px;
+}
+
+.sofa-leg-right {
+  right: 85px;
+}
+
+.sofa-pillow {
+  position: absolute;
+
+  top: 47px;
+
+  width: 78px;
+  height: 65px;
+
+  border-radius: 14px;
+
+  box-shadow:
+    inset 0 3px 4px rgba(255,255,255,0.2);
+}
+
+.pillow-one {
+  left: 112px;
+
+  transform: rotate(-5deg);
+
+  background:
+    linear-gradient(
+      135deg,
+      #86789b,
+      #65566f
+    );
+}
+
+.pillow-two {
+  right: 112px;
+
+  transform: rotate(5deg);
+
+  background:
+    linear-gradient(
+      135deg,
+      #c47c72,
+      #9b5c56
     );
 }
 
 
 /* =========================================================
-   SAMURAI
-========================================================= */
+   COFFEE TABLE
+   ========================================================= */
+
+.coffee-table {
+  position: absolute;
+
+  left: 50%;
+  bottom: 125px;
+
+  width: 190px;
+  height: 100px;
+
+  transform: translateX(-50%);
+
+  z-index: 4;
+}
+
+.table-top {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  top: 0;
+
+  height: 27px;
+
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      180deg,
+      #a47d58,
+      #684a34
+    );
+
+  box-shadow:
+    0 5px 7px rgba(0,0,0,0.22),
+    inset 0 3px 3px rgba(255,255,255,0.2);
+}
+
+.table-reflection {
+  position: absolute;
+
+  left: 25%;
+  top: 5px;
+
+  width: 48%;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background: rgba(255,255,255,0.17);
+}
+
+.table-leg {
+  position: absolute;
+
+  top: 20px;
+
+  width: 9px;
+  height: 74px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #402a1b,
+      #806044,
+      #3d281a
+    );
+
+  transform-origin: top center;
+}
+
+.table-leg-left {
+  left: 35px;
+  transform: rotate(8deg);
+}
+
+.table-leg-right {
+  right: 35px;
+  transform: rotate(-8deg);
+}
+
+
+/* =========================================================
+   PLANT
+   ========================================================= */
+
+.room-plant {
+  position: absolute;
+
+  right: 35px;
+  bottom: 80px;
+
+  width: 90px;
+  height: 180px;
+
+  z-index: 3;
+}
+
+.plant-pot {
+  position: absolute;
+
+  left: 22px;
+  bottom: 0;
+
+  width: 50px;
+  height: 48px;
+
+  border-radius:
+    6px
+    6px
+    15px
+    15px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #674634,
+      var(--plant-pot),
+      #6e4a37
+    );
+
+  box-shadow:
+    0 7px 10px rgba(0,0,0,0.18);
+}
+
+.plant-pot span {
+  position: absolute;
+
+  left: 6px;
+  right: 6px;
+  top: 4px;
+
+  height: 5px;
+
+  border-radius: 50%;
+
+  background: rgba(0,0,0,0.23);
+}
+
+.plant-stem {
+  position: absolute;
+
+  left: 47px;
+  bottom: 38px;
+
+  width: 4px;
+  height: 105px;
+
+  border-radius: 50%;
+
+  background: #4e613f;
+
+  transform-origin: bottom;
+}
+
+.stem-one {
+  transform: rotate(-23deg);
+}
+
+.stem-two {
+  transform: rotate(4deg);
+}
+
+.stem-three {
+  transform: rotate(25deg);
+}
+
+.plant-leaf {
+  position: absolute;
+
+  width: 42px;
+  height: 18px;
+
+  border-radius:
+    100%
+    0
+    100%
+    0;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7d9566,
+      #465a3b
+    );
+}
+
+.leaf-one {
+  left: 6px;
+  top: 62px;
+
+  transform: rotate(-25deg);
+}
+
+.leaf-two {
+  left: 41px;
+  top: 45px;
+
+  transform: rotate(25deg);
+}
+
+.leaf-three {
+  left: 2px;
+  top: 95px;
+
+  transform: rotate(-13deg);
+}
+
+.leaf-four {
+  left: 46px;
+  top: 86px;
+
+  transform: rotate(34deg);
+}
+
+.leaf-five {
+  left: 25px;
+  top: 28px;
+
+  transform: rotate(7deg);
+}
+
+
+/* =========================================================
+   CHARACTER
+   ========================================================= */
+
+.character-shadow {
+  position: absolute;
+
+  left: 50%;
+  bottom: 95px;
+
+  width: 260px;
+  height: 70px;
+
+  transform:
+    translateX(-50%)
+    perspective(500px)
+    rotateX(62deg);
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(20,14,28,0.35),
+      rgba(20,14,28,0.08) 62%,
+      transparent 75%
+    );
+
+  filter: blur(8px);
+
+  z-index: 5;
+}
 
 .samurai-container {
   position: absolute;
 
   left: 50%;
-  top: 50%;
+  top: 32px;
 
-  width: 280px;
-  height: 405px;
+  width: 320px;
+  height: 440px;
 
-  transform:
-    translate(-50%, -50%);
+  transform: translateX(-50%);
 
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
 
-  z-index: 15;
-
-  pointer-events: none;
+  z-index: 10;
 }
 
 .samurai-aura {
   position: absolute;
 
   left: 50%;
-  bottom: 45px;
+  top: 50%;
 
   width: 270px;
   height: 350px;
 
-  transform:
-    translateX(-50%);
+  transform: translate(-50%, -50%);
 
   border-radius: 50%;
 
   background:
     radial-gradient(
       ellipse,
-      rgba(124,92,252,0.12),
-      transparent 68%
+      rgba(91,111,255,0.17),
+      rgba(125,92,252,0.08) 45%,
+      transparent 72%
     );
 
-  filter: blur(8px);
+  filter: blur(20px);
 
-  z-index: 0;
+  animation:
+    auraPulse 4s ease-in-out infinite;
+}
+
+@keyframes auraPulse {
+  0%,
+  100% {
+    opacity: 0.62;
+    transform:
+      translate(-50%, -50%)
+      scale(0.96);
+  }
+
+  50% {
+    opacity: 1;
+    transform:
+      translate(-50%, -50%)
+      scale(1.04);
+  }
 }
 
 .samurai-image {
   position: relative;
 
-  z-index: 2;
-
-  display: block;
-
-  width: 260px;
-  height: 380px;
+  width: 300px;
+  height: 420px;
 
   object-fit: contain;
 
-  object-position:
-    center bottom;
+  object-position: center bottom;
+
+  display: block;
+
+  z-index: 2;
 
   filter:
     drop-shadow(
-      0 18px 25px
-      rgba(0,0,0,0.36)
-    )
-    drop-shadow(
-      0 0 24px
-      rgba(124,92,252,0.12)
+      0 16px 20px rgba(0,0,0,0.27)
     );
 
   animation:
-    samuraiFloat 5s ease-in-out infinite;
+    samuraiFloat 4.5s ease-in-out infinite;
 }
 
 @keyframes samuraiFloat {
-
   0%,
   100% {
-    transform:
-      translateY(0);
+    transform: translateY(0);
   }
 
   50% {
-    transform:
-      translateY(-7px);
+    transform: translateY(-8px);
   }
 }
 
 
 /* =========================================================
    SKILL ORBIT
-========================================================= */
+   ========================================================= */
 
 .skills-orbit {
   position: absolute;
 
-  left: 50%;
-  top: 50%;
+  inset: 0;
 
-  width: 700px;
-  height: 550px;
-
-  transform:
-    translate(-50%, -50%);
-
-  z-index: 25;
+  z-index: 30;
 
   pointer-events: none;
-}
-
-
-/* SUBTLE ORBIT */
-
-.skills-orbit::before {
-  content: "";
-
-  position: absolute;
-
-  left: 50%;
-  top: 50%;
-
-  width: 500px;
-  height: 430px;
-
-  transform:
-    translate(-50%, -50%);
-
-  border:
-    1px solid
-    rgba(255,255,255,0.055);
-
-  border-radius: 50%;
-
-  pointer-events: none;
-}
-
-.skillsensai-light-theme .skills-orbit::before {
-  border-color:
-    rgba(70,55,45,0.10);
 }
 
 
 /* =========================================================
-   SKILL CIRCLE
-========================================================= */
+   SKILL CIRCLES
+   ========================================================= */
 
 .skill-circle {
   position: absolute;
 
-  width: 116px;
-  height: 116px;
-
-  padding: 0;
-
-  border-radius: 50%;
+  width: 108px;
+  height: 108px;
 
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 
-  gap: 6px;
+  gap: 5px;
 
-  color: #fff;
+  padding: 10px;
 
-  border: 1px solid;
+  border-radius: 50%;
+
+  border: 2px solid rgba(255,255,255,0.68);
 
   cursor: pointer;
 
-  background:
-    rgba(18,18,24,0.83);
+  pointer-events: auto;
 
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
 
   box-shadow:
-    0 10px 28px rgba(0,0,0,0.25);
+    0 12px 30px rgba(25,20,40,0.15),
+    inset 0 1px 0 rgba(255,255,255,0.65);
 
   transition:
     transform 0.28s ease,
     box-shadow 0.28s ease,
-    background 0.28s ease;
-
-  pointer-events: auto;
-
-  animation:
-    skillFloat 4.5s ease-in-out infinite;
-}
-
-.skillsensai-light-theme .skill-circle {
-  background:
-    rgba(255,255,255,0.78);
-
-  box-shadow:
-    0 10px 28px rgba(75,60,50,0.12);
+    filter 0.28s ease;
 }
 
 .skill-circle:hover {
   transform:
-    scale(1.08);
+    translateY(-7px)
+    scale(1.07);
 
-  z-index: 40;
+  box-shadow:
+    0 18px 38px rgba(25,20,40,0.22),
+    0 0 25px currentColor,
+    inset 0 1px 0 rgba(255,255,255,0.7);
 }
-
-.skill-circle:disabled {
-  cursor: default;
-}
-
-
-/* =========================================================
-   SKILL POSITIONS
-========================================================= */
-
-.skill-position-1 {
-  left: 292px;
-  top: -10px;
-
-  animation-delay: 0s;
-}
-
-.skill-position-2 {
-  right: 30px;
-  top: 110px;
-
-  animation-delay: -0.8s;
-}
-
-.skill-position-3 {
-  right: 30px;
-  bottom: 80px;
-
-  animation-delay: -1.6s;
-}
-
-.skill-position-4 {
-  left: 292px;
-  bottom: -10px;
-
-  animation-delay: -2.4s;
-}
-
-.skill-position-5 {
-  left: 30px;
-  bottom: 80px;
-
-  animation-delay: -3.2s;
-}
-
-.skill-position-6 {
-  left: 30px;
-  top: 110px;
-
-  animation-delay: -4s;
-}
-
-
-@keyframes skillFloat {
-
-  0%,
-  100% {
-    margin-top: 0;
-  }
-
-  50% {
-    margin-top: -7px;
-  }
-}
-
-
-/* =========================================================
-   SKILL ICON
-========================================================= */
 
 .skill-icon {
-  position: relative;
-
-  width: 39px;
-  height: 39px;
-
-  border-radius: 50%;
-
   display: flex;
   align-items: center;
   justify-content: center;
 
-  background:
-    rgba(255,255,255,0.08);
+  width: 37px;
+  height: 37px;
+
+  border-radius: 50%;
+
+  color: white;
+
+  background: rgba(255,255,255,0.19);
+
+  box-shadow:
+    inset 0 1px 2px rgba(255,255,255,0.28);
 }
 
 .skill-name {
-  position: relative;
+  max-width: 90px;
+
+  color: white;
 
   font-size: 12px;
 
-  font-weight: 700;
+  font-weight: 800;
 
-  letter-spacing: 0.1px;
+  line-height: 1.1;
 
-  white-space: nowrap;
-
-  color: inherit;
+  text-align: center;
 
   text-shadow:
-    0 1px 4px rgba(0,0,0,0.35);
-}
-
-.skillsensai-light-theme .skill-name {
-  text-shadow: none;
-}
-
-
-/* =========================================================
-   SKILL COLORS
-========================================================= */
-
-/* MUSIC - VIOLET */
-
-.skill-music {
-  border-color:
-    rgba(157,126,255,0.72);
-
-  color: #bba9ff;
-
-  box-shadow:
-    0 8px 28px rgba(124,92,252,0.16);
-}
-
-.skill-music .skill-icon {
-  background:
-    rgba(124,92,252,0.19);
-}
-
-.skill-music:hover {
-  box-shadow:
-    0 0 28px rgba(124,92,252,0.36);
-}
-
-
-/* MARTIAL - RED */
-
-.skill-martial {
-  border-color:
-    rgba(235,87,95,0.72);
-
-  color: #ff969c;
-
-  box-shadow:
-    0 8px 28px rgba(220,70,80,0.14);
-}
-
-.skill-martial .skill-icon {
-  background:
-    rgba(220,70,80,0.18);
-}
-
-.skill-martial:hover {
-  box-shadow:
-    0 0 28px rgba(230,75,85,0.34);
-}
-
-
-/* DANCE - ORANGE */
-
-.skill-dance {
-  border-color:
-    rgba(246,164,82,0.58);
-
-  color: #ffbf82;
-}
-
-.skill-dance .skill-icon {
-  background:
-    rgba(246,164,82,0.14);
-}
-
-
-/* ART - PINK */
-
-.skill-art {
-  border-color:
-    rgba(239,117,180,0.58);
-
-  color: #ff9bca;
-}
-
-.skill-art .skill-icon {
-  background:
-    rgba(239,117,180,0.14);
-}
-
-
-/* CODING - BLUE */
-
-.skill-coding {
-  border-color:
-    rgba(77,166,255,0.58);
-
-  color: #87c5ff;
-}
-
-.skill-coding .skill-icon {
-  background:
-    rgba(77,166,255,0.14);
-}
-
-
-/* MORE - GREEN */
-
-.skill-more {
-  border-color:
-    rgba(85,201,145,0.55);
-
-  color: #8ce0b2;
-}
-
-.skill-more .skill-icon {
-  background:
-    rgba(85,201,145,0.14);
-}
-
-
-/* =========================================================
-   LIGHT MODE COLOR ADJUSTMENTS
-========================================================= */
-
-.skillsensai-light-theme .skill-music {
-  color: #6245d8;
-  border-color:
-    rgba(98,69,216,0.35);
-}
-
-.skillsensai-light-theme .skill-martial {
-  color: #c43d47;
-  border-color:
-    rgba(196,61,71,0.34);
-}
-
-.skillsensai-light-theme .skill-dance {
-  color: #c87425;
-  border-color:
-    rgba(200,116,37,0.30);
-}
-
-.skillsensai-light-theme .skill-art {
-  color: #c34d8c;
-  border-color:
-    rgba(195,77,140,0.30);
-}
-
-.skillsensai-light-theme .skill-coding {
-  color: #2678c8;
-  border-color:
-    rgba(38,120,200,0.30);
-}
-
-.skillsensai-light-theme .skill-more {
-  color: #268c58;
-  border-color:
-    rgba(38,140,88,0.30);
-}
-
-
-/* =========================================================
-   COMING SOON
-========================================================= */
-
-.skill-coming {
-  opacity: 0.63;
-
-  filter:
-    saturate(0.75);
-}
-
-.skill-coming:hover {
-  transform: none;
-
-  box-shadow:
-    0 10px 28px rgba(0,0,0,0.20);
+    0 1px 4px rgba(0,0,0,0.32);
 }
 
 .coming-label {
   position: absolute;
 
-  top: 13px;
-  right: 12px;
+  right: 7px;
+  top: 7px;
+
+  padding: 3px 6px;
+
+  border-radius: 8px;
+
+  color: rgba(255,255,255,0.9);
+
+  background: rgba(0,0,0,0.23);
 
   font-size: 7px;
 
+  font-weight: 800;
+
   text-transform: uppercase;
-
-  letter-spacing: 0.7px;
-
-  padding: 3px 5px;
-
-  border-radius: 999px;
-
-  background:
-    rgba(255,255,255,0.08);
-
-  color:
-    rgba(255,255,255,0.65);
 }
 
-.skillsensai-light-theme .coming-label {
-  color:
-    rgba(50,42,38,0.55);
+
+/* =========================================================
+   SKILL COLORS
+   ========================================================= */
+
+.skill-blue {
+  color: #5c79ff;
 
   background:
-    rgba(50,42,38,0.07);
+    linear-gradient(
+      145deg,
+      #6f8cff,
+      #4964e9
+    );
+}
+
+.skill-red {
+  color: #e95068;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ef6a7c,
+      #c52e4b
+    );
+}
+
+.skill-pink {
+  color: #ef72b6;
+
+  background:
+    linear-gradient(
+      145deg,
+      #f68bc4,
+      #d64e94
+    );
+}
+
+.skill-orange {
+  color: #ef9c50;
+
+  background:
+    linear-gradient(
+      145deg,
+      #f6b26b,
+      #df7d35
+    );
+}
+
+.skill-green {
+  color: #60ad7b;
+
+  background:
+    linear-gradient(
+      145deg,
+      #75c890,
+      #438d61
+    );
+}
+
+.skill-purple {
+  color: #a77ce7;
+
+  background:
+    linear-gradient(
+      145deg,
+      #b48aef,
+      #8257c6
+    );
+}
+
+
+/* =========================================================
+   ORBIT POSITIONS
+   ========================================================= */
+
+.skill-position-1 {
+  left: 50%;
+  top: 25px;
+
+  transform:
+    translateX(-50%);
+
+  animation:
+    skillFloatOne 4.2s ease-in-out infinite;
+}
+
+.skill-position-2 {
+  right: 68px;
+  top: 150px;
+
+  animation:
+    skillFloatTwo 4.8s ease-in-out infinite;
+}
+
+.skill-position-3 {
+  right: 93px;
+  bottom: 93px;
+
+  animation:
+    skillFloatThree 4.5s ease-in-out infinite;
+}
+
+.skill-position-4 {
+  left: 50%;
+  bottom: 22px;
+
+  transform:
+    translateX(-50%);
+
+  animation:
+    skillFloatFour 5s ease-in-out infinite;
+}
+
+.skill-position-5 {
+  left: 93px;
+  bottom: 93px;
+
+  animation:
+    skillFloatFive 4.6s ease-in-out infinite;
+}
+
+.skill-position-6 {
+  left: 68px;
+  top: 150px;
+
+  animation:
+    skillFloatSix 4.3s ease-in-out infinite;
+}
+
+
+/* Keep translateX for centered hover */
+
+.skill-position-1:hover,
+.skill-position-4:hover {
+  transform:
+    translateX(-50%)
+    translateY(-7px)
+    scale(1.07);
+}
+
+
+/* =========================================================
+   FLOAT ANIMATIONS
+   ========================================================= */
+
+@keyframes skillFloatOne {
+  0%, 100% {
+    transform:
+      translateX(-50%)
+      translateY(0);
+  }
+
+  50% {
+    transform:
+      translateX(-50%)
+      translateY(-9px);
+  }
+}
+
+@keyframes skillFloatTwo {
+  0%, 100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes skillFloatThree {
+  0%, 100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes skillFloatFour {
+  0%, 100% {
+    transform:
+      translateX(-50%)
+      translateY(0);
+  }
+
+  50% {
+    transform:
+      translateX(-50%)
+      translateY(-7px);
+  }
+}
+
+@keyframes skillFloatFive {
+  0%, 100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes skillFloatSix {
+  0%, 100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 
 /* =========================================================
    LEARNING FLOW
-========================================================= */
+   THIS IS NOW DIRECTLY BELOW THE SAMURAI + SKILLS
+   ========================================================= */
 
 .learning-flow {
   position: relative;
 
-  z-index: 8;
+  width: min(1080px, 100%);
 
-  width: min(1000px, 92vw);
+  margin:
+    -8px
+    auto
+    0;
 
-  margin-top: 10px;
+  padding:
+    18px
+    22px
+    24px;
 
-  padding-top: 20px;
+  border-radius: 25px;
+
+  border: 1px solid var(--flow-border);
+
+  background: var(--flow-bg);
+
+  backdrop-filter: blur(16px);
+
+  box-shadow:
+    0 15px 45px var(--room-shadow);
+
+  z-index: 40;
 }
 
-.flow-heading {
+.learning-flow-heading {
   text-align: center;
 
-  margin-bottom: 22px;
+  margin-bottom: 18px;
 }
 
-.flow-heading span {
-  font-size: 11px;
+.learning-flow-heading > span {
+  color: #8065df;
 
-  text-transform: uppercase;
+  font-size: 10px;
 
-  letter-spacing: 2px;
+  font-weight: 900;
 
-  color:
-    rgba(255,255,255,0.4);
+  letter-spacing: 1.7px;
 }
 
-.skillsensai-light-theme .flow-heading span {
-  color:
-    rgba(50,42,38,0.42);
-}
+.learning-flow-heading h2 {
+  margin:
+    5px
+    0
+    3px;
 
-.flow-heading h2 {
-  margin: 5px 0 0;
+  color: var(--room-text);
 
-  font-size:
-    clamp(23px, 3vw, 31px);
+  font-size: clamp(22px, 2.4vw, 29px);
 
   letter-spacing: -0.7px;
-
-  color: #fff;
 }
 
-.skillsensai-light-theme .flow-heading h2 {
-  color: #30282c;
+.learning-flow-heading p {
+  margin: 0;
+
+  color: var(--room-muted);
+
+  font-size: 12px;
 }
 
 
 /* =========================================================
    FLOW CARDS
-========================================================= */
+   ========================================================= */
 
-.flow-cards {
-  display: flex;
+.learning-flow-cards {
+  display: grid;
 
-  align-items: stretch;
+  grid-template-columns:
+    1fr
+    28px
+    1fr
+    28px
+    1fr;
 
-  justify-content: center;
+  align-items: center;
 
-  gap: 12px;
+  gap: 8px;
 }
 
 .flow-card {
-  flex: 1;
-
-  min-width: 0;
+  min-height: 105px;
 
   display: flex;
+  align-items: center;
 
-  gap: 13px;
+  gap: 12px;
 
-  align-items: flex-start;
+  padding: 15px;
 
-  padding: 17px;
+  border-radius: 17px;
 
-  border-radius: 15px;
+  border: 1px solid rgba(255,255,255,0.4);
 
-  background:
-    rgba(255,255,255,0.045);
-
-  border:
-    1px solid
-    rgba(255,255,255,0.075);
-
-  backdrop-filter: blur(10px);
-
-  transition:
-    transform 0.25s ease,
-    background 0.25s ease;
-}
-
-.flow-card:hover {
-  transform:
-    translateY(-3px);
-
-  background:
-    rgba(255,255,255,0.065);
-}
-
-.skillsensai-light-theme .flow-card {
   background:
     rgba(255,255,255,0.48);
 
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.65);
+
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.skillsensai-dark-theme .flow-card {
+  background:
+    rgba(255,255,255,0.045);
+
   border-color:
-    rgba(70,55,45,0.09);
+    rgba(255,255,255,0.07);
+}
+
+.flow-card:hover {
+  transform: translateY(-4px);
+
+  box-shadow:
+    0 12px 28px rgba(30,25,45,0.12);
 }
 
 .flow-icon {
-  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
 
-  width: 40px;
-  height: 40px;
-
-  border-radius: 11px;
+  flex-shrink: 0;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  background:
-    rgba(124,92,252,0.14);
+  border-radius: 13px;
 
-  color:
-    #ae9cff;
+  color: white;
 }
 
-.flow-card:nth-child(3) .flow-icon {
+.flow-learn .flow-icon {
   background:
-    rgba(230,80,90,0.13);
-
-  color:
-    #f18d94;
+    linear-gradient(
+      135deg,
+      #617fff,
+      #4b61dc
+    );
 }
 
-.flow-card:nth-child(5) .flow-icon {
+.flow-practice .flow-icon {
   background:
-    rgba(85,201,145,0.13);
-
-  color:
-    #81d9aa;
+    linear-gradient(
+      135deg,
+      #ed8b59,
+      #d85e37
+    );
 }
 
-.flow-card span {
-  font-size: 10px;
+.flow-master .flow-icon {
+  background:
+    linear-gradient(
+      135deg,
+      #a06ee8,
+      #744bbd
+    );
+}
+
+.flow-number {
+  color: #8a8096;
+
+  font-size: 9px;
+
+  font-weight: 900;
 
   letter-spacing: 1px;
-
-  color:
-    rgba(255,255,255,0.35);
-}
-
-.skillsensai-light-theme .flow-card span {
-  color:
-    rgba(50,42,38,0.38);
 }
 
 .flow-card h3 {
-  margin: 3px 0 5px;
+  margin:
+    1px
+    0
+    3px;
+
+  color: var(--room-text);
 
   font-size: 17px;
-
-  color: #fff;
-}
-
-.skillsensai-light-theme .flow-card h3 {
-  color: #30282c;
 }
 
 .flow-card p {
   margin: 0;
 
-  font-size: 12px;
+  color: var(--room-muted);
 
-  line-height: 1.55;
+  font-size: 10px;
 
-  color:
-    rgba(255,255,255,0.5);
+  line-height: 1.45;
 }
 
-.skillsensai-light-theme .flow-card p {
-  color:
-    rgba(50,42,38,0.58);
-}
+.flow-arrow {
+  width: 28px;
+  height: 28px;
 
-.flow-line {
-  width: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  align-self: center;
+  color: #8374a3;
 
-  height: 1px;
+  border-radius: 50%;
 
   background:
-    rgba(255,255,255,0.12);
-}
-
-.skillsensai-light-theme .flow-line {
-  background:
-    rgba(70,55,45,0.12);
+    rgba(124,92,252,0.09);
 }
 
 
 /* =========================================================
    PROGRESS
-========================================================= */
+   ========================================================= */
 
 .home-progress {
-  width: min(700px, 90vw);
-
-  margin:
-    25px auto 0;
-
-  padding: 14px 17px;
-
-  border-radius: 13px;
-
-  background:
-    rgba(255,255,255,0.035);
-
-  border:
-    1px solid
-    rgba(255,255,255,0.065);
+  margin-top: 17px;
 }
 
-.skillsensai-light-theme .home-progress {
-  background:
-    rgba(255,255,255,0.45);
-
-  border-color:
-    rgba(70,55,45,0.08);
-}
-
-.progress-top {
+.home-progress-top {
   display: flex;
-
+  align-items: center;
   justify-content: space-between;
 
-  align-items: center;
+  margin-bottom: 7px;
 
-  margin-bottom: 8px;
+  color: var(--room-muted);
 
   font-size: 11px;
-
-  color:
-    rgba(255,255,255,0.46);
 }
 
-.progress-top strong {
-  color:
-    rgba(255,255,255,0.72);
+.home-progress-top strong {
+  color: var(--room-text);
 
-  font-weight: 600;
+  font-size: 12px;
 }
 
-.skillsensai-light-theme .progress-top {
-  color:
-    rgba(50,42,38,0.48);
-}
-
-.skillsensai-light-theme .progress-top strong {
-  color:
-    rgba(50,42,38,0.72);
-}
-
-.progress-track {
-  height: 5px;
-
-  border-radius: 999px;
+.home-progress-track {
+  width: 100%;
+  height: 7px;
 
   overflow: hidden;
 
+  border-radius: 10px;
+
   background:
-    rgba(255,255,255,0.08);
+    rgba(124,92,252,0.12);
 }
 
-.skillsensai-light-theme .progress-track {
-  background:
-    rgba(50,42,38,0.09);
-}
-
-.progress-fill {
+.home-progress-fill {
   height: 100%;
 
   border-radius: inherit;
@@ -1781,8 +2287,8 @@ body.skillsensai-light-theme {
   background:
     linear-gradient(
       90deg,
-      #7355e8,
-      #b18dff
+      #637fff,
+      #9a6cf1
     );
 
   transition:
@@ -1791,8 +2297,84 @@ body.skillsensai-light-theme {
 
 
 /* =========================================================
-   LOGIN MODAL
-========================================================= */
+   TOAST
+   ========================================================= */
+
+.home-toast {
+  position: fixed;
+
+  left: 50%;
+  bottom: 25px;
+
+  transform: translateX(-50%);
+
+  z-index: 200;
+
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  max-width: min(430px, 90vw);
+
+  padding:
+    11px
+    13px;
+
+  border-radius: 13px;
+
+  border: 1px solid var(--room-glass-border);
+
+  color: var(--room-text);
+
+  background: var(--room-glass);
+
+  backdrop-filter: blur(18px);
+
+  box-shadow:
+    0 15px 35px rgba(0,0,0,0.18);
+
+  font-size: 12px;
+
+  animation:
+    toastIn 0.22s ease;
+}
+
+.home-toast svg {
+  color: #8263dd;
+}
+
+.home-toast button {
+  display: flex;
+
+  margin-left: 3px;
+
+  border: 0;
+
+  color: inherit;
+
+  background: transparent;
+
+  cursor: pointer;
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform:
+      translate(-50%, 12px);
+  }
+
+  to {
+    opacity: 1;
+    transform:
+      translate(-50%, 0);
+  }
+}
+
+
+/* =========================================================
+   LOGIN OVERLAY
+   ========================================================= */
 
 .login-overlay {
   position: fixed;
@@ -1802,49 +2384,50 @@ body.skillsensai-light-theme {
   z-index: 5000;
 
   display: flex;
-
   align-items: center;
   justify-content: center;
 
   padding: 20px;
 
   background:
-    rgba(0,0,0,0.76);
+    rgba(8, 7, 12, 0.76);
 
-  backdrop-filter:
-    blur(13px);
+  backdrop-filter: blur(13px);
 }
 
 .login-modal {
   position: relative;
 
-  width: min(430px, 94vw);
+  width: min(440px, 100%);
 
-  padding: 29px;
+  padding: 30px;
 
-  border-radius: 22px;
-
-  background:
-    #15151b;
+  border-radius: 25px;
 
   border:
-    1px solid
-    rgba(255,255,255,0.09);
+    1px solid rgba(255,255,255,0.12);
+
+  color: #1c1922;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,0.98),
+      rgba(245,241,252,0.98)
+    );
 
   box-shadow:
-    0 30px 80px rgba(0,0,0,0.5);
-
-  color: #fff;
+    0 30px 90px rgba(0,0,0,0.42);
 
   animation:
-    modalIn 0.22s ease-out;
+    loginModalIn 0.25s ease;
 }
 
-@keyframes modalIn {
+@keyframes loginModalIn {
   from {
     opacity: 0;
     transform:
-      translateY(10px)
+      translateY(12px)
       scale(0.97);
   }
 
@@ -1859,60 +2442,63 @@ body.skillsensai-light-theme {
 .login-close {
   position: absolute;
 
-  top: 15px;
-  right: 15px;
+  right: 16px;
+  top: 16px;
 
   width: 34px;
   height: 34px;
-
-  border: 0;
-
-  border-radius: 50%;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  color:
-    rgba(255,255,255,0.6);
+  border: 0;
 
-  background:
-    rgba(255,255,255,0.06);
+  border-radius: 50%;
+
+  color: #6f6877;
+
+  background: rgba(80,70,90,0.07);
 
   cursor: pointer;
 }
 
 .login-close:hover {
-  color: #fff;
-
-  background:
-    rgba(255,255,255,0.11);
+  background: rgba(80,70,90,0.13);
 }
 
 .login-header {
   text-align: center;
 
   padding:
-    5px 25px 20px;
+    5px
+    18px
+    22px;
 }
 
-.login-shield {
-  width: 54px;
-  height: 54px;
+.login-logo {
+  width: 50px;
+  height: 50px;
 
-  margin:
-    0 auto 12px;
-
-  border-radius: 16px;
+  margin: 0 auto 13px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  color: #b8a8ff;
+  border-radius: 16px;
+
+  color: white;
 
   background:
-    rgba(124,92,252,0.14);
+    linear-gradient(
+      135deg,
+      #657eff,
+      #a065df
+    );
+
+  box-shadow:
+    0 10px 25px rgba(100,85,230,0.28);
 }
 
 .login-header h2 {
@@ -1920,468 +2506,662 @@ body.skillsensai-light-theme {
 
   font-size: 22px;
 
-  letter-spacing: -0.4px;
+  letter-spacing: -0.6px;
+}
+
+.login-header h2 span {
+  color: #7c5cfc;
 }
 
 .login-header p {
-  margin:
-    7px 0 0;
+  margin: 7px 0 0;
+
+  color: #777080;
 
   font-size: 12px;
-
-  color:
-    rgba(255,255,255,0.5);
 }
+
+
+/* =========================================================
+   LOGIN TABS
+   ========================================================= */
 
 .login-tabs {
   display: grid;
 
   grid-template-columns: 1fr 1fr;
 
-  gap: 7px;
+  gap: 6px;
 
-  padding: 4px;
+  padding: 5px;
 
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 
-  border-radius: 11px;
+  border-radius: 13px;
 
-  background:
-    rgba(255,255,255,0.05);
+  background: rgba(100,85,120,0.07);
 }
 
 .login-tab {
   display: flex;
-
   align-items: center;
   justify-content: center;
 
   gap: 7px;
 
+  height: 39px;
+
   border: 0;
 
-  border-radius: 8px;
+  border-radius: 9px;
 
-  padding: 10px;
+  color: #817987;
 
   background: transparent;
 
-  color:
-    rgba(255,255,255,0.46);
+  font-size: 12px;
+
+  font-weight: 700;
 
   cursor: pointer;
 }
 
 .login-tab.active {
-  color: #fff;
+  color: #51407f;
 
-  background:
-    rgba(124,92,252,0.22);
+  background: white;
+
+  box-shadow:
+    0 4px 12px rgba(40,30,60,0.08);
 }
+
+
+/* =========================================================
+   LOGIN METHODS
+   ========================================================= */
 
 .login-method {
   display: flex;
-
   flex-direction: column;
-
-  gap: 11px;
-}
-
-.login-method label {
-  font-size: 12px;
-
-  color:
-    rgba(255,255,255,0.65);
 }
 
 .google-login-button,
 .otp-button {
   width: 100%;
-
-  min-height: 48px;
-
-  border: 0;
-
-  border-radius: 11px;
+  height: 48px;
 
   display: flex;
-
   align-items: center;
   justify-content: center;
 
   gap: 10px;
 
+  border: 0;
+
+  border-radius: 13px;
+
+  font-size: 13px;
+
+  font-weight: 800;
+
   cursor: pointer;
-
-  font-weight: 600;
-
-  color: #fff;
-
-  background:
-    linear-gradient(
-      135deg,
-      #7154e8,
-      #8a6cff
-    );
-
-  box-shadow:
-    0 8px 22px rgba(99,74,220,0.2);
 
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
 }
 
-.google-login-button:hover,
-.otp-button:hover {
-  transform:
-    translateY(-1px);
+.google-login-button {
+  color: #27232d;
+
+  background: white;
+
+  border:
+    1px solid #e1dce7;
 
   box-shadow:
-    0 11px 27px rgba(99,74,220,0.28);
+    0 7px 18px rgba(50,40,65,0.07);
+}
+
+.google-login-button:hover,
+.otp-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.google-login-button:disabled,
+.otp-button:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.62;
 }
 
 .google-g {
-  width: 24px;
-  height: 24px;
+  font-size: 21px;
 
-  border-radius: 50%;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: #fff;
+  font-weight: 900;
 
   color: #4285f4;
-
-  font-size: 14px;
-
-  font-weight: 800;
 }
 
-.login-method small {
-  text-align: center;
-
-  font-size: 10px;
-
-  line-height: 1.5;
-
-  color:
-    rgba(255,255,255,0.35);
-}
-
-.phone-input-wrap {
+.login-security {
   display: flex;
+  align-items: flex-start;
 
-  align-items: center;
+  gap: 7px;
 
-  gap: 9px;
-
-  height: 48px;
-
-  padding:
-    0 13px;
-
-  border-radius: 11px;
-
-  border:
-    1px solid
-    rgba(255,255,255,0.1);
-
-  background:
-    rgba(255,255,255,0.045);
-
-  color:
-    rgba(255,255,255,0.5);
-}
-
-.phone-input-wrap input {
-  flex: 1;
-
-  min-width: 0;
-
-  border: 0;
-
-  outline: none;
-
-  background: transparent;
-
-  color: #fff;
-
-  font-size: 14px;
-}
-
-.phone-input-wrap input::placeholder {
-  color:
-    rgba(255,255,255,0.28);
-}
-
-.otp-input {
-  width: 100%;
-
-  height: 52px;
-
-  border-radius: 11px;
-
-  border:
-    1px solid
-    rgba(255,255,255,0.1);
-
-  outline: none;
-
-  background:
-    rgba(255,255,255,0.045);
-
-  color: #fff;
-
-  text-align: center;
-
-  letter-spacing: 8px;
-
-  font-size: 20px;
-}
-
-.otp-input:focus,
-.phone-input-wrap:focus-within {
-  border-color:
-    rgba(140,116,255,0.6);
-}
-
-.change-number {
-  border: 0;
-
-  background: transparent;
-
-  color:
-    #a996ff;
-
-  cursor: pointer;
-
-  font-size: 12px;
-}
-
-.login-error {
   margin-top: 13px;
 
-  padding: 10px 12px;
+  color: #88818f;
 
-  border-radius: 9px;
-
-  background:
-    rgba(220,70,80,0.1);
-
-  border:
-    1px solid
-    rgba(220,70,80,0.2);
-
-  color:
-    #ff9b9f;
-
-  font-size: 11px;
+  font-size: 10px;
 
   line-height: 1.45;
 }
 
-.login-footer {
-  margin:
-    20px 0 0;
+.login-security svg {
+  flex-shrink: 0;
 
-  text-align: center;
+  margin-top: 1px;
 
-  font-size: 10px;
-
-  color:
-    rgba(255,255,255,0.28);
+  color: #6c9d75;
 }
 
 
 /* =========================================================
-   RESPONSIVE
-========================================================= */
+   PHONE
+   ========================================================= */
 
-@media (max-width: 850px) {
+.login-method label {
+  margin-bottom: 7px;
 
-  .ceiling-fan {
-    transform:
-      translateX(-50%)
-      scale(0.85);
-  }
+  color: #5d5663;
 
-  .hanging-bulb {
-    left: auto;
-    right: 105px;
-  }
+  font-size: 11px;
 
-  .room-login {
-    right: 18px;
-  }
+  font-weight: 800;
+}
 
-  .home-content {
-    padding-top: 118px;
-  }
+.phone-input-wrapper {
+  height: 48px;
 
-  .skills-room {
-    width: 700px;
+  display: flex;
+  align-items: center;
 
-    transform:
-      scale(0.88);
-  }
+  gap: 9px;
 
-  .learning-flow {
-    margin-top: -20px;
+  padding: 0 13px;
+
+  margin-bottom: 12px;
+
+  border:
+    1px solid #ddd7e4;
+
+  border-radius: 12px;
+
+  color: #776e80;
+
+  background: white;
+}
+
+.phone-input-wrapper:focus-within {
+  border-color: #8a72ed;
+
+  box-shadow:
+    0 0 0 3px rgba(124,92,252,0.1);
+}
+
+.phone-input-wrapper input {
+  width: 100%;
+
+  border: 0;
+  outline: 0;
+
+  color: #2b2630;
+
+  background: transparent;
+
+  font-size: 13px;
+}
+
+.otp-button {
+  color: white;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7058e8,
+      #9161d7
+    );
+
+  box-shadow:
+    0 8px 20px rgba(110,80,220,0.23);
+}
+
+.otp-label {
+  margin-top: 2px;
+}
+
+.otp-input {
+  width: 100%;
+  height: 52px;
+
+  box-sizing: border-box;
+
+  margin-bottom: 12px;
+
+  border:
+    1px solid #ddd7e4;
+
+  border-radius: 12px;
+
+  outline: 0;
+
+  text-align: center;
+
+  letter-spacing: 9px;
+
+  font-size: 20px;
+
+  font-weight: 800;
+
+  color: #312b38;
+
+  background: white;
+}
+
+.otp-input:focus {
+  border-color: #8a72ed;
+
+  box-shadow:
+    0 0 0 3px rgba(124,92,252,0.1);
+}
+
+
+/* =========================================================
+   AUTH MESSAGES
+   ========================================================= */
+
+.login-error,
+.login-success {
+  margin-top: 12px;
+
+  padding: 10px 12px;
+
+  border-radius: 10px;
+
+  font-size: 10px;
+
+  line-height: 1.45;
+}
+
+.login-error {
+  color: #b52f46;
+
+  background:
+    rgba(218,60,84,0.08);
+
+  border:
+    1px solid rgba(218,60,84,0.13);
+}
+
+.login-success {
+  color: #3d7951;
+
+  background:
+    rgba(80,160,100,0.08);
+
+  border:
+    1px solid rgba(80,160,100,0.13);
+}
+
+.spin {
+  animation:
+    spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
 
-@media (max-width: 650px) {
+/* =========================================================
+   RESPONSIVE — TABLET
+   ========================================================= */
 
-  .ceiling {
-    height: 72px;
+@media (max-width: 900px) {
+
+  .home-content {
+    padding-top: 100px;
   }
 
-  .ceiling-fan {
-    left: 50%;
-
-    transform:
-      translateX(-50%)
-      scale(0.62);
+  .skills-room {
+    height: 570px;
   }
 
-  .hanging-bulb {
-    top: 0;
-    right: 72px;
+  .living-sofa {
+    width: 580px;
+  }
 
-    transform:
-      scale(0.78);
+  .living-rug {
+    width: 560px;
+  }
 
-    transform-origin:
-      top center;
+  .skill-position-2 {
+    right: 25px;
+  }
+
+  .skill-position-3 {
+    right: 40px;
+  }
+
+  .skill-position-5 {
+    left: 40px;
+  }
+
+  .skill-position-6 {
+    left: 25px;
+  }
+
+  .room-plant {
+    right: 5px;
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+   ========================================================= */
+
+@media (max-width: 680px) {
+
+  .room-background {
+    min-height: 100vh;
   }
 
   .room-login {
-    top: 88px;
     right: 14px;
+    top: 16px;
   }
 
   .login-button {
-    padding: 8px 12px;
+    width: 40px;
+    padding: 0;
+
+    justify-content: center;
   }
 
   .login-button span {
     display: none;
   }
 
-  .home-content {
-    padding-top: 125px;
+  .hanging-bulb {
+    right: 18%;
+    transform: scale(0.75);
+    transform-origin: top center;
   }
 
-  .home-intro h1 {
-    font-size: 31px;
+  .ceiling-fan {
+    transform:
+      translateX(-50%)
+      scale(0.72);
+
+    transform-origin: top center;
+  }
+
+  .home-content {
+    width: 95%;
+
+    padding-top: 92px;
+    padding-bottom: 40px;
+  }
+
+  .brand-name {
+    font-size: 28px;
   }
 
   .home-intro p {
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .skills-room {
-    width: 650px;
-    height: 530px;
+    height: 525px;
+  }
+
+  .samurai-container {
+    top: 58px;
+
+    width: 240px;
+    height: 360px;
+  }
+
+  .samurai-image {
+    width: 235px;
+    height: 350px;
+  }
+
+  .samurai-aura {
+    width: 220px;
+    height: 300px;
+  }
+
+  .character-shadow {
+    bottom: 75px;
+  }
+
+  .skill-circle {
+    width: 78px;
+    height: 78px;
+
+    padding: 7px;
+
+    gap: 2px;
+  }
+
+  .skill-icon {
+    width: 29px;
+    height: 29px;
+  }
+
+  .skill-icon svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .skill-name {
+    max-width: 66px;
+
+    font-size: 8px;
+  }
+
+  .coming-label {
+    right: 3px;
+    top: 3px;
+
+    padding: 2px 4px;
+
+    font-size: 5px;
+  }
+
+  .skill-position-1 {
+    top: 18px;
+  }
+
+  .skill-position-2 {
+    right: 5px;
+    top: 145px;
+  }
+
+  .skill-position-3 {
+    right: 25px;
+    bottom: 63px;
+  }
+
+  .skill-position-4 {
+    bottom: 12px;
+  }
+
+  .skill-position-5 {
+    left: 25px;
+    bottom: 63px;
+  }
+
+  .skill-position-6 {
+    left: 5px;
+    top: 145px;
+  }
+
+  .living-sofa {
+    width: 470px;
+    height: 160px;
+
+    bottom: 62px;
 
     transform:
-      scale(0.67);
+      translateX(-50%)
+      scale(0.8);
+  }
+
+  .living-rug {
+    width: 460px;
+    height: 135px;
+
+    bottom: 8px;
+  }
+
+  .coffee-table {
+    transform:
+      translateX(-50%)
+      scale(0.72);
+
+    transform-origin: bottom center;
+
+    bottom: 90px;
+  }
+
+  .room-plant {
+    display: none;
   }
 
   .learning-flow {
-    width: 94vw;
-
-    margin-top: -75px;
+    padding: 18px 14px;
   }
 
-  .flow-cards {
+  .learning-flow-cards {
+    display: flex;
     flex-direction: column;
 
-    gap: 9px;
-  }
-
-  .flow-line {
-    display: none;
+    gap: 7px;
   }
 
   .flow-card {
     width: 100%;
+
+    box-sizing: border-box;
   }
 
-  .home-progress {
-    margin-top: 16px;
-  }
-}
-
-
-@media (max-width: 430px) {
-
-  .hanging-bulb {
-    right: 58px;
+  .flow-arrow {
+    transform: rotate(90deg);
   }
 
-  .room-login {
-    right: 10px;
+  .profile-name {
+    display: none;
   }
 
-  .home-content {
-    width: 96vw;
+  .profile-button {
+    width: 42px;
+
+    padding: 0;
+
+    justify-content: center;
   }
 
-  .skills-room {
-    transform:
-      scale(0.58);
-
-    margin-top: -15px;
+  .profile-button > svg {
+    display: none;
   }
 
-  .learning-flow {
-    margin-top: -120px;
-  }
-
-  .login-modal {
-    padding: 23px 19px;
-  }
 }
 
 
 /* =========================================================
-   ACCESSIBILITY
-========================================================= */
+   SMALL MOBILE
+   ========================================================= */
 
-button:focus-visible,
-input:focus-visible {
-  outline:
-    2px solid
-    rgba(145,120,255,0.8);
+@media (max-width: 430px) {
 
-  outline-offset: 3px;
+  .home-content {
+    padding-top: 88px;
+  }
+
+  .skills-room {
+    height: 500px;
+  }
+
+  .samurai-container {
+    top: 65px;
+
+    width: 210px;
+    height: 330px;
+  }
+
+  .samurai-image {
+    width: 215px;
+    height: 320px;
+  }
+
+  .skill-circle {
+    width: 70px;
+    height: 70px;
+  }
+
+  .skill-position-2 {
+    right: 0;
+  }
+
+  .skill-position-6 {
+    left: 0;
+  }
+
+  .skill-position-3 {
+    right: 13px;
+  }
+
+  .skill-position-5 {
+    left: 13px;
+  }
+
+  .living-sofa {
+    opacity: 0.72;
+  }
+
+  .living-rug {
+    opacity: 0.68;
+  }
+
+  .learning-flow-heading h2 {
+    font-size: 20px;
+  }
+
+  .login-modal {
+    padding: 24px 19px;
+  }
 }
 
 
 /* =========================================================
    REDUCE MOTION
-========================================================= */
+   ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
 
-  *,
-  *::before,
-  *::after {
-    animation-duration:
-      0.01ms !important;
-
-    animation-iteration-count:
-      1 !important;
-
-    scroll-behavior:
-      auto !important;
-
-    transition-duration:
-      0.01ms !important;
+  .samurai-image,
+  .samurai-aura,
+  .fan-blades,
+  .skill-circle,
+  .profile-dropdown,
+  .home-toast,
+  .login-modal {
+    animation: none !important;
   }
 }
