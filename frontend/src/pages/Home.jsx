@@ -16,13 +16,13 @@ import {
   User,
   Phone,
   Mail,
-  ArrowRight,
-  Loader2,
   X,
   ShieldCheck,
   BookOpen,
   Target,
   Trophy,
+  ArrowRight,
+  Loader2,
 } from "lucide-react";
 
 import {
@@ -40,7 +40,7 @@ import { getLessonsLearned } from "../utils/progress";
 import "./Home.css";
 
 /* =========================================================
-   GLOBAL THEME
+   THEME
    ========================================================= */
 
 const applyGlobalTheme = (theme) => {
@@ -118,9 +118,9 @@ const skills = [
 export default function Home() {
   const navigate = useNavigate();
 
-  /* -------------------------------------------------------
+  /* =======================================================
      STATE
-  ------------------------------------------------------- */
+     ======================================================= */
 
   const [theme, setTheme] = useState(
     localStorage.getItem("skillsensai_theme") || "light"
@@ -152,8 +152,8 @@ export default function Home() {
   const [lessonsLearned, setLessonsLearned] = useState(0);
 
   /* =======================================================
-     THEME
-  ======================================================= */
+     APPLY THEME
+     ======================================================= */
 
   useEffect(() => {
     applyGlobalTheme(theme);
@@ -163,6 +163,10 @@ export default function Home() {
       theme
     );
   }, [theme]);
+
+  /* =======================================================
+     THEME TOGGLE
+     ======================================================= */
 
   const toggleTheme = () => {
     setTheme((currentTheme) => {
@@ -183,8 +187,8 @@ export default function Home() {
   };
 
   /* =======================================================
-     FIREBASE AUTH LISTENER
-  ======================================================= */
+     FIREBASE AUTH
+     ======================================================= */
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(
@@ -198,8 +202,8 @@ export default function Home() {
   }, []);
 
   /* =======================================================
-     LOAD LESSON PROGRESS
-  ======================================================= */
+     LESSON PROGRESS
+     ======================================================= */
 
   useEffect(() => {
     const loadProgress = () => {
@@ -223,36 +227,36 @@ export default function Home() {
 
     loadProgress();
 
-    const handleStorage = () => {
+    const handleProgressUpdate = () => {
       loadProgress();
     };
 
     window.addEventListener(
       "storage",
-      handleStorage
+      handleProgressUpdate
     );
 
     window.addEventListener(
       "skillsensai-progress-updated",
-      handleStorage
+      handleProgressUpdate
     );
 
     return () => {
       window.removeEventListener(
         "storage",
-        handleStorage
+        handleProgressUpdate
       );
 
       window.removeEventListener(
         "skillsensai-progress-updated",
-        handleStorage
+        handleProgressUpdate
       );
     };
   }, []);
 
   /* =======================================================
-     CLOSE PROFILE WHEN CLICKING OUTSIDE
-  ======================================================= */
+     CLOSE PROFILE OUTSIDE
+     ======================================================= */
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
@@ -277,8 +281,8 @@ export default function Home() {
   }, []);
 
   /* =======================================================
-     OPEN LOGIN
-  ======================================================= */
+     LOGIN
+     ======================================================= */
 
   const openLogin = () => {
     setLoginError("");
@@ -292,7 +296,7 @@ export default function Home() {
 
   /* =======================================================
      GOOGLE LOGIN
-  ======================================================= */
+     ======================================================= */
 
   const handleGoogleLogin = async () => {
     try {
@@ -338,7 +342,7 @@ export default function Home() {
         "auth/unauthorized-domain"
       ) {
         setLoginError(
-          "This website domain is not authorized in Firebase Authentication. Add skillsensai.vercel.app to Firebase Authorized domains."
+          "This website is not authorized in Firebase. Add skillsensai.vercel.app to Authorized domains."
         );
       } else {
         setLoginError(
@@ -352,8 +356,8 @@ export default function Home() {
   };
 
   /* =======================================================
-     PHONE NUMBER FORMAT
-  ======================================================= */
+     PHONE FORMAT
+     ======================================================= */
 
   const getFormattedPhoneNumber = () => {
     let value = phoneNumber.trim();
@@ -380,7 +384,7 @@ export default function Home() {
 
   /* =======================================================
      SEND OTP
-  ======================================================= */
+     ======================================================= */
 
   const handleSendOtp = async () => {
     try {
@@ -488,7 +492,7 @@ export default function Home() {
 
   /* =======================================================
      VERIFY OTP
-  ======================================================= */
+     ======================================================= */
 
   const handleVerifyOtp = async () => {
     try {
@@ -554,8 +558,8 @@ export default function Home() {
   };
 
   /* =======================================================
-     CHANGE PHONE NUMBER
-  ======================================================= */
+     CHANGE PHONE
+     ======================================================= */
 
   const handleChangeNumber = () => {
     setPhoneStep("phone");
@@ -576,7 +580,7 @@ export default function Home() {
 
   /* =======================================================
      LOGOUT
-  ======================================================= */
+     ======================================================= */
 
   const handleLogout = async () => {
     try {
@@ -593,8 +597,8 @@ export default function Home() {
   };
 
   /* =======================================================
-     USER DISPLAY
-  ======================================================= */
+     DISPLAY USER
+     ======================================================= */
 
   const displayName =
     user?.displayName ||
@@ -607,8 +611,8 @@ export default function Home() {
     "SkillSensAI learner";
 
   /* =======================================================
-     RENDER
-  ======================================================= */
+     JSX
+     ======================================================= */
 
   return (
     <div className="home-page">
@@ -623,8 +627,6 @@ export default function Home() {
 
         <div className="ceiling">
           <div className="ceiling-line" />
-
-          {/* HANGING BULB */}
 
           <div className="hanging-bulb">
             <div className="bulb-wire" />
@@ -765,11 +767,13 @@ export default function Home() {
         </div>
 
         {/* =================================================
-            HOME CONTENT
+            MAIN CONTENT
         ================================================= */}
 
         <div className="home-content">
-          {/* INTRO */}
+          {/* =================================================
+              INTRO
+          ================================================= */}
 
           <section className="home-intro">
             <span className="home-eyebrow">
@@ -789,9 +793,13 @@ export default function Home() {
             </p>
           </section>
 
-          {/* SKILLS ROOM */}
+          {/* =================================================
+              SKILLS ROOM
+          ================================================= */}
 
           <section className="skills-room">
+            {/* SOFA */}
+
             <div className="room-sofa">
               <div className="sofa-back" />
               <div className="sofa-seat" />
@@ -799,21 +807,34 @@ export default function Home() {
               <div className="sofa-arm sofa-arm-right" />
             </div>
 
+            {/* RUG */}
+
             <div className="room-rug">
               <div className="rug-inner" />
             </div>
 
+            {/* PLANT */}
+
             <div className="room-plant">
-              <div className="plant-pot" />
+              <div className="plant-stem" />
 
               <div className="plant-leaf leaf-1" />
               <div className="plant-leaf leaf-2" />
               <div className="plant-leaf leaf-3" />
               <div className="plant-leaf leaf-4" />
               <div className="plant-leaf leaf-5" />
+              <div className="plant-leaf leaf-6" />
+
+              <div className="plant-pot">
+                <div className="plant-pot-rim" />
+              </div>
             </div>
 
+            {/* CHARACTER SHADOW */}
+
             <div className="character-shadow" />
+
+            {/* SAMURAI */}
 
             <div className="samurai-container">
               <div className="samurai-aura" />
@@ -825,20 +846,21 @@ export default function Home() {
               />
             </div>
 
+            {/* SKILLS */}
+
             <div className="skills-orbit">
               {skills.map(
                 (skill, index) => {
                   const Icon =
                     skill.icon;
 
-                  const position =
-                    index + 1;
-
                   return (
                     <button
                       key={skill.name}
                       type="button"
-                      className={`skill-circle skill-${skill.color} skill-position-${position} ${
+                      className={`skill-circle skill-${skill.color} skill-position-${
+                        index + 1
+                      } ${
                         skill.active
                           ? "skill-active"
                           : "skill-coming-soon"
@@ -856,22 +878,23 @@ export default function Home() {
                       disabled={
                         !skill.active
                       }
-                      title={
-                        skill.active
-                          ? `Learn ${skill.name}`
-                          : `${skill.name} coming soon`
-                      }
                     >
-                      <span className="skill-icon">
-                        <Icon size={27} />
-                      </span>
+                      <Icon
+                        className="skill-icon"
+                        size={25}
+                      />
 
-                      <span className="skill-label">
+                      {/* IMPORTANT:
+                          CSS uses .skill-name,
+                          not .skill-label.
+                      */}
+
+                      <span className="skill-name">
                         {skill.name}
                       </span>
 
                       {!skill.active && (
-                        <span className="skill-status">
+                        <span className="skill-coming-text">
                           Coming Soon
                         </span>
                       )}
@@ -882,64 +905,81 @@ export default function Home() {
             </div>
           </section>
 
-          {/* LEARNING FLOW */}
+          {/* =================================================
+              LEARNING FLOW
+          ================================================= */}
 
           <section className="learning-flow">
-            <div className="learning-flow-item">
-              <div className="learning-flow-icon">
-                <BookOpen size={20} />
+            <div className="learning-step">
+              <div className="learning-icon">
+                <BookOpen size={21} />
               </div>
 
-              <div>
-                <strong>
+              <div className="learning-text">
+                <span className="learning-number">
+                  01
+                </span>
+
+                <h3>
                   Learn
-                </strong>
+                </h3>
 
-                <span>
-                  Structured lessons
-                </span>
+                <p>
+                  Follow structured
+                  lessons designed for
+                  your level.
+                </p>
               </div>
             </div>
 
-            <ArrowRight
-              className="learning-flow-arrow"
-              size={22}
-            />
+            <div className="learning-arrow">
+              <ArrowRight size={22} />
+            </div>
 
-            <div className="learning-flow-item">
-              <div className="learning-flow-icon">
-                <Target size={20} />
+            <div className="learning-step">
+              <div className="learning-icon">
+                <Target size={21} />
               </div>
 
-              <div>
-                <strong>
+              <div className="learning-text">
+                <span className="learning-number">
+                  02
+                </span>
+
+                <h3>
                   Practice
-                </strong>
+                </h3>
 
-                <span>
-                  Real activities
-                </span>
+                <p>
+                  Apply what you learn
+                  through real activities.
+                </p>
               </div>
             </div>
 
-            <ArrowRight
-              className="learning-flow-arrow"
-              size={22}
-            />
+            <div className="learning-arrow">
+              <ArrowRight size={22} />
+            </div>
 
-            <div className="learning-flow-item">
-              <div className="learning-flow-icon">
-                <Trophy size={20} />
+            <div className="learning-step">
+              <div className="learning-icon">
+                <Trophy size={21} />
               </div>
 
-              <div>
-                <strong>
-                  Improve
-                </strong>
-
-                <span>
-                  Intelligent feedback
+              <div className="learning-text">
+                <span className="learning-number">
+                  03
                 </span>
+
+                <h3>
+                  Improve
+                </h3>
+
+                <p>
+                  Get intelligent
+                  feedback and keep
+                  progressing.
+                </p>
               </div>
             </div>
           </section>
@@ -968,7 +1008,6 @@ export default function Home() {
                 onClick={() =>
                   setLoginOpen(false)
                 }
-                aria-label="Close login"
               >
                 <X size={20} />
               </button>
@@ -988,7 +1027,7 @@ export default function Home() {
                 </p>
               </div>
 
-              {/* LOGIN TABS */}
+              {/* TABS */}
 
               <div className="login-tabs">
                 <button
@@ -1199,8 +1238,6 @@ export default function Home() {
                 </div>
               )}
 
-              {/* LOGIN ERROR */}
-
               {loginError && (
                 <div className="login-error">
                   {loginError}
@@ -1210,7 +1247,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* INVISIBLE RECAPTCHA */}
+        {/* RECAPTCHA */}
 
         <div id="recaptcha-container" />
       </main>
