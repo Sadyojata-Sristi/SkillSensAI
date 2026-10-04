@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Bot,
   MessageCircle,
   Send,
   X,
@@ -127,8 +126,7 @@ function AIChat() {
   };
 
   const saveCustomization = () => {
-    const finalName =
-      tempName.trim() || "Nova";
+    const finalName = tempName.trim() || "Nova";
 
     setAiName(finalName);
     setAiCharacter(tempCharacter);
@@ -172,7 +170,6 @@ function AIChat() {
       return;
     }
 
-    // Keep uploaded image reasonably small.
     if (file.size > 3 * 1024 * 1024) {
       alert("Please choose an image smaller than 3 MB.");
       return;
@@ -185,6 +182,8 @@ function AIChat() {
     };
 
     reader.readAsDataURL(file);
+
+    event.target.value = "";
   };
 
   const sendMessage = async () => {
@@ -233,8 +232,7 @@ function AIChat() {
     */
 
     setTimeout(() => {
-      const lower =
-        trimmedMessage.toLowerCase();
+      const lower = trimmedMessage.toLowerCase();
 
       let aiText =
         `I'm ${aiName}! I'm currently in demo mode, but I'm ready to help you learn.`;
@@ -306,7 +304,7 @@ function AIChat() {
   return (
     <>
       {/* =====================================================
-          AI CHARACTER
+          AI CHARACTER ABOVE CHAT BUTTON
           ===================================================== */}
 
       <button
@@ -341,6 +339,7 @@ function AIChat() {
         >
           <MessageCircle size={21} />
           <span>Chat with AI</span>
+
           <Sparkles
             size={16}
             className="ai-chat-sparkle"
@@ -354,9 +353,11 @@ function AIChat() {
 
       {isOpen && (
         <div className="skillsensai-ai-chat-window">
+
           {/* HEADER */}
           <div className="ai-chat-header">
             <div className="ai-chat-header-left">
+
               <div className="ai-chat-avatar">
                 {getCharacter()}
               </div>
@@ -374,6 +375,7 @@ function AIChat() {
             </div>
 
             <div className="ai-chat-header-actions">
+
               <button
                 className="ai-header-icon"
                 onClick={openCustomize}
@@ -384,19 +386,20 @@ function AIChat() {
 
               <button
                 className="ai-header-icon"
-                onClick={() =>
-                  setIsOpen(false)
-                }
+                onClick={() => setIsOpen(false)}
                 title="Close"
               >
                 <X size={19} />
               </button>
+
             </div>
           </div>
 
           {/* MESSAGES */}
           <div className="ai-chat-messages">
+
             <div className="ai-chat-welcome">
+
               <div className="ai-welcome-icon">
                 {getCharacter()}
               </div>
@@ -411,6 +414,7 @@ function AIChat() {
                   learning companion.
                 </p>
               </div>
+
             </div>
 
             {messages.map((message) => (
@@ -422,6 +426,7 @@ function AIChat() {
                     : "ai-row"
                 }`}
               >
+
                 <div
                   className={`ai-message-avatar ${
                     message.sender === "user"
@@ -445,11 +450,13 @@ function AIChat() {
                 >
                   {message.text}
                 </div>
+
               </div>
             ))}
 
             {isTyping && (
               <div className="ai-message-row ai-row">
+
                 <div className="ai-message-avatar">
                   {getCharacter()}
                 </div>
@@ -459,15 +466,19 @@ function AIChat() {
                   <span />
                   <span />
                 </div>
+
               </div>
             )}
 
             <div ref={messagesEndRef} />
+
           </div>
 
           {/* INPUT */}
           <div className="ai-chat-input-area">
+
             <div className="ai-chat-input-wrapper">
+
               <input
                 ref={inputRef}
                 type="text"
@@ -482,9 +493,7 @@ function AIChat() {
               <button
                 className="ai-send-button"
                 onClick={sendMessage}
-                disabled={
-                  !input.trim() || isTyping
-                }
+                disabled={!input.trim() || isTyping}
               >
                 {isTyping ? (
                   <Loader2
@@ -495,6 +504,7 @@ function AIChat() {
                   <Send size={18} />
                 )}
               </button>
+
             </div>
 
             <div className="ai-chat-footer">
@@ -502,6 +512,7 @@ function AIChat() {
                 ✨ SkillSensAI AI Companion
               </span>
             </div>
+
           </div>
 
           {/* =================================================
@@ -510,10 +521,16 @@ function AIChat() {
 
           {showCustomize && (
             <div className="ai-customize-overlay">
+
               <div className="ai-customize-panel">
+
                 <div className="ai-customize-header">
+
                   <div>
-                    <h3>Customize Your AI</h3>
+                    <h3>
+                      Customize Your AI
+                    </h3>
+
                     <p>
                       Create your own learning
                       companion.
@@ -526,11 +543,14 @@ function AIChat() {
                   >
                     <X size={19} />
                   </button>
+
                 </div>
 
                 {/* PREVIEW */}
                 <div className="ai-customize-preview">
+
                   <div className="ai-preview-character">
+
                     {tempImage ? (
                       <img
                         src={tempImage}
@@ -550,17 +570,17 @@ function AIChat() {
                         }
                       </span>
                     )}
+
                   </div>
 
                   <strong>
-                    {tempName.trim() ||
-                      "Your AI"}
+                    {tempName.trim() || "Your AI"}
                   </strong>
 
                   <span>
-                    Your personal AI
-                    companion
+                    Your personal AI companion
                   </span>
+
                 </div>
 
                 {/* NAME */}
@@ -572,37 +592,35 @@ function AIChat() {
                   className="ai-name-input"
                   value={tempName}
                   onChange={(event) =>
-                    setTempName(
-                      event.target.value
-                    )
+                    setTempName(event.target.value)
                   }
                   maxLength={24}
                   placeholder="Give your AI a name"
                 />
 
-                {/* CHARACTERS */}
+                {/* CHARACTER OPTIONS */}
                 <label className="ai-customize-label">
                   Choose your AI character
                 </label>
 
                 <div className="ai-character-options">
+
                   {AI_OPTIONS.map((option) => (
                     <button
                       key={option.id}
+                      type="button"
                       className={`ai-character-option ${
-                        tempCharacter ===
-                        option.id
+                        tempCharacter === option.id
                           ? "selected"
                           : ""
                       }`}
                       onClick={() => {
-                        setTempCharacter(
-                          option.id
-                        );
+                        setTempCharacter(option.id);
                         setTempImage("");
                       }}
                       title={option.name}
                     >
+
                       <span>
                         {option.emoji}
                       </span>
@@ -613,8 +631,10 @@ function AIChat() {
                           <Check size={11} />
                         </div>
                       )}
+
                     </button>
                   ))}
+
                 </div>
 
                 {/* UPLOAD */}
@@ -622,15 +642,12 @@ function AIChat() {
                   ref={fileInputRef}
                   type="file"
                   accept="image/*"
-                  onChange={
-                    handleImageUpload
-                  }
-                  style={{
-                    display: "none",
-                  }}
+                  onChange={handleImageUpload}
+                  style={{ display: "none" }}
                 />
 
                 <button
+                  type="button"
                   className="ai-upload-button"
                   onClick={() =>
                     fileInputRef.current?.click()
@@ -647,10 +664,9 @@ function AIChat() {
 
                 {tempImage && (
                   <button
+                    type="button"
                     className="ai-remove-image"
-                    onClick={() =>
-                      setTempImage("")
-                    }
+                    onClick={() => setTempImage("")}
                   >
                     Remove uploaded image
                   </button>
@@ -658,17 +674,18 @@ function AIChat() {
 
                 {/* SAVE */}
                 <button
+                  type="button"
                   className="ai-save-button"
-                  onClick={
-                    saveCustomization
-                  }
+                  onClick={saveCustomization}
                 >
                   <Check size={18} />
                   Save AI
                 </button>
+
               </div>
             </div>
           )}
+
         </div>
       )}
     </>
