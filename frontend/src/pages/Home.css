@@ -3101,3 +3101,7 @@ body.skillsensai-dark-theme {
     right: 40px;
   }
 }
+
+.room-rug {
+  bottom: -28px !important;
+}
