@@ -2460,3 +2460,600 @@ body.skillsensai-dark-theme {
     min-height: 105px;
   }
 }
+
+/* =========================================================
+   SKILLSENSAI — FINAL HOME PAGE OVERRIDES
+   ========================================================= */
+
+
+/* =========================================================
+   1. REMOVE CEILING FAN COMPLETELY
+   ========================================================= */
+
+.ceiling-fan,
+.fan-ceiling-mount,
+.fan-rod,
+.fan-motor,
+.fan-blades,
+.blade {
+  display: none !important;
+}
+
+
+/* Keep the ceiling itself clean after removing the fan */
+.ceiling {
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   2. MAKE THE HANGING LIGHT A REAL, CLEAR BUTTON
+   ========================================================= */
+
+.hanging-bulb {
+  position: absolute;
+  top: 20px;
+  right: 70px;
+
+  z-index: 3000;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  pointer-events: auto;
+}
+
+
+/* Hanging wire */
+.bulb-wire {
+  width: 2px;
+  height: 52px;
+
+  background: linear-gradient(
+    to bottom,
+    rgba(20, 20, 30, 0.9),
+    rgba(80, 70, 100, 0.7)
+  );
+
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+}
+
+
+/* Actual clickable button */
+.bulb-button {
+  position: relative;
+
+  width: 58px;
+  height: 68px;
+
+  padding: 0;
+  margin: 0;
+
+  border: 0;
+  border-radius: 50%;
+
+  background: transparent;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+
+  cursor: pointer;
+
+  z-index: 3001;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
+}
+
+
+/* Make the whole light visibly clickable */
+.bulb-button:hover {
+  transform: scale(1.08);
+  filter: brightness(1.08);
+}
+
+
+.bulb-button:active {
+  transform: scale(0.94);
+}
+
+
+/* Keyboard accessibility */
+.bulb-button:focus-visible {
+  outline: 3px solid rgba(124, 92, 252, 0.65);
+  outline-offset: 5px;
+}
+
+
+/* Bulb neck */
+.bulb-neck {
+  width: 18px;
+  height: 10px;
+
+  margin-top: 1px;
+
+  border-radius: 5px 5px 3px 3px;
+
+  background: linear-gradient(
+    180deg,
+    #555,
+    #222
+  );
+
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.25),
+    0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+
+/* Bulb glass */
+.bulb-glass {
+  position: relative;
+
+  width: 40px;
+  height: 44px;
+
+  margin-top: -1px;
+
+  border-radius:
+    50%
+    50%
+    45%
+    45%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition:
+    background 0.3s ease,
+    box-shadow 0.3s ease,
+    color 0.3s ease;
+
+  overflow: visible;
+}
+
+
+/* LIGHT ON */
+.bulb-on .bulb-glass {
+  color: #fff7c7;
+
+  background:
+    radial-gradient(
+      circle at 50% 45%,
+      #fffef1 0%,
+      #fff4a8 35%,
+      #ffd95a 65%,
+      #e9a91e 100%
+    );
+
+  box-shadow:
+    0 0 12px rgba(255, 222, 105, 0.95),
+    0 0 28px rgba(255, 205, 70, 0.75),
+    0 0 55px rgba(255, 193, 50, 0.45);
+}
+
+
+/* LIGHT OFF */
+.bulb-off .bulb-glass {
+  color: #9c9caa;
+
+  background:
+    radial-gradient(
+      circle at 50% 45%,
+      #5c5c67 0%,
+      #3e3e49 55%,
+      #25252d 100%
+    );
+
+  box-shadow:
+    inset 0 0 8px rgba(255, 255, 255, 0.08),
+    0 3px 10px rgba(0, 0, 0, 0.35);
+}
+
+
+/* Little glow underneath when ON */
+.bulb-on .bulb-glass::after {
+  content: "";
+
+  position: absolute;
+
+  left: 50%;
+  bottom: -14px;
+
+  width: 90px;
+  height: 28px;
+
+  transform: translateX(-50%);
+
+  background: radial-gradient(
+    ellipse,
+    rgba(255, 220, 100, 0.28),
+    transparent 70%
+  );
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   3. TRUE CIRCULAR SKILL ORBIT AROUND SAMURAI
+   ========================================================= */
+
+.skills-room {
+  position: relative;
+}
+
+
+/*
+   The samurai stays exactly in the center.
+
+   Six skills form an actual circle around him:
+
+                  MUSIC
+             ↙           ↘
+        DANCE               MARTIAL
+             ↘           ↙
+          CODING       ART
+                MORE
+*/
+
+
+.skills-orbit {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 25;
+
+  pointer-events: none;
+}
+
+
+/* Every skill remains independently clickable */
+.skill-circle {
+  position: absolute;
+
+  width: 96px;
+  height: 96px;
+
+  min-width: 96px;
+  min-height: 96px;
+
+  padding: 0;
+
+  border-radius: 50% !important;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  pointer-events: auto;
+
+  box-sizing: border-box;
+
+  z-index: 30;
+
+  transform: translate(-50%, -50%);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    filter 0.25s ease;
+}
+
+
+/* =========================================================
+   TRUE ORBIT POSITIONS
+   ========================================================= */
+
+/*
+   Center of the room = 50% / 50%
+
+   Radius is approximately 190px.
+
+   This gives a real circular arrangement instead of
+   six independent left/right columns.
+*/
+
+
+/* 12 o'clock */
+.skill-position-1 {
+  top: calc(50% - 190px);
+  left: 50%;
+}
+
+
+/* 2 o'clock */
+.skill-position-2 {
+  top: calc(50% - 95px);
+  left: calc(50% + 165px);
+}
+
+
+/* 4 o'clock */
+.skill-position-3 {
+  top: calc(50% + 95px);
+  left: calc(50% + 165px);
+}
+
+
+/* 6 o'clock */
+.skill-position-4 {
+  top: calc(50% + 190px);
+  left: 50%;
+}
+
+
+/* 8 o'clock */
+.skill-position-5 {
+  top: calc(50% + 95px);
+  left: calc(50% - 165px);
+}
+
+
+/* 10 o'clock */
+.skill-position-6 {
+  top: calc(50% - 95px);
+  left: calc(50% - 165px);
+}
+
+
+/* =========================================================
+   SKILL ICONS
+   ========================================================= */
+
+.skill-icon {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+}
+
+
+.skill-name {
+  margin-top: 5px;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  line-height: 1.1;
+
+  text-align: center;
+
+  white-space: nowrap;
+}
+
+
+.coming-soon {
+  margin-top: 3px;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  letter-spacing: 0.5px;
+
+  text-transform: uppercase;
+}
+
+
+/* =========================================================
+   ACTIVE SKILL HOVER
+   ========================================================= */
+
+.skill-active {
+  cursor: pointer;
+}
+
+
+.skill-active:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+
+  filter: brightness(1.08);
+}
+
+
+.skill-active:active {
+  transform: translate(-50%, -50%) scale(0.96);
+}
+
+
+/* Disabled skills */
+.skill-disabled {
+  cursor: not-allowed;
+
+  opacity: 0.72;
+}
+
+
+/* =========================================================
+   KEEP SKILLS VISUALLY ABOVE ROOM ELEMENTS
+   ========================================================= */
+
+.samurai-container {
+  z-index: 20;
+}
+
+
+.character-shadow {
+  z-index: 18;
+}
+
+
+.room-sofa,
+.room-rug,
+.room-plant {
+  z-index: 10;
+}
+
+
+/* =========================================================
+   MOBILE — KEEP THE CIRCLE ARRANGEMENT
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  .hanging-bulb {
+    top: 18px;
+    right: 28px;
+  }
+
+
+  .skill-circle {
+    width: 82px;
+    height: 82px;
+
+    min-width: 82px;
+    min-height: 82px;
+  }
+
+
+  .skill-position-1 {
+    top: calc(50% - 160px);
+    left: 50%;
+  }
+
+
+  .skill-position-2 {
+    top: calc(50% - 80px);
+    left: calc(50% + 125px);
+  }
+
+
+  .skill-position-3 {
+    top: calc(50% + 80px);
+    left: calc(50% + 125px);
+  }
+
+
+  .skill-position-4 {
+    top: calc(50% + 160px);
+    left: 50%;
+  }
+
+
+  .skill-position-5 {
+    top: calc(50% + 80px);
+    left: calc(50% - 125px);
+  }
+
+
+  .skill-position-6 {
+    top: calc(50% - 80px);
+    left: calc(50% - 125px);
+  }
+
+
+  .skill-name {
+    font-size: 11px;
+  }
+
+
+  .skill-icon svg {
+    width: 21px;
+    height: 21px;
+  }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  .hanging-bulb {
+    top: 12px;
+    right: 15px;
+  }
+
+
+  .bulb-wire {
+    height: 38px;
+  }
+
+
+  .bulb-button {
+    width: 50px;
+    height: 58px;
+  }
+
+
+  .bulb-glass {
+    width: 34px;
+    height: 38px;
+  }
+
+
+  .skill-circle {
+    width: 68px;
+    height: 68px;
+
+    min-width: 68px;
+    min-height: 68px;
+  }
+
+
+  .skill-position-1 {
+    top: calc(50% - 135px);
+    left: 50%;
+  }
+
+
+  .skill-position-2 {
+    top: calc(50% - 68px);
+    left: calc(50% + 105px);
+  }
+
+
+  .skill-position-3 {
+    top: calc(50% + 68px);
+    left: calc(50% + 105px);
+  }
+
+
+  .skill-position-4 {
+    top: calc(50% + 135px);
+    left: 50%;
+  }
+
+
+  .skill-position-5 {
+    top: calc(50% + 68px);
+    left: calc(50% - 105px);
+  }
+
+
+  .skill-position-6 {
+    top: calc(50% - 68px);
+    left: calc(50% - 105px);
+  }
+
+
+  .skill-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+
+  .skill-name {
+    font-size: 9px;
+  }
+
+
+  .coming-soon {
+    font-size: 7px;
+  }
+}
