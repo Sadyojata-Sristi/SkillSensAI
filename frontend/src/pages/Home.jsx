@@ -40,7 +40,7 @@ import { getLessonsLearned } from "../utils/progress";
 import "./Home.css";
 
 /* =========================================================
-   THEME
+   THEME HELPER
    ========================================================= */
 
 const applyGlobalTheme = (theme) => {
@@ -119,23 +119,28 @@ export default function Home() {
   const navigate = useNavigate();
 
   /* =======================================================
-     STATE
+     THEME
      ======================================================= */
 
-  const [theme, setTheme] = useState(
-    localStorage.getItem("skillsensai_theme") || "light"
-  );
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("skillsensai_theme") || "light";
+  });
+
+  /* =======================================================
+     AUTH
+     ======================================================= */
 
   const [user, setUser] = useState(null);
-
   const [profileOpen, setProfileOpen] = useState(false);
 
-  const [loginOpen, setLoginOpen] = useState(false);
+  /* =======================================================
+     LOGIN
+     ======================================================= */
 
+  const [loginOpen, setLoginOpen] = useState(false);
   const [loginMethod, setLoginMethod] = useState("google");
 
   const [phoneNumber, setPhoneNumber] = useState("");
-
   const [otp, setOtp] = useState("");
 
   const [confirmationResult, setConfirmationResult] =
@@ -144,12 +149,21 @@ export default function Home() {
   const [phoneStep, setPhoneStep] = useState("phone");
 
   const [loading, setLoading] = useState(false);
-
   const [loginError, setLoginError] = useState("");
 
   const recaptchaRef = useRef(null);
 
+  /* =======================================================
+     PROGRESS
+     ======================================================= */
+
   const [lessonsLearned, setLessonsLearned] = useState(0);
+
+  /* =======================================================
+     LIGHT BULB
+     ======================================================= */
+
+  const [bulbOn, setBulbOn] = useState(true);
 
   /* =======================================================
      APPLY THEME
@@ -157,11 +171,6 @@ export default function Home() {
 
   useEffect(() => {
     applyGlobalTheme(theme);
-
-    localStorage.setItem(
-      "skillsensai_theme",
-      theme
-    );
   }, [theme]);
 
   /* =======================================================
@@ -171,9 +180,7 @@ export default function Home() {
   const toggleTheme = () => {
     setTheme((currentTheme) => {
       const nextTheme =
-        currentTheme === "light"
-          ? "dark"
-          : "light";
+        currentTheme === "light" ? "dark" : "light";
 
       applyGlobalTheme(nextTheme);
 
@@ -187,7 +194,7 @@ export default function Home() {
   };
 
   /* =======================================================
-     FIREBASE AUTH
+     FIREBASE AUTH LISTENER
      ======================================================= */
 
   useEffect(() => {
@@ -202,19 +209,19 @@ export default function Home() {
   }, []);
 
   /* =======================================================
-     LESSON PROGRESS
+     LOAD PROGRESS
      ======================================================= */
 
   useEffect(() => {
     const loadProgress = () => {
       try {
-        const count = getLessonsLearned();
+        const value = getLessonsLearned();
 
-        setLessonsLearned(
-          typeof count === "number"
-            ? count
-            : 0
-        );
+        if (typeof value === "number") {
+          setLessonsLearned(value);
+        } else {
+          setLessonsLearned(0);
+        }
       } catch (error) {
         console.error(
           "Unable to load lesson progress:",
@@ -227,41 +234,41 @@ export default function Home() {
 
     loadProgress();
 
-    const handleProgressUpdate = () => {
-      loadProgress();
-    };
-
     window.addEventListener(
       "storage",
-      handleProgressUpdate
+      loadProgress
     );
 
     window.addEventListener(
       "skillsensai-progress-updated",
-      handleProgressUpdate
+      loadProgress
     );
 
     return () => {
       window.removeEventListener(
         "storage",
-        handleProgressUpdate
+        loadProgress
       );
 
       window.removeEventListener(
         "skillsensai-progress-updated",
-        handleProgressUpdate
+        loadProgress
       );
     };
   }, []);
 
   /* =======================================================
-     CLOSE PROFILE OUTSIDE
+     CLOSE PROFILE WHEN CLICKING OUTSIDE
      ======================================================= */
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
+      const profileArea =
+        document.querySelector(".profile-area");
+
       if (
-        !event.target.closest(".profile-area")
+        profileArea &&
+        !profileArea.contains(event.target)
       ) {
         setProfileOpen(false);
       }
@@ -281,7 +288,7 @@ export default function Home() {
   }, []);
 
   /* =======================================================
-     LOGIN
+     OPEN LOGIN
      ======================================================= */
 
   const openLogin = () => {
@@ -295,54 +302,62 @@ export default function Home() {
   };
 
   /* =======================================================
+     CLOSE LOGIN
+     ======================================================= */
+
+  const closeLogin = () => {
+    if (loading) return;
+
+    setLoginOpen(false);
+    setLoginError("");
+    setPhoneNumber("");
+    setOtp("");
+    setConfirmationResult(null);
+    setPhoneStep("phone");
+  };
+
+  /* =======================================================
      GOOGLE LOGIN
      ======================================================= */
 
   const handleGoogleLogin = async () => {
-    try {
-      setLoading(true);
-      setLoginError("");
+    setLoading(true);
+    setLoginError("");
 
-      const provider =
-        new GoogleAuthProvider();
+    try {
+      const provider = new GoogleAuthProvider();
 
       provider.setCustomParameters({
         prompt: "select_account",
       });
 
-      await signInWithPopup(
-        auth,
-        provider
-      );
+      await signInWithPopup(auth, provider);
 
       setLoginOpen(false);
       setProfileOpen(false);
     } catch (error) {
-      console.error(
-        "Google login error:",
-        error
-      );
+      console.error("Google login error:", error);
 
       if (
         error?.code ===
         "auth/popup-closed-by-user"
       ) {
         setLoginError(
-          "Login window was closed."
+          "The Google sign-in window was closed."
         );
       } else if (
         error?.code ===
         "auth/popup-blocked"
       ) {
         setLoginError(
-          "Your browser blocked the login popup. Please allow popups for this site."
+          "Your browser blocked the Google sign-in popup. Please allow popups for this site."
         );
       } else if (
         error?.code ===
         "auth/unauthorized-domain"
       ) {
         setLoginError(
-          "This website is not authorized in Firebase. Add skillsensai.vercel.app to Authorized domains."
+          "This website is not authorized in Firebase Authentication."
         );
       } else {
         setLoginError(
@@ -356,77 +371,75 @@ export default function Home() {
   };
 
   /* =======================================================
-     PHONE FORMAT
+     PHONE NUMBER FORMAT
      ======================================================= */
 
-  const getFormattedPhoneNumber = () => {
-    let value = phoneNumber.trim();
+  const formatPhoneNumber = (value) => {
+    let cleaned = value.replace(/\D/g, "");
 
-    value = value.replace(
-      /[\s()-]/g,
-      ""
-    );
+    if (cleaned.startsWith("91")) {
+      cleaned = cleaned.substring(2);
+    }
 
-    if (!value) {
+    cleaned = cleaned.substring(0, 10);
+
+    if (cleaned.length === 0) {
       return "";
     }
 
-    if (value.startsWith("+")) {
-      return value;
-    }
+    return `+91${cleaned}`;
+  };
 
-    if (value.startsWith("91")) {
-      return `+${value}`;
-    }
+  const handlePhoneChange = (event) => {
+    const formatted = formatPhoneNumber(
+      event.target.value
+    );
 
-    return `+91${value}`;
+    setPhoneNumber(formatted);
+    setLoginError("");
   };
 
   /* =======================================================
      SEND OTP
      ======================================================= */
 
-  const handleSendOtp = async () => {
+  const sendOTP = async () => {
+    if (!phoneNumber || phoneNumber.length !== 13) {
+      setLoginError(
+        "Please enter a valid 10-digit Indian mobile number."
+      );
+
+      return;
+    }
+
+    setLoading(true);
+    setLoginError("");
+
     try {
-      setLoading(true);
-      setLoginError("");
+      if (recaptchaRef.current) {
+        recaptchaRef.current.clear();
+        recaptchaRef.current = null;
+      }
 
-      const formattedNumber =
-        getFormattedPhoneNumber();
-
-      if (
-        !formattedNumber ||
-        formattedNumber.length < 12
-      ) {
-        setLoginError(
-          "Please enter a valid Indian phone number."
+      recaptchaRef.current =
+        new RecaptchaVerifier(
+          auth,
+          "recaptcha-container",
+          {
+            size: "invisible",
+            callback: () => {},
+            "expired-callback": () => {
+              setLoginError(
+                "reCAPTCHA expired. Please try again."
+              );
+            },
+          }
         );
-
-        setLoading(false);
-        return;
-      }
-
-      if (!recaptchaRef.current) {
-        recaptchaRef.current =
-          new RecaptchaVerifier(
-            auth,
-            "recaptcha-container",
-            {
-              size: "invisible",
-              callback: () => {},
-              "expired-callback": () => {
-                recaptchaRef.current = null;
-              },
-            }
-          );
-      }
-
-      await recaptchaRef.current.render();
 
       const result =
         await signInWithPhoneNumber(
           auth,
-          formattedNumber,
+          phoneNumber,
           recaptchaRef.current
         );
 
@@ -435,16 +448,23 @@ export default function Home() {
       setOtp("");
     } catch (error) {
       console.error(
-        "Phone login error:",
+        "Phone authentication error:",
         error
       );
 
       if (
         error?.code ===
+        "auth/billing-not-enabled"
+      ) {
+        setLoginError(
+          "Phone authentication requires Firebase billing to be enabled. Google login is available without this."
+        );
+      } else if (
+        error?.code ===
         "auth/invalid-phone-number"
       ) {
         setLoginError(
-          "Please enter a valid phone number."
+          "The phone number is invalid."
         );
       } else if (
         error?.code ===
@@ -452,20 +472,6 @@ export default function Home() {
       ) {
         setLoginError(
           "Too many attempts. Please try again later."
-        );
-      } else if (
-        error?.code ===
-        "auth/quota-exceeded"
-      ) {
-        setLoginError(
-          "SMS quota has been exceeded."
-        );
-      } else if (
-        error?.code ===
-        "auth/billing-not-enabled"
-      ) {
-        setLoginError(
-          "Phone authentication requires Firebase billing."
         );
       } else {
         setLoginError(
@@ -494,32 +500,28 @@ export default function Home() {
      VERIFY OTP
      ======================================================= */
 
-  const handleVerifyOtp = async () => {
-    try {
-      setLoading(true);
-      setLoginError("");
-
-      if (!confirmationResult) {
-        setLoginError(
-          "Please request an OTP first."
-        );
-
-        setLoading(false);
-        return;
-      }
-
-      if (!otp || otp.length < 6) {
-        setLoginError(
-          "Please enter the 6-digit OTP."
-        );
-
-        setLoading(false);
-        return;
-      }
-
-      await confirmationResult.confirm(
-        otp
+  const verifyOTP = async () => {
+    if (!confirmationResult) {
+      setLoginError(
+        "Please request a new OTP."
       );
+
+      return;
+    }
+
+    if (otp.length !== 6) {
+      setLoginError(
+        "Please enter the 6-digit OTP."
+      );
+
+      return;
+    }
+
+    setLoading(true);
+    setLoginError("");
+
+    try {
+      await confirmationResult.confirm(otp);
 
       setLoginOpen(false);
       setPhoneStep("phone");
@@ -537,7 +539,7 @@ export default function Home() {
         "auth/invalid-verification-code"
       ) {
         setLoginError(
-          "Incorrect OTP. Please try again."
+          "Incorrect OTP. Please check the code and try again."
         );
       } else if (
         error?.code ===
@@ -549,7 +551,7 @@ export default function Home() {
       } else {
         setLoginError(
           error?.message ||
-            "OTP verification failed."
+            "Unable to verify OTP."
         );
       }
     } finally {
@@ -558,24 +560,14 @@ export default function Home() {
   };
 
   /* =======================================================
-     CHANGE PHONE
+     CHANGE PHONE NUMBER
      ======================================================= */
 
-  const handleChangeNumber = () => {
+  const changePhoneNumber = () => {
     setPhoneStep("phone");
     setOtp("");
     setConfirmationResult(null);
     setLoginError("");
-
-    if (recaptchaRef.current) {
-      try {
-        recaptchaRef.current.clear();
-      } catch (error) {
-        console.error(error);
-      }
-
-      recaptchaRef.current = null;
-    }
   };
 
   /* =======================================================
@@ -586,7 +578,6 @@ export default function Home() {
     try {
       await signOut(auth);
 
-      setUser(null);
       setProfileOpen(false);
     } catch (error) {
       console.error(
@@ -597,7 +588,7 @@ export default function Home() {
   };
 
   /* =======================================================
-     DISPLAY USER
+     DISPLAY NAME
      ======================================================= */
 
   const displayName =
@@ -611,12 +602,29 @@ export default function Home() {
     "SkillSensAI learner";
 
   /* =======================================================
-     JSX
+     SKILL CLICK
+     ======================================================= */
+
+  const handleSkillClick = (skill) => {
+    if (!skill.active) {
+      return;
+    }
+
+    navigate(skill.path);
+  };
+
+  /* =======================================================
+     RENDER
      ======================================================= */
 
   return (
     <div className="home-page">
       <main className="room-background">
+
+        {/* =================================================
+            ROOM BACKGROUND
+        ================================================= */}
+
         <div className="room-wall" />
         <div className="room-floor" />
         <div className="room-corner-glow" />
@@ -628,35 +636,41 @@ export default function Home() {
         <div className="ceiling">
           <div className="ceiling-line" />
 
+          {/* FAN IS INTENTIONALLY NOT RENDERED
+              BECAUSE HOME.CSS HIDES IT COMPLETELY */}
+
           <div className="hanging-bulb">
+
             <div className="bulb-wire" />
 
             <button
               type="button"
               className={`bulb-button ${
-                theme === "light"
+                bulbOn
                   ? "bulb-on"
                   : "bulb-off"
               }`}
-              onClick={toggleTheme}
+              onClick={() =>
+                setBulbOn((current) => !current)
+              }
               aria-label={
-                theme === "light"
-                  ? "Turn lights off"
-                  : "Turn lights on"
+                bulbOn
+                  ? "Turn light off"
+                  : "Turn light on"
               }
               title={
-                theme === "light"
-                  ? "Turn lights off"
-                  : "Turn lights on"
+                bulbOn
+                  ? "Turn light off"
+                  : "Turn light on"
               }
             >
               <span className="bulb-neck" />
 
               <span className="bulb-glass">
-                {theme === "light" ? (
-                  <Lightbulb size={22} />
+                {bulbOn ? (
+                  <Lightbulb size={20} />
                 ) : (
-                  <LightbulbOff size={22} />
+                  <LightbulbOff size={20} />
                 )}
               </span>
             </button>
@@ -668,26 +682,28 @@ export default function Home() {
         ================================================= */}
 
         <div className="room-login">
+
           {!user ? (
             <button
               type="button"
               className="login-button"
               onClick={openLogin}
             >
-              <LogIn size={17} />
-              <span>Login</span>
+              <LogIn size={15} />
+              Login
             </button>
           ) : (
             <div className="profile-area">
+
               <button
                 type="button"
                 className="profile-button"
                 onClick={() =>
                   setProfileOpen(
-                    (previous) =>
-                      !previous
+                    (current) => !current
                   )
                 }
+                aria-expanded={profileOpen}
               >
                 <span className="profile-avatar">
                   {user.photoURL ? (
@@ -696,7 +712,7 @@ export default function Home() {
                       alt={displayName}
                     />
                   ) : (
-                    <User size={17} />
+                    <User size={16} />
                   )}
                 </span>
 
@@ -704,20 +720,29 @@ export default function Home() {
                   {displayName}
                 </span>
 
-                <ChevronDown size={16} />
+                <ChevronDown
+                  size={14}
+                  className={
+                    profileOpen
+                      ? "profile-chevron-open"
+                      : ""
+                  }
+                />
               </button>
 
               {profileOpen && (
                 <div className="profile-dropdown">
+
                   <div className="profile-dropdown-header">
-                    <div className="profile-avatar">
+
+                    <div className="profile-large-avatar">
                       {user.photoURL ? (
                         <img
                           src={user.photoURL}
                           alt={displayName}
                         />
                       ) : (
-                        <User size={18} />
+                        <User size={20} />
                       )}
                     </div>
 
@@ -730,40 +755,42 @@ export default function Home() {
                         {displayContact}
                       </span>
                     </div>
+
                   </div>
 
-                  <div className="profile-progress">
-                    <div className="profile-progress-icon">
-                      <BookOpen size={16} />
-                    </div>
+                  <div className="profile-progress-mini">
 
                     <div>
-                      <strong>
-                        {lessonsLearned} lessons
-                      </strong>
-
                       <span>
-                        completed
+                        Lessons completed
                       </span>
+
+                      <strong>
+                        {lessonsLearned}
+                      </strong>
                     </div>
+
+                    <div className="profile-mini-icon">
+                      <Trophy size={18} />
+                    </div>
+
                   </div>
 
                   <button
                     type="button"
                     className="logout-button"
-                    onClick={
-                      handleLogout
-                    }
+                    onClick={handleLogout}
                   >
-                    <LogOut size={17} />
-                    <span>
-                      Logout
-                    </span>
+                    <LogOut size={15} />
+                    Logout
                   </button>
+
                 </div>
               )}
+
             </div>
           )}
+
         </div>
 
         {/* =================================================
@@ -771,138 +798,174 @@ export default function Home() {
         ================================================= */}
 
         <div className="home-content">
+
           {/* =================================================
               INTRO
           ================================================= */}
 
           <section className="home-intro">
+
             <span className="home-eyebrow">
-              WELCOME TO SKILLSENSAI
+              AI-POWERED SKILL LEARNING
             </span>
 
             <h1>
-              Learn Skills.{" "}
-              <span>Your Way.</span>
+              Learn Skills.
+              <br />
+              <span>Become Your Best.</span>
             </h1>
 
             <p>
-              Learn from structured lessons,
-              practice with real activities,
-              and improve with intelligent
-              feedback.
+              Learn practical skills at your own pace
+              with AI guidance, expert knowledge and
+              real-world practice.
             </p>
+
           </section>
 
           {/* =================================================
-              SKILLS ROOM
+              SKILL ROOM
           ================================================= */}
 
           <section className="skills-room">
-            {/* SOFA */}
+
+            {/* =================================================
+                SOFA
+            ================================================= */}
 
             <div className="room-sofa">
-              <div className="sofa-back" />
-              <div className="sofa-seat" />
+
+              <div className="sofa-back">
+
+                <div className="sofa-cushion sofa-cushion-one" />
+                <div className="sofa-cushion sofa-cushion-two" />
+                <div className="sofa-cushion sofa-cushion-three" />
+
+              </div>
+
+              <div className="sofa-seat">
+                <span />
+              </div>
+
               <div className="sofa-arm sofa-arm-left" />
               <div className="sofa-arm sofa-arm-right" />
+
+              <div className="sofa-leg sofa-leg-left" />
+              <div className="sofa-leg sofa-leg-right" />
+
             </div>
 
-            {/* RUG */}
+            {/* =================================================
+                RUG
+            ================================================= */}
 
             <div className="room-rug">
               <div className="rug-inner" />
             </div>
 
-            {/* PLANT */}
+            {/* =================================================
+                PLANT
+            ================================================= */}
 
             <div className="room-plant">
-              <div className="plant-stem" />
 
-              <div className="plant-leaf leaf-1" />
-              <div className="plant-leaf leaf-2" />
-              <div className="plant-leaf leaf-3" />
-              <div className="plant-leaf leaf-4" />
-              <div className="plant-leaf leaf-5" />
-              <div className="plant-leaf leaf-6" />
+              <div className="plant-stem stem-one" />
+              <div className="plant-stem stem-two" />
+              <div className="plant-stem stem-three" />
+              <div className="plant-stem stem-four" />
+
+              <div className="plant-leaf leaf-one" />
+              <div className="plant-leaf leaf-two" />
+              <div className="plant-leaf leaf-three" />
+              <div className="plant-leaf leaf-four" />
+              <div className="plant-leaf leaf-five" />
+              <div className="plant-leaf leaf-six" />
 
               <div className="plant-pot">
-                <div className="plant-pot-rim" />
+                <span />
               </div>
+
             </div>
 
-            {/* CHARACTER SHADOW */}
+            {/* =================================================
+                CHARACTER SHADOW
+            ================================================= */}
 
             <div className="character-shadow" />
 
-            {/* SAMURAI */}
+            {/* =================================================
+                SAMURAI
+            ================================================= */}
 
             <div className="samurai-container">
+
               <div className="samurai-aura" />
 
               <img
                 src="/samurai.png"
-                alt="SkillSensAI learner"
+                alt="SkillSensAI character"
                 className="samurai-image"
               />
+
             </div>
 
-            {/* SKILLS */}
+            {/* =================================================
+                SKILL ORBIT
+            ================================================= */}
 
             <div className="skills-orbit">
+
               {skills.map(
                 (skill, index) => {
-                  const Icon =
-                    skill.icon;
+                  const Icon = skill.icon;
 
                   return (
                     <button
                       key={skill.name}
                       type="button"
-                      className={`skill-circle skill-${skill.color} skill-position-${
-                        index + 1
-                      } ${
+                      className={[
+                        "skill-circle",
+                        `skill-${skill.color}`,
+                        `skill-position-${
+                          index + 1
+                        }`,
                         skill.active
                           ? "skill-active"
-                          : "skill-coming-soon"
-                      }`}
-                      onClick={() => {
-                        if (
-                          skill.active &&
-                          skill.path
-                        ) {
-                          navigate(
-                            skill.path
-                          );
-                        }
-                      }}
-                      disabled={
-                        !skill.active
+                          : "skill-disabled",
+                      ].join(" ")}
+                      onClick={() =>
+                        handleSkillClick(skill)
+                      }
+                      disabled={!skill.active}
+                      title={
+                        skill.active
+                          ? `Learn ${skill.name}`
+                          : `${skill.name} coming soon`
                       }
                     >
+
                       <Icon
                         className="skill-icon"
                         size={25}
                       />
-
-                      {/* IMPORTANT:
-                          CSS uses .skill-name,
-                          not .skill-label.
-                      */}
 
                       <span className="skill-name">
                         {skill.name}
                       </span>
 
                       {!skill.active && (
-                        <span className="skill-coming-text">
+                        <span className="coming-soon">
                           Coming Soon
                         </span>
                       )}
+
                     </button>
                   );
                 }
               )}
+
             </div>
+
           </section>
 
           {/* =================================================
@@ -910,79 +973,131 @@ export default function Home() {
           ================================================= */}
 
           <section className="learning-flow">
-            <div className="learning-step">
-              <div className="learning-icon">
-                <BookOpen size={21} />
-              </div>
 
-              <div className="learning-text">
-                <span className="learning-number">
-                  01
-                </span>
+            <div className="flow-heading">
 
-                <h3>
-                  Learn
-                </h3>
+              <span>
+                YOUR JOURNEY
+              </span>
 
-                <p>
-                  Follow structured
-                  lessons designed for
-                  your level.
-                </p>
-              </div>
+              <h2>
+                Learn. Practice. Master.
+              </h2>
+
+              <p>
+                Turn your curiosity into real-world
+                skills.
+              </p>
+
             </div>
 
-            <div className="learning-arrow">
-              <ArrowRight size={22} />
-            </div>
+            <div className="flow-cards">
 
-            <div className="learning-step">
-              <div className="learning-icon">
-                <Target size={21} />
+              {/* =================================================
+                  LEARN
+              ================================================= */}
+
+              <div className="flow-card flow-learn">
+
+                <div className="flow-card-icon">
+                  <BookOpen size={19} />
+                </div>
+
+                <div>
+                  <span>
+                    STEP 01
+                  </span>
+
+                  <h3>
+                    Learn
+                  </h3>
+
+                  <p>
+                    Follow structured lessons
+                    designed around your pace
+                    and skill level.
+                  </p>
+                </div>
+
+                <ArrowRight
+                  size={15}
+                  className="flow-arrow"
+                />
+
               </div>
 
-              <div className="learning-text">
-                <span className="learning-number">
-                  02
-                </span>
+              {/* =================================================
+                  PRACTICE
+              ================================================= */}
 
-                <h3>
-                  Practice
-                </h3>
+              <div className="flow-card flow-practice">
 
-                <p>
-                  Apply what you learn
-                  through real activities.
-                </p>
+                <div className="flow-card-icon">
+                  <Target size={19} />
+                </div>
+
+                <div>
+                  <span>
+                    STEP 02
+                  </span>
+
+                  <h3>
+                    Practice
+                  </h3>
+
+                  <p>
+                    Put your knowledge into
+                    practice with real activities
+                    and AI feedback.
+                  </p>
+                </div>
+
+                <ArrowRight
+                  size={15}
+                  className="flow-arrow"
+                />
+
               </div>
+
+              {/* =================================================
+                  MASTER
+              ================================================= */}
+
+              <div className="flow-card flow-master">
+
+                <div className="flow-card-icon">
+                  <Trophy size={19} />
+                </div>
+
+                <div>
+                  <span>
+                    STEP 03
+                  </span>
+
+                  <h3>
+                    Master
+                  </h3>
+
+                  <p>
+                    Build confidence through
+                    continuous practice and
+                    measurable progress.
+                  </p>
+                </div>
+
+              </div>
+
             </div>
 
-            <div className="learning-arrow">
-              <ArrowRight size={22} />
+            <div className="home-bottom-note">
+              <Sparkles size={13} />
+              <span>
+                SkillSensAI grows with you.
+              </span>
             </div>
 
-            <div className="learning-step">
-              <div className="learning-icon">
-                <Trophy size={21} />
-              </div>
-
-              <div className="learning-text">
-                <span className="learning-number">
-                  03
-                </span>
-
-                <h3>
-                  Improve
-                </h3>
-
-                <p>
-                  Get intelligent
-                  feedback and keep
-                  progressing.
-                </p>
-              </div>
-            </div>
           </section>
+
         </div>
 
         {/* =================================================
@@ -992,88 +1107,118 @@ export default function Home() {
         {loginOpen && (
           <div
             className="login-overlay"
-            onClick={(event) => {
+            onMouseDown={(event) => {
               if (
                 event.target ===
                 event.currentTarget
               ) {
-                setLoginOpen(false);
+                closeLogin();
               }
             }}
           >
+
             <div className="login-modal">
+
+              {/* CLOSE */}
+
               <button
                 type="button"
                 className="login-close"
-                onClick={() =>
-                  setLoginOpen(false)
-                }
+                onClick={closeLogin}
+                disabled={loading}
+                aria-label="Close login"
               >
-                <X size={20} />
+                <X size={17} />
               </button>
 
+              {/* ICON */}
+
               <div className="login-modal-icon">
-                <ShieldCheck size={28} />
+                {loginMethod === "google" ? (
+                  <Mail size={25} />
+                ) : (
+                  <Phone size={25} />
+                )}
               </div>
 
+              {/* HEADER */}
+
               <div className="login-modal-header">
+
+                <span>
+                  WELCOME TO SKILLSENSAI
+                </span>
+
                 <h2>
-                  Welcome to SkillSensAI
+                  Start your{" "}
+                  <strong>
+                    learning journey.
+                  </strong>
                 </h2>
 
                 <p>
-                  Sign in to continue your
-                  learning journey.
+                  Sign in to save your progress,
+                  continue your lessons and build
+                  your skills.
                 </p>
+
               </div>
 
               {/* TABS */}
 
               <div className="login-tabs">
+
                 <button
                   type="button"
                   className={
-                    loginMethod ===
-                    "google"
+                    loginMethod === "google"
                       ? "login-tab-active"
                       : ""
                   }
                   onClick={() => {
+                    if (loading) return;
+
                     setLoginMethod(
                       "google"
                     );
+
                     setLoginError("");
                   }}
                 >
-                  <Mail size={17} />
+                  <Mail size={14} />
                   Google
                 </button>
 
                 <button
                   type="button"
                   className={
-                    loginMethod ===
-                    "phone"
+                    loginMethod === "phone"
                       ? "login-tab-active"
                       : ""
                   }
                   onClick={() => {
+                    if (loading) return;
+
                     setLoginMethod(
                       "phone"
                     );
+
                     setLoginError("");
                   }}
                 >
-                  <Phone size={17} />
+                  <Phone size={14} />
                   Phone
                 </button>
+
               </div>
 
-              {/* GOOGLE */}
+              {/* =================================================
+                  GOOGLE
+              ================================================= */}
 
-              {loginMethod ===
-                "google" && (
+              {loginMethod === "google" && (
                 <div className="login-method-content">
+
                   <button
                     type="button"
                     className="google-login-button"
@@ -1082,9 +1227,10 @@ export default function Home() {
                     }
                     disabled={loading}
                   >
+
                     {loading ? (
                       <Loader2
-                        size={19}
+                        size={18}
                         className="login-spinner"
                       />
                     ) : (
@@ -1093,77 +1239,83 @@ export default function Home() {
                       </span>
                     )}
 
-                    <span>
-                      {loading
-                        ? "Signing in..."
-                        : "Continue with Google"}
-                    </span>
+                    {loading
+                      ? "Signing in..."
+                      : "Continue with Google"}
+
                   </button>
 
                   <div className="login-security-note">
-                    <ShieldCheck size={15} />
+                    <ShieldCheck
+                      size={13}
+                    />
 
                     <span>
-                      Secure authentication
-                      powered by Firebase.
+                      Your account and progress
+                      are securely protected.
                     </span>
                   </div>
+
                 </div>
               )}
 
-              {/* PHONE */}
+              {/* =================================================
+                  PHONE
+              ================================================= */}
 
-              {loginMethod ===
-                "phone" && (
+              {loginMethod === "phone" && (
                 <div className="login-method-content">
-                  {phoneStep ===
-                  "phone" ? (
+
+                  {phoneStep === "phone" ? (
                     <>
                       <label className="login-input-label">
-                        Phone Number
+                        Mobile Number
                       </label>
 
                       <div className="login-phone-input">
-                        <Phone size={18} />
+
+                        <Phone size={16} />
 
                         <input
                           type="tel"
-                          placeholder="9876543210"
-                          value={
-                            phoneNumber
+                          inputMode="numeric"
+                          value={phoneNumber}
+                          onChange={
+                            handlePhoneChange
                           }
-                          onChange={(event) =>
-                            setPhoneNumber(
-                              event.target.value
-                            )
-                          }
-                          maxLength={15}
+                          placeholder="+91 9876543210"
+                          maxLength={13}
+                          disabled={loading}
                         />
+
                       </div>
 
                       <button
                         type="button"
                         className="phone-login-button"
-                        onClick={
-                          handleSendOtp
-                        }
+                        onClick={sendOTP}
                         disabled={loading}
                       >
+
                         {loading ? (
-                          <Loader2
-                            size={18}
-                            className="login-spinner"
-                          />
+                          <>
+                            <Loader2
+                              size={17}
+                              className="login-spinner"
+                            />
+
+                            Sending OTP...
+                          </>
                         ) : (
-                          <Phone size={18} />
+                          <>
+                            <Phone size={17} />
+
+                            Send OTP
+                          </>
                         )}
 
-                        <span>
-                          {loading
-                            ? "Sending OTP..."
-                            : "Send OTP"}
-                        </span>
                       </button>
+
                     </>
                   ) : (
                     <>
@@ -1172,84 +1324,103 @@ export default function Home() {
                       </label>
 
                       <div className="otp-input-wrapper">
+
                         <input
                           type="text"
                           inputMode="numeric"
                           autoComplete="one-time-code"
-                          placeholder="6-digit OTP"
                           value={otp}
                           onChange={(event) =>
                             setOtp(
-                              event.target.value.replace(
-                                /\D/g,
-                                ""
-                              )
+                              event.target.value
+                                .replace(/\D/g, "")
+                                .slice(0, 6)
                             )
                           }
+                          placeholder="000000"
                           maxLength={6}
+                          disabled={loading}
                         />
+
                       </div>
 
                       <button
                         type="button"
                         className="phone-login-button"
-                        onClick={
-                          handleVerifyOtp
-                        }
+                        onClick={verifyOTP}
                         disabled={loading}
                       >
+
                         {loading ? (
-                          <Loader2
-                            size={18}
-                            className="login-spinner"
-                          />
+                          <>
+                            <Loader2
+                              size={17}
+                              className="login-spinner"
+                            />
+
+                            Verifying...
+                          </>
                         ) : (
-                          <ShieldCheck size={18} />
+                          <>
+                            <ShieldCheck
+                              size={17}
+                            />
+
+                            Verify OTP
+                          </>
                         )}
 
-                        <span>
-                          {loading
-                            ? "Verifying..."
-                            : "Verify OTP"}
-                        </span>
                       </button>
 
                       <button
                         type="button"
                         className="change-number-button"
                         onClick={
-                          handleChangeNumber
+                          changePhoneNumber
                         }
+                        disabled={loading}
                       >
                         Change phone number
                       </button>
+
                     </>
                   )}
 
                   <div className="login-security-note">
-                    <ShieldCheck size={15} />
+                    <ShieldCheck
+                      size={13}
+                    />
 
                     <span>
-                      Your login is secured
-                      by Firebase
-                      Authentication.
+                      Your phone number is used
+                      only for secure authentication.
                     </span>
                   </div>
+
                 </div>
               )}
+
+              {/* =================================================
+                  ERROR
+              ================================================= */}
 
               {loginError && (
                 <div className="login-error">
                   {loginError}
                 </div>
               )}
+
             </div>
+
           </div>
         )}
 
-        {/* RECAPTCHA */}
+        {/* =================================================
+            FIREBASE RECAPTCHA
+        ================================================= */}
 
         <div id="recaptcha-container" />
+
       </main>
     </div>
   );
