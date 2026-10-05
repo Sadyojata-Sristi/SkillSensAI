@@ -10,7 +10,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
-import "./music.css";
+import "./Music.css";
 import {
   getLessonsLearned,
   getSelectedMusicCharacter,
