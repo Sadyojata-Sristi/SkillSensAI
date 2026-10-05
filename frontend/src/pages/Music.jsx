@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Music2,
-  Mic2,
   Upload,
   Sparkles,
   ChevronRight,
@@ -23,15 +22,18 @@ const TOTAL_LESSONS = 6;
 
 /*
 =========================================================
-MUSIC CHARACTER DATA
+SKILLSENSAI — MUSIC CHARACTERS
 =========================================================
+
 Each character has 7 stages:
 
-0 = Before learning
-1 = Lesson 1 completed
-2 = Lesson 2 completed
-...
-6 = All lessons completed
+Stage 0 = Before learning
+Stage 1 = Lesson 1 completed
+Stage 2 = Lesson 2 completed
+Stage 3 = Lesson 3 completed
+Stage 4 = Lesson 4 completed
+Stage 5 = Lesson 5 completed
+Stage 6 = All lessons completed
 =========================================================
 */
 
@@ -40,7 +42,6 @@ const MUSIC_CHARACTERS = [
     id: "singer",
     name: "Singer",
     icon: "🎤",
-
     stages: [
       "/music/characters/singer/stage-0.png",
       "/music/characters/singer/stage-1.png",
@@ -56,7 +57,6 @@ const MUSIC_CHARACTERS = [
     id: "guitarist",
     name: "Guitarist",
     icon: "🎸",
-
     stages: [
       "/music/characters/guitarist/stage-0.png",
       "/music/characters/guitarist/stage-1.png",
@@ -72,7 +72,6 @@ const MUSIC_CHARACTERS = [
     id: "pianist",
     name: "Pianist",
     icon: "🎹",
-
     stages: [
       "/music/characters/pianist/stage-0.png",
       "/music/characters/pianist/stage-1.png",
@@ -88,7 +87,6 @@ const MUSIC_CHARACTERS = [
     id: "flutist",
     name: "Flute",
     icon: "🪈",
-
     stages: [
       "/music/characters/flutist/stage-0.png",
       "/music/characters/flutist/stage-1.png",
@@ -104,7 +102,6 @@ const MUSIC_CHARACTERS = [
     id: "violinist",
     name: "Violin",
     icon: "🎻",
-
     stages: [
       "/music/characters/violinist/stage-0.png",
       "/music/characters/violinist/stage-1.png",
@@ -120,7 +117,6 @@ const MUSIC_CHARACTERS = [
     id: "veena",
     name: "Veena",
     icon: "🎶",
-
     stages: [
       "/music/characters/veena/stage-0.png",
       "/music/characters/veena/stage-1.png",
@@ -136,7 +132,6 @@ const MUSIC_CHARACTERS = [
     id: "drummer",
     name: "Drummer",
     icon: "🥁",
-
     stages: [
       "/music/characters/drummer/stage-0.png",
       "/music/characters/drummer/stage-1.png",
@@ -153,8 +148,7 @@ const MUSIC_CHARACTERS = [
 function Music() {
   const navigate = useNavigate();
 
-  const [lessonsCompleted, setLessonsCompleted] =
-    useState(0);
+  const [lessonsCompleted, setLessonsCompleted] = useState(0);
 
   const [selectedCharacter, setSelectedCharacter] =
     useState("singer");
@@ -162,54 +156,75 @@ function Music() {
   const [showCharacterSelector, setShowCharacterSelector] =
     useState(false);
 
-  const [pageReady, setPageReady] =
-    useState(false);
+  const [pageReady, setPageReady] = useState(false);
 
 
   /*
-  ---------------------------------------------------------
-  LOAD MUSIC PROGRESS
-  ---------------------------------------------------------
+  =========================================================
+  LOAD SAVED MUSIC DATA
+  =========================================================
   */
 
   useEffect(() => {
-    const lessons =
-      getLessonsLearned();
+    const lessons = getLessonsLearned();
 
-    const character =
-      getSelectedMusicCharacter();
+    const character = getSelectedMusicCharacter();
 
     setLessonsCompleted(
       Math.min(
-        Math.max(lessons, 0),
+        Math.max(Number(lessons) || 0, 0),
         TOTAL_LESSONS
       )
     );
 
-    setSelectedCharacter(
-      character
-    );
+    const validCharacter =
+      MUSIC_CHARACTERS.some(
+        (item) => item.id === character
+      )
+        ? character
+        : "singer";
 
-    const timer =
-      setTimeout(() => {
-        setPageReady(true);
-      }, 100);
+    setSelectedCharacter(validCharacter);
 
-    return () =>
+
+    /*
+    IMPORTANT:
+
+    Music.css uses:
+
+    .music-room.music-room-entered {
+      opacity: 1;
+    }
+
+    Therefore the class MUST be
+    "music-room-entered".
+    */
+
+    const timer = setTimeout(() => {
+      setPageReady(true);
+    }, 100);
+
+    return () => {
       clearTimeout(timer);
+    };
   }, []);
 
 
   /*
-  ---------------------------------------------------------
+  =========================================================
   LISTEN FOR PROGRESS CHANGES
-  ---------------------------------------------------------
+  =========================================================
   */
 
   useEffect(() => {
     const updateProgress = () => {
+      const lessons = getLessonsLearned();
+
       setLessonsCompleted(
-        getLessonsLearned()
+        Math.min(
+          Math.max(Number(lessons) || 0, 0),
+          TOTAL_LESSONS
+        )
       );
     };
 
@@ -228,9 +243,9 @@ function Music() {
 
 
   /*
-  ---------------------------------------------------------
-  CHARACTER
-  ---------------------------------------------------------
+  =========================================================
+  CURRENT CHARACTER
+  =========================================================
   */
 
   const currentCharacter =
@@ -240,56 +255,48 @@ function Music() {
     ) || MUSIC_CHARACTERS[0];
 
 
-  const currentStage =
-    Math.min(
-      Math.max(lessonsCompleted, 0),
-      TOTAL_LESSONS
-    );
+  const currentStage = Math.min(
+    Math.max(lessonsCompleted, 0),
+    TOTAL_LESSONS
+  );
 
 
   const currentImage =
-    currentCharacter.stages[
-      currentStage
-    ];
+    currentCharacter.stages[currentStage];
 
 
   const progressPercentage =
     Math.round(
-      (lessonsCompleted /
-        TOTAL_LESSONS) *
-        100
+      (lessonsCompleted / TOTAL_LESSONS) * 100
     );
 
 
   /*
-  ---------------------------------------------------------
+  =========================================================
   SELECT CHARACTER
-  ---------------------------------------------------------
+  =========================================================
   */
 
-  const selectCharacter = (
-    characterId
-  ) => {
+  const selectCharacter = (characterId) => {
+    setSelectedCharacter(characterId);
 
-    setSelectedCharacter(
-      characterId
-    );
+    setSelectedMusicCharacter(characterId);
 
-    setSelectedMusicCharacter(
-      characterId
-    );
-
-    setShowCharacterSelector(
-      false
-    );
+    setShowCharacterSelector(false);
   };
 
+
+  /*
+  =========================================================
+  RENDER
+  =========================================================
+  */
 
   return (
     <div
       className={`music-room ${
         pageReady
-          ? "music-room-ready"
+          ? "music-room-entered"
           : ""
       }`}
     >
@@ -311,9 +318,7 @@ function Music() {
 
         <button
           className="music-back-button"
-          onClick={() =>
-            navigate("/")
-          }
+          onClick={() => navigate("/")}
         >
           ← Home
         </button>
@@ -329,21 +334,25 @@ function Music() {
 
         </div>
 
+        <div className="music-header-space" />
+
       </header>
 
 
       {/* =================================================
-          MAIN
+          MAIN CONTENT
       ================================================= */}
 
       <main className="music-room-content">
 
 
-        {/* INTRO */}
+        {/* =================================================
+            INTRO
+        ================================================= */}
 
         <section className="music-intro">
 
-          <p className="music-eyebrow">
+          <p className="music-small-label">
             YOUR MUSICAL JOURNEY
           </p>
 
@@ -367,6 +376,12 @@ function Music() {
 
         <section className="music-character-section">
 
+          <div className="character-stars">
+            <span>✦</span>
+            <span>✦</span>
+            <span>✦</span>
+          </div>
+
 
           <div className="character-glow" />
 
@@ -377,9 +392,7 @@ function Music() {
 
               <img
                 src={currentImage}
-                alt={
-                  currentCharacter.name
-                }
+                alt={currentCharacter.name}
                 className="music-character-image"
                 onError={(event) => {
                   event.currentTarget.style.display =
@@ -398,22 +411,38 @@ function Music() {
           </div>
 
 
-          <div className="character-particle particle-1">
+          {/* MUSIC PARTICLES */}
+
+          <div className="character-particle particle-one">
             ♪
           </div>
 
-          <div className="character-particle particle-2">
+          <div className="character-particle particle-two">
             ♫
           </div>
 
-          <div className="character-particle particle-3">
+          <div className="character-particle particle-three">
             ✦
           </div>
 
+          <div className="character-particle particle-four">
+            ♪
+          </div>
 
-          <h2 className="character-name">
-            {currentCharacter.name}
-          </h2>
+
+          {/* CHARACTER NAME */}
+
+          <div className="character-name">
+
+            <span>
+              {currentCharacter.name}
+            </span>
+
+            <small>
+              Stage {currentStage} / {TOTAL_LESSONS}
+            </small>
+
+          </div>
 
 
           {/* =================================================
@@ -422,15 +451,14 @@ function Music() {
 
           <div className="music-progress-container">
 
-            <div className="music-progress-text">
+            <div className="music-progress-top">
 
               <span>
                 Musical Journey
               </span>
 
               <strong>
-                {lessonsCompleted} /{" "}
-                {TOTAL_LESSONS}
+                {lessonsCompleted} / {TOTAL_LESSONS}
               </strong>
 
             </div>
@@ -441,15 +469,14 @@ function Music() {
               <div
                 className="music-progress-fill"
                 style={{
-                  width:
-                    `${progressPercentage}%`,
+                  width: `${progressPercentage}%`,
                 }}
               />
 
             </div>
 
 
-            <span className="music-progress-percent">
+            <span className="music-progress-label">
               {progressPercentage}% complete
             </span>
 
@@ -457,7 +484,7 @@ function Music() {
 
 
           {/* =================================================
-              CUSTOMIZE BUTTON
+              CUSTOMIZE MUSICIAN
           ================================================= */}
 
           <button
@@ -466,6 +493,7 @@ function Music() {
               setShowCharacterSelector(true)
             }
           >
+
             <Sparkles size={20} />
 
             <span>
@@ -475,7 +503,6 @@ function Music() {
             <ChevronRight size={19} />
 
           </button>
-
 
         </section>
 
@@ -487,20 +514,24 @@ function Music() {
         <section className="music-options">
 
 
+          {/* LEARN FROM SCRATCH */}
+
           <button
-            className="music-option-card"
+            className="music-option-card learn-card"
             onClick={() =>
-              navigate(
-                "/music/learn"
-              )
+              navigate("/music/learn")
             }
           >
 
-            <div className="music-option-icon">
+            <div className="option-icon">
               <Music2 size={28} />
             </div>
 
-            <div className="music-option-content">
+            <div className="option-content">
+
+              <span className="option-label">
+                LEARN
+              </span>
 
               <h3>
                 Learn From Scratch
@@ -512,27 +543,34 @@ function Music() {
                 practical exercises.
               </p>
 
-            </div>
+              <span className="option-action">
+                Start Learning
+                <ChevronRight size={18} />
+              </span>
 
-            <ChevronRight />
+            </div>
 
           </button>
 
 
+          {/* UPLOAD SONG */}
+
           <button
-            className="music-option-card"
+            className="music-option-card upload-card"
             onClick={() =>
-              navigate(
-                "/music/upload-song"
-              )
+              navigate("/music/upload-song")
             }
           >
 
-            <div className="music-option-icon">
+            <div className="option-icon">
               <Upload size={28} />
             </div>
 
-            <div className="music-option-content">
+            <div className="option-content">
+
+              <span className="option-label">
+                AI PRACTICE
+              </span>
 
               <h3>
                 Upload Song
@@ -543,9 +581,12 @@ function Music() {
                 AI-powered musical feedback.
               </p>
 
-            </div>
+              <span className="option-action">
+                Analyse Recording
+                <ChevronRight size={18} />
+              </span>
 
-            <ChevronRight />
+            </div>
 
           </button>
 
@@ -559,37 +600,77 @@ function Music() {
 
         <section className="lesson-indicators">
 
-          {Array.from(
-            {
-              length:
-                TOTAL_LESSONS,
-            },
-            (_, index) => {
+          <div className="lesson-heading">
+            <span>
+              Your Learning Progress
+            </span>
 
-              const lessonNumber =
-                index + 1;
+            <strong>
+              {lessonsCompleted}/{TOTAL_LESSONS}
+            </strong>
+          </div>
 
-              const completed =
-                lessonNumber <=
-                lessonsCompleted;
 
-              return (
+          <div className="lesson-dots">
 
-                <div
-                  key={lessonNumber}
-                  className={`lesson-indicator ${
-                    completed
-                      ? "completed"
-                      : ""
-                  }`}
-                >
-                  {lessonNumber}
-                </div>
+            {Array.from(
+              {
+                length: TOTAL_LESSONS,
+              },
+              (_, index) => {
 
-              );
+                const lessonNumber =
+                  index + 1;
 
-            }
-          )}
+                const completed =
+                  lessonNumber <=
+                  lessonsCompleted;
+
+                const current =
+                  lessonNumber ===
+                  lessonsCompleted + 1;
+
+
+                return (
+                  <React.Fragment
+                    key={lessonNumber}
+                  >
+
+                    <div
+                      className={`lesson-dot-wrapper ${
+                        completed
+                          ? "completed"
+                          : ""
+                      } ${
+                        current
+                          ? "current"
+                          : ""
+                      }`}
+                    >
+
+                      <div className="lesson-dot">
+                        {completed
+                          ? "✓"
+                          : lessonNumber}
+                      </div>
+
+                    </div>
+
+
+                    {index <
+                      TOTAL_LESSONS - 1 && (
+
+                      <div className="lesson-connector" />
+
+                    )}
+
+                  </React.Fragment>
+                );
+
+              }
+            )}
+
+          </div>
 
         </section>
 
@@ -617,6 +698,8 @@ function Music() {
             }
           >
 
+            {/* HEADER */}
+
             <div className="character-selector-header">
 
               <div>
@@ -638,6 +721,7 @@ function Music() {
 
 
               <button
+                className="selector-close"
                 onClick={() =>
                   setShowCharacterSelector(false)
                 }
@@ -647,6 +731,8 @@ function Music() {
 
             </div>
 
+
+            {/* CHARACTER OPTIONS */}
 
             <div className="character-options-grid">
 
@@ -690,6 +776,14 @@ function Music() {
                 )
               )}
 
+            </div>
+
+
+            {/* SELECTOR NOTE */}
+
+            <div className="selector-note">
+              Your musician will grow as you
+              complete your learning journey.
             </div>
 
           </div>
