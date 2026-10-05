@@ -1,4 +1,3 @@
-```jsx
 import React, {
   useEffect,
   useRef,
@@ -2318,4 +2317,3 @@ function Lesson() {
 }
 
 export default Lesson;
-```
