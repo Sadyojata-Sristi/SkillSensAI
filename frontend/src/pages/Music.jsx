@@ -6,6 +6,7 @@ import {
   Sparkles,
   ChevronRight,
   X,
+  Lightbulb,
 } from "lucide-react";
 
 import "./Music.css";
@@ -158,17 +159,42 @@ function Music() {
 
   const [pageReady, setPageReady] = useState(false);
 
+  /*
+  =========================================================
+  THEME
+  OFF  = LIGHT
+  ON   = DARK
+  =========================================================
+  */
+
+  const [darkMode, setDarkMode] = useState(() => {
+    return (
+      localStorage.getItem("skillsensai_theme") ===
+      "dark"
+    );
+  });
+
 
   /*
   =========================================================
-  LOAD SAVED MUSIC DATA
+  CHARACTER IMAGE ERROR STATE
+  =========================================================
+  */
+
+  const [imageFailed, setImageFailed] = useState(false);
+
+
+  /*
+  =========================================================
+  LOAD MUSIC DATA
   =========================================================
   */
 
   useEffect(() => {
     const lessons = getLessonsLearned();
 
-    const character = getSelectedMusicCharacter();
+    const character =
+      getSelectedMusicCharacter();
 
     setLessonsCompleted(
       Math.min(
@@ -186,19 +212,14 @@ function Music() {
 
     setSelectedCharacter(validCharacter);
 
+    const savedTheme =
+      localStorage.getItem(
+        "skillsensai_theme"
+      );
 
-    /*
-    IMPORTANT:
-
-    Music.css uses:
-
-    .music-room.music-room-entered {
-      opacity: 1;
-    }
-
-    Therefore the class MUST be
-    "music-room-entered".
-    */
+    setDarkMode(
+      savedTheme === "dark"
+    );
 
     const timer = setTimeout(() => {
       setPageReady(true);
@@ -212,13 +233,28 @@ function Music() {
 
   /*
   =========================================================
+  RESET IMAGE ERROR WHEN CHARACTER/STAGE CHANGES
+  =========================================================
+  */
+
+  useEffect(() => {
+    setImageFailed(false);
+  }, [
+    selectedCharacter,
+    lessonsCompleted,
+  ]);
+
+
+  /*
+  =========================================================
   LISTEN FOR PROGRESS CHANGES
   =========================================================
   */
 
   useEffect(() => {
     const updateProgress = () => {
-      const lessons = getLessonsLearned();
+      const lessons =
+        getLessonsLearned();
 
       setLessonsCompleted(
         Math.min(
@@ -244,6 +280,33 @@ function Music() {
 
   /*
   =========================================================
+  THEME TOGGLE
+  =========================================================
+  */
+
+  const toggleTheme = () => {
+    const nextTheme =
+      !darkMode;
+
+    setDarkMode(nextTheme);
+
+    localStorage.setItem(
+      "skillsensai_theme",
+      nextTheme
+        ? "dark"
+        : "light"
+    );
+
+    window.dispatchEvent(
+      new Event(
+        "skillsensai-theme-updated"
+      )
+    );
+  };
+
+
+  /*
+  =========================================================
   CURRENT CHARACTER
   =========================================================
   */
@@ -251,23 +314,33 @@ function Music() {
   const currentCharacter =
     MUSIC_CHARACTERS.find(
       (character) =>
-        character.id === selectedCharacter
-    ) || MUSIC_CHARACTERS[0];
+        character.id ===
+        selectedCharacter
+    ) ||
+    MUSIC_CHARACTERS[0];
 
 
-  const currentStage = Math.min(
-    Math.max(lessonsCompleted, 0),
-    TOTAL_LESSONS
-  );
+  const currentStage =
+    Math.min(
+      Math.max(
+        lessonsCompleted,
+        0
+      ),
+      TOTAL_LESSONS
+    );
 
 
   const currentImage =
-    currentCharacter.stages[currentStage];
+    currentCharacter.stages[
+      currentStage
+    ];
 
 
   const progressPercentage =
     Math.round(
-      (lessonsCompleted / TOTAL_LESSONS) * 100
+      (lessonsCompleted /
+        TOTAL_LESSONS) *
+        100
     );
 
 
@@ -277,12 +350,22 @@ function Music() {
   =========================================================
   */
 
-  const selectCharacter = (characterId) => {
-    setSelectedCharacter(characterId);
+  const selectCharacter = (
+    characterId
+  ) => {
+    setImageFailed(false);
 
-    setSelectedMusicCharacter(characterId);
+    setSelectedCharacter(
+      characterId
+    );
 
-    setShowCharacterSelector(false);
+    setSelectedMusicCharacter(
+      characterId
+    );
+
+    setShowCharacterSelector(
+      false
+    );
   };
 
 
@@ -298,6 +381,10 @@ function Music() {
         pageReady
           ? "music-room-entered"
           : ""
+      } ${
+        darkMode
+          ? "music-dark-mode"
+          : "music-light-mode"
       }`}
     >
 
@@ -318,7 +405,9 @@ function Music() {
 
         <button
           className="music-back-button"
-          onClick={() => navigate("/")}
+          onClick={() =>
+            navigate("/")
+          }
         >
           ← Home
         </button>
@@ -334,7 +423,37 @@ function Music() {
 
         </div>
 
-        <div className="music-header-space" />
+
+        {/* =================================================
+            LIGHT BULB
+        ================================================= */}
+
+        <button
+          className={`music-theme-toggle ${
+            darkMode
+              ? "dark"
+              : "light"
+          }`}
+          onClick={toggleTheme}
+          aria-label={
+            darkMode
+              ? "Switch to light theme"
+              : "Switch to dark theme"
+          }
+          title={
+            darkMode
+              ? "Light Theme"
+              : "Dark Theme"
+          }
+        >
+          <Lightbulb size={21} />
+
+          <span
+            className="music-theme-switch"
+          >
+            <span />
+          </span>
+        </button>
 
       </header>
 
@@ -358,7 +477,9 @@ function Music() {
 
           <h1>
             Become the musician
-            <span> you imagine.</span>
+            <span>
+              {" "}you imagine.
+            </span>
           </h1>
 
           <p>
@@ -386,17 +507,20 @@ function Music() {
           <div className="character-glow" />
 
 
-          <div className="music-character-wrapper">
+          <div
+            className="music-character-wrapper"
+            key={`${selectedCharacter}-${currentStage}`}
+          >
 
-            {currentImage ? (
+            {!imageFailed ? (
 
               <img
+                key={`${currentCharacter.id}-${currentStage}`}
                 src={currentImage}
                 alt={currentCharacter.name}
                 className="music-character-image"
-                onError={(event) => {
-                  event.currentTarget.style.display =
-                    "none";
+                onError={() => {
+                  setImageFailed(true);
                 }}
               />
 
@@ -439,7 +563,8 @@ function Music() {
             </span>
 
             <small>
-              Stage {currentStage} / {TOTAL_LESSONS}
+              Stage {currentStage} /{" "}
+              {TOTAL_LESSONS}
             </small>
 
           </div>
@@ -458,7 +583,8 @@ function Music() {
               </span>
 
               <strong>
-                {lessonsCompleted} / {TOTAL_LESSONS}
+                {lessonsCompleted} /{" "}
+                {TOTAL_LESSONS}
               </strong>
 
             </div>
@@ -469,7 +595,8 @@ function Music() {
               <div
                 className="music-progress-fill"
                 style={{
-                  width: `${progressPercentage}%`,
+                  width:
+                    `${progressPercentage}%`,
                 }}
               />
 
@@ -490,7 +617,9 @@ function Music() {
           <button
             className="customize-musician-button"
             onClick={() =>
-              setShowCharacterSelector(true)
+              setShowCharacterSelector(
+                true
+              )
             }
           >
 
@@ -519,7 +648,9 @@ function Music() {
           <button
             className="music-option-card learn-card"
             onClick={() =>
-              navigate("/music/learn")
+              navigate(
+                "/music/learn"
+              )
             }
           >
 
@@ -558,7 +689,9 @@ function Music() {
           <button
             className="music-option-card upload-card"
             onClick={() =>
-              navigate("/music/upload-song")
+              navigate(
+                "/music/upload-song"
+              )
             }
           >
 
@@ -590,7 +723,6 @@ function Music() {
 
           </button>
 
-
         </section>
 
 
@@ -601,13 +733,16 @@ function Music() {
         <section className="lesson-indicators">
 
           <div className="lesson-heading">
+
             <span>
               Your Learning Progress
             </span>
 
             <strong>
-              {lessonsCompleted}/{TOTAL_LESSONS}
+              {lessonsCompleted}/
+              {TOTAL_LESSONS}
             </strong>
+
           </div>
 
 
@@ -615,7 +750,8 @@ function Music() {
 
             {Array.from(
               {
-                length: TOTAL_LESSONS,
+                length:
+                  TOTAL_LESSONS,
               },
               (_, index) => {
 
@@ -649,9 +785,11 @@ function Music() {
                     >
 
                       <div className="lesson-dot">
+
                         {completed
                           ? "✓"
                           : lessonNumber}
+
                       </div>
 
                     </div>
@@ -666,14 +804,12 @@ function Music() {
 
                   </React.Fragment>
                 );
-
               }
             )}
 
           </div>
 
         </section>
-
 
       </main>
 
@@ -687,7 +823,9 @@ function Music() {
         <div
           className="character-selector-overlay"
           onClick={() =>
-            setShowCharacterSelector(false)
+            setShowCharacterSelector(
+              false
+            )
           }
         >
 
@@ -723,7 +861,9 @@ function Music() {
               <button
                 className="selector-close"
                 onClick={() =>
-                  setShowCharacterSelector(false)
+                  setShowCharacterSelector(
+                    false
+                  )
                 }
               >
                 <X size={22} />
