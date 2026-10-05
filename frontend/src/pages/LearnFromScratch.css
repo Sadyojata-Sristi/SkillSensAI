@@ -50,7 +50,7 @@
 .learn-page.dark .learn-header-title strong,
 .learn-page.dark .learn-intro h1,
 .learn-page.dark .journey-heading h2,
-.learn-page.dark .lesson-card-content h3,
+.learn-page.dark .learn-lesson-card-content h3,
 .learn-page.dark .journey-complete-card h3,
 .learn-page.dark .learn-character-name {
   color: #f5f2ff;
@@ -59,7 +59,7 @@
 .learn-page.dark .learn-header-title span,
 .learn-page.dark .learn-intro p,
 .learn-page.dark .journey-heading p,
-.learn-page.dark .lesson-card-content p,
+.learn-page.dark .learn-lesson-card-content p,
 .learn-page.dark .learn-character-stage {
   color: #a9a1bb;
 }
@@ -576,12 +576,6 @@
   min-height: 80px;
 }
 
-/*
-   ONE SINGLE LINE.
-   It passes directly through
-   the CENTER of every circle.
-*/
-
 .journey-path::before {
   content: "";
 
@@ -716,17 +710,16 @@
   color: #777085;
 }
 
-/*
-   We use ONE central line above.
-   Old individual connectors are disabled.
-*/
-
 .journey-connector {
   display: none;
 }
 
 /* =========================================================
-   LESSON CARDS
+   LEARN FROM SCRATCH LESSON CARDS
+   IMPORTANT:
+   These names are intentionally unique.
+   They must NOT use .lesson-card because
+   Lesson.jsx also uses that class.
    ========================================================= */
 
 .lesson-list {
@@ -744,7 +737,7 @@
   gap: 16px;
 }
 
-.lesson-card {
+.learn-lesson-card {
   position: relative;
 
   display: flex;
@@ -753,6 +746,8 @@
 
   gap: 18px;
 
+  width: 100%;
+
   min-height: 82px;
 
   box-sizing: border-box;
@@ -760,8 +755,9 @@
   padding:
     20px 22px;
 
-  background:
-    rgba(255, 255, 255, 0.86);
+  background: #ffffff;
+
+  color: #30245a;
 
   border:
     1px solid
@@ -776,27 +772,19 @@
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease,
-    border-color 0.2s ease;
+    border-color 0.2s ease,
+    background 0.2s ease;
 }
 
-.learn-page.dark
-.lesson-card {
-  background:
-    rgba(25, 21, 36, 0.88);
+/* =========================================================
+   LIGHT THEME CARD STATES
+   ========================================================= */
 
-  border-color:
-    rgba(255, 255, 255, 0.08);
-
-  box-shadow:
-    0 15px 35px
-    rgba(0, 0, 0, 0.24);
-}
-
-.lesson-card.clickable {
+.learn-lesson-card.clickable {
   cursor: pointer;
 }
 
-.lesson-card.clickable:hover {
+.learn-lesson-card.clickable:hover {
   transform:
     translateY(-3px);
 
@@ -808,16 +796,26 @@
     rgba(72, 52, 150, 0.12);
 }
 
-.lesson-card.locked {
+.learn-lesson-card.locked {
   opacity: 0.62;
+
+  cursor: not-allowed;
+
+  background: #f4f2f8;
+
+  color: #777085;
 }
 
-.lesson-card.completed {
+.learn-lesson-card.completed {
+  background: #ffffff;
+
   border-color:
     rgba(124, 92, 252, 0.25);
 }
 
-.lesson-card.current {
+.learn-lesson-card.current {
+  background: #ffffff;
+
   border-color:
     rgba(124, 92, 252, 0.55);
 
@@ -833,7 +831,7 @@
    LESSON ICON
    ========================================================= */
 
-.lesson-card-icon {
+.learn-lesson-card-icon {
   width: 58px;
 
   height: 58px;
@@ -850,51 +848,48 @@
 
   background: #f1eeff;
 
+  color: #6245d8;
+
   font-size: 27px;
 }
 
-.learn-page.dark
-.lesson-card-icon {
-  background: #29213f;
-}
-
-.lesson-card.completed
-.lesson-card-icon {
+.learn-lesson-card.completed
+.learn-lesson-card-icon {
   background: #7c5cfc;
+
+  color: #ffffff;
 }
 
-.lesson-card.locked
-.lesson-card-icon {
+.learn-lesson-card.locked
+.learn-lesson-card-icon {
   background: #e9e6f1;
-}
 
-.learn-page.dark
-.lesson-card.locked
-.lesson-card-icon {
-  background: #292534;
+  color: #8c85a2;
 }
 
 /* =========================================================
    LESSON CONTENT
    ========================================================= */
 
-.lesson-card-content {
+.learn-lesson-card-content {
   min-width: 0;
 
   flex: 1;
 }
 
-.lesson-card-content h3 {
+.learn-lesson-card-content h3 {
   margin: 0;
 
   font-size: 17px;
+
+  line-height: 1.35;
 
   font-weight: 800;
 
   color: #30245a;
 }
 
-.lesson-card-content p {
+.learn-lesson-card-content p {
   margin:
     6px 0 0;
 
@@ -903,13 +898,15 @@
   line-height: 1.5;
 
   color: #7a7292;
+
+  overflow-wrap: anywhere;
 }
 
 /* =========================================================
    LESSON ACTION
    ========================================================= */
 
-.lesson-action {
+.learn-lesson-action {
   width: 42px;
 
   height: 42px;
@@ -929,30 +926,128 @@
   color: #6245d8;
 }
 
-.learn-page.dark
-.lesson-action {
-  background: #29213f;
-
-  color: #b7a9ff;
-}
-
-.lesson-card.completed
-.lesson-action {
+.learn-lesson-card.completed
+.learn-lesson-action {
   background: #eeeaff;
 
   color: #6245d8;
 }
 
-.lesson-card.locked
-.lesson-action {
+.learn-lesson-card.locked
+.learn-lesson-action {
   background: #eceaf1;
 
   color: #9690a5;
 }
 
+/* =========================================================
+   DARK LESSON CARDS
+   ========================================================= */
+
+.learn-page.dark .learn-lesson-card {
+  background:
+    rgba(25, 21, 36, 0.88);
+
+  color: #f5f2ff;
+
+  border-color:
+    rgba(255, 255, 255, 0.08);
+
+  box-shadow:
+    0 15px 35px
+    rgba(0, 0, 0, 0.24);
+}
+
 .learn-page.dark
-.lesson-card.locked
-.lesson-action {
+.learn-lesson-card.clickable:hover {
+  border-color:
+    rgba(124, 92, 252, 0.45);
+
+  box-shadow:
+    0 16px 35px
+    rgba(0, 0, 0, 0.32);
+}
+
+.learn-page.dark
+.learn-lesson-card.completed {
+  background:
+    rgba(38, 31, 55, 0.92);
+
+  border-color:
+    rgba(124, 92, 252, 0.28);
+}
+
+.learn-page.dark
+.learn-lesson-card.current {
+  background:
+    rgba(35, 29, 50, 0.96);
+
+  border-color:
+    rgba(124, 92, 252, 0.60);
+}
+
+.learn-page.dark
+.learn-lesson-card.locked {
+  background:
+    rgba(24, 21, 31, 0.90);
+
+  border-color:
+    rgba(255, 255, 255, 0.06);
+
+  color: #777085;
+}
+
+.learn-page.dark
+.learn-lesson-card-icon {
+  background: #29213f;
+
+  color: #b7a9ff;
+}
+
+.learn-page.dark
+.learn-lesson-card.completed
+.learn-lesson-card-icon {
+  background: #7c5cfc;
+
+  color: #ffffff;
+}
+
+.learn-page.dark
+.learn-lesson-card.locked
+.learn-lesson-card-icon {
+  background: #292534;
+
+  color: #777085;
+}
+
+.learn-page.dark
+.learn-lesson-card-content h3 {
+  color: #f5f2ff;
+}
+
+.learn-page.dark
+.learn-lesson-card-content p {
+  color: #a9a1bb;
+}
+
+.learn-page.dark
+.learn-lesson-action {
+  background: #29213f;
+
+  color: #b7a9ff;
+}
+
+.learn-page.dark
+.learn-lesson-card.completed
+.learn-lesson-action {
+  background: #332b4b;
+
+  color: #b7a9ff;
+}
+
+.learn-page.dark
+.learn-lesson-card.locked
+.learn-lesson-action {
   background: #292534;
 
   color: #777085;
@@ -1164,12 +1259,6 @@
     padding: 18px;
   }
 
-  /*
-     Keep all six nodes aligned.
-     On very small screens the journey
-     stays as one clean horizontal row.
-  */
-
   .journey-section {
     overflow: hidden;
   }
@@ -1202,14 +1291,16 @@
     height: 52px;
   }
 
-  .lesson-card {
+  /* UNIQUE MOBILE CARD CLASSES */
+
+  .learn-lesson-card {
     gap: 13px;
 
     padding:
       17px;
   }
 
-  .lesson-card-icon {
+  .learn-lesson-card-icon {
     width: 48px;
 
     height: 48px;
@@ -1217,15 +1308,15 @@
     font-size: 22px;
   }
 
-  .lesson-card-content h3 {
+  .learn-lesson-card-content h3 {
     font-size: 15px;
   }
 
-  .lesson-card-content p {
+  .learn-lesson-card-content p {
     font-size: 12px;
   }
 
-  .lesson-action {
+  .learn-lesson-action {
     width: 36px;
 
     height: 36px;
