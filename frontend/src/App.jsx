@@ -16,35 +16,55 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+
+        {/* =========================
+            HOME
+        ========================= */}
         <Route
           path="/"
           element={<Home />}
         />
 
+        {/* =========================
+            MUSIC ROOM
+        ========================= */}
         <Route
           path="/music"
           element={<Music />}
         />
 
+        {/* =========================
+            MUSIC — LEARN FROM SCRATCH
+        ========================= */}
         <Route
           path="/music/learn"
           element={<LearnFromScratch />}
         />
 
+        {/* =========================
+            MARTIAL ARTS
+        ========================= */}
         <Route
           path="/martial-arts"
           element={<MartialArts />}
         />
 
+        {/* =========================
+            BOXING
+        ========================= */}
         <Route
           path="/martial-arts/boxing"
           element={<Boxing />}
         />
 
+        {/* =========================
+            KARATE
+        ========================= */}
         <Route
           path="/martial-arts/karate"
           element={<Karate />}
         />
+
       </Routes>
     </BrowserRouter>
   );
