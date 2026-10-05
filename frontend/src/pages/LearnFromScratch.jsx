@@ -279,7 +279,7 @@ function LearnFromScratch() {
 
     if (isCompleted || isCurrent) {
       navigate(
-        `/music/learn/lesson/${lesson.id}`
+        "/music/learn/lesson/" + lesson.id
       );
     }
   };
@@ -294,10 +294,6 @@ function LearnFromScratch() {
         theme === "dark" ? "dark" : "light"
       }`}
     >
-      {/* =================================================
-          HEADER
-          ================================================= */}
-
       <header className="learn-header">
         <button
           className="learn-back-button"
@@ -310,21 +306,13 @@ function LearnFromScratch() {
 
         <div className="learn-header-title">
           <strong>Learn From Scratch</strong>
-
           <span>
             Your personal music learning journey
           </span>
         </div>
       </header>
 
-      {/* =================================================
-          MAIN
-          ================================================= */}
-
       <main className="learn-content">
-
-        {/* INTRO */}
-
         <section className="learn-intro">
           <div className="learn-eyebrow">
             <Sparkles size={14} />
@@ -341,16 +329,10 @@ function LearnFromScratch() {
           </p>
         </section>
 
-        {/* =================================================
-            CHARACTER
-            ================================================= */}
-
         <section className="learn-character-section">
-
           <div className="learn-character-glow" />
 
           <div className="learn-character-wrapper">
-
             {!imageFailed ? (
               <img
                 className="learn-character-image"
@@ -365,7 +347,6 @@ function LearnFromScratch() {
                 Character image unavailable
               </div>
             )}
-
           </div>
 
           <div className="learn-character-name">
@@ -375,15 +356,9 @@ function LearnFromScratch() {
           <div className="learn-character-stage">
             Stage {stage} of {TOTAL_LESSONS}
           </div>
-
         </section>
 
-        {/* =================================================
-            PROGRESS
-            ================================================= */}
-
         <section className="learn-progress-card">
-
           <div className="learn-progress-top">
             <span>
               Your Progress
@@ -402,15 +377,9 @@ function LearnFromScratch() {
               }}
             />
           </div>
-
         </section>
 
-        {/* =================================================
-            JOURNEY
-            ================================================= */}
-
         <section className="journey-section">
-
           <div className="journey-heading">
             <h2>Your Learning Journey</h2>
 
@@ -419,12 +388,8 @@ function LearnFromScratch() {
             </p>
           </div>
 
-          {/* JOURNEY CIRCLES */}
-
           <div className="journey-path">
-
             {LESSONS.map((lesson) => {
-
               const completed =
                 lesson.id <= lessonsLearned;
 
@@ -449,7 +414,10 @@ function LearnFromScratch() {
                     }`}
                   >
                     {completed ? (
-                      <Check size={25} strokeWidth={3} />
+                      <Check
+                        size={25}
+                        strokeWidth={3}
+                      />
                     ) : locked ? (
                       <Lock size={20} />
                     ) : (
@@ -461,15 +429,10 @@ function LearnFromScratch() {
                 </div>
               );
             })}
-
           </div>
 
-          {/* LESSON CARDS */}
-
           <div className="lesson-list">
-
             {LESSONS.map((lesson) => {
-
               const completed =
                 lesson.id <= lessonsLearned;
 
@@ -493,7 +456,6 @@ function LearnFromScratch() {
                     handleLessonClick(lesson)
                   }
                 >
-
                   <div className="lesson-card-icon">
                     {lesson.icon}
                   </div>
@@ -510,7 +472,6 @@ function LearnFromScratch() {
                   </div>
 
                   <div className="lesson-action">
-
                     {completed ? (
                       <Check
                         size={20}
@@ -521,22 +482,14 @@ function LearnFromScratch() {
                     ) : (
                       <ChevronRight size={21} />
                     )}
-
                   </div>
-
                 </div>
               );
             })}
-
           </div>
-
-          {/* =================================================
-              COMPLETE
-              ================================================= */}
 
           {lessonsLearned >= TOTAL_LESSONS && (
             <div className="journey-complete-card">
-
               <div className="complete-icon">
                 <Sparkles size={28} />
               </div>
@@ -551,12 +504,9 @@ function LearnFromScratch() {
                 Keep practicing and continue
                 developing your musical skills.
               </p>
-
             </div>
           )}
-
         </section>
-
       </main>
     </div>
   );
