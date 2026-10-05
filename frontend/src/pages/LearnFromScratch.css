@@ -5,14 +5,138 @@
 
 .learn-page {
   min-height: 100vh;
-  background: linear-gradient(
-    135deg,
-    #f8f6ff 0%,
-    #eeeaff 50%,
-    #e8e3ff 100%
-  );
+
+  background:
+    radial-gradient(
+      circle at 50% 10%,
+      rgba(124, 92, 252, 0.08),
+      transparent 35%
+    ),
+    #f8f6ff;
+
   color: #241b45;
+
   overflow-x: hidden;
+
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
+}
+
+/* =========================================================
+   DARK THEME
+   ========================================================= */
+
+.learn-page.dark {
+  background:
+    radial-gradient(
+      circle at 50% 10%,
+      rgba(124, 92, 252, 0.16),
+      transparent 35%
+    ),
+    #0d0b14;
+
+  color: #f5f2ff;
+}
+
+/* =========================================================
+   DARK ELEMENTS
+   ========================================================= */
+
+.learn-page.dark .learn-header {
+  background: rgba(20, 17, 30, 0.90);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.learn-page.dark .learn-header-title strong,
+.learn-page.dark .learn-intro h1,
+.learn-page.dark .journey-heading h2,
+.learn-page.dark .lesson-card-content h3,
+.learn-page.dark .journey-complete-card h3,
+.learn-page.dark .learn-character-name {
+  color: #f5f2ff;
+}
+
+.learn-page.dark .learn-header-title span,
+.learn-page.dark .learn-intro p,
+.learn-page.dark .journey-heading p,
+.learn-page.dark .lesson-card-content p,
+.learn-page.dark .learn-character-stage {
+  color: #a9a1bb;
+}
+
+/* =========================================================
+   MUSIC ROOM BUTTON
+   ========================================================= */
+
+.learn-back-button {
+  height: 44px;
+
+  padding: 0 17px;
+
+  border: none;
+
+  border-radius: 13px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 8px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c5cfc,
+      #6245d8
+    );
+
+  color: #ffffff;
+
+  cursor: pointer;
+
+  font-size: 13px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.1px;
+
+  box-shadow:
+    0 8px 22px rgba(98, 69, 216, 0.28);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+}
+
+.learn-back-button:hover {
+  transform: translateY(-2px);
+
+  filter: brightness(1.05);
+
+  box-shadow:
+    0 12px 28px rgba(98, 69, 216, 0.38);
+}
+
+.learn-back-button:active {
+  transform: translateY(0);
+}
+
+.learn-page.dark .learn-back-button {
+  background:
+    linear-gradient(
+      135deg,
+      #8064ff,
+      #6245d8
+    );
+
+  color: #ffffff;
+
+  box-shadow:
+    0 8px 25px rgba(98, 69, 216, 0.40);
 }
 
 /* =========================================================
@@ -21,95 +145,103 @@
 
 .learn-header {
   height: 78px;
+
   padding: 0 32px;
 
   display: flex;
+
   align-items: center;
+
   gap: 22px;
 
-  background: rgba(255, 255, 255, 0.78);
-  border-bottom: 1px solid rgba(124, 92, 252, 0.12);
+  background: rgba(255, 255, 255, 0.84);
+
+  border-bottom:
+    1px solid rgba(124, 92, 252, 0.12);
 
   backdrop-filter: blur(16px);
+
   -webkit-backdrop-filter: blur(16px);
 
   position: sticky;
+
   top: 0;
+
   z-index: 100;
-}
-
-.learn-back-button {
-  width: 44px;
-  height: 44px;
-
-  border: none;
-  border-radius: 14px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: #ffffff;
-  color: #6245d8;
-
-  cursor: pointer;
-
-  box-shadow: 0 8px 24px rgba(72, 52, 150, 0.10);
 
   transition:
-    transform 0.2s ease,
-    background 0.2s ease;
-}
-
-.learn-back-button:hover {
-  transform: translateX(-3px);
-  background: #f1eeff;
+    background 0.3s ease,
+    border-color 0.3s ease;
 }
 
 .learn-header-title {
   display: flex;
+
   flex-direction: column;
+
   gap: 2px;
 }
 
 .learn-header-title strong {
   font-size: 20px;
+
   font-weight: 800;
+
   letter-spacing: -0.4px;
 }
 
 .learn-header-title span {
   font-size: 12px;
+
   color: #756d91;
+
   font-weight: 600;
 }
 
 /* =========================================================
-   MAIN CONTENT
+   MAIN
    ========================================================= */
 
 .learn-content {
-  width: min(1180px, calc(100% - 40px));
+  width: min(
+    1180px,
+    calc(100% - 40px)
+  );
+
   margin: 0 auto;
+
   padding: 52px 0 80px;
 }
 
+/* =========================================================
+   INTRO
+   ========================================================= */
+
 .learn-intro {
   text-align: center;
+
   max-width: 720px;
+
   margin: 0 auto 42px;
 }
 
 .learn-eyebrow {
   display: inline-flex;
+
   align-items: center;
+
+  justify-content: center;
+
   gap: 7px;
 
   margin-bottom: 12px;
 
   font-size: 12px;
+
   font-weight: 800;
+
   letter-spacing: 1.5px;
+
   text-transform: uppercase;
 
   color: #6245d8;
@@ -118,8 +250,14 @@
 .learn-intro h1 {
   margin: 0;
 
-  font-size: clamp(32px, 5vw, 52px);
+  font-size: clamp(
+    32px,
+    5vw,
+    52px
+  );
+
   line-height: 1.05;
+
   letter-spacing: -1.8px;
 
   color: #241b45;
@@ -131,6 +269,7 @@
   max-width: 620px;
 
   font-size: 16px;
+
   line-height: 1.7;
 
   color: #706887;
@@ -142,7 +281,9 @@
 
 .learn-character-section {
   display: flex;
+
   flex-direction: column;
+
   align-items: center;
 
   margin-bottom: 42px;
@@ -156,7 +297,8 @@
 
   border-radius: 50%;
 
-  background: rgba(124, 92, 252, 0.20);
+  background:
+    rgba(124, 92, 252, 0.20);
 
   filter: blur(55px);
 
@@ -170,12 +312,15 @@
   height: 250px;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
 }
 
 .learn-character-image {
   position: relative;
+
   z-index: 2;
 
   width: 220px;
@@ -184,9 +329,16 @@
   object-fit: contain;
 
   filter:
-    drop-shadow(0 20px 30px rgba(67, 45, 145, 0.20));
+    drop-shadow(
+      0 20px 30px
+      rgba(67, 45, 145, 0.20)
+    );
 
-  animation: learnCharacterFloat 4s ease-in-out infinite;
+  animation:
+    learnCharacterFloat
+    4s
+    ease-in-out
+    infinite;
 }
 
 @keyframes learnCharacterFloat {
@@ -207,23 +359,41 @@
   border-radius: 50%;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
 
-  background: rgba(255, 255, 255, 0.7);
+  background:
+    rgba(255, 255, 255, 0.7);
 
-  border: 2px dashed rgba(98, 69, 216, 0.25);
+  border:
+    2px dashed
+    rgba(98, 69, 216, 0.25);
 
   color: #8b82a8;
 
   font-size: 13px;
+
   text-align: center;
+}
+
+.learn-page.dark
+.learn-character-placeholder {
+  background:
+    rgba(30, 26, 42, 0.8);
+
+  border-color:
+    rgba(183, 169, 255, 0.22);
+
+  color: #8e879e;
 }
 
 .learn-character-name {
   margin-top: 12px;
 
   font-size: 18px;
+
   font-weight: 800;
 
   color: #30245a;
@@ -233,32 +403,60 @@
   margin-top: 5px;
 
   font-size: 13px;
+
   font-weight: 600;
 
   color: #7b7395;
 }
 
 /* =========================================================
-   PROGRESS
+   PROGRESS CARD
    ========================================================= */
 
 .learn-progress-card {
-  width: min(720px, 100%);
-  margin: 0 auto 56px;
+  width: min(
+    720px,
+    100%
+  );
 
-  padding: 22px 24px;
+  margin:
+    0 auto 56px;
 
-  background: rgba(255, 255, 255, 0.78);
+  padding:
+    22px 24px;
 
-  border: 1px solid rgba(124, 92, 252, 0.13);
+  background:
+    rgba(255, 255, 255, 0.84);
+
+  border:
+    1px solid
+    rgba(124, 92, 252, 0.13);
+
   border-radius: 22px;
 
-  box-shadow: 0 15px 40px rgba(72, 52, 150, 0.08);
+  box-shadow:
+    0 15px 40px
+    rgba(72, 52, 150, 0.08);
+}
+
+.learn-page.dark
+.learn-progress-card {
+  background:
+    rgba(25, 21, 36, 0.88);
+
+  border-color:
+    rgba(255, 255, 255, 0.08);
+
+  box-shadow:
+    0 15px 40px
+    rgba(0, 0, 0, 0.28);
 }
 
 .learn-progress-top {
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
 
   margin-bottom: 12px;
@@ -266,18 +464,28 @@
 
 .learn-progress-top span:first-child {
   font-size: 14px;
+
   font-weight: 800;
+
   color: #35275e;
+}
+
+.learn-page.dark
+.learn-progress-top span:first-child {
+  color: #eeeaff;
 }
 
 .learn-progress-top span:last-child {
   font-size: 13px;
+
   font-weight: 800;
+
   color: #6245d8;
 }
 
 .learn-progress-track {
   width: 100%;
+
   height: 10px;
 
   overflow: hidden;
@@ -287,18 +495,25 @@
   background: #e5e0f5;
 }
 
+.learn-page.dark
+.learn-progress-track {
+  background: #292435;
+}
+
 .learn-progress-fill {
   height: 100%;
 
   border-radius: inherit;
 
-  background: linear-gradient(
-    90deg,
-    #7c5cfc,
-    #6245d8
-  );
+  background:
+    linear-gradient(
+      90deg,
+      #7c5cfc,
+      #6245d8
+    );
 
-  transition: width 0.5s ease;
+  transition:
+    width 0.5s ease;
 }
 
 /* =========================================================
@@ -311,6 +526,7 @@
 
 .journey-heading {
   text-align: center;
+
   margin-bottom: 34px;
 }
 
@@ -318,7 +534,9 @@
   margin: 0;
 
   font-size: 28px;
+
   font-weight: 850;
+
   letter-spacing: -0.8px;
 
   color: #2b2050;
@@ -333,110 +551,197 @@
 }
 
 /* =========================================================
-   JOURNEY PATH
+   PERFECT HORIZONTAL JOURNEY
    ========================================================= */
 
 .journey-path {
-  width: min(850px, 100%);
-  margin: 0 auto 46px;
+  width: min(
+    900px,
+    100%
+  );
 
-  display: flex;
+  margin:
+    0 auto 48px;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(6, 64px);
+
+  justify-content: space-between;
+
   align-items: center;
-  justify-content: center;
 
-  gap: 0;
+  position: relative;
+
+  min-height: 80px;
 }
+
+/*
+   ONE SINGLE LINE.
+   It passes directly through
+   the CENTER of every circle.
+*/
+
+.journey-path::before {
+  content: "";
+
+  position: absolute;
+
+  left: 32px;
+
+  right: 32px;
+
+  top: 50%;
+
+  height: 7px;
+
+  transform:
+    translateY(-50%);
+
+  background: #ddd8eb;
+
+  border-radius: 999px;
+
+  z-index: 0;
+}
+
+.learn-page.dark
+.journey-path::before {
+  background: #302b3d;
+}
+
+/* =========================================================
+   JOURNEY CIRCLES
+   ========================================================= */
 
 .journey-node-wrapper {
   position: relative;
 
-  display: flex;
-  align-items: center;
-  flex: 1;
-}
+  width: 64px;
 
-.journey-node-wrapper:last-child {
-  flex: 0 0 auto;
+  height: 64px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  z-index: 2;
 }
 
 .journey-node {
   position: relative;
+
   z-index: 3;
 
   width: 64px;
-  height: 64px;
 
-  flex-shrink: 0;
+  height: 64px;
 
   border-radius: 50%;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
 
-  border: 4px solid #ffffff;
+  box-sizing: border-box;
+
+  border:
+    4px solid #ffffff;
 
   font-size: 24px;
 
-  box-shadow: 0 10px 25px rgba(72, 52, 150, 0.15);
+  box-shadow:
+    0 10px 25px
+    rgba(72, 52, 150, 0.15);
 
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
 }
 
+.learn-page.dark
+.journey-node {
+  border-color: #0d0b14;
+}
+
 .journey-node:hover {
-  transform: translateY(-4px);
+  transform:
+    translateY(-4px);
 }
 
 .journey-node.completed {
   background: #7c5cfc;
+
   color: #ffffff;
 }
 
 .journey-node.current {
   background: #ffffff;
+
   color: #6245d8;
 
   border-color: #7c5cfc;
 
   box-shadow:
-    0 0 0 7px rgba(124, 92, 252, 0.12),
-    0 12px 30px rgba(72, 52, 150, 0.18);
+    0 0 0 7px
+    rgba(124, 92, 252, 0.12),
+
+    0 12px 30px
+    rgba(72, 52, 150, 0.18);
+}
+
+.learn-page.dark
+.journey-node.current {
+  background: #191522;
+
+  border-color: #7c5cfc;
 }
 
 .journey-node.locked {
   background: #ddd8eb;
+
   color: #8c85a2;
 
   box-shadow: none;
 }
 
-.journey-connector {
-  height: 7px;
-  flex: 1;
+.learn-page.dark
+.journey-node.locked {
+  background: #292534;
 
-  margin: 0 -2px;
-
-  background: #ddd8eb;
-
-  border-radius: 999px;
+  color: #777085;
 }
 
-.journey-connector.completed {
-  background: #7c5cfc;
+/*
+   We use ONE central line above.
+   Old individual connectors are disabled.
+*/
+
+.journey-connector {
+  display: none;
 }
 
 /* =========================================================
-   LESSON LIST
+   LESSON CARDS
    ========================================================= */
 
 .lesson-list {
-  width: min(900px, 100%);
+  width: min(
+    900px,
+    100%
+  );
+
   margin: 0 auto;
 
   display: flex;
+
   flex-direction: column;
+
   gap: 16px;
 }
 
@@ -444,17 +749,30 @@
   position: relative;
 
   display: flex;
+
   align-items: center;
+
   gap: 18px;
 
-  padding: 20px 22px;
+  min-height: 82px;
 
-  background: rgba(255, 255, 255, 0.86);
+  box-sizing: border-box;
 
-  border: 1px solid rgba(124, 92, 252, 0.12);
+  padding:
+    20px 22px;
+
+  background:
+    rgba(255, 255, 255, 0.86);
+
+  border:
+    1px solid
+    rgba(124, 92, 252, 0.12);
+
   border-radius: 20px;
 
-  box-shadow: 0 10px 28px rgba(72, 52, 150, 0.07);
+  box-shadow:
+    0 10px 28px
+    rgba(72, 52, 150, 0.07);
 
   transition:
     transform 0.2s ease,
@@ -462,16 +780,33 @@
     border-color 0.2s ease;
 }
 
+.learn-page.dark
+.lesson-card {
+  background:
+    rgba(25, 21, 36, 0.88);
+
+  border-color:
+    rgba(255, 255, 255, 0.08);
+
+  box-shadow:
+    0 15px 35px
+    rgba(0, 0, 0, 0.24);
+}
+
 .lesson-card.clickable {
   cursor: pointer;
 }
 
 .lesson-card.clickable:hover {
-  transform: translateY(-3px);
+  transform:
+    translateY(-3px);
 
-  border-color: rgba(124, 92, 252, 0.35);
+  border-color:
+    rgba(124, 92, 252, 0.35);
 
-  box-shadow: 0 16px 35px rgba(72, 52, 150, 0.12);
+  box-shadow:
+    0 16px 35px
+    rgba(72, 52, 150, 0.12);
 }
 
 .lesson-card.locked {
@@ -479,19 +814,29 @@
 }
 
 .lesson-card.completed {
-  border-color: rgba(124, 92, 252, 0.25);
+  border-color:
+    rgba(124, 92, 252, 0.25);
 }
 
 .lesson-card.current {
-  border-color: rgba(124, 92, 252, 0.55);
+  border-color:
+    rgba(124, 92, 252, 0.55);
 
   box-shadow:
-    0 12px 32px rgba(98, 69, 216, 0.12),
-    0 0 0 3px rgba(124, 92, 252, 0.05);
+    0 12px 32px
+    rgba(98, 69, 216, 0.12),
+
+    0 0 0 3px
+    rgba(124, 92, 252, 0.05);
 }
+
+/* =========================================================
+   LESSON ICON
+   ========================================================= */
 
 .lesson-card-icon {
   width: 58px;
+
   height: 58px;
 
   flex-shrink: 0;
@@ -499,7 +844,9 @@
   border-radius: 17px;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
 
   background: #f1eeff;
@@ -507,16 +854,34 @@
   font-size: 27px;
 }
 
-.lesson-card.completed .lesson-card-icon {
+.learn-page.dark
+.lesson-card-icon {
+  background: #29213f;
+}
+
+.lesson-card.completed
+.lesson-card-icon {
   background: #7c5cfc;
 }
 
-.lesson-card.locked .lesson-card-icon {
+.lesson-card.locked
+.lesson-card-icon {
   background: #e9e6f1;
 }
 
+.learn-page.dark
+.lesson-card.locked
+.lesson-card-icon {
+  background: #292534;
+}
+
+/* =========================================================
+   LESSON CONTENT
+   ========================================================= */
+
 .lesson-card-content {
   min-width: 0;
+
   flex: 1;
 }
 
@@ -524,22 +889,30 @@
   margin: 0;
 
   font-size: 17px;
+
   font-weight: 800;
 
   color: #30245a;
 }
 
 .lesson-card-content p {
-  margin: 6px 0 0;
+  margin:
+    6px 0 0;
 
   font-size: 13px;
+
   line-height: 1.5;
 
   color: #7a7292;
 }
 
+/* =========================================================
+   LESSON ACTION
+   ========================================================= */
+
 .lesson-action {
   width: 42px;
+
   height: 42px;
 
   flex-shrink: 0;
@@ -547,70 +920,130 @@
   border-radius: 50%;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
 
   background: #f1eeff;
+
   color: #6245d8;
 }
 
-.lesson-card.completed .lesson-action {
+.learn-page.dark
+.lesson-action {
+  background: #29213f;
+
+  color: #b7a9ff;
+}
+
+.lesson-card.completed
+.lesson-action {
   background: #eeeaff;
+
   color: #6245d8;
 }
 
-.lesson-card.locked .lesson-action {
+.lesson-card.locked
+.lesson-action {
   background: #eceaf1;
+
   color: #9690a5;
 }
 
+.learn-page.dark
+.lesson-card.locked
+.lesson-action {
+  background: #292534;
+
+  color: #777085;
+}
+
 /* =========================================================
-   COMPLETE STATE
+   COMPLETION CARD
    ========================================================= */
 
 .journey-complete-card {
-  width: min(720px, 100%);
+  width: min(
+    720px,
+    100%
+  );
 
-  margin: 38px auto 0;
-  padding: 32px 26px;
+  margin:
+    38px auto 0;
+
+  padding:
+    32px 26px;
 
   text-align: center;
 
-  background: linear-gradient(
-    135deg,
-    rgba(124, 92, 252, 0.10),
-    rgba(255, 255, 255, 0.85)
-  );
+  background:
+    linear-gradient(
+      135deg,
+      rgba(124, 92, 252, 0.10),
+      rgba(255, 255, 255, 0.85)
+    );
 
-  border: 1px solid rgba(124, 92, 252, 0.18);
+  border:
+    1px solid
+    rgba(124, 92, 252, 0.18);
 
   border-radius: 24px;
 
-  box-shadow: 0 15px 40px rgba(72, 52, 150, 0.08);
+  box-shadow:
+    0 15px 40px
+    rgba(72, 52, 150, 0.08);
 }
 
-.journey-complete-card .complete-icon {
+.learn-page.dark
+.journey-complete-card {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(124, 92, 252, 0.14),
+      rgba(25, 21, 36, 0.90)
+    );
+
+  border-color:
+    rgba(255, 255, 255, 0.08);
+}
+
+.journey-complete-card
+.complete-icon {
   width: 64px;
+
   height: 64px;
 
-  margin: 0 auto 16px;
+  margin:
+    0 auto 16px;
 
   border-radius: 50%;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
 
-  background: #7c5cfc;
+  background:
+    linear-gradient(
+      135deg,
+      #7c5cfc,
+      #6245d8
+    );
+
   color: #ffffff;
 
-  box-shadow: 0 10px 25px rgba(124, 92, 252, 0.25);
+  box-shadow:
+    0 10px 25px
+    rgba(124, 92, 252, 0.25);
 }
 
 .journey-complete-card h3 {
   margin: 0;
 
   font-size: 24px;
+
   font-weight: 850;
 
   color: #2c2150;
@@ -619,7 +1052,8 @@
 .journey-complete-card p {
   max-width: 540px;
 
-  margin: 10px auto 0;
+  margin:
+    10px auto 0;
 
   color: #756d91;
 
@@ -627,36 +1061,84 @@
 }
 
 /* =========================================================
-   RESPONSIVE
+   RESPONSIVE — TABLET
    ========================================================= */
 
 @media (max-width: 800px) {
+
   .learn-header {
     padding: 0 18px;
   }
 
   .learn-content {
-    width: min(100% - 28px, 680px);
+    width:
+      min(
+        calc(100% - 28px),
+        680px
+      );
+
     padding-top: 38px;
   }
 
   .journey-path {
-    display: none;
+    grid-template-columns:
+      repeat(6, 48px);
+
+    min-height: 60px;
   }
 
-  .lesson-card {
-    padding: 17px;
+  .journey-path::before {
+    left: 24px;
+
+    right: 24px;
+
+    height: 5px;
+  }
+
+  .journey-node-wrapper,
+  .journey-node {
+    width: 48px;
+
+    height: 48px;
+  }
+
+  .journey-node {
+    font-size: 18px;
+
+    border-width: 3px;
   }
 }
 
+/* =========================================================
+   RESPONSIVE — MOBILE
+   ========================================================= */
+
 @media (max-width: 560px) {
+
   .learn-header {
     height: 70px;
-    gap: 14px;
+
+    gap: 12px;
+
+    padding:
+      0 14px;
+  }
+
+  .learn-back-button {
+    height: 40px;
+
+    padding:
+      0 12px;
+
+    font-size: 11px;
   }
 
   .learn-header-title strong {
-    font-size: 17px;
+    font-size: 16px;
+  }
+
+  .learn-header-title span {
+    display: none;
   }
 
   .learn-intro h1 {
@@ -669,11 +1151,13 @@
 
   .learn-character-wrapper {
     width: 210px;
+
     height: 210px;
   }
 
   .learn-character-image {
     width: 185px;
+
     height: 185px;
   }
 
@@ -681,13 +1165,56 @@
     padding: 18px;
   }
 
+  /*
+     Keep all six nodes aligned.
+     On very small screens the journey
+     stays as one clean horizontal row.
+  */
+
+  .journey-section {
+    overflow: hidden;
+  }
+
+  .journey-path {
+    width: 560px;
+
+    margin-left: 50%;
+
+    transform:
+      translateX(-50%);
+
+    grid-template-columns:
+      repeat(6, 52px);
+
+    justify-content:
+      space-between;
+  }
+
+  .journey-path::before {
+    left: 26px;
+
+    right: 26px;
+  }
+
+  .journey-node-wrapper,
+  .journey-node {
+    width: 52px;
+
+    height: 52px;
+  }
+
   .lesson-card {
     gap: 13px;
+
+    padding:
+      17px;
   }
 
   .lesson-card-icon {
     width: 48px;
+
     height: 48px;
+
     font-size: 22px;
   }
 
@@ -701,6 +1228,7 @@
 
   .lesson-action {
     width: 36px;
+
     height: 36px;
   }
 }
