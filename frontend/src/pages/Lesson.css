@@ -1,12 +1,14 @@
 /* =========================================================
-   SKILLSENSAI LESSON FLOW + ANALYSIS UPDATE
+   SKILLSENSAI LESSON FLOW + ANALYSIS
+   ALL LESSON STYLES ARE SCOPED TO .lesson-page
    ========================================================= */
+
 
 /* =========================================================
    STEP INDICATOR
    ========================================================= */
 
-.lesson-stepper {
+.lesson-page .lesson-stepper {
   width: 100%;
   max-width: 900px;
   margin: 0 auto 38px;
@@ -18,7 +20,7 @@
   gap: 14px;
 }
 
-.step-item {
+.lesson-page .step-item {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -31,7 +33,7 @@
   white-space: nowrap;
 }
 
-.step-item span {
+.lesson-page .step-item span {
   width: 34px;
   height: 34px;
 
@@ -50,11 +52,11 @@
   transition: 0.25s ease;
 }
 
-.step-item.active {
+.lesson-page .step-item.active {
   color: #6245d8;
 }
 
-.step-item.active span {
+.lesson-page .step-item.active span {
   background: #7c5cfc;
   color: white;
 
@@ -62,7 +64,7 @@
     0 6px 18px rgba(124, 92, 252, 0.25);
 }
 
-.step-line {
+.lesson-page .step-line {
   height: 2px;
   flex: 1;
 
@@ -71,11 +73,12 @@
   background: #e4dfed;
 }
 
+
 /* =========================================================
    STEP NAVIGATION
    ========================================================= */
 
-.step-navigation {
+.lesson-page .step-navigation {
   width: 100%;
 
   display: flex;
@@ -87,8 +90,8 @@
   margin: 26px 0 50px;
 }
 
-.next-step-button,
-.back-step-button {
+.lesson-page .next-step-button,
+.lesson-page .back-step-button {
   border: none;
 
   min-height: 48px;
@@ -114,7 +117,7 @@
     opacity 0.2s ease;
 }
 
-.next-step-button {
+.lesson-page .next-step-button {
   background: #6245d8;
   color: white;
 
@@ -122,37 +125,38 @@
     0 8px 20px rgba(98, 69, 216, 0.2);
 }
 
-.next-step-button:hover:not(:disabled) {
+.lesson-page .next-step-button:hover:not(:disabled) {
   transform: translateY(-2px);
 
   box-shadow:
     0 12px 25px rgba(98, 69, 216, 0.3);
 }
 
-.next-step-button:disabled {
+.lesson-page .next-step-button:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
 
-.back-step-button {
+.lesson-page .back-step-button {
   background: #eeeaf7;
   color: #514a63;
 }
 
-.back-step-button:hover:not(:disabled) {
+.lesson-page .back-step-button:hover:not(:disabled) {
   transform: translateY(-2px);
 }
 
-.back-step-button:disabled {
+.lesson-page .back-step-button:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
+
 
 /* =========================================================
    ANALYSIS CARD
    ========================================================= */
 
-.results-card {
+.lesson-page .results-card {
   width: 100%;
 
   padding: 42px;
@@ -160,15 +164,16 @@
   overflow: visible;
 }
 
-.analysis-title {
+.lesson-page .analysis-title {
   margin-bottom: 32px;
 }
+
 
 /* =========================================================
    SCORE HERO
    ========================================================= */
 
-.score-hero {
+.lesson-page .score-hero {
   width: 100%;
 
   display: grid;
@@ -195,7 +200,7 @@
   border: 1px solid #ded6f5;
 }
 
-.score-circle {
+.lesson-page .score-circle {
   width: 190px;
   height: 190px;
 
@@ -221,7 +226,7 @@
     );
 }
 
-.score-circle strong {
+.lesson-page .score-circle strong {
   font-size: 54px;
   line-height: 1;
 
@@ -230,7 +235,7 @@
   font-weight: 800;
 }
 
-.score-circle span {
+.lesson-page .score-circle span {
   margin-top: 8px;
 
   font-size: 16px;
@@ -239,11 +244,11 @@
   font-weight: 600;
 }
 
-.score-feedback {
+.lesson-page .score-feedback {
   min-width: 0;
 }
 
-.analysis-label {
+.lesson-page .analysis-label {
   display: block;
 
   margin-bottom: 8px;
@@ -256,7 +261,7 @@
   letter-spacing: 0.12em;
 }
 
-.score-feedback h3 {
+.lesson-page .score-feedback h3 {
   margin: 0 0 14px;
 
   color: #211b32;
@@ -265,7 +270,7 @@
   line-height: 1.25;
 }
 
-.score-feedback p {
+.lesson-page .score-feedback p {
   margin: 0;
 
   color: #514a63;
@@ -277,11 +282,12 @@
   word-break: break-word;
 }
 
+
 /* =========================================================
    ANALYSIS METRICS
    ========================================================= */
 
-.analysis-grid {
+.lesson-page .analysis-grid {
   width: 100%;
 
   display: grid;
@@ -297,7 +303,7 @@
   margin-bottom: 48px;
 }
 
-.analysis-stat {
+.lesson-page .analysis-stat {
   min-width: 0;
 
   padding: 25px;
@@ -318,7 +324,7 @@
   gap: 9px;
 }
 
-.analysis-stat > span {
+.lesson-page .analysis-stat > span {
   color: #665d76;
 
   font-size: 13px;
@@ -329,7 +335,7 @@
   overflow-wrap: anywhere;
 }
 
-.analysis-stat strong {
+.lesson-page .analysis-stat strong {
   color: #2e2641;
 
   font-size: 30px;
@@ -338,13 +344,13 @@
   font-weight: 800;
 }
 
-.analysis-stat small {
+.lesson-page .analysis-stat small {
   color: #7c748b;
 
   font-size: 12px;
 }
 
-.stat-bar {
+.lesson-page .stat-bar {
   width: 100%;
 
   height: 8px;
@@ -358,7 +364,7 @@
   overflow: hidden;
 }
 
-.stat-bar span {
+.lesson-page .stat-bar span {
   display: block;
 
   height: 100%;
@@ -374,11 +380,12 @@
   transition: width 0.5s ease;
 }
 
+
 /* =========================================================
    COMPARISON SECTION
    ========================================================= */
 
-.comparison-section {
+.lesson-page .comparison-section {
   width: 100%;
 
   margin-top: 20px;
@@ -389,13 +396,13 @@
   border-top: 1px solid #e4dfeb;
 }
 
-.comparison-heading {
+.lesson-page .comparison-heading {
   width: 100%;
 
   margin-bottom: 24px;
 }
 
-.comparison-heading h3 {
+.lesson-page .comparison-heading h3 {
   margin: 0 0 8px;
 
   color: #211b32;
@@ -404,7 +411,7 @@
   line-height: 1.3;
 }
 
-.comparison-heading p {
+.lesson-page .comparison-heading p {
   margin: 0;
 
   color: #625a70;
@@ -415,11 +422,12 @@
   overflow-wrap: anywhere;
 }
 
+
 /* =========================================================
    LARGE PITCH GRAPH
    ========================================================= */
 
-.comparison-graph {
+.lesson-page .comparison-graph {
   position: relative;
 
   width: 100%;
@@ -454,7 +462,7 @@
   overflow: hidden;
 }
 
-.pitch-svg {
+.lesson-page .pitch-svg {
   position: absolute;
 
   inset: 0;
@@ -469,7 +477,7 @@
   pointer-events: none;
 }
 
-.reference-line {
+.lesson-page .reference-line {
   position: absolute;
 
   left: 0;
@@ -484,7 +492,7 @@
   z-index: 2;
 }
 
-.reference-line span {
+.lesson-page .reference-line span {
   position: absolute;
 
   left: 20px;
@@ -506,7 +514,7 @@
   letter-spacing: 0.08em;
 }
 
-.graph-y-label {
+.lesson-page .graph-y-label {
   position: absolute;
 
   right: 18px;
@@ -530,15 +538,15 @@
   font-weight: 800;
 }
 
-.high-label {
+.lesson-page .high-label {
   top: 18px;
 }
 
-.low-label {
+.lesson-page .low-label {
   bottom: 18px;
 }
 
-.no-graph-data {
+.lesson-page .no-graph-data {
   position: absolute;
 
   inset: 0;
@@ -557,13 +565,13 @@
   color: #625a70;
 }
 
-.no-graph-data > div {
+.lesson-page .no-graph-data > div {
   font-size: 42px;
 
   margin-bottom: 12px;
 }
 
-.no-graph-data strong {
+.lesson-page .no-graph-data strong {
   color: #332a46;
 
   font-size: 18px;
@@ -571,7 +579,7 @@
   margin-bottom: 8px;
 }
 
-.no-graph-data p {
+.lesson-page .no-graph-data p {
   max-width: 520px;
 
   margin: 0 0 8px;
@@ -581,15 +589,16 @@
   line-height: 1.6;
 }
 
-.no-graph-data small {
+.lesson-page .no-graph-data small {
   color: #8b8396;
 }
+
 
 /* =========================================================
    GRAPH LEGEND
    ========================================================= */
 
-.graph-legend {
+.lesson-page .graph-legend {
   width: 100%;
 
   display: flex;
@@ -606,7 +615,7 @@
   font-weight: 600;
 }
 
-.graph-legend span {
+.lesson-page .graph-legend span {
   display: inline-flex;
 
   align-items: center;
@@ -614,7 +623,7 @@
   gap: 8px;
 }
 
-.graph-legend i {
+.lesson-page .graph-legend i {
   width: 13px;
   height: 13px;
 
@@ -623,19 +632,20 @@
   border-radius: 50%;
 }
 
-.legend-target {
+.lesson-page .legend-target {
   background: #7c5cfc;
 }
 
-.legend-user {
+.lesson-page .legend-user {
   background: #6245d8;
 }
+
 
 /* =========================================================
    THEORY COMPARISON
    ========================================================= */
 
-.theory-comparison {
+.lesson-page .theory-comparison {
   width: 100%;
 
   margin-top: 45px;
@@ -645,7 +655,7 @@
   border-top: 1px solid #e4dfeb;
 }
 
-.theory-comparison h3 {
+.lesson-page .theory-comparison h3 {
   margin: 0 0 24px;
 
   color: #211b32;
@@ -653,7 +663,7 @@
   font-size: 25px;
 }
 
-.comparison-row {
+.lesson-page .comparison-row {
   width: 100%;
 
   display: grid;
@@ -667,7 +677,7 @@
   gap: 24px;
 }
 
-.comparison-column {
+.lesson-page .comparison-column {
   min-width: 0;
 
   padding: 28px;
@@ -679,7 +689,7 @@
   border: 1px solid #e2ddec;
 }
 
-.comparison-column > span {
+.lesson-page .comparison-column > span {
   display: block;
 
   margin-bottom: 9px;
@@ -693,7 +703,7 @@
   letter-spacing: 0.12em;
 }
 
-.comparison-column strong {
+.lesson-page .comparison-column strong {
   display: block;
 
   margin-bottom: 12px;
@@ -705,7 +715,7 @@
   line-height: 1.35;
 }
 
-.comparison-column p {
+.lesson-page .comparison-column p {
   margin: 0;
 
   color: #625a70;
@@ -718,11 +728,12 @@
   word-break: break-word;
 }
 
+
 /* =========================================================
    ANALYSIS BACK BUTTON
    ========================================================= */
 
-.analysis-back-button-wrapper {
+.lesson-page .analysis-back-button-wrapper {
   width: 100%;
 
   display: flex;
@@ -730,6 +741,7 @@
 
   margin: 22px 0 45px;
 }
+
 
 /* =========================================================
    DARK THEME — ANALYSIS
@@ -886,16 +898,18 @@
   color: #b9b0c1;
 }
 
+
 /* =========================================================
    RESPONSIVE
    ========================================================= */
 
 @media (max-width: 1000px) {
-  .results-card {
+
+  .lesson-page .results-card {
     padding: 30px;
   }
 
-  .score-hero {
+  .lesson-page .score-hero {
     grid-template-columns:
       190px
       minmax(0, 1fr);
@@ -905,16 +919,16 @@
     padding: 28px;
   }
 
-  .score-circle {
+  .lesson-page .score-circle {
     width: 160px;
     height: 160px;
   }
 
-  .score-circle strong {
+  .lesson-page .score-circle strong {
     font-size: 46px;
   }
 
-  .analysis-grid {
+  .lesson-page .analysis-grid {
     grid-template-columns:
       repeat(
         2,
@@ -922,41 +936,43 @@
       );
   }
 
-  .comparison-graph {
+  .lesson-page .comparison-graph {
     height: 400px;
     min-height: 360px;
   }
 }
 
+
 @media (max-width: 700px) {
-  .lesson-stepper {
+
+  .lesson-page .lesson-stepper {
     gap: 6px;
   }
 
-  .step-line {
+  .lesson-page .step-line {
     max-width: 25px;
   }
 
-  .step-item strong {
+  .lesson-page .step-item strong {
     display: none;
   }
 
-  .step-item span {
+  .lesson-page .step-item span {
     width: 32px;
     height: 32px;
   }
 
-  .step-navigation {
+  .lesson-page .step-navigation {
     justify-content: space-between;
 
     margin-bottom: 35px;
   }
 
-  .results-card {
+  .lesson-page .results-card {
     padding: 20px;
   }
 
-  .score-hero {
+  .lesson-page .score-hero {
     grid-template-columns: 1fr;
 
     text-align: center;
@@ -966,43 +982,43 @@
     padding: 25px;
   }
 
-  .score-circle {
+  .lesson-page .score-circle {
     width: 145px;
     height: 145px;
   }
 
-  .score-circle strong {
+  .lesson-page .score-circle strong {
     font-size: 42px;
   }
 
-  .score-feedback p {
+  .lesson-page .score-feedback p {
     text-align: left;
   }
 
-  .analysis-grid {
+  .lesson-page .analysis-grid {
     grid-template-columns: 1fr;
 
     gap: 14px;
   }
 
-  .analysis-stat {
+  .lesson-page .analysis-stat {
     min-height: 125px;
   }
 
-  .comparison-graph {
+  .lesson-page .comparison-graph {
     height: 330px;
     min-height: 300px;
   }
 
-  .comparison-row {
+  .lesson-page .comparison-row {
     grid-template-columns: 1fr;
   }
 
-  .comparison-column {
+  .lesson-page .comparison-column {
     padding: 22px;
   }
 
-  .graph-legend {
+  .lesson-page .graph-legend {
     flex-direction: column;
 
     gap: 10px;
