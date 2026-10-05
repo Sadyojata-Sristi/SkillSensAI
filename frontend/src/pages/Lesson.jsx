@@ -1,4 +1,3 @@
-```jsx
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -3574,39 +3573,3 @@ function App() {
 }
 
 export default App;
-```
-
-### One thing before testing
-
-Create this folder in your public directory:
-
-```text
-frontend/
-└── public/
-    └── music/
-        └── lessons/
-```
-
-For now, put your Lesson 1 video here:
-
-```text
-public/music/lessons/lesson-1.mp4
-```
-
-You don't need all six videos yet. Lesson 2–6 can be added later.
-
-Then run:
-
-```bash
-npm run build
-```
-
-If the build passes, open:
-
-```text
-/music/learn
-```
-
-and click **Lesson 1**.
-
-**Important:** the pitch tracker and analysis displayed in this first version are currently the **UI/prototype layer**. We have not yet connected them to your FastAPI `/analyze-voice` / `/compare-song-voice` backend. Once the lesson interface is working, we'll replace that simulated analysis with your actual `librosa` pitch analysis and make the **Record Live** tracker genuinely respond to the microphone.
