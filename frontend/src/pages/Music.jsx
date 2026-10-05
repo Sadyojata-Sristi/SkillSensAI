@@ -1,701 +1,604 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
-  BookOpen,
-  CheckCircle2,
-  Mic,
   Music2,
-  Play,
   Upload,
-  Square,
+  GraduationCap,
+  Palette,
+  Lock,
   Sparkles,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
-import "./Music.css";
-
+import "./music.css";
 import {
-  completeLesson,
-  isLessonCompleted,
-  getCompletedLessons,
+  getLessonsLearned,
+  getSelectedMusicCharacter,
+  setSelectedMusicCharacter,
 } from "../utils/progress";
 
-const MUSIC_LESSONS = [
+/*
+=========================================================
+SKILLSENSAI — MUSIC ROOM
+=========================================================
+
+6 Lesson Character Progression
+
+0 lessons  -> character stage 0
+1 lesson   -> character stage 1
+2 lessons  -> character stage 2
+3 lessons  -> character stage 3
+4 lessons  -> character stage 4
+5 lessons  -> character stage 5
+6 lessons  -> final character stage
+=========================================================
+*/
+
+const TOTAL_LESSONS = 6;
+
+/*
+---------------------------------------------------------
+CHARACTER SETS
+
+Later, replace these placeholder paths with the images
+you upload.
+
+Example:
+
+/music/characters/singer/stage-0.png
+/music/characters/singer/stage-1.png
+...
+---------------------------------------------------------
+*/
+
+const CHARACTER_OPTIONS = [
   {
-    id: "music-lesson-1",
-    title: "Understanding Pitch",
-    description:
-      "Learn what pitch is and how to identify high and low notes.",
-    video: "/lessons/music/music-lesson-1.mp4",
+    id: "singer",
+    name: "Singer",
+    description: "The Voice",
+    images: [
+      "/music/characters/singer/stage-0.png",
+      "/music/characters/singer/stage-1.png",
+      "/music/characters/singer/stage-2.png",
+      "/music/characters/singer/stage-3.png",
+      "/music/characters/singer/stage-4.png",
+      "/music/characters/singer/stage-5.png",
+      "/music/characters/singer/stage-6.png",
+    ],
   },
+
   {
-    id: "music-lesson-2",
-    title: "Basic Voice Control",
-    description:
-      "Learn the fundamentals of controlling your voice while singing.",
-    video: "/lessons/music/music-lesson-2.mp4",
+    id: "guitarist",
+    name: "Guitarist",
+    description: "The Strings",
+    images: [
+      "/music/characters/guitarist/stage-0.png",
+      "/music/characters/guitarist/stage-1.png",
+      "/music/characters/guitarist/stage-2.png",
+      "/music/characters/guitarist/stage-3.png",
+      "/music/characters/guitarist/stage-4.png",
+      "/music/characters/guitarist/stage-5.png",
+      "/music/characters/guitarist/stage-6.png",
+    ],
   },
+
   {
-    id: "music-lesson-3",
-    title: "Breathing for Singing",
-    description:
-      "Learn simple breathing techniques to improve your singing.",
-    video: "/lessons/music/music-lesson-3.mp4",
-  },
-  {
-    id: "music-lesson-4",
-    title: "Basic Rhythm",
-    description:
-      "Understand rhythm, timing and how to stay on beat.",
-    video: "/lessons/music/music-lesson-4.mp4",
-  },
-  {
-    id: "music-lesson-5",
-    title: "Putting It Together",
-    description:
-      "Combine pitch, breathing, voice control and rhythm.",
-    video: "/lessons/music/music-lesson-5.mp4",
+    id: "pianist",
+    name: "Pianist",
+    description: "The Keys",
+    images: [
+      "/music/characters/pianist/stage-0.png",
+      "/music/characters/pianist/stage-1.png",
+      "/music/characters/pianist/stage-2.png",
+      "/music/characters/pianist/stage-3.png",
+      "/music/characters/pianist/stage-4.png",
+      "/music/characters/pianist/stage-5.png",
+      "/music/characters/pianist/stage-6.png",
+    ],
   },
 ];
 
 function Music() {
   const navigate = useNavigate();
 
-  const [selectedLesson, setSelectedLesson] = useState(null);
-  const [completedLessons, setCompletedLessons] = useState([]);
-
-  const [showLearnFromScratch, setShowLearnFromScratch] =
-    useState(false);
-
-  const [showLearnSong, setShowLearnSong] = useState(false);
-
-  const [songFile, setSongFile] = useState(null);
-  const [recordingFile, setRecordingFile] = useState(null);
-
-  const [isRecording, setIsRecording] = useState(false);
-  const [message, setMessage] = useState("");
-
-  const mediaRecorderRef = useRef(null);
-  const recordingChunksRef = useRef([]);
-
-  /* -----------------------------------------
-     LOAD PROGRESS
-  ----------------------------------------- */
+  const [lessonsCompleted, setLessonsCompleted] = useState(0);
+  const [selectedCharacter, setSelectedCharacter] = useState("singer");
+  const [showCharacterSelector, setShowCharacterSelector] = useState(false);
+  const [roomEntered, setRoomEntered] = useState(false);
 
   useEffect(() => {
-    const updateProgress = () => {
-      setCompletedLessons(getCompletedLessons());
-    };
+    const completed = getLessonsLearned();
 
-    updateProgress();
-
-    window.addEventListener(
-      "skillsensai-progress-updated",
-      updateProgress
+    const safeCompleted = Math.min(
+      Math.max(Number(completed) || 0, 0),
+      TOTAL_LESSONS
     );
 
-    return () => {
-      window.removeEventListener(
-        "skillsensai-progress-updated",
-        updateProgress
-      );
-    };
+    setLessonsCompleted(safeCompleted);
+
+    const savedCharacter = getSelectedMusicCharacter();
+
+    if (savedCharacter) {
+      setSelectedCharacter(savedCharacter);
+    }
+
+    // Small entrance animation
+    const timer = setTimeout(() => {
+      setRoomEntered(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, []);
 
-  /* -----------------------------------------
-     LESSON COMPLETION
-  ----------------------------------------- */
+  const currentCharacter =
+    CHARACTER_OPTIONS.find(
+      (character) => character.id === selectedCharacter
+    ) || CHARACTER_OPTIONS[0];
 
-  const handleCompleteLesson = (lessonId) => {
-    const completed = completeLesson(lessonId);
-
-    setCompletedLessons(getCompletedLessons());
-
-    if (completed) {
-      setMessage("Lesson completed! Your progress has been saved.");
-    } else {
-      setMessage("You have already completed this lesson.");
-    }
-  };
-
-  const lessonCompleted = (lessonId) => {
-    return isLessonCompleted(lessonId);
-  };
-
-  /* -----------------------------------------
-     FILE UPLOAD
-  ----------------------------------------- */
-
-  const handleSongUpload = (event) => {
-    const file = event.target.files?.[0];
-
-    if (!file) return;
-
-    setSongFile(file);
-    setMessage(`Song selected: ${file.name}`);
-  };
-
-  const handleRecordingUpload = (event) => {
-    const file = event.target.files?.[0];
-
-    if (!file) return;
-
-    setRecordingFile(file);
-    setMessage(`Recording selected: ${file.name}`);
-  };
-
-  /* -----------------------------------------
-     RECORD AUDIO
-  ----------------------------------------- */
-
-  const startRecording = async () => {
-    try {
-      const stream =
-        await navigator.mediaDevices.getUserMedia({
-          audio: true,
-        });
-
-      const recorder = new MediaRecorder(stream);
-
-      recordingChunksRef.current = [];
-
-      recorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          recordingChunksRef.current.push(event.data);
-        }
-      };
-
-      recorder.onstop = () => {
-        const audioBlob = new Blob(
-          recordingChunksRef.current,
-          {
-            type: "audio/webm",
-          }
-        );
-
-        const file = new File(
-          [audioBlob],
-          "skillsensai-recording.webm",
-          {
-            type: "audio/webm",
-          }
-        );
-
-        setRecordingFile(file);
-
-        stream.getTracks().forEach((track) => {
-          track.stop();
-        });
-
-        setMessage("Live recording completed.");
-      };
-
-      mediaRecorderRef.current = recorder;
-
-      recorder.start();
-
-      setIsRecording(true);
-      setMessage("Recording started. Sing now!");
-    } catch (error) {
-      console.error(error);
-
-      setMessage(
-        "Microphone access was denied or unavailable."
-      );
-    }
-  };
-
-  const stopRecording = () => {
-    if (!mediaRecorderRef.current) return;
-
-    if (
-      mediaRecorderRef.current.state !== "inactive"
-    ) {
-      mediaRecorderRef.current.stop();
-    }
-
-    setIsRecording(false);
-  };
-
-  /* -----------------------------------------
-     AI ANALYSIS
-  ----------------------------------------- */
-
-  const analyzeSong = () => {
-    if (!songFile) {
-      setMessage("Please upload a song first.");
-      return;
-    }
-
-    setMessage(
-      "AI song analysis will process your pitch and rhythm."
-    );
-  };
-
-  const analyzeRecording = () => {
-    if (!recordingFile) {
-      setMessage(
-        "Please record or upload your singing first."
-      );
-      return;
-    }
-
-    setMessage(
-      "AI voice analysis will provide pitch and singing feedback."
-    );
-  };
-
-  /* -----------------------------------------
-     PROGRESS
-  ----------------------------------------- */
-
-  const completedCount = completedLessons.filter((id) =>
-    MUSIC_LESSONS.some((lesson) => lesson.id === id)
-  ).length;
-
-  const progressPercentage = Math.round(
-    (completedCount / MUSIC_LESSONS.length) * 100
+  const currentStage = Math.min(
+    lessonsCompleted,
+    TOTAL_LESSONS
   );
 
-  /* -----------------------------------------
-     RENDER
-  ----------------------------------------- */
+  const currentImage = currentCharacter.images[currentStage];
+
+  const progressPercentage =
+    (lessonsCompleted / TOTAL_LESSONS) * 100;
+
+  const handleCharacterChange = (characterId) => {
+    setSelectedCharacter(characterId);
+    setSelectedMusicCharacter(characterId);
+    setShowCharacterSelector(false);
+  };
+
+  const handleLearnFromScratch = () => {
+    navigate("/music/learn");
+  };
+
+  const handleUploadSong = () => {
+    navigate("/music/upload-song");
+  };
 
   return (
-    <div className="music-page">
+    <div
+      className={`music-room ${
+        roomEntered ? "music-room-entered" : ""
+      }`}
+    >
+      {/* ================================================
+          BACKGROUND
+      ================================================= */}
 
-      {/* HEADER */}
-      <header className="music-header">
+      <div className="music-room-background">
+        <div className="music-glow glow-one"></div>
+        <div className="music-glow glow-two"></div>
+        <div className="music-glow glow-three"></div>
 
-        <div className="music-brand">
-          <span className="music-brand-skill">
-            Skill
-          </span>
-          <span className="music-brand-sensai">
-            SensAI
-          </span>
-        </div>
+        <div className="floating-note note-one">♪</div>
+        <div className="floating-note note-two">♫</div>
+        <div className="floating-note note-three">♬</div>
+        <div className="floating-note note-four">♪</div>
+      </div>
 
+      {/* ================================================
+          TOP BAR
+      ================================================= */}
+
+      <header className="music-room-header">
         <button
           className="music-back-button"
           onClick={() => navigate("/")}
+          aria-label="Back to Home"
         >
-          <ArrowLeft size={18} />
-          Back Home
+          <ArrowLeft size={21} />
+          <span>Home</span>
         </button>
 
+        <div className="music-room-title">
+          <Music2 size={22} />
+          <span>MUSIC ROOM</span>
+        </div>
+
+        <div className="music-header-space"></div>
       </header>
 
-      {/* HERO */}
-      <section className="music-hero">
+      {/* ================================================
+          MAIN ROOM
+      ================================================= */}
 
-        <div className="music-hero-icon">
-          <Music2 size={42} />
-        </div>
+      <main className="music-room-content">
 
-        <div>
-          <p className="music-eyebrow">
-            AI-POWERED MUSIC LEARNING
-          </p>
+        {/* ==============================================
+            TITLE
+        ============================================== */}
 
-          <h1>
-            Learn <span>Music</span> Your Way
-          </h1>
-
-          <p className="music-hero-description">
-            Learn from scratch, practice your voice,
-            analyze songs and improve step by step with
-            SkillSensAI.
-          </p>
-        </div>
-
-      </section>
-
-      {/* MAIN */}
-      <main className="music-main">
-
-        {/* PROGRESS CARD */}
-        <section className="music-progress-card">
-
-          <div className="music-progress-top">
-
-            <div>
-              <p className="music-progress-label">
-                YOUR MUSIC PROGRESS
-              </p>
-
-              <h2>
-                {completedCount} / {MUSIC_LESSONS.length}
-                {" "}Lessons Completed
-              </h2>
-            </div>
-
-            <div className="music-progress-percentage">
-              {progressPercentage}%
-            </div>
-
+        <section className="music-intro">
+          <div className="music-small-label">
+            <Sparkles size={15} />
+            YOUR MUSICAL JOURNEY
           </div>
 
-          <div className="music-progress-bar">
-            <div
-              className="music-progress-fill"
-              style={{
-                width: `${progressPercentage}%`,
+          <h1>Welcome to Your Music Room</h1>
+
+          <p>
+            Learn, practice and bring your musician to life.
+          </p>
+        </section>
+
+        {/* ==============================================
+            CHARACTER AREA
+        ============================================== */}
+
+        <section className="music-character-section">
+
+          <div className="character-stars">
+            <span>✦</span>
+            <span>✧</span>
+            <span>✦</span>
+            <span>✧</span>
+            <span>✦</span>
+          </div>
+
+          <div
+            className={`character-glow ${
+              lessonsCompleted === TOTAL_LESSONS
+                ? "character-complete"
+                : ""
+            }`}
+          ></div>
+
+          <div
+            className={`music-character-wrapper ${
+              lessonsCompleted === TOTAL_LESSONS
+                ? "character-awakened"
+                : ""
+            }`}
+          >
+            <img
+              src={currentImage}
+              alt={`${currentCharacter.name} character`}
+              className="music-character-image"
+              onError={(event) => {
+                /*
+                Temporary fallback while your images
+                have not been uploaded yet.
+                */
+                event.currentTarget.style.display = "none";
+                event.currentTarget.parentElement.classList.add(
+                  "character-placeholder-visible"
+                );
               }}
             />
+
+            <div className="character-placeholder">
+              <Music2 size={65} strokeWidth={1.2} />
+
+              <span>
+                {currentCharacter.name}
+              </span>
+
+              <small>
+                Character artwork coming soon
+              </small>
+            </div>
           </div>
 
-        </section>
+          {/* Character floating particles */}
 
-        {/* LEARNING MODES */}
-        <section className="music-mode-section">
-
-          <div className="music-section-heading">
-            <p>START LEARNING</p>
-            <h2>Choose Your Learning Path</h2>
+          <div className="character-particle particle-one">
+            ♪
           </div>
 
-          <div className="music-mode-grid">
-
-            {/* LEARN FROM SCRATCH */}
-            <button
-              className={`music-mode-card ${
-                showLearnFromScratch
-                  ? "music-mode-card-active"
-                  : ""
-              }`}
-              onClick={() => {
-                setShowLearnFromScratch(
-                  !showLearnFromScratch
-                );
-                setShowLearnSong(false);
-                setSelectedLesson(null);
-                setMessage("");
-              }}
-            >
-
-              <div className="music-mode-icon blue">
-                <BookOpen size={30} />
-              </div>
-
-              <div className="music-mode-content">
-                <h3>Learn From Scratch</h3>
-
-                <p>
-                  Start from the basics and build your
-                  music skills step by step.
-                </p>
-
-                <span>
-                  {completedCount}/
-                  {MUSIC_LESSONS.length} completed
-                </span>
-              </div>
-
-            </button>
-
-            {/* LEARN A SONG */}
-            <button
-              className={`music-mode-card ${
-                showLearnSong
-                  ? "music-mode-card-active red"
-                  : ""
-              }`}
-              onClick={() => {
-                setShowLearnSong(!showLearnSong);
-                setShowLearnFromScratch(false);
-                setSelectedLesson(null);
-                setMessage("");
-              }}
-            >
-
-              <div className="music-mode-icon red">
-                <Sparkles size={30} />
-              </div>
-
-              <div className="music-mode-content">
-                <h3>Learn a Song</h3>
-
-                <p>
-                  Upload a song and practice singing
-                  along with AI-powered feedback.
-                </p>
-
-                <span>
-                  Practice • Record • Improve
-                </span>
-              </div>
-
-            </button>
-
+          <div className="character-particle particle-two">
+            ✦
           </div>
 
-        </section>
+          <div className="character-particle particle-three">
+            ♫
+          </div>
 
-        {/* LEARN FROM SCRATCH */}
-        {showLearnFromScratch && (
-          <section className="music-lessons-section">
+          <div className="character-particle particle-four">
+            ✧
+          </div>
 
-            <div className="music-section-heading">
-              <p>STEP BY STEP</p>
-              <h2>Music Lessons</h2>
+          {/* Character name */}
+
+          <div className="character-name">
+            <span>{currentCharacter.name}</span>
+
+            <small>
+              {lessonsCompleted === TOTAL_LESSONS
+                ? "Musician Awakened"
+                : currentCharacter.description}
+            </small>
+          </div>
+
+          {/* ============================================
+              PROGRESS
+          ============================================ */}
+
+          <div className="music-progress-container">
+
+            <div className="music-progress-top">
+              <span>
+                Musical Journey
+              </span>
+
+              <strong>
+                {lessonsCompleted}/{TOTAL_LESSONS}
+              </strong>
             </div>
 
-            <div className="music-lessons-list">
+            <div className="music-progress-bar">
+              <div
+                className="music-progress-fill"
+                style={{
+                  width: `${progressPercentage}%`,
+                }}
+              ></div>
+            </div>
 
-              {MUSIC_LESSONS.map((lesson, index) => {
+            <div className="music-progress-label">
+              {lessonsCompleted === 0
+                ? "Your musician is waiting for you."
+                : lessonsCompleted === TOTAL_LESSONS
+                ? "Your musician has come to life!"
+                : `${TOTAL_LESSONS - lessonsCompleted} lessons remaining`}
+            </div>
 
+          </div>
+
+          {/* Customize */}
+
+          <button
+            className="customize-character-button"
+            onClick={() =>
+              setShowCharacterSelector(true)
+            }
+          >
+            <Palette size={17} />
+            Customize Musician
+          </button>
+
+        </section>
+
+        {/* ==============================================
+            MAIN OPTIONS
+        ============================================== */}
+
+        <section className="music-options">
+
+          {/* LEARN FROM SCRATCH */}
+
+          <button
+            className="music-option-card learn-card"
+            onClick={handleLearnFromScratch}
+          >
+            <div className="option-icon">
+              <GraduationCap size={29} />
+            </div>
+
+            <div className="option-content">
+              <span className="option-label">
+                START YOUR JOURNEY
+              </span>
+
+              <h2>Learn From Scratch</h2>
+
+              <p>
+                Learn music step by step through lessons,
+                quizzes and practical challenges.
+              </p>
+
+              <div className="option-action">
+                {lessonsCompleted > 0
+                  ? "Continue Learning"
+                  : "Start Learning"}
+                <span>→</span>
+              </div>
+            </div>
+          </button>
+
+          {/* UPLOAD SONG */}
+
+          <button
+            className="music-option-card upload-card"
+            onClick={handleUploadSong}
+          >
+            <div className="option-icon">
+              <Upload size={27} />
+            </div>
+
+            <div className="option-content">
+              <span className="option-label">
+                PRACTICE YOUR MUSIC
+              </span>
+
+              <h2>Upload Song</h2>
+
+              <p>
+                Upload a song or recording and practice
+                with AI-powered musical feedback.
+              </p>
+
+              <div className="option-action">
+                Upload & Practice
+                <span>→</span>
+              </div>
+            </div>
+          </button>
+
+        </section>
+
+        {/* ==============================================
+            LESSON INDICATORS
+        ============================================== */}
+
+        <section className="lesson-indicators">
+
+          <span className="lesson-heading">
+            YOUR 6-LESSON JOURNEY
+          </span>
+
+          <div className="lesson-dots">
+
+            {Array.from(
+              { length: TOTAL_LESSONS },
+              (_, index) => {
+                const lessonNumber = index + 1;
                 const completed =
-                  lessonCompleted(lesson.id);
+                  lessonNumber <= lessonsCompleted;
+
+                const current =
+                  lessonNumber === lessonsCompleted + 1;
 
                 return (
                   <div
-                    className={`music-lesson-card ${
+                    key={lessonNumber}
+                    className={`lesson-dot-wrapper ${
                       completed
-                        ? "music-lesson-completed"
-                        : ""
+                        ? "completed"
+                        : current
+                        ? "current"
+                        : "locked"
                     }`}
-                    key={lesson.id}
                   >
-
-                    <div className="music-lesson-number">
-                      {completed ? (
-                        <CheckCircle2 size={24} />
-                      ) : (
-                        index + 1
-                      )}
+                    <div className="lesson-dot">
+                      {completed ? "✓" : lessonNumber}
                     </div>
 
-                    <div className="music-lesson-details">
-
-                      <h3>{lesson.title}</h3>
-
-                      <p>
-                        {lesson.description}
-                      </p>
-
-                      {completed && (
-                        <span className="music-completed-text">
-                          Completed
-                        </span>
-                      )}
-
-                    </div>
-
-                    <button
-                      className="music-lesson-open"
-                      onClick={() =>
-                        setSelectedLesson(lesson)
-                      }
-                    >
-                      <Play size={16} />
-                      Open
-                    </button>
-
+                    {index <
+                      TOTAL_LESSONS - 1 && (
+                      <div className="lesson-connector"></div>
+                    )}
                   </div>
                 );
-              })}
+              }
+            )}
 
-            </div>
-
-          </section>
-        )}
-
-        {/* SELECTED LESSON */}
-        {selectedLesson && (
-          <section className="music-video-section">
-
-            <div className="music-video-header">
-
-              <div>
-                <p>NOW LEARNING</p>
-
-                <h2>
-                  {selectedLesson.title}
-                </h2>
-              </div>
-
-              <button
-                className="music-close-video"
-                onClick={() =>
-                  setSelectedLesson(null)
-                }
-              >
-                Close
-              </button>
-
-            </div>
-
-            <p className="music-video-description">
-              {selectedLesson.description}
-            </p>
-
-            <video
-              className="music-video-player"
-              controls
-              src={selectedLesson.video}
-            />
-
-            <div className="music-video-actions">
-
-              <button
-                className="music-complete-button"
-                onClick={() =>
-                  handleCompleteLesson(
-                    selectedLesson.id
-                  )
-                }
-                disabled={lessonCompleted(
-                  selectedLesson.id
-                )}
-              >
-                <CheckCircle2 size={18} />
-
-                {lessonCompleted(
-                  selectedLesson.id
-                )
-                  ? "Lesson Completed"
-                  : "Mark Lesson Complete"}
-              </button>
-
-            </div>
-
-          </section>
-        )}
-
-        {/* LEARN A SONG */}
-        {showLearnSong && (
-          <section className="music-song-section">
-
-            <div className="music-section-heading">
-              <p>SONG PRACTICE</p>
-              <h2>Practice With Your Voice</h2>
-            </div>
-
-            <div className="music-song-grid">
-
-              {/* SONG */}
-              <div className="music-song-card">
-
-                <div className="music-card-icon">
-                  <Music2 size={26} />
-                </div>
-
-                <h3>Choose a Song</h3>
-
-                <p>
-                  Upload the song you want to practice.
-                </p>
-
-                <label className="music-upload-button">
-
-                  <Upload size={18} />
-
-                  Upload Song
-
-                  <input
-                    type="file"
-                    accept="audio/*"
-                    onChange={handleSongUpload}
-                  />
-
-                </label>
-
-                {songFile && (
-                  <div className="music-file-name">
-                    {songFile.name}
-                  </div>
-                )}
-
-                <button
-                  className="music-analyze-button"
-                  onClick={analyzeSong}
-                >
-                  <Sparkles size={18} />
-                  Analyze Song
-                </button>
-
-              </div>
-
-              {/* VOICE */}
-              <div className="music-song-card">
-
-                <div className="music-card-icon red">
-                  <Mic size={26} />
-                </div>
-
-                <h3>Your Singing</h3>
-
-                <p>
-                  Record your voice live or upload
-                  an existing recording.
-                </p>
-
-                <div className="music-record-actions">
-
-                  {!isRecording ? (
-                    <button
-                      className="music-record-button"
-                      onClick={startRecording}
-                    >
-                      <Mic size={18} />
-                      Record Live
-                    </button>
-                  ) : (
-                    <button
-                      className="music-stop-button"
-                      onClick={stopRecording}
-                    >
-                      <Square size={17} />
-                      Stop Recording
-                    </button>
-                  )}
-
-                  <label className="music-upload-button secondary">
-
-                    <Upload size={18} />
-
-                    Upload Recording
-
-                    <input
-                      type="file"
-                      accept="audio/*"
-                      onChange={handleRecordingUpload}
-                    />
-
-                  </label>
-
-                </div>
-
-                {recordingFile && (
-                  <div className="music-file-name">
-                    {recordingFile.name}
-                  </div>
-                )}
-
-                <button
-                  className="music-analyze-button red"
-                  onClick={analyzeRecording}
-                >
-                  <Sparkles size={18} />
-                  Analyze My Voice
-                </button>
-
-              </div>
-
-            </div>
-
-          </section>
-        )}
-
-        {/* MESSAGE */}
-        {message && (
-          <div className="music-message">
-            {message}
           </div>
-        )}
+
+        </section>
 
       </main>
+
+      {/* ================================================
+          CHARACTER SELECTOR MODAL
+      ================================================= */}
+
+      {showCharacterSelector && (
+        <div
+          className="character-selector-overlay"
+          onClick={() =>
+            setShowCharacterSelector(false)
+          }
+        >
+          <div
+            className="character-selector-modal"
+            onClick={(event) =>
+              event.stopPropagation()
+            }
+          >
+
+            <button
+              className="selector-close"
+              onClick={() =>
+                setShowCharacterSelector(false)
+              }
+            >
+              ×
+            </button>
+
+            <div className="selector-header">
+              <Palette size={22} />
+
+              <h2>Choose Your Musician</h2>
+
+              <p>
+                Your chosen appearance will continue
+                evolving as you learn.
+              </p>
+            </div>
+
+            <div className="character-options">
+
+              {CHARACTER_OPTIONS.map(
+                (character) => {
+                  const selected =
+                    selectedCharacter ===
+                    character.id;
+
+                  return (
+                    <button
+                      key={character.id}
+                      className={`character-option ${
+                        selected
+                          ? "selected"
+                          : ""
+                      }`}
+                      onClick={() =>
+                        handleCharacterChange(
+                          character.id
+                        )
+                      }
+                    >
+
+                      <div className="character-option-image">
+
+                        <img
+                          src={
+                            character.images[0]
+                          }
+                          alt={
+                            character.name
+                          }
+                          onError={(event) => {
+                            event.currentTarget.style.display =
+                              "none";
+
+                            event.currentTarget.parentElement.classList.add(
+                              "option-placeholder-visible"
+                            );
+                          }}
+                        />
+
+                        <div className="option-placeholder">
+                          <Music2 size={35} />
+                        </div>
+
+                      </div>
+
+                      <strong>
+                        {character.name}
+                      </strong>
+
+                      <span>
+                        {character.description}
+                      </span>
+
+                      {selected && (
+                        <div className="selected-mark">
+                          ✓
+                        </div>
+                      )}
+
+                    </button>
+                  );
+                }
+              )}
+
+            </div>
+
+            <div className="selector-note">
+              <Lock size={14} />
+              More musician appearances will be added
+              later.
+            </div>
+
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
