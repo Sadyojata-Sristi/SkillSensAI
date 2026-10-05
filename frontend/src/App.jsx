@@ -8,6 +8,7 @@ import {
 import Home from "./pages/Home";
 import Music from "./pages/Music";
 import LearnFromScratch from "./pages/LearnFromScratch";
+import Lesson from "./pages/Lesson";
 import MartialArts from "./pages/MartialArts";
 import Boxing from "./pages/Boxing";
 import Karate from "./pages/Karate";
@@ -39,6 +40,14 @@ function App() {
         <Route
           path="/music/learn"
           element={<LearnFromScratch />}
+        />
+
+        {/* =========================
+            INDIVIDUAL MUSIC LESSON
+        ========================= */}
+        <Route
+          path="/music/learn/lesson/:lessonId"
+          element={<Lesson />}
         />
 
         {/* =========================
