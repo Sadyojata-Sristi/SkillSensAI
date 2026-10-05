@@ -1,12 +1,12 @@
+```jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import {
   ArrowLeft,
   Check,
   Lock,
-  Play,
   ChevronRight,
-  Music2,
   Sparkles,
 } from "lucide-react";
 
@@ -17,22 +17,11 @@ import {
   getSelectedMusicCharacter,
 } from "../utils/progress";
 
-/*
-=========================================================
-SKILLSENSAI — LEARN FROM SCRATCH
-=========================================================
-*/
+/* =========================================================
+   CONSTANTS
+   ========================================================= */
 
 const TOTAL_LESSONS = 6;
-
-/*
----------------------------------------------------------
-UNIVERSAL MUSIC CURRICULUM
-
-The curriculum is the SAME for every musician.
-The selected character is only visual.
----------------------------------------------------------
-*/
 
 const LESSONS = [
   {
@@ -79,80 +68,169 @@ const LESSONS = [
   },
 ];
 
-/*
----------------------------------------------------------
-MUSICIAN APPEARANCE
----------------------------------------------------------
-*/
+/* =========================================================
+   MUSIC CHARACTERS
+   ========================================================= */
 
 const MUSIC_CHARACTERS = {
   singer: {
     name: "Singer",
-    image: (stage) =>
-      `/music/characters/singer/stage-${stage}.png`,
+    stages: [
+      "/music/characters/singer/stage-0.png",
+      "/music/characters/singer/stage-1.png",
+      "/music/characters/singer/stage-2.png",
+      "/music/characters/singer/stage-3.png",
+      "/music/characters/singer/stage-4.png",
+      "/music/characters/singer/stage-5.png",
+      "/music/characters/singer/stage-6.png",
+    ],
   },
 
   guitarist: {
     name: "Guitarist",
-    image: (stage) =>
-      `/music/characters/guitarist/stage-${stage}.png`,
+    stages: [
+      "/music/characters/guitarist/stage-0.png",
+      "/music/characters/guitarist/stage-1.png",
+      "/music/characters/guitarist/stage-2.png",
+      "/music/characters/guitarist/stage-3.png",
+      "/music/characters/guitarist/stage-4.png",
+      "/music/characters/guitarist/stage-5.png",
+      "/music/characters/guitarist/stage-6.png",
+    ],
   },
 
   pianist: {
     name: "Pianist",
-    image: (stage) =>
-      `/music/characters/pianist/stage-${stage}.png`,
+    stages: [
+      "/music/characters/pianist/stage-0.png",
+      "/music/characters/pianist/stage-1.png",
+      "/music/characters/pianist/stage-2.png",
+      "/music/characters/pianist/stage-3.png",
+      "/music/characters/pianist/stage-4.png",
+      "/music/characters/pianist/stage-5.png",
+      "/music/characters/pianist/stage-6.png",
+    ],
   },
 
   flutist: {
     name: "Flute Player",
-    image: (stage) =>
-      `/music/characters/flutist/stage-${stage}.png`,
+    stages: [
+      "/music/characters/flutist/stage-0.png",
+      "/music/characters/flutist/stage-1.png",
+      "/music/characters/flutist/stage-2.png",
+      "/music/characters/flutist/stage-3.png",
+      "/music/characters/flutist/stage-4.png",
+      "/music/characters/flutist/stage-5.png",
+      "/music/characters/flutist/stage-6.png",
+    ],
   },
 
   violinist: {
     name: "Violinist",
-    image: (stage) =>
-      `/music/characters/violinist/stage-${stage}.png`,
+    stages: [
+      "/music/characters/violinist/stage-0.png",
+      "/music/characters/violinist/stage-1.png",
+      "/music/characters/violinist/stage-2.png",
+      "/music/characters/violinist/stage-3.png",
+      "/music/characters/violinist/stage-4.png",
+      "/music/characters/violinist/stage-5.png",
+      "/music/characters/violinist/stage-6.png",
+    ],
   },
 
   veena: {
     name: "Veena Player",
-    image: (stage) =>
-      `/music/characters/veena/stage-${stage}.png`,
+    stages: [
+      "/music/characters/veena/stage-0.png",
+      "/music/characters/veena/stage-1.png",
+      "/music/characters/veena/stage-2.png",
+      "/music/characters/veena/stage-3.png",
+      "/music/characters/veena/stage-4.png",
+      "/music/characters/veena/stage-5.png",
+      "/music/characters/veena/stage-6.png",
+    ],
   },
 
   drummer: {
     name: "Drummer",
-    image: (stage) =>
-      `/music/characters/drummer/stage-${stage}.png`,
+    stages: [
+      "/music/characters/drummer/stage-0.png",
+      "/music/characters/drummer/stage-1.png",
+      "/music/characters/drummer/stage-2.png",
+      "/music/characters/drummer/stage-3.png",
+      "/music/characters/drummer/stage-4.png",
+      "/music/characters/drummer/stage-5.png",
+      "/music/characters/drummer/stage-6.png",
+    ],
   },
 };
+
+/* =========================================================
+   COMPONENT
+   ========================================================= */
 
 function LearnFromScratch() {
   const navigate = useNavigate();
 
-  const [lessonsCompleted, setLessonsCompleted] =
-    useState(() => getLessonsLearned());
+  const [lessonsLearned, setLessonsLearned] =
+    useState(getLessonsLearned());
 
-  const [selectedCharacter, setSelectedCharacter] =
-    useState(() => getSelectedMusicCharacter());
+  const [characterId, setCharacterId] = useState(
+    getSelectedMusicCharacter()
+  );
+
+  const [theme, setTheme] = useState(
+    localStorage.getItem("skillsensai_theme") || "light"
+  );
 
   const [imageFailed, setImageFailed] =
     useState(false);
 
-  /*
-  -------------------------------------------------------
-  LISTEN FOR PROGRESS CHANGES
-  -------------------------------------------------------
-  */
+  /* =======================================================
+     THEME
+     ======================================================= */
+
+  useEffect(() => {
+    const updateTheme = () => {
+      setTheme(
+        localStorage.getItem("skillsensai_theme") ||
+          "light"
+      );
+    };
+
+    updateTheme();
+
+    window.addEventListener(
+      "skillsensai-theme-changed",
+      updateTheme
+    );
+
+    window.addEventListener(
+      "storage",
+      updateTheme
+    );
+
+    return () => {
+      window.removeEventListener(
+        "skillsensai-theme-changed",
+        updateTheme
+      );
+
+      window.removeEventListener(
+        "storage",
+        updateTheme
+      );
+    };
+  }, []);
+
+  /* =======================================================
+     PROGRESS
+     ======================================================= */
 
   useEffect(() => {
     const updateProgress = () => {
-      setLessonsCompleted(getLessonsLearned());
-      setSelectedCharacter(
-        getSelectedMusicCharacter()
-      );
+      setLessonsLearned(getLessonsLearned());
+      setCharacterId(getSelectedMusicCharacter());
     };
 
     window.addEventListener(
@@ -168,432 +246,283 @@ function LearnFromScratch() {
     };
   }, []);
 
-  /*
-  -------------------------------------------------------
-  CURRENT CHARACTER
-  -------------------------------------------------------
-  */
-
-  const currentCharacter =
-    MUSIC_CHARACTERS[selectedCharacter] ||
-    MUSIC_CHARACTERS.singer;
-
-  /*
-  -------------------------------------------------------
-  CHARACTER STAGE
-
-  0 = before learning
-  1 = lesson 1 complete
-  ...
-  6 = all lessons complete
-  -------------------------------------------------------
-  */
-
-  const currentStage = Math.min(
-    Math.max(lessonsCompleted, 0),
-    TOTAL_LESSONS
-  );
-
-  /*
-  -------------------------------------------------------
-  RESET IMAGE FALLBACK WHEN CHARACTER/STAGE CHANGES
-  -------------------------------------------------------
-  */
+  /* =======================================================
+     CHARACTER
+     ======================================================= */
 
   useEffect(() => {
     setImageFailed(false);
-  }, [selectedCharacter, currentStage]);
+  }, [characterId, lessonsLearned]);
 
-  /*
-  -------------------------------------------------------
-  PROGRESS PERCENTAGE
-  -------------------------------------------------------
-  */
+  const character =
+    MUSIC_CHARACTERS[characterId] ||
+    MUSIC_CHARACTERS.singer;
+
+  const stage = Math.min(
+    Math.max(lessonsLearned, 0),
+    TOTAL_LESSONS
+  );
 
   const progressPercentage =
-    (lessonsCompleted / TOTAL_LESSONS) * 100;
+    (lessonsLearned / TOTAL_LESSONS) * 100;
 
-  /*
-  -------------------------------------------------------
-  LESSON CLICK
-  -------------------------------------------------------
-  */
+  /* =======================================================
+     LESSON CLICK
+     ======================================================= */
 
-  const openLesson = (lesson) => {
-    const isUnlocked =
-      lesson.id <= lessonsCompleted + 1;
+  const handleLessonClick = (lesson) => {
+    const isCompleted =
+      lesson.id <= lessonsLearned;
 
-    if (!isUnlocked) {
-      return;
+    const isCurrent =
+      lesson.id === lessonsLearned + 1;
+
+    if (isCompleted || isCurrent) {
+      navigate(
+        `/music/learn/lesson/${lesson.id}`
+      );
     }
-
-    /*
-      For now this opens the lesson route.
-      We will build the actual lesson screen next.
-    */
-
-    navigate(
-      `/music/learn/lesson/${lesson.id}`
-    );
   };
 
-  return (
-    <div className="learn-page">
+  /* =======================================================
+     RENDER
+     ======================================================= */
 
+  return (
+    <div
+      className={`learn-page ${
+        theme === "dark" ? "dark" : "light"
+      }`}
+    >
       {/* =================================================
           HEADER
-      ================================================= */}
+          ================================================= */}
 
       <header className="learn-header">
-
         <button
           className="learn-back-button"
           onClick={() => navigate("/music")}
+          aria-label="Back to Music Room"
         >
           <ArrowLeft size={20} />
           <span>Music Room</span>
         </button>
 
         <div className="learn-header-title">
-          <Music2 size={22} />
-          <span>Learn From Scratch</span>
+          <strong>Learn From Scratch</strong>
+
+          <span>
+            Your personal music learning journey
+          </span>
         </div>
-
-        <div className="learn-header-spacer" />
-
       </header>
 
-
       {/* =================================================
-          MAIN CONTENT
-      ================================================= */}
+          MAIN
+          ================================================= */}
 
       <main className="learn-content">
 
-        {/* =================================================
-            INTRO
-        ================================================= */}
+        {/* INTRO */}
 
         <section className="learn-intro">
-
           <div className="learn-eyebrow">
-            <Sparkles size={15} />
-            YOUR MUSIC JOURNEY
+            <Sparkles size={14} />
+            MUSIC JOURNEY
           </div>
 
           <h1>
-            Learn From Scratch
+            Become a Musician
           </h1>
 
           <p>
             Learn step by step, practice what you learn,
-            and become a better musician.
+            and bring your musician to life as you progress.
           </p>
-
         </section>
-
 
         {/* =================================================
             CHARACTER
-        ================================================= */}
+            ================================================= */}
 
         <section className="learn-character-section">
 
           <div className="learn-character-glow" />
 
-          <div
-            className={`learn-character-wrapper ${
-              lessonsCompleted === TOTAL_LESSONS
-                ? "learn-character-complete"
-                : ""
-            }`}
-          >
+          <div className="learn-character-wrapper">
 
             {!imageFailed ? (
               <img
-                key={`${selectedCharacter}-${currentStage}`}
-                src={currentCharacter.image(
-                  currentStage
-                )}
-                alt={currentCharacter.name}
                 className="learn-character-image"
+                src={character.stages[stage]}
+                alt={`${character.name} learning stage`}
                 onError={() =>
                   setImageFailed(true)
                 }
               />
             ) : (
               <div className="learn-character-placeholder">
-                <Music2 size={54} />
+                Character image unavailable
               </div>
             )}
 
           </div>
 
           <div className="learn-character-name">
-            {currentCharacter.name}
+            {character.name}
           </div>
 
           <div className="learn-character-stage">
-            Stage {currentStage} / {TOTAL_LESSONS}
+            Stage {stage} of {TOTAL_LESSONS}
           </div>
 
         </section>
 
-
         {/* =================================================
             PROGRESS
-        ================================================= */}
+            ================================================= */}
 
         <section className="learn-progress-card">
 
           <div className="learn-progress-top">
-
-            <div>
-              <span className="learn-progress-label">
-                Your Progress
-              </span>
-
-              <strong>
-                {lessonsCompleted} / {TOTAL_LESSONS}
-              </strong>
-            </div>
-
-            <span className="learn-progress-percent">
-              {Math.round(progressPercentage)}%
+            <span>
+              Your Progress
             </span>
 
+            <span>
+              {lessonsLearned}/{TOTAL_LESSONS} Lessons
+            </span>
           </div>
 
           <div className="learn-progress-track">
-
             <div
               className="learn-progress-fill"
               style={{
                 width: `${progressPercentage}%`,
               }}
             />
-
           </div>
-
-          <p>
-            {lessonsCompleted === 0 &&
-              "Your journey begins here."}
-
-            {lessonsCompleted > 0 &&
-              lessonsCompleted < TOTAL_LESSONS &&
-              `${TOTAL_LESSONS - lessonsCompleted} lessons remaining.`}
-
-            {lessonsCompleted === TOTAL_LESSONS &&
-              "You've completed the entire journey! 🎉"}
-          </p>
 
         </section>
 
-
         {/* =================================================
             JOURNEY
-        ================================================= */}
+            ================================================= */}
 
         <section className="journey-section">
 
           <div className="journey-heading">
+            <h2>Your Learning Journey</h2>
 
-            <div>
-              <span className="journey-small-label">
-                YOUR PATH
-              </span>
-
-              <h2>
-                Your Learning Journey
-              </h2>
-            </div>
-
-            <span className="journey-count">
-              {lessonsCompleted}/{TOTAL_LESSONS}
-            </span>
-
+            <p>
+              Complete each lesson to unlock the next step.
+            </p>
           </div>
 
-
-          {/* =================================================
-              JOURNEY PATH
-          ================================================= */}
+          {/* JOURNEY CIRCLES */}
 
           <div className="journey-path">
 
-            {LESSONS.map((lesson, index) => {
+            {LESSONS.map((lesson) => {
 
-              const isCompleted =
-                lesson.id <= lessonsCompleted;
+              const completed =
+                lesson.id <= lessonsLearned;
 
-              const isCurrent =
-                lesson.id ===
-                lessonsCompleted + 1;
+              const current =
+                lesson.id === lessonsLearned + 1;
 
-              const isLocked =
-                lesson.id >
-                lessonsCompleted + 1;
+              const locked =
+                lesson.id > lessonsLearned + 1;
 
               return (
-                <React.Fragment
+                <div
                   key={lesson.id}
+                  className="journey-node-wrapper"
                 >
-
-                  {/* Connector */}
-
-                  {index > 0 && (
-                    <div
-                      className={`journey-connector ${
-                        LESSONS[index - 1].id <=
-                        lessonsCompleted
-                          ? "journey-connector-completed"
-                          : ""
-                      }`}
-                    />
-                  )}
-
-
-                  {/* Lesson Node */}
-
-                  <button
-                    className={`journey-node-wrapper ${
-                      isCompleted
+                  <div
+                    className={`journey-node ${
+                      completed
                         ? "completed"
-                        : ""
-                    } ${
-                      isCurrent
+                        : current
                         ? "current"
-                        : ""
-                    } ${
-                      isLocked
-                        ? "locked"
-                        : ""
+                        : "locked"
                     }`}
-                    onClick={() =>
-                      openLesson(lesson)
-                    }
-                    disabled={isLocked}
                   >
-
-                    <div className="journey-node">
-
-                      {isCompleted ? (
-                        <Check size={27} />
-                      ) : isLocked ? (
-                        <Lock size={23} />
-                      ) : (
-                        <span>
-                          {lesson.icon}
-                        </span>
-                      )}
-
-                    </div>
-
-                    <div className="journey-node-number">
-                      Lesson {lesson.id}
-                    </div>
-
-                  </button>
-
-                </React.Fragment>
+                    {completed ? (
+                      <Check size={25} strokeWidth={3} />
+                    ) : locked ? (
+                      <Lock size={20} />
+                    ) : (
+                      <span>
+                        {lesson.id}
+                      </span>
+                    )}
+                  </div>
+                </div>
               );
             })}
 
           </div>
 
-
-          {/* =================================================
-              LESSON CARDS
-          ================================================= */}
+          {/* LESSON CARDS */}
 
           <div className="lesson-list">
 
             {LESSONS.map((lesson) => {
 
-              const isCompleted =
-                lesson.id <= lessonsCompleted;
+              const completed =
+                lesson.id <= lessonsLearned;
 
-              const isCurrent =
-                lesson.id ===
-                lessonsCompleted + 1;
+              const current =
+                lesson.id === lessonsLearned + 1;
 
-              const isLocked =
-                lesson.id >
-                lessonsCompleted + 1;
+              const locked =
+                lesson.id > lessonsLearned + 1;
 
               return (
                 <div
                   key={lesson.id}
                   className={`lesson-card ${
-                    isCompleted
-                      ? "lesson-completed"
-                      : ""
-                  } ${
-                    isCurrent
-                      ? "lesson-current"
-                      : ""
-                  } ${
-                    isLocked
-                      ? "lesson-locked"
-                      : ""
+                    completed
+                      ? "completed"
+                      : current
+                      ? "current clickable"
+                      : "locked"
                   }`}
+                  onClick={() =>
+                    handleLessonClick(lesson)
+                  }
                 >
 
                   <div className="lesson-card-icon">
-
-                    {isCompleted ? (
-                      <Check size={25} />
-                    ) : isLocked ? (
-                      <Lock size={22} />
-                    ) : (
-                      <span>
-                        {lesson.icon}
-                      </span>
-                    )}
-
+                    {lesson.icon}
                   </div>
 
-
                   <div className="lesson-card-content">
-
-                    <span className="lesson-number">
-                      LESSON {lesson.id}
-                    </span>
-
                     <h3>
+                      Lesson {lesson.id}:{" "}
                       {lesson.title}
                     </h3>
 
                     <p>
-                      {isLocked
-                        ? `Complete Lesson ${
-                            lesson.id - 1
-                          } to unlock this lesson.`
-                        : lesson.description}
+                      {lesson.description}
                     </p>
-
                   </div>
 
+                  <div className="lesson-action">
 
-                  <button
-                    className="lesson-action"
-                    disabled={isLocked}
-                    onClick={() =>
-                      openLesson(lesson)
-                    }
-                  >
-
-                    {isCompleted
-                      ? "Review"
-                      : isCurrent
-                      ? "Start"
-                      : "Locked"}
-
-                    {!isLocked && (
-                      <ChevronRight size={18} />
+                    {completed ? (
+                      <Check
+                        size={20}
+                        strokeWidth={3}
+                      />
+                    ) : locked ? (
+                      <Lock size={18} />
+                    ) : (
+                      <ChevronRight size={21} />
                     )}
 
-                  </button>
+                  </div>
 
                 </div>
               );
@@ -601,43 +530,37 @@ function LearnFromScratch() {
 
           </div>
 
+          {/* =================================================
+              COMPLETE
+              ================================================= */}
+
+          {lessonsLearned >= TOTAL_LESSONS && (
+            <div className="journey-complete-card">
+
+              <div className="complete-icon">
+                <Sparkles size={28} />
+              </div>
+
+              <h3>
+                Your Musician Has Come to Life!
+              </h3>
+
+              <p>
+                You completed the complete
+                Learn From Scratch journey.
+                Keep practicing and continue
+                developing your musical skills.
+              </p>
+
+            </div>
+          )}
+
         </section>
 
-
-        {/* =================================================
-            COMPLETION MESSAGE
-        ================================================= */}
-
-        {lessonsCompleted === TOTAL_LESSONS && (
-          <section className="journey-complete-card">
-
-            <div className="journey-complete-icon">
-              ✨
-            </div>
-
-            <h2>
-              Your Musician Has Come to Life!
-            </h2>
-
-            <p>
-              You completed all 6 lessons.
-              Your musician has reached the final stage.
-            </p>
-
-            <button
-              onClick={() => navigate("/music")}
-            >
-              Return to Music Room
-              <ChevronRight size={19} />
-            </button>
-
-          </section>
-        )}
-
       </main>
-
     </div>
   );
 }
 
 export default LearnFromScratch;
+```
