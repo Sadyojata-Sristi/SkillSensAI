@@ -1,62 +1,47 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  ArrowLeft,
   Music2,
+  Mic2,
   Upload,
-  GraduationCap,
-  Palette,
-  Lock,
   Sparkles,
+  ChevronRight,
+  X,
 } from "lucide-react";
 
 import "./Music.css";
+
 import {
   getLessonsLearned,
   getSelectedMusicCharacter,
   setSelectedMusicCharacter,
 } from "../utils/progress";
 
-/*
-=========================================================
-SKILLSENSAI — MUSIC ROOM
-=========================================================
-
-6 Lesson Character Progression
-
-0 lessons  -> character stage 0
-1 lesson   -> character stage 1
-2 lessons  -> character stage 2
-3 lessons  -> character stage 3
-4 lessons  -> character stage 4
-5 lessons  -> character stage 5
-6 lessons  -> final character stage
-=========================================================
-*/
 
 const TOTAL_LESSONS = 6;
 
+
 /*
----------------------------------------------------------
-CHARACTER SETS
+=========================================================
+MUSIC CHARACTER DATA
+=========================================================
+Each character has 7 stages:
 
-Later, replace these placeholder paths with the images
-you upload.
-
-Example:
-
-/music/characters/singer/stage-0.png
-/music/characters/singer/stage-1.png
+0 = Before learning
+1 = Lesson 1 completed
+2 = Lesson 2 completed
 ...
----------------------------------------------------------
+6 = All lessons completed
+=========================================================
 */
 
-const CHARACTER_OPTIONS = [
+const MUSIC_CHARACTERS = [
   {
     id: "singer",
     name: "Singer",
-    description: "The Voice",
-    images: [
+    icon: "🎤",
+
+    stages: [
       "/music/characters/singer/stage-0.png",
       "/music/characters/singer/stage-1.png",
       "/music/characters/singer/stage-2.png",
@@ -70,8 +55,9 @@ const CHARACTER_OPTIONS = [
   {
     id: "guitarist",
     name: "Guitarist",
-    description: "The Strings",
-    images: [
+    icon: "🎸",
+
+    stages: [
       "/music/characters/guitarist/stage-0.png",
       "/music/characters/guitarist/stage-1.png",
       "/music/characters/guitarist/stage-2.png",
@@ -85,8 +71,9 @@ const CHARACTER_OPTIONS = [
   {
     id: "pianist",
     name: "Pianist",
-    description: "The Keys",
-    images: [
+    icon: "🎹",
+
+    stages: [
       "/music/characters/pianist/stage-0.png",
       "/music/characters/pianist/stage-1.png",
       "/music/characters/pianist/stage-2.png",
@@ -96,507 +83,619 @@ const CHARACTER_OPTIONS = [
       "/music/characters/pianist/stage-6.png",
     ],
   },
+
+  {
+    id: "flutist",
+    name: "Flute",
+    icon: "🪈",
+
+    stages: [
+      "/music/characters/flutist/stage-0.png",
+      "/music/characters/flutist/stage-1.png",
+      "/music/characters/flutist/stage-2.png",
+      "/music/characters/flutist/stage-3.png",
+      "/music/characters/flutist/stage-4.png",
+      "/music/characters/flutist/stage-5.png",
+      "/music/characters/flutist/stage-6.png",
+    ],
+  },
+
+  {
+    id: "violinist",
+    name: "Violin",
+    icon: "🎻",
+
+    stages: [
+      "/music/characters/violinist/stage-0.png",
+      "/music/characters/violinist/stage-1.png",
+      "/music/characters/violinist/stage-2.png",
+      "/music/characters/violinist/stage-3.png",
+      "/music/characters/violinist/stage-4.png",
+      "/music/characters/violinist/stage-5.png",
+      "/music/characters/violinist/stage-6.png",
+    ],
+  },
+
+  {
+    id: "veena",
+    name: "Veena",
+    icon: "🎶",
+
+    stages: [
+      "/music/characters/veena/stage-0.png",
+      "/music/characters/veena/stage-1.png",
+      "/music/characters/veena/stage-2.png",
+      "/music/characters/veena/stage-3.png",
+      "/music/characters/veena/stage-4.png",
+      "/music/characters/veena/stage-5.png",
+      "/music/characters/veena/stage-6.png",
+    ],
+  },
+
+  {
+    id: "drummer",
+    name: "Drummer",
+    icon: "🥁",
+
+    stages: [
+      "/music/characters/drummer/stage-0.png",
+      "/music/characters/drummer/stage-1.png",
+      "/music/characters/drummer/stage-2.png",
+      "/music/characters/drummer/stage-3.png",
+      "/music/characters/drummer/stage-4.png",
+      "/music/characters/drummer/stage-5.png",
+      "/music/characters/drummer/stage-6.png",
+    ],
+  },
 ];
+
 
 function Music() {
   const navigate = useNavigate();
 
-  const [lessonsCompleted, setLessonsCompleted] = useState(0);
-  const [selectedCharacter, setSelectedCharacter] = useState("singer");
-  const [showCharacterSelector, setShowCharacterSelector] = useState(false);
-  const [roomEntered, setRoomEntered] = useState(false);
+  const [lessonsCompleted, setLessonsCompleted] =
+    useState(0);
+
+  const [selectedCharacter, setSelectedCharacter] =
+    useState("singer");
+
+  const [showCharacterSelector, setShowCharacterSelector] =
+    useState(false);
+
+  const [pageReady, setPageReady] =
+    useState(false);
+
+
+  /*
+  ---------------------------------------------------------
+  LOAD MUSIC PROGRESS
+  ---------------------------------------------------------
+  */
 
   useEffect(() => {
-    const completed = getLessonsLearned();
+    const lessons =
+      getLessonsLearned();
 
-    const safeCompleted = Math.min(
-      Math.max(Number(completed) || 0, 0),
+    const character =
+      getSelectedMusicCharacter();
+
+    setLessonsCompleted(
+      Math.min(
+        Math.max(lessons, 0),
+        TOTAL_LESSONS
+      )
+    );
+
+    setSelectedCharacter(
+      character
+    );
+
+    const timer =
+      setTimeout(() => {
+        setPageReady(true);
+      }, 100);
+
+    return () =>
+      clearTimeout(timer);
+  }, []);
+
+
+  /*
+  ---------------------------------------------------------
+  LISTEN FOR PROGRESS CHANGES
+  ---------------------------------------------------------
+  */
+
+  useEffect(() => {
+    const updateProgress = () => {
+      setLessonsCompleted(
+        getLessonsLearned()
+      );
+    };
+
+    window.addEventListener(
+      "skillsensai-progress-updated",
+      updateProgress
+    );
+
+    return () => {
+      window.removeEventListener(
+        "skillsensai-progress-updated",
+        updateProgress
+      );
+    };
+  }, []);
+
+
+  /*
+  ---------------------------------------------------------
+  CHARACTER
+  ---------------------------------------------------------
+  */
+
+  const currentCharacter =
+    MUSIC_CHARACTERS.find(
+      (character) =>
+        character.id === selectedCharacter
+    ) || MUSIC_CHARACTERS[0];
+
+
+  const currentStage =
+    Math.min(
+      Math.max(lessonsCompleted, 0),
       TOTAL_LESSONS
     );
 
-    setLessonsCompleted(safeCompleted);
 
-    const savedCharacter = getSelectedMusicCharacter();
+  const currentImage =
+    currentCharacter.stages[
+      currentStage
+    ];
 
-    if (savedCharacter) {
-      setSelectedCharacter(savedCharacter);
-    }
-
-    // Small entrance animation
-    const timer = setTimeout(() => {
-      setRoomEntered(true);
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  const currentCharacter =
-    CHARACTER_OPTIONS.find(
-      (character) => character.id === selectedCharacter
-    ) || CHARACTER_OPTIONS[0];
-
-  const currentStage = Math.min(
-    lessonsCompleted,
-    TOTAL_LESSONS
-  );
-
-  const currentImage = currentCharacter.images[currentStage];
 
   const progressPercentage =
-    (lessonsCompleted / TOTAL_LESSONS) * 100;
+    Math.round(
+      (lessonsCompleted /
+        TOTAL_LESSONS) *
+        100
+    );
 
-  const handleCharacterChange = (characterId) => {
-    setSelectedCharacter(characterId);
-    setSelectedMusicCharacter(characterId);
-    setShowCharacterSelector(false);
+
+  /*
+  ---------------------------------------------------------
+  SELECT CHARACTER
+  ---------------------------------------------------------
+  */
+
+  const selectCharacter = (
+    characterId
+  ) => {
+
+    setSelectedCharacter(
+      characterId
+    );
+
+    setSelectedMusicCharacter(
+      characterId
+    );
+
+    setShowCharacterSelector(
+      false
+    );
   };
 
-  const handleLearnFromScratch = () => {
-    navigate("/music/learn");
-  };
-
-  const handleUploadSong = () => {
-    navigate("/music/upload-song");
-  };
 
   return (
     <div
       className={`music-room ${
-        roomEntered ? "music-room-entered" : ""
+        pageReady
+          ? "music-room-ready"
+          : ""
       }`}
     >
-      {/* ================================================
+
+      {/* =================================================
           BACKGROUND
       ================================================= */}
 
       <div className="music-room-background">
-        <div className="music-glow glow-one"></div>
-        <div className="music-glow glow-two"></div>
-        <div className="music-glow glow-three"></div>
-
-        <div className="floating-note note-one">♪</div>
-        <div className="floating-note note-two">♫</div>
-        <div className="floating-note note-three">♬</div>
-        <div className="floating-note note-four">♪</div>
+        <div className="music-glow" />
       </div>
 
-      {/* ================================================
-          TOP BAR
+
+      {/* =================================================
+          HEADER
       ================================================= */}
 
       <header className="music-room-header">
+
         <button
           className="music-back-button"
-          onClick={() => navigate("/")}
-          aria-label="Back to Home"
+          onClick={() =>
+            navigate("/")
+          }
         >
-          <ArrowLeft size={21} />
-          <span>Home</span>
+          ← Home
         </button>
 
+
         <div className="music-room-title">
-          <Music2 size={22} />
-          <span>MUSIC ROOM</span>
+
+          <Music2 size={25} />
+
+          <span>
+            Music Room
+          </span>
+
         </div>
 
-        <div className="music-header-space"></div>
       </header>
 
-      {/* ================================================
-          MAIN ROOM
+
+      {/* =================================================
+          MAIN
       ================================================= */}
 
       <main className="music-room-content">
 
-        {/* ==============================================
-            TITLE
-        ============================================== */}
+
+        {/* INTRO */}
 
         <section className="music-intro">
-          <div className="music-small-label">
-            <Sparkles size={15} />
-            YOUR MUSICAL JOURNEY
-          </div>
 
-          <h1>Welcome to Your Music Room</h1>
+          <p className="music-eyebrow">
+            YOUR MUSICAL JOURNEY
+          </p>
+
+          <h1>
+            Become the musician
+            <span> you imagine.</span>
+          </h1>
 
           <p>
-            Learn, practice and bring your musician to life.
+            Learn step by step, practice your
+            skills and watch your musician come
+            to life.
           </p>
+
         </section>
 
-        {/* ==============================================
-            CHARACTER AREA
-        ============================================== */}
+
+        {/* =================================================
+            CHARACTER
+        ================================================= */}
 
         <section className="music-character-section">
 
-          <div className="character-stars">
-            <span>✦</span>
-            <span>✧</span>
-            <span>✦</span>
-            <span>✧</span>
-            <span>✦</span>
+
+          <div className="character-glow" />
+
+
+          <div className="music-character-wrapper">
+
+            {currentImage ? (
+
+              <img
+                src={currentImage}
+                alt={
+                  currentCharacter.name
+                }
+                className="music-character-image"
+                onError={(event) => {
+                  event.currentTarget.style.display =
+                    "none";
+                }}
+              />
+
+            ) : (
+
+              <div className="character-placeholder">
+                {currentCharacter.icon}
+              </div>
+
+            )}
+
           </div>
 
-          <div
-            className={`character-glow ${
-              lessonsCompleted === TOTAL_LESSONS
-                ? "character-complete"
-                : ""
-            }`}
-          ></div>
 
-          <div
-            className={`music-character-wrapper ${
-              lessonsCompleted === TOTAL_LESSONS
-                ? "character-awakened"
-                : ""
-            }`}
-          >
-            <img
-              src={currentImage}
-              alt={`${currentCharacter.name} character`}
-              className="music-character-image"
-              onError={(event) => {
-                /*
-                Temporary fallback while your images
-                have not been uploaded yet.
-                */
-                event.currentTarget.style.display = "none";
-                event.currentTarget.parentElement.classList.add(
-                  "character-placeholder-visible"
-                );
-              }}
-            />
-
-            <div className="character-placeholder">
-              <Music2 size={65} strokeWidth={1.2} />
-
-              <span>
-                {currentCharacter.name}
-              </span>
-
-              <small>
-                Character artwork coming soon
-              </small>
-            </div>
-          </div>
-
-          {/* Character floating particles */}
-
-          <div className="character-particle particle-one">
+          <div className="character-particle particle-1">
             ♪
           </div>
 
-          <div className="character-particle particle-two">
-            ✦
-          </div>
-
-          <div className="character-particle particle-three">
+          <div className="character-particle particle-2">
             ♫
           </div>
 
-          <div className="character-particle particle-four">
-            ✧
+          <div className="character-particle particle-3">
+            ✦
           </div>
 
-          {/* Character name */}
 
-          <div className="character-name">
-            <span>{currentCharacter.name}</span>
+          <h2 className="character-name">
+            {currentCharacter.name}
+          </h2>
 
-            <small>
-              {lessonsCompleted === TOTAL_LESSONS
-                ? "Musician Awakened"
-                : currentCharacter.description}
-            </small>
-          </div>
 
-          {/* ============================================
+          {/* =================================================
               PROGRESS
-          ============================================ */}
+          ================================================= */}
 
           <div className="music-progress-container">
 
-            <div className="music-progress-top">
+            <div className="music-progress-text">
+
               <span>
                 Musical Journey
               </span>
 
               <strong>
-                {lessonsCompleted}/{TOTAL_LESSONS}
+                {lessonsCompleted} /{" "}
+                {TOTAL_LESSONS}
               </strong>
+
             </div>
 
+
             <div className="music-progress-bar">
+
               <div
                 className="music-progress-fill"
                 style={{
-                  width: `${progressPercentage}%`,
+                  width:
+                    `${progressPercentage}%`,
                 }}
-              ></div>
+              />
+
             </div>
 
-            <div className="music-progress-label">
-              {lessonsCompleted === 0
-                ? "Your musician is waiting for you."
-                : lessonsCompleted === TOTAL_LESSONS
-                ? "Your musician has come to life!"
-                : `${TOTAL_LESSONS - lessonsCompleted} lessons remaining`}
-            </div>
+
+            <span className="music-progress-percent">
+              {progressPercentage}% complete
+            </span>
 
           </div>
 
-          {/* Customize */}
+
+          {/* =================================================
+              CUSTOMIZE BUTTON
+          ================================================= */}
 
           <button
-            className="customize-character-button"
+            className="customize-musician-button"
             onClick={() =>
               setShowCharacterSelector(true)
             }
           >
-            <Palette size={17} />
-            Customize Musician
+            <Sparkles size={20} />
+
+            <span>
+              Customize Your Musician
+            </span>
+
+            <ChevronRight size={19} />
+
           </button>
+
 
         </section>
 
-        {/* ==============================================
+
+        {/* =================================================
             MAIN OPTIONS
-        ============================================== */}
+        ================================================= */}
 
         <section className="music-options">
 
-          {/* LEARN FROM SCRATCH */}
 
           <button
-            className="music-option-card learn-card"
-            onClick={handleLearnFromScratch}
+            className="music-option-card"
+            onClick={() =>
+              navigate(
+                "/music/learn"
+              )
+            }
           >
-            <div className="option-icon">
-              <GraduationCap size={29} />
+
+            <div className="music-option-icon">
+              <Music2 size={28} />
             </div>
 
-            <div className="option-content">
-              <span className="option-label">
-                START YOUR JOURNEY
-              </span>
+            <div className="music-option-content">
 
-              <h2>Learn From Scratch</h2>
+              <h3>
+                Learn From Scratch
+              </h3>
 
               <p>
-                Learn music step by step through lessons,
-                quizzes and practical challenges.
+                Follow your learning path,
+                complete lessons, quizzes and
+                practical exercises.
               </p>
 
-              <div className="option-action">
-                {lessonsCompleted > 0
-                  ? "Continue Learning"
-                  : "Start Learning"}
-                <span>→</span>
-              </div>
             </div>
+
+            <ChevronRight />
+
           </button>
 
-          {/* UPLOAD SONG */}
 
           <button
-            className="music-option-card upload-card"
-            onClick={handleUploadSong}
+            className="music-option-card"
+            onClick={() =>
+              navigate(
+                "/music/upload-song"
+              )
+            }
           >
-            <div className="option-icon">
-              <Upload size={27} />
+
+            <div className="music-option-icon">
+              <Upload size={28} />
             </div>
 
-            <div className="option-content">
-              <span className="option-label">
-                PRACTICE YOUR MUSIC
-              </span>
+            <div className="music-option-content">
 
-              <h2>Upload Song</h2>
+              <h3>
+                Upload Song
+              </h3>
 
               <p>
-                Upload a song or recording and practice
-                with AI-powered musical feedback.
+                Upload your recording and get
+                AI-powered musical feedback.
               </p>
 
-              <div className="option-action">
-                Upload & Practice
-                <span>→</span>
-              </div>
             </div>
+
+            <ChevronRight />
+
           </button>
+
 
         </section>
 
-        {/* ==============================================
+
+        {/* =================================================
             LESSON INDICATORS
-        ============================================== */}
+        ================================================= */}
 
         <section className="lesson-indicators">
 
-          <span className="lesson-heading">
-            YOUR 6-LESSON JOURNEY
-          </span>
+          {Array.from(
+            {
+              length:
+                TOTAL_LESSONS,
+            },
+            (_, index) => {
 
-          <div className="lesson-dots">
+              const lessonNumber =
+                index + 1;
 
-            {Array.from(
-              { length: TOTAL_LESSONS },
-              (_, index) => {
-                const lessonNumber = index + 1;
-                const completed =
-                  lessonNumber <= lessonsCompleted;
+              const completed =
+                lessonNumber <=
+                lessonsCompleted;
 
-                const current =
-                  lessonNumber === lessonsCompleted + 1;
+              return (
 
-                return (
-                  <div
-                    key={lessonNumber}
-                    className={`lesson-dot-wrapper ${
-                      completed
-                        ? "completed"
-                        : current
-                        ? "current"
-                        : "locked"
-                    }`}
-                  >
-                    <div className="lesson-dot">
-                      {completed ? "✓" : lessonNumber}
-                    </div>
+                <div
+                  key={lessonNumber}
+                  className={`lesson-indicator ${
+                    completed
+                      ? "completed"
+                      : ""
+                  }`}
+                >
+                  {lessonNumber}
+                </div>
 
-                    {index <
-                      TOTAL_LESSONS - 1 && (
-                      <div className="lesson-connector"></div>
-                    )}
-                  </div>
-                );
-              }
-            )}
+              );
 
-          </div>
+            }
+          )}
 
         </section>
 
+
       </main>
 
-      {/* ================================================
-          CHARACTER SELECTOR MODAL
+
+      {/* =================================================
+          CHARACTER SELECTOR
       ================================================= */}
 
       {showCharacterSelector && (
+
         <div
           className="character-selector-overlay"
           onClick={() =>
             setShowCharacterSelector(false)
           }
         >
+
           <div
-            className="character-selector-modal"
+            className="character-selector"
             onClick={(event) =>
               event.stopPropagation()
             }
           >
 
-            <button
-              className="selector-close"
-              onClick={() =>
-                setShowCharacterSelector(false)
-              }
-            >
-              ×
-            </button>
+            <div className="character-selector-header">
 
-            <div className="selector-header">
-              <Palette size={22} />
+              <div>
 
-              <h2>Choose Your Musician</h2>
+                <span>
+                  CUSTOMIZE
+                </span>
 
-              <p>
-                Your chosen appearance will continue
-                evolving as you learn.
-              </p>
+                <h2>
+                  Choose Your Musician
+                </h2>
+
+                <p>
+                  Pick the musician you want
+                  to become.
+                </p>
+
+              </div>
+
+
+              <button
+                onClick={() =>
+                  setShowCharacterSelector(false)
+                }
+              >
+                <X size={22} />
+              </button>
+
             </div>
 
-            <div className="character-options">
 
-              {CHARACTER_OPTIONS.map(
-                (character) => {
-                  const selected =
-                    selectedCharacter ===
-                    character.id;
+            <div className="character-options-grid">
 
-                  return (
-                    <button
-                      key={character.id}
-                      className={`character-option ${
-                        selected
-                          ? "selected"
-                          : ""
-                      }`}
-                      onClick={() =>
-                        handleCharacterChange(
-                          character.id
-                        )
-                      }
-                    >
+              {MUSIC_CHARACTERS.map(
+                (character) => (
 
-                      <div className="character-option-image">
+                  <button
+                    key={character.id}
+                    className={`character-option ${
+                      selectedCharacter ===
+                      character.id
+                        ? "selected"
+                        : ""
+                    }`}
+                    onClick={() =>
+                      selectCharacter(
+                        character.id
+                      )
+                    }
+                  >
 
-                        <img
-                          src={
-                            character.images[0]
-                          }
-                          alt={
-                            character.name
-                          }
-                          onError={(event) => {
-                            event.currentTarget.style.display =
-                              "none";
+                    <div className="character-option-icon">
+                      {character.icon}
+                    </div>
 
-                            event.currentTarget.parentElement.classList.add(
-                              "option-placeholder-visible"
-                            );
-                          }}
-                        />
+                    <span>
+                      {character.name}
+                    </span>
 
-                        <div className="option-placeholder">
-                          <Music2 size={35} />
-                        </div>
+                    {selectedCharacter ===
+                      character.id && (
 
-                      </div>
+                      <small>
+                        Selected
+                      </small>
 
-                      <strong>
-                        {character.name}
-                      </strong>
+                    )}
 
-                      <span>
-                        {character.description}
-                      </span>
+                  </button>
 
-                      {selected && (
-                        <div className="selected-mark">
-                          ✓
-                        </div>
-                      )}
-
-                    </button>
-                  );
-                }
+                )
               )}
 
             </div>
 
-            <div className="selector-note">
-              <Lock size={14} />
-              More musician appearances will be added
-              later.
-            </div>
-
           </div>
+
         </div>
+
       )}
 
     </div>
