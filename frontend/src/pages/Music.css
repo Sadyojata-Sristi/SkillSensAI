@@ -31,7 +31,9 @@
   opacity: 0;
 
   transition:
-    opacity 0.8s ease;
+    opacity 0.8s ease,
+    background 0.5s ease,
+    color 0.5s ease;
 }
 
 .music-room.music-room-entered {
@@ -294,7 +296,7 @@
   flex-direction: column;
   align-items: center;
 
-  min-height: 520px;
+  min-height: 560px;
 
   padding-top: 15px;
 }
@@ -347,6 +349,8 @@
 
   animation:
     characterGlow 4s ease-in-out infinite;
+
+  pointer-events: none;
 }
 
 .character-glow.character-complete {
@@ -394,6 +398,10 @@
 
 /* =========================================================
    CHARACTER
+   IMPORTANT:
+   The image is strictly contained inside this box.
+   This prevents large uploaded images from covering
+   the Customize button.
    ========================================================= */
 
 .music-character-wrapper {
@@ -404,6 +412,9 @@
   width: 330px;
   height: 350px;
 
+  min-width: 330px;
+  min-height: 350px;
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -412,13 +423,22 @@
 
   animation:
     characterFloat 5s ease-in-out infinite;
+
+  overflow: hidden;
 }
 
 .music-character-image {
+  display: block;
+
   width: 100%;
   height: 100%;
 
+  max-width: 100%;
+  max-height: 100%;
+
   object-fit: contain;
+
+  object-position: center;
 
   filter:
     drop-shadow(
@@ -429,6 +449,9 @@
   transition:
     transform 0.6s ease,
     filter 0.6s ease;
+
+  animation:
+    characterImageAppear 0.45s ease;
 }
 
 .music-character-wrapper:hover
@@ -459,6 +482,18 @@
 
   50% {
     transform: translateY(-10px);
+  }
+}
+
+@keyframes characterImageAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
@@ -621,6 +656,10 @@
   width: min(400px, 90%);
 
   margin-top: 22px;
+
+  position: relative;
+
+  z-index: 6;
 }
 
 .music-progress-top {
@@ -712,6 +751,80 @@
   color: #ffffff;
 
   transform: translateY(-2px);
+}
+
+/* =========================================================
+   PROMINENT CUSTOMIZE MUSICIAN BUTTON
+   ========================================================= */
+
+.customize-musician-button {
+  position: relative;
+
+  z-index: 20;
+
+  margin-top: 24px;
+
+  min-width: 260px;
+  min-height: 54px;
+
+  padding: 14px 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+
+  border: 1px solid rgba(124, 92, 252, 0.45);
+
+  border-radius: 15px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(124, 92, 252, 0.22),
+      rgba(98, 69, 216, 0.12)
+    );
+
+  color: #bcaaff;
+
+  font-size: 15px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 10px 30px rgba(124, 92, 252, 0.12);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.customize-musician-button:hover {
+  transform: translateY(-3px);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(124, 92, 252, 0.32),
+      rgba(98, 69, 216, 0.18)
+    );
+
+  border-color:
+    rgba(157, 124, 255, 0.7);
+
+  box-shadow:
+    0 15px 35px rgba(124, 92, 252, 0.2);
+}
+
+.customize-musician-button:active {
+  transform: translateY(-1px);
+}
+
+.customize-musician-button svg:last-child {
+  margin-left: 3px;
 }
 
 /* =========================================================
@@ -1005,409 +1118,12 @@
 }
 
 /* =========================================================
-   CHARACTER SELECTOR
+   CHARACTER SELECTOR OVERLAY
    ========================================================= */
 
 .character-selector-overlay {
   position: fixed;
 
-  inset: 0;
-
-  z-index: 5000;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 20px;
-
-  background:
-    rgba(0, 0, 0, 0.76);
-
-  backdrop-filter: blur(12px);
-}
-
-.character-selector-modal {
-  position: relative;
-
-  width: min(720px, 100%);
-
-  max-height: 90vh;
-
-  overflow-y: auto;
-
-  padding: 35px;
-
-  border:
-    1px solid
-    rgba(255, 255, 255, 0.1);
-
-  border-radius: 25px;
-
-  background:
-    linear-gradient(
-      145deg,
-      #171226,
-      #0d0b16
-    );
-
-  box-shadow:
-    0 30px 90px
-    rgba(0, 0, 0, 0.55);
-}
-
-.selector-close {
-  position: absolute;
-
-  top: 17px;
-  right: 19px;
-
-  width: 34px;
-  height: 34px;
-
-  border: none;
-
-  border-radius: 50%;
-
-  background:
-    rgba(255, 255, 255, 0.07);
-
-  color: rgba(255, 255, 255, 0.65);
-
-  font-size: 23px;
-
-  cursor: pointer;
-}
-
-.selector-header {
-  text-align: center;
-
-  margin-bottom: 28px;
-
-  color: #a990ff;
-}
-
-.selector-header h2 {
-  margin:
-    9px 0
-    6px;
-
-  color: #ffffff;
-
-  font-size: 25px;
-}
-
-.selector-header p {
-  margin: 0;
-
-  color: rgba(255, 255, 255, 0.45);
-
-  font-size: 12px;
-}
-
-.character-options {
-  display: grid;
-
-  grid-template-columns:
-    repeat(3, 1fr);
-
-  gap: 15px;
-}
-
-.character-option {
-  position: relative;
-
-  padding: 15px;
-
-  border:
-    1px solid
-    rgba(255, 255, 255, 0.08);
-
-  border-radius: 18px;
-
-  background:
-    rgba(255, 255, 255, 0.035);
-
-  color: #ffffff;
-
-  cursor: pointer;
-
-  transition:
-    transform 0.25s ease,
-    border-color 0.25s ease,
-    background 0.25s ease;
-}
-
-.character-option:hover {
-  transform: translateY(-4px);
-
-  border-color:
-    rgba(157, 124, 255, 0.35);
-}
-
-.character-option.selected {
-  border-color:
-    rgba(157, 124, 255, 0.7);
-
-  background:
-    rgba(124, 92, 252, 0.12);
-}
-
-.character-option-image {
-  position: relative;
-
-  height: 145px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  margin-bottom: 10px;
-}
-
-.character-option-image img {
-  width: 100%;
-  height: 100%;
-
-  object-fit: contain;
-}
-
-.option-placeholder {
-  position: absolute;
-
-  inset: 15px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 50%;
-
-  background:
-    rgba(124, 92, 252, 0.08);
-
-  color:
-    rgba(167, 143, 255, 0.45);
-
-  opacity: 0;
-}
-
-.option-placeholder-visible
-.option-placeholder {
-  opacity: 1;
-}
-
-.character-option strong {
-  display: block;
-
-  font-size: 14px;
-}
-
-.character-option > span {
-  display: block;
-
-  margin-top: 3px;
-
-  color: rgba(255, 255, 255, 0.4);
-
-  font-size: 10px;
-}
-
-.selected-mark {
-  position: absolute;
-
-  top: 10px;
-  right: 10px;
-
-  width: 24px;
-  height: 24px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 50%;
-
-  background:
-    #7455df;
-
-  color: #ffffff;
-
-  font-size: 12px;
-}
-
-.selector-note {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
-
-  margin-top: 25px;
-
-  color: rgba(255, 255, 255, 0.3);
-
-  font-size: 10px;
-}
-
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
-
-@media (max-width: 750px) {
-  .music-room-header {
-    padding: 0 20px;
-  }
-
-  .music-room-title {
-    font-size: 12px;
-  }
-
-  .music-room-content {
-    padding-top: 32px;
-  }
-
-  .music-character-section {
-    min-height: 480px;
-  }
-
-  .music-character-wrapper {
-    width: 290px;
-    height: 310px;
-  }
-
-  .character-glow {
-    width: 300px;
-    height: 300px;
-  }
-
-  .music-options {
-    grid-template-columns: 1fr;
-  }
-
-  .character-options {
-    grid-template-columns: 1fr;
-  }
-
-  .character-option-image {
-    height: 180px;
-  }
-
-  .lesson-connector {
-    width: 35px;
-  }
-}
-
-@media (max-width: 480px) {
-  .music-room-title span {
-    display: none;
-  }
-
-  .music-back-button span {
-    display: none;
-  }
-
-  .music-character-wrapper {
-    width: 255px;
-    height: 280px;
-  }
-
-  .character-stars {
-    width: 290px;
-  }
-
-  .character-particle {
-    display: none;
-  }
-
-  .music-option-card {
-    padding: 22px;
-
-    min-height: 180px;
-  }
-
-  .option-content h2 {
-    font-size: 20px;
-  }
-
-  .lesson-dot {
-    width: 29px;
-    height: 29px;
-  }
-
-  .lesson-connector {
-    width: 20px;
-  }
-}
-
-/* =========================================================
-   CUSTOMIZE MUSICIAN — PROMINENT BUTTON
-   ========================================================= */
-
-.customize-musician-button {
-  margin-top: 24px;
-
-  min-width: 260px;
-  min-height: 54px;
-
-  padding: 14px 22px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 11px;
-
-  border: 1px solid rgba(124, 92, 252, 0.45);
-
-  border-radius: 15px;
-
-  background:
-    linear-gradient(
-      135deg,
-      rgba(124, 92, 252, 0.22),
-      rgba(98, 69, 216, 0.12)
-    );
-
-  color: #6245d8;
-
-  font-size: 15px;
-  font-weight: 800;
-
-  cursor: pointer;
-
-  box-shadow:
-    0 10px 30px rgba(124, 92, 252, 0.12);
-
-  transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease,
-    background 0.25s ease;
-}
-
-.customize-musician-button:hover {
-  transform: translateY(-3px);
-
-  background:
-    linear-gradient(
-      135deg,
-      rgba(124, 92, 252, 0.32),
-      rgba(98, 69, 216, 0.18)
-    );
-
-  box-shadow:
-    0 15px 35px rgba(124, 92, 252, 0.2);
-}
-
-.customize-musician-button svg:last-child {
-  margin-left: 3px;
-}
-
-
-/* =========================================================
-   CHARACTER SELECTOR
-   ========================================================= */
-
-.character-selector-overlay {
-  position: fixed;
   inset: 0;
 
   z-index: 5000;
@@ -1424,8 +1140,13 @@
   backdrop-filter: blur(14px);
 }
 
+/* =========================================================
+   CHARACTER SELECTOR
+   ========================================================= */
 
 .character-selector {
+  position: relative;
+
   width: min(760px, 100%);
 
   max-height: 88vh;
@@ -1450,7 +1171,6 @@
     0 30px 80px rgba(34, 20, 70, 0.28);
 }
 
-
 /* =========================================================
    SELECTOR HEADER
    ========================================================= */
@@ -1465,7 +1185,6 @@
   margin-bottom: 26px;
 }
 
-
 .character-selector-header span {
   font-size: 12px;
 
@@ -1476,7 +1195,6 @@
   color: #7c5cfc;
 }
 
-
 .character-selector-header h2 {
   margin: 5px 0 6px;
 
@@ -1485,7 +1203,6 @@
   color: #21183b;
 }
 
-
 .character-selector-header p {
   margin: 0;
 
@@ -1493,7 +1210,6 @@
 
   font-size: 14px;
 }
-
 
 .character-selector-header > button {
   width: 42px;
@@ -1517,13 +1233,11 @@
   transition: 0.2s ease;
 }
 
-
 .character-selector-header > button:hover {
   background: rgba(124, 92, 252, 0.18);
 
   transform: rotate(5deg);
 }
-
 
 /* =========================================================
    CHARACTER OPTIONS GRID
@@ -1538,8 +1252,9 @@
   gap: 15px;
 }
 
-
 .character-option {
+  position: relative;
+
   min-height: 145px;
 
   padding: 18px 12px;
@@ -1569,7 +1284,6 @@
     background 0.2s ease;
 }
 
-
 .character-option:hover {
   transform: translateY(-4px);
 
@@ -1579,7 +1293,6 @@
   box-shadow:
     0 12px 30px rgba(124, 92, 252, 0.12);
 }
-
 
 .character-option.selected {
   border-color: #7c5cfc;
@@ -1594,7 +1307,6 @@
   box-shadow:
     0 10px 30px rgba(124, 92, 252, 0.16);
 }
-
 
 .character-option-icon {
   width: 60px;
@@ -1611,13 +1323,11 @@
   font-size: 32px;
 }
 
-
 .character-option span {
   font-size: 15px;
 
   font-weight: 800;
 }
-
 
 .character-option small {
   color: #7c5cfc;
@@ -1631,76 +1341,43 @@
   letter-spacing: 0.8px;
 }
 
+.selected-mark {
+  position: absolute;
 
-/* =========================================================
-   MOBILE
-   ========================================================= */
+  top: 10px;
+  right: 10px;
 
-@media (max-width: 700px) {
+  width: 24px;
+  height: 24px;
 
-  .customize-musician-button {
-    width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    max-width: 340px;
-  }
+  border-radius: 50%;
 
+  background:
+    #7455df;
 
-  .character-options-grid {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-  }
+  color: #ffffff;
 
-
-  .character-selector {
-    padding: 22px;
-
-    border-radius: 22px;
-  }
-
-
-  .character-selector-header h2 {
-    font-size: 25px;
-  }
-
+  font-size: 12px;
 }
 
+.selector-note {
+  display: flex;
 
-@media (max-width: 430px) {
+  justify-content: center;
+  align-items: center;
 
-  .character-options-grid {
-    grid-template-columns: 1fr 1fr;
+  gap: 6px;
 
-    gap: 10px;
-  }
+  margin-top: 25px;
 
+  color: rgba(255, 255, 255, 0.3);
 
-  .character-option {
-    min-height: 125px;
-
-    padding: 12px 8px;
-  }
-
-
-  .character-option-icon {
-    width: 52px;
-    height: 52px;
-
-    font-size: 27px;
-  }
-
+  font-size: 10px;
 }
-
-/* =========================================================
-   SKILLSENSAI MUSIC — LIGHT / DARK THEME
-   ========================================================= */
-
-.music-room {
-  transition:
-    background 0.5s ease,
-    color 0.5s ease,
-    opacity 0.8s ease;
-}
-
 
 /* =========================================================
    LIGHT THEME
@@ -1751,15 +1428,20 @@
 .music-room.music-light-mode
 .music-option-card {
   background: rgba(255, 255, 255, 0.82);
-  border-color: rgba(124, 92, 252, 0.16);
+
+  border-color:
+    rgba(124, 92, 252, 0.16);
+
   color: #24203d;
+
   box-shadow:
     0 15px 45px rgba(78, 59, 140, 0.10);
 }
 
 .music-room.music-light-mode
 .music-option-card:hover {
-  background: rgba(255, 255, 255, 0.96);
+  background:
+    rgba(255, 255, 255, 0.96);
 }
 
 .music-room.music-light-mode
@@ -1773,6 +1455,11 @@
 }
 
 .music-room.music-light-mode
+.music-progress-top strong {
+  color: #24203d;
+}
+
+.music-room.music-light-mode
 .music-progress-label {
   color: #77718a;
 }
@@ -1782,6 +1469,19 @@
   color: #312b4c;
 }
 
+/* Customize button in light mode */
+
+.music-room.music-light-mode
+.customize-musician-button {
+  color: #6245d8;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(124, 92, 252, 0.18),
+      rgba(98, 69, 216, 0.09)
+    );
+}
 
 /* =========================================================
    DARK THEME
@@ -1875,155 +1575,6 @@
   color: #ffffff;
 }
 
-
-/* =========================================================
-   LIGHT BULB BUTTON
-   ========================================================= */
-
-.music-theme-toggle {
-  position: relative;
-
-  width: 62px;
-  height: 34px;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  padding: 4px 7px;
-
-  border: none;
-  border-radius: 999px;
-
-  cursor: pointer;
-
-  transition:
-    background 0.3s ease,
-    box-shadow 0.3s ease,
-    transform 0.2s ease;
-
-  z-index: 20;
-}
-
-.music-theme-toggle:hover {
-  transform: translateY(-1px);
-}
-
-
-/* LIGHT / OFF */
-
-.music-theme-toggle.light {
-  background: #e5e0f3;
-  color: #6f687e;
-  box-shadow:
-    inset 0 0 0 1px rgba(80, 65, 120, 0.10);
-}
-
-
-/* DARK / ON */
-
-.music-theme-toggle.dark {
-  background: #242033;
-  color: #f7dc70;
-  box-shadow:
-    0 0 18px rgba(247, 220, 112, 0.12),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
-}
-
-
-/* SWITCH */
-
-.music-theme-switch {
-  width: 20px;
-  height: 20px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 50%;
-
-  background: #ffffff;
-
-  transition:
-    transform 0.3s ease,
-    background 0.3s ease;
-}
-
-.music-theme-switch span {
-  width: 6px;
-  height: 6px;
-
-  border-radius: 50%;
-
-  background: #b5afc7;
-}
-
-
-/* DARK POSITION */
-
-.music-theme-toggle.dark
-.music-theme-switch {
-  transform: translateX(-27px);
-  background: #f7dc70;
-}
-
-.music-theme-toggle.dark
-.music-theme-switch span {
-  background: #ffffff;
-}
-
-
-/* LIGHT POSITION */
-
-.music-theme-toggle.light
-.music-theme-switch {
-  transform: translateX(0);
-}
-
-
-/* =========================================================
-   CHARACTER IMAGE STABILITY
-   ========================================================= */
-
-.music-character-wrapper {
-  position: relative;
-  min-height: 280px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.music-character-image {
-  display: block;
-
-  max-width: 100%;
-  height: auto;
-
-  object-fit: contain;
-
-  animation:
-    characterImageAppear 0.45s ease;
-}
-
-@keyframes characterImageAppear {
-  from {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-
-/* =========================================================
-   DARK THEME — CHARACTER AREA
-   ========================================================= */
-
 .music-room.music-dark-mode
 .character-glow {
   opacity: 1;
@@ -2031,80 +1582,28 @@
 
 .music-room.music-dark-mode
 .character-placeholder {
-  background: rgba(255, 255, 255, 0.05);
+  background:
+    rgba(255, 255, 255, 0.05);
+
   color: #ffffff;
 }
 
-
-/* =========================================================
-   CHARACTER SELECTOR — DARK THEME
-   ========================================================= */
+/* Customize button in dark mode */
 
 .music-room.music-dark-mode
-.character-selector {
+.customize-musician-button {
+  color: #c5b6ff;
+
   background:
     linear-gradient(
-      145deg,
-      #171329,
-      #0c0a14
+      135deg,
+      rgba(124, 92, 252, 0.22),
+      rgba(98, 69, 216, 0.12)
     );
-
-  color: #ffffff;
-
-  border-color:
-    rgba(151, 126, 255, 0.20);
-
-  box-shadow:
-    0 30px 100px rgba(0, 0, 0, 0.65);
 }
-
-.music-room.music-dark-mode
-.character-selector-header h2 {
-  color: #ffffff;
-}
-
-.music-room.music-dark-mode
-.character-selector-header p {
-  color: #aaa5b8;
-}
-
-.music-room.music-dark-mode
-.character-option {
-  background:
-    rgba(255, 255, 255, 0.045);
-
-  color: #ffffff;
-
-  border-color:
-    rgba(255, 255, 255, 0.08);
-}
-
-.music-room.music-dark-mode
-.character-option:hover {
-  background:
-    rgba(124, 92, 252, 0.12);
-
-  border-color:
-    rgba(124, 92, 252, 0.40);
-}
-
-.music-room.music-dark-mode
-.character-option.selected {
-  background:
-    rgba(124, 92, 252, 0.16);
-
-  border-color:
-    #8c72ff;
-}
-
-.music-room.music-dark-mode
-.selector-note {
-  color: #8f899f;
-}
-
 
 /* =========================================================
-   CHARACTER SELECTOR — LIGHT THEME
+   CHARACTER SELECTOR — LIGHT
    ========================================================= */
 
 .music-room.music-light-mode
@@ -2169,13 +1668,241 @@
   color: #77718a;
 }
 
+/* =========================================================
+   CHARACTER SELECTOR — DARK
+   ========================================================= */
+
+.music-room.music-dark-mode
+.character-selector {
+  background:
+    linear-gradient(
+      145deg,
+      #171329,
+      #0c0a14
+    );
+
+  color: #ffffff;
+
+  border-color:
+    rgba(151, 126, 255, 0.20);
+
+  box-shadow:
+    0 30px 100px rgba(0, 0, 0, 0.65);
+}
+
+.music-room.music-dark-mode
+.character-selector-header h2 {
+  color: #ffffff;
+}
+
+.music-room.music-dark-mode
+.character-selector-header p {
+  color: #aaa5b8;
+}
+
+.music-room.music-dark-mode
+.character-option {
+  background:
+    rgba(255, 255, 255, 0.045);
+
+  color: #ffffff;
+
+  border-color:
+    rgba(255, 255, 255, 0.08);
+}
+
+.music-room.music-dark-mode
+.character-option:hover {
+  background:
+    rgba(124, 92, 252, 0.12);
+
+  border-color:
+    rgba(124, 92, 252, 0.40);
+}
+
+.music-room.music-dark-mode
+.character-option.selected {
+  background:
+    rgba(124, 92, 252, 0.16);
+
+  border-color:
+    #8c72ff;
+}
+
+.music-room.music-dark-mode
+.selector-note {
+  color: #8f899f;
+}
 
 /* =========================================================
-   MOBILE
+   LIGHT BULB / THEME BUTTON
+   ========================================================= */
+
+.music-theme-toggle {
+  position: relative;
+
+  width: 62px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 4px 7px;
+
+  border: none;
+
+  border-radius: 999px;
+
+  cursor: pointer;
+
+  transition:
+    background 0.3s ease,
+    box-shadow 0.3s ease,
+    transform 0.2s ease;
+
+  z-index: 20;
+}
+
+.music-theme-toggle:hover {
+  transform: translateY(-1px);
+}
+
+.music-theme-toggle.light {
+  background: #e5e0f3;
+
+  color: #6f687e;
+
+  box-shadow:
+    inset 0 0 0 1px
+    rgba(80, 65, 120, 0.10);
+}
+
+.music-theme-toggle.dark {
+  background: #242033;
+
+  color: #f7dc70;
+
+  box-shadow:
+    0 0 18px
+    rgba(247, 220, 112, 0.12),
+
+    inset 0 0 0 1px
+    rgba(255, 255, 255, 0.08);
+}
+
+.music-theme-switch {
+  width: 20px;
+  height: 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #ffffff;
+
+  transition:
+    transform 0.3s ease,
+    background 0.3s ease;
+}
+
+.music-theme-switch span {
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+
+  background: #b5afc7;
+}
+
+.music-theme-toggle.dark
+.music-theme-switch {
+  transform: translateX(-27px);
+
+  background: #f7dc70;
+}
+
+.music-theme-toggle.dark
+.music-theme-switch span {
+  background: #ffffff;
+}
+
+.music-theme-toggle.light
+.music-theme-switch {
+  transform: translateX(0);
+}
+
+/* =========================================================
+   RESPONSIVE — TABLET
+   ========================================================= */
+
+@media (max-width: 750px) {
+  .music-room-header {
+    padding: 0 20px;
+  }
+
+  .music-room-title {
+    font-size: 12px;
+  }
+
+  .music-room-content {
+    padding-top: 32px;
+  }
+
+  .music-character-section {
+    min-height: 500px;
+  }
+
+  .music-character-wrapper {
+    width: 290px;
+    height: 310px;
+
+    min-width: 290px;
+    min-height: 310px;
+  }
+
+  .character-glow {
+    width: 300px;
+    height: 300px;
+  }
+
+  .music-options {
+    grid-template-columns: 1fr;
+  }
+
+  .character-options-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .character-option-image {
+    height: 180px;
+  }
+
+  .lesson-connector {
+    width: 35px;
+  }
+
+  .customize-musician-button {
+    width: min(340px, 90%);
+  }
+
+  .character-selector {
+    padding: 22px;
+  }
+
+  .character-selector-header h2 {
+    font-size: 25px;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE — MOBILE
    ========================================================= */
 
 @media (max-width: 600px) {
-
   .music-theme-toggle {
     width: 56px;
     height: 32px;
@@ -2187,7 +1914,119 @@
   }
 
   .music-character-wrapper {
-    min-height: 230px;
+    width: 270px;
+    height: 290px;
+
+    min-width: 270px;
+    min-height: 290px;
   }
 
+  .music-character-section {
+    min-height: 480px;
+  }
+
+  .customize-musician-button {
+    width: 100%;
+
+    max-width: 340px;
+
+    min-height: 52px;
+  }
+
+  .character-options-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+  }
+
+  .character-selector {
+    padding: 22px;
+
+    border-radius: 22px;
+  }
+
+  .character-option {
+    min-height: 125px;
+
+    padding: 12px 8px;
+  }
+
+  .character-option-icon {
+    width: 52px;
+    height: 52px;
+
+    font-size: 27px;
+  }
+}
+
+@media (max-width: 480px) {
+  .music-room-title span {
+    display: none;
+  }
+
+  .music-back-button span {
+    display: none;
+  }
+
+  .music-character-wrapper {
+    width: 255px;
+    height: 280px;
+
+    min-width: 255px;
+    min-height: 280px;
+  }
+
+  .character-stars {
+    width: 290px;
+  }
+
+  .character-particle {
+    display: none;
+  }
+
+  .music-option-card {
+    padding: 22px;
+
+    min-height: 180px;
+  }
+
+  .option-content h2 {
+    font-size: 20px;
+  }
+
+  .lesson-dot {
+    width: 29px;
+    height: 29px;
+  }
+
+  .lesson-connector {
+    width: 20px;
+  }
+}
+
+/* =========================================================
+   IMPORTANT IMAGE SAFETY
+   Prevent any uploaded image from escaping its container.
+   ========================================================= */
+
+.music-character-wrapper img {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* =========================================================
+   BUTTON SAFETY
+   ========================================================= */
+
+.customize-musician-button,
+.customize-character-button {
+  position: relative;
+
+  z-index: 50;
+
+  pointer-events: auto;
 }
