@@ -305,6 +305,7 @@ function LearnFromScratch() {
 
         <div className="learn-header-title">
           <strong>Learn From Scratch</strong>
+
           <span>
             Your personal music learning journey
           </span>
@@ -312,6 +313,7 @@ function LearnFromScratch() {
       </header>
 
       <main className="learn-content">
+
         <section className="learn-intro">
           <div className="learn-eyebrow">
             <Sparkles size={14} />
@@ -379,6 +381,7 @@ function LearnFromScratch() {
         </section>
 
         <section className="journey-section">
+
           <div className="journey-heading">
             <h2>Your Learning Journey</h2>
 
@@ -431,6 +434,7 @@ function LearnFromScratch() {
           </div>
 
           <div className="lesson-list">
+
             {LESSONS.map((lesson) => {
               const completed =
                 lesson.id <= lessonsLearned;
@@ -444,7 +448,7 @@ function LearnFromScratch() {
               return (
                 <div
                   key={lesson.id}
-                  className={`lesson-card ${
+                  className={`learn-lesson-card ${
                     completed
                       ? "completed"
                       : current
@@ -455,11 +459,11 @@ function LearnFromScratch() {
                     handleLessonClick(lesson)
                   }
                 >
-                  <div className="lesson-card-icon">
+                  <div className="learn-lesson-card-icon">
                     {lesson.icon}
                   </div>
 
-                  <div className="lesson-card-content">
+                  <div className="learn-lesson-card-content">
                     <h3>
                       Lesson {lesson.id}:{" "}
                       {lesson.title}
@@ -470,7 +474,7 @@ function LearnFromScratch() {
                     </p>
                   </div>
 
-                  <div className="lesson-action">
+                  <div className="learn-lesson-action">
                     {completed ? (
                       <Check
                         size={20}
@@ -485,6 +489,7 @@ function LearnFromScratch() {
                 </div>
               );
             })}
+
           </div>
 
           {lessonsLearned >= TOTAL_LESSONS && (
@@ -505,6 +510,7 @@ function LearnFromScratch() {
               </p>
             </div>
           )}
+
         </section>
       </main>
     </div>
