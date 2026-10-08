@@ -9,6 +9,7 @@ import Home from "./pages/Home";
 import Music from "./pages/Music";
 import LearnFromScratch from "./pages/LearnFromScratch";
 import Lesson from "./pages/Lesson";
+import MusicSong from "./pages/MusicSong";
 import MartialArts from "./pages/MartialArts";
 import Boxing from "./pages/Boxing";
 import Karate from "./pages/Karate";
@@ -48,6 +49,15 @@ function App() {
         <Route
           path="/music/learn/lesson/:lessonId"
           element={<Lesson />}
+        />
+
+        {/* =========================
+            MUSIC — UPLOAD SONG
+            NEW ROUTE
+        ========================= */}
+        <Route
+          path="/music/upload-song"
+          element={<MusicSong />}
         />
 
         {/* =========================
