@@ -7,3 +7,4 @@ soundfile
 imageio-ffmpeg
 scikit-learn
 joblib
+faster-whisper
