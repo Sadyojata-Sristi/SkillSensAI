@@ -128,16 +128,28 @@ const defaultCharacters = [
     description: "Your original SkillSensAI warrior.",
   },
   {
-    id: "singer",
-    name: "Singer",
-    image: "/singer.png",
-    description: "Music character.",
+    id: "dancer",
+    name: "Dancer",
+    image: "/Dancer.png",
+    description: "Your Michael Jackson",
   },
   {
-    id: "fighter",
-    name: "Fighter",
-    image: "/fighter.png",
+    id: "karate",
+    name: "Karate",
+    image: "/Karate.png",
     description: "Martial Arts character.",
+  },
+  {
+    id: "lady",
+    name: "Lady",
+    image: "/Lady.png",
+    description: "Your SkillSensAI learning companion.",
+  },
+  {
+    id: "shadowboxer",
+    name: "Shadow Boxer",
+    image: "/ShadowBoxer.png",
+    description: "Your boxing learning companion.",
   },
 ];
 
