@@ -8,13 +8,15 @@ from sklearn.ensemble import RandomForestRegressor
 # SkillSensAI Music AI — Training
 # ============================================================
 
-MODEL_PATH = "music_model.pkl"
+MODEL_PATH = "music_model.joblib"
 
 
 # ============================================================
-# TRAINING DATA
+# FEATURE ORDER
 #
-# Features:
+# IMPORTANT:
+# main.py MUST use this exact order when sending
+# features to the model.
 #
 # 0 = pitch accuracy
 # 1 = note match
@@ -22,9 +24,20 @@ MODEL_PATH = "music_model.pkl"
 # 3 = stability
 # 4 = average pitch error (cents)
 # 5 = voiced ratio
-#
-# Target:
-# performance score
+# ============================================================
+
+FEATURE_NAMES = [
+    "pitch_accuracy",
+    "note_match",
+    "timing_accuracy",
+    "stability",
+    "average_pitch_error_cents",
+    "voiced_ratio",
+]
+
+
+# ============================================================
+# TRAINING DATA
 # ============================================================
 
 X = np.array([
@@ -83,18 +96,20 @@ y = np.array([
     48,
     44,
     40,
-    35
+    35,
 ], dtype=np.float32)
 
 
 # ============================================================
-# CREATE MODEL
+# CREATE RANDOM FOREST MODEL
 # ============================================================
 
 model = RandomForestRegressor(
     n_estimators=200,
     max_depth=8,
-    random_state=42
+    min_samples_leaf=1,
+    random_state=42,
+    n_jobs=-1,
 )
 
 
@@ -102,36 +117,28 @@ model = RandomForestRegressor(
 # TRAIN
 # ============================================================
 
-model.fit(
-    X,
-    y
-)
+model.fit(X, y)
 
 
 # ============================================================
-# SAVE
+# SAVE MODEL
 # ============================================================
 
-joblib.dump(
-    model,
-    MODEL_PATH
-)
+joblib.dump(model, MODEL_PATH)
 
 
 # ============================================================
-# TEST
+# TEST MODEL
 # ============================================================
 
 test_examples = np.array([
     [95, 94, 96, 94, 15, 0.96],
     [75, 72, 78, 74, 55, 0.88],
-    [50, 47, 52, 48, 130, 0.70]
+    [50, 47, 52, 48, 130, 0.70],
 ], dtype=np.float32)
 
 
-predictions = model.predict(
-    test_examples
-)
+predictions = model.predict(test_examples)
 
 
 # ============================================================
@@ -140,15 +147,26 @@ predictions = model.predict(
 
 print()
 print("==========================================")
-print(" SkillSensAI Music AI")
+print("       SkillSensAI Music AI")
 print("==========================================")
+print()
 print("Model: Random Forest Regressor")
 print("Training samples:", len(X))
-print("Features:", X.shape[1])
+print("Features:", len(FEATURE_NAMES))
+print()
+print("Feature order:")
+
+for index, feature in enumerate(FEATURE_NAMES):
+    print(f"{index}: {feature}")
+
 print()
 print("Test predictions:")
 
 for index, prediction in enumerate(predictions):
+
+    prediction = float(
+        np.clip(prediction, 0, 100)
+    )
 
     print(
         f"Example {index + 1}: "
@@ -158,5 +176,5 @@ for index, prediction in enumerate(predictions):
 print()
 print("Model saved as:")
 print(MODEL_PATH)
-print("==========================================")
 print()
+print("==========================================")
