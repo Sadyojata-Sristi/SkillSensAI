@@ -8,6 +8,7 @@ import subprocess
 import numpy as np
 import librosa
 import imageio_ffmpeg
+import joblib
 
 
 # ============================================================
@@ -17,7 +18,7 @@ import imageio_ffmpeg
 app = FastAPI(
     title="SkillSensAI Backend",
     description="AI-powered skill learning backend for SkillSensAI",
-    version="2.0.0"
+    version="3.0.0"
 )
 
 
@@ -50,6 +51,36 @@ HOP_LENGTH = 512
 
 
 # ============================================================
+# MUSIC AI MODEL
+# ============================================================
+
+MODEL_PATH = os.path.join(
+    os.path.dirname(__file__),
+    "music_model.pkl"
+)
+
+
+try:
+
+    music_model = joblib.load(
+        MODEL_PATH
+    )
+
+    print(
+        "Music AI model loaded successfully."
+    )
+
+except Exception as error:
+
+    music_model = None
+
+    print(
+        "Music AI model could not be loaded:",
+        str(error)
+    )
+
+
+# ============================================================
 # ROOT
 # ============================================================
 
@@ -59,7 +90,12 @@ def root():
     return {
         "message": "SkillSensAI backend is running!",
         "status": "online",
-        "version": "2.0.0"
+        "version": "3.0.0",
+        "music_ai": (
+            "active"
+            if music_model is not None
+            else "unavailable"
+        )
     }
 
 
@@ -72,7 +108,12 @@ def health():
 
     return {
         "success": True,
-        "status": "healthy"
+        "status": "healthy",
+        "music_ai": (
+            "active"
+            if music_model is not None
+            else "unavailable"
+        )
     }
 
 
@@ -211,7 +252,7 @@ def detect_pitch_timeline(
 
 
     # --------------------------------------------------------
-    # REMOVE EXTREMELY QUIET SIGNALS
+    # RMS / ENERGY
     # --------------------------------------------------------
 
     rms = librosa.feature.rms(
@@ -371,9 +412,11 @@ def frequency_to_note(
 
         return "Unknown"
 
+
     if not np.isfinite(frequency):
 
         return "Unknown"
+
 
     if frequency <= 0:
 
@@ -395,6 +438,24 @@ def frequency_to_note(
         )
 
 
+        note_names = [
+            "C",
+            "C#",
+            "D",
+            "D#",
+            "E",
+            "F",
+            "F#",
+            "F#",
+            "G",
+            "G#",
+            "A",
+            "A#",
+            "B"
+        ]
+
+        # Safety correction because the list above
+        # must contain exactly 12 notes.
         note_names = [
             "C",
             "C#",
@@ -497,14 +558,6 @@ def cents_to_accuracy(
     )
 
 
-    # Very forgiving musical tolerance.
-    #
-    # 0 cents   = 100
-    # 25 cents  ≈ excellent
-    # 50 cents  ≈ good
-    # 100 cents ≈ one semitone
-    # 200 cents ≈ two semitones
-
     accuracy = (
         100
         * np.exp(
@@ -591,6 +644,130 @@ def interpolate_timeline(
 
 
 # ============================================================
+# AI FEATURE EXTRACTION
+#
+# These are the exact six features used by train_model.py.
+#
+# 0 = pitch accuracy
+# 1 = note match
+# 2 = timing accuracy
+# 3 = stability
+# 4 = average pitch error in cents
+# 5 = voiced ratio
+# ============================================================
+
+def calculate_ai_features(
+    reference_timeline,
+    user_timeline,
+    pitch_accuracy,
+    note_match,
+    timing_accuracy,
+    stability,
+    average_pitch_error
+):
+
+    reference_valid = [
+        point
+        for point in reference_timeline
+        if point["frequency"] > 0
+    ]
+
+
+    user_valid = [
+        point
+        for point in user_timeline
+        if point["frequency"] > 0
+    ]
+
+
+    # --------------------------------------------------------
+    # VOICED RATIO
+    # --------------------------------------------------------
+
+    if len(reference_valid) == 0:
+
+        voiced_ratio = 0.0
+
+    else:
+
+        voiced_ratio = (
+            len(user_valid)
+            / len(reference_valid)
+        )
+
+
+    voiced_ratio = float(
+        np.clip(
+            voiced_ratio,
+            0.0,
+            1.0
+        )
+    )
+
+
+    # --------------------------------------------------------
+    # FEATURE VECTOR
+    # --------------------------------------------------------
+
+    features = np.array(
+        [
+            pitch_accuracy,
+            note_match,
+            timing_accuracy,
+            stability,
+            average_pitch_error,
+            voiced_ratio
+        ],
+        dtype=np.float32
+    )
+
+
+    return features
+
+
+# ============================================================
+# AI PERFORMANCE PREDICTION
+# ============================================================
+
+def predict_ai_score(
+    features
+):
+
+    if music_model is None:
+
+        return None
+
+
+    try:
+
+        prediction = music_model.predict(
+            features.reshape(
+                1,
+                -1
+            )
+        )[0]
+
+
+        return float(
+            np.clip(
+                prediction,
+                0,
+                100
+            )
+        )
+
+
+    except Exception as error:
+
+        print(
+            "AI prediction error:",
+            str(error)
+        )
+
+        return None
+
+
+# ============================================================
 # SCORE REFERENCE + USER
 # ============================================================
 
@@ -613,10 +790,17 @@ def calculate_music_score_from_timelines(
     ]
 
 
+    # ========================================================
+    # NO REFERENCE PITCH
+    # ========================================================
+
     if not reference_valid:
 
         return {
             "overall_score": 0,
+            "ai_score": None,
+            "rule_based_score": 0,
+            "ai_model": "Unavailable",
             "pitch_accuracy": 0,
             "note_match": 0,
             "timing_accuracy": 0,
@@ -628,10 +812,17 @@ def calculate_music_score_from_timelines(
         }
 
 
+    # ========================================================
+    # NO USER PITCH
+    # ========================================================
+
     if not user_valid:
 
         return {
             "overall_score": 0,
+            "ai_score": None,
+            "rule_based_score": 0,
+            "ai_model": "Unavailable",
             "pitch_accuracy": 0,
             "note_match": 0,
             "timing_accuracy": 0,
@@ -643,9 +834,9 @@ def calculate_music_score_from_timelines(
         }
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # NORMALIZED TIME
-    # --------------------------------------------------------
+    # ========================================================
 
     reference_duration = max(
         point["time"]
@@ -660,10 +851,12 @@ def calculate_music_score_from_timelines(
 
 
     if reference_duration <= 0:
+
         reference_duration = 1
 
 
     if user_duration <= 0:
+
         user_duration = 1
 
 
@@ -691,11 +884,19 @@ def calculate_music_score_from_timelines(
     )
 
 
+    # ========================================================
+    # REFERENCE PITCH
+    # ========================================================
+
     reference_pitch = interpolate_timeline(
         reference_timeline,
         target_times
     )
 
+
+    # ========================================================
+    # USER PITCH
+    # ========================================================
 
     user_normalized_times = (
         np.array(
@@ -735,9 +936,9 @@ def calculate_music_score_from_timelines(
         )
 
 
-    # --------------------------------------------------------
-    # CENTS
-    # --------------------------------------------------------
+    # ========================================================
+    # CENTS ERROR
+    # ========================================================
 
     cents_errors = []
 
@@ -764,6 +965,7 @@ def calculate_music_score_from_timelines(
 
 
         if cents is None:
+
             continue
 
 
@@ -780,6 +982,9 @@ def calculate_music_score_from_timelines(
 
         return {
             "overall_score": 0,
+            "ai_score": None,
+            "rule_based_score": 0,
+            "ai_model": "Unavailable",
             "pitch_accuracy": 0,
             "note_match": 0,
             "timing_accuracy": 0,
@@ -802,9 +1007,9 @@ def calculate_music_score_from_timelines(
     )
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # PITCH ACCURACY
-    # --------------------------------------------------------
+    # ========================================================
 
     pitch_accuracy = float(
         np.mean(
@@ -816,12 +1021,9 @@ def calculate_music_score_from_timelines(
     )
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # NOTE MATCH
-    #
-    # 50 cents = same musical note region.
-    # 80 cents = still reasonably close.
-    # --------------------------------------------------------
+    # ========================================================
 
     note_match = float(
         np.mean(
@@ -831,12 +1033,9 @@ def calculate_music_score_from_timelines(
     )
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # TIMING ACCURACY
-    #
-    # Approximation based on how much usable singing overlaps
-    # the reference melody.
-    # --------------------------------------------------------
+    # ========================================================
 
     reference_active = np.array(
         [
@@ -866,6 +1065,7 @@ def calculate_music_score_from_timelines(
             ]
         )
 
+
         timing_accuracy = float(
             overlap * 100
         )
@@ -875,9 +1075,9 @@ def calculate_music_score_from_timelines(
         timing_accuracy = 0.0
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # STABILITY
-    # --------------------------------------------------------
+    # ========================================================
 
     if len(user_pitch) > 2:
 
@@ -923,6 +1123,7 @@ def calculate_music_score_from_timelines(
             / reference_variation
         )
 
+
         stability = (
             100
             * np.exp(
@@ -944,16 +1145,79 @@ def calculate_music_score_from_timelines(
     )
 
 
-    # --------------------------------------------------------
-    # OVERALL SCORE
-    # --------------------------------------------------------
+    # ========================================================
+    # AVERAGE PITCH ERROR
+    # ========================================================
 
-    overall_score = (
+    average_error = float(
+        np.mean(
+            absolute_errors
+        )
+    )
+
+
+    # ========================================================
+    # RULE-BASED SCORE
+    # ========================================================
+
+    rule_based_score = (
         pitch_accuracy * 0.50
         + note_match * 0.25
         + timing_accuracy * 0.15
         + stability * 0.10
     )
+
+
+    rule_based_score = float(
+        np.clip(
+            rule_based_score,
+            0,
+            100
+        )
+    )
+
+
+    # ========================================================
+    # AI FEATURES
+    # ========================================================
+
+    ai_features = calculate_ai_features(
+        reference_timeline,
+        user_timeline,
+        pitch_accuracy,
+        note_match,
+        timing_accuracy,
+        stability,
+        average_error
+    )
+
+
+    # ========================================================
+    # AI SCORE
+    # ========================================================
+
+    ai_score = predict_ai_score(
+        ai_features
+    )
+
+
+    # ========================================================
+    # FINAL SCORE
+    #
+    # AI contributes 60%.
+    # Existing analytical score contributes 40%.
+    # ========================================================
+
+    if ai_score is not None:
+
+        overall_score = (
+            rule_based_score * 0.40
+            + ai_score * 0.60
+        )
+
+    else:
+
+        overall_score = rule_based_score
 
 
     overall_score = float(
@@ -965,9 +1229,9 @@ def calculate_music_score_from_timelines(
     )
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # FEEDBACK
-    # --------------------------------------------------------
+    # ========================================================
 
     feedback = []
 
@@ -1035,13 +1299,6 @@ def calculate_music_score_from_timelines(
         )
 
 
-    average_error = float(
-        np.mean(
-            absolute_errors
-        )
-    )
-
-
     if average_error <= 25:
 
         feedback.append(
@@ -1067,12 +1324,80 @@ def calculate_music_score_from_timelines(
         )
 
 
+    # ========================================================
+    # AI-SPECIFIC FEEDBACK
+    # ========================================================
+
+    if ai_score is not None:
+
+        if ai_score >= 90:
+
+            feedback.append(
+                "AI evaluation: your overall singing performance is excellent."
+            )
+
+        elif ai_score >= 75:
+
+            feedback.append(
+                "AI evaluation: your performance is good with some areas to improve."
+            )
+
+        elif ai_score >= 60:
+
+            feedback.append(
+                "AI evaluation: your performance is developing. "
+                "Focused practice can improve your score."
+            )
+
+        else:
+
+            feedback.append(
+                "AI evaluation: focus on pitch matching and "
+                "consistent singing before increasing song difficulty."
+            )
+
+
+    # ========================================================
+    # AI MODEL NAME
+    # ========================================================
+
+    if ai_score is not None:
+
+        ai_model_name = (
+            "Random Forest Music Performance Model"
+        )
+
+    else:
+
+        ai_model_name = "Unavailable"
+
+
+    # ========================================================
+    # FINAL RESPONSE
+    # ========================================================
+
     return {
 
         "overall_score": round(
             overall_score,
             2
         ),
+
+        "ai_score": (
+            round(
+                ai_score,
+                2
+            )
+            if ai_score is not None
+            else None
+        ),
+
+        "rule_based_score": round(
+            rule_based_score,
+            2
+        ),
+
+        "ai_model": ai_model_name,
 
         "pitch_accuracy": round(
             pitch_accuracy,
@@ -1163,7 +1488,9 @@ async def save_upload(
             )
 
             if not chunk:
+
                 break
+
 
             temporary_file.write(
                 chunk
@@ -1179,11 +1506,13 @@ async def save_upload(
 
         temporary_file.close()
 
+
         if os.path.exists(file_path):
 
             os.remove(
                 file_path
             )
+
 
         raise
 
@@ -1493,6 +1822,7 @@ async def compare_song_voice(
 ):
 
     song_path = None
+
     voice_path = None
 
 
@@ -1514,6 +1844,10 @@ async def compare_song_voice(
             )
 
 
+        # ----------------------------------------------------
+        # SAVE FILES
+        # ----------------------------------------------------
+
         song_path = await save_upload(
             song
         )
@@ -1523,6 +1857,10 @@ async def compare_song_voice(
             voice
         )
 
+
+        # ----------------------------------------------------
+        # LOAD AUDIO
+        # ----------------------------------------------------
 
         song_audio, song_sample_rate = load_audio(
             song_path
@@ -1550,17 +1888,29 @@ async def compare_song_voice(
             )
 
 
+        # ----------------------------------------------------
+        # DETECT REFERENCE PITCH
+        # ----------------------------------------------------
+
         reference_timeline = detect_pitch_timeline(
             song_audio,
             song_sample_rate
         )
 
 
+        # ----------------------------------------------------
+        # DETECT USER PITCH
+        # ----------------------------------------------------
+
         user_timeline = detect_pitch_timeline(
             voice_audio,
             voice_sample_rate
         )
 
+
+        # ----------------------------------------------------
+        # VALIDATE REFERENCE
+        # ----------------------------------------------------
 
         if not any(
             point["frequency"] > 0
@@ -1576,6 +1926,10 @@ async def compare_song_voice(
             )
 
 
+        # ----------------------------------------------------
+        # VALIDATE USER
+        # ----------------------------------------------------
+
         if not any(
             point["frequency"] > 0
             for point in user_timeline
@@ -1590,11 +1944,19 @@ async def compare_song_voice(
             )
 
 
+        # ----------------------------------------------------
+        # CALCULATE SCORE
+        # ----------------------------------------------------
+
         score = calculate_music_score_from_timelines(
             reference_timeline,
             user_timeline
         )
 
+
+        # ----------------------------------------------------
+        # RETURN RESULT
+        # ----------------------------------------------------
 
         return {
 
@@ -1602,6 +1964,15 @@ async def compare_song_voice(
 
             "overall_score":
                 score["overall_score"],
+
+            "ai_score":
+                score["ai_score"],
+
+            "rule_based_score":
+                score["rule_based_score"],
+
+            "ai_model":
+                score["ai_model"],
 
             "pitch_accuracy":
                 score["pitch_accuracy"],
@@ -1649,8 +2020,10 @@ async def compare_song_voice(
                 ),
 
             "prototype_note": (
-                "Pitch is compared using a "
-                "time-aware musical timeline."
+                "SkillSensAI uses a Random Forest "
+                "music-performance model together "
+                "with pitch, note, timing and stability "
+                "analysis."
             )
         }
 
@@ -1679,6 +2052,10 @@ async def compare_song_voice(
 
     finally:
 
+        # ----------------------------------------------------
+        # DELETE SONG
+        # ----------------------------------------------------
+
         if (
             song_path
             and
@@ -1695,6 +2072,10 @@ async def compare_song_voice(
 
                 pass
 
+
+        # ----------------------------------------------------
+        # DELETE VOICE
+        # ----------------------------------------------------
 
         if (
             voice_path
@@ -1748,6 +2129,15 @@ async def startup_event():
 
     print(
         "Time-aware pitch comparison: ACTIVE"
+    )
+
+    print(
+        "Music ML model: "
+        + (
+            "ACTIVE"
+            if music_model is not None
+            else "UNAVAILABLE"
+        )
     )
 
     print(
