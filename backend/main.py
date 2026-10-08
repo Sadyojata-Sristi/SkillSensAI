@@ -17,7 +17,7 @@ import imageio_ffmpeg
 app = FastAPI(
     title="SkillSensAI Backend",
     description="AI-powered skill learning backend for SkillSensAI",
-    version="1.0.0"
+    version="2.0.0"
 )
 
 
@@ -42,28 +42,34 @@ SAMPLE_RATE = 16000
 
 MAX_ANALYSIS_SECONDS = 20
 
-MAX_GRAPH_POINTS = 200
+MAX_GRAPH_POINTS = 250
+
+FRAME_LENGTH = 2048
+
+HOP_LENGTH = 512
 
 
 # ============================================================
-# BASIC ROOT ENDPOINT
+# ROOT
 # ============================================================
 
 @app.get("/")
 def root():
+
     return {
         "message": "SkillSensAI backend is running!",
         "status": "online",
-        "version": "1.0.0"
+        "version": "2.0.0"
     }
 
 
 # ============================================================
-# HEALTH CHECK
+# HEALTH
 # ============================================================
 
 @app.get("/health")
 def health():
+
     return {
         "success": True,
         "status": "healthy"
@@ -77,6 +83,7 @@ def health():
 def get_ffmpeg_path():
 
     try:
+
         return imageio_ffmpeg.get_ffmpeg_exe()
 
     except Exception as error:
@@ -87,7 +94,7 @@ def get_ffmpeg_path():
 
 
 # ============================================================
-# CONVERT UPLOAD TO WAV
+# CONVERT TO WAV
 # ============================================================
 
 def convert_to_wav(
@@ -167,9 +174,13 @@ def load_audio(file_path: str):
 
 # ============================================================
 # PITCH DETECTION
+#
+# Returns pitch for every time frame.
+#
+# 0 means that no reliable pitch was detected.
 # ============================================================
 
-def detect_pitch(
+def detect_pitch_timeline(
     audio,
     sample_rate
 ):
@@ -180,7 +191,13 @@ def detect_pitch(
     )
 
     if len(audio) == 0:
+
         return []
+
+
+    # --------------------------------------------------------
+    # NORMALIZE
+    # --------------------------------------------------------
 
     try:
 
@@ -192,6 +209,22 @@ def detect_pitch(
 
         pass
 
+
+    # --------------------------------------------------------
+    # REMOVE EXTREMELY QUIET SIGNALS
+    # --------------------------------------------------------
+
+    rms = librosa.feature.rms(
+        y=audio,
+        frame_length=FRAME_LENGTH,
+        hop_length=HOP_LENGTH
+    )[0]
+
+
+    # --------------------------------------------------------
+    # PITCH DETECTION
+    # --------------------------------------------------------
+
     try:
 
         pitch = librosa.yin(
@@ -199,82 +232,135 @@ def detect_pitch(
             fmin=librosa.note_to_hz("C2"),
             fmax=librosa.note_to_hz("C7"),
             sr=sample_rate,
-            frame_length=1024,
-            hop_length=1024
+            frame_length=FRAME_LENGTH,
+            hop_length=HOP_LENGTH
         )
 
     except Exception:
 
         return []
 
-    valid_pitch = []
 
-    for value in pitch:
+    timeline = []
+
+    for index, frequency in enumerate(pitch):
+
+        time = (
+            index
+            * HOP_LENGTH
+            / sample_rate
+        )
+
+        energy = (
+            float(rms[index])
+            if index < len(rms)
+            else 0.0
+        )
+
+
+        # ----------------------------------------------------
+        # Ignore very quiet frames
+        # ----------------------------------------------------
+
+        if energy < 0.01:
+
+            frequency = 0.0
+
 
         if (
-            np.isfinite(value)
-            and value > 0
+            not np.isfinite(frequency)
+            or frequency <= 0
         ):
 
-            valid_pitch.append(
-                float(value)
-            )
+            frequency = 0.0
 
-    return valid_pitch
+
+        timeline.append(
+            {
+                "time": round(
+                    float(time),
+                    4
+                ),
+
+                "frequency": round(
+                    float(frequency),
+                    2
+                ),
+
+                "note": frequency_to_note(
+                    frequency
+                ),
+
+                "confidence": round(
+                    min(
+                        energy * 20,
+                        1.0
+                    ),
+                    3
+                )
+            }
+        )
+
+
+    return timeline
 
 
 # ============================================================
-# REDUCE GRAPH POINTS
+# PITCH DETECTION
+# Compatibility helper
 # ============================================================
 
-def reduce_pitch_points(
-    pitch_data,
+def detect_pitch(
+    audio,
+    sample_rate
+):
+
+    timeline = detect_pitch_timeline(
+        audio,
+        sample_rate
+    )
+
+    return [
+        point["frequency"]
+        for point in timeline
+        if point["frequency"] > 0
+    ]
+
+
+# ============================================================
+# REDUCE TIMELINE
+# ============================================================
+
+def reduce_pitch_timeline(
+    timeline,
     max_points=MAX_GRAPH_POINTS
 ):
 
-    if not pitch_data:
+    if not timeline:
+
         return []
 
-    pitch_data = np.asarray(
-        pitch_data,
-        dtype=np.float32
-    )
 
-    if len(pitch_data) <= max_points:
+    if len(timeline) <= max_points:
 
-        return [
-            float(round(value, 2))
-            for value in pitch_data
-        ]
+        return timeline
 
-    reduced = []
 
-    chunks = np.array_split(
-        pitch_data,
+    indexes = np.linspace(
+        0,
+        len(timeline) - 1,
         max_points
-    )
+    ).astype(int)
 
-    for chunk in chunks:
 
-        if len(chunk) == 0:
-            continue
-
-        reduced.append(
-            float(
-                round(
-                    float(
-                        np.mean(chunk)
-                    ),
-                    2
-                )
-            )
-        )
-
-    return reduced
+    return [
+        timeline[index]
+        for index in indexes
+    ]
 
 
 # ============================================================
-# FREQUENCY → MUSICAL NOTE
+# FREQUENCY → NOTE
 # ============================================================
 
 def frequency_to_note(
@@ -282,13 +368,17 @@ def frequency_to_note(
 ):
 
     if frequency is None:
+
         return "Unknown"
 
     if not np.isfinite(frequency):
+
         return "Unknown"
 
     if frequency <= 0:
-        return "Unknown"
+
+        return "Silence"
+
 
     try:
 
@@ -303,6 +393,7 @@ def frequency_to_note(
         note_number = int(
             round(note_number)
         )
+
 
         note_names = [
             "C",
@@ -319,15 +410,19 @@ def frequency_to_note(
             "B"
         ]
 
+
         note_name = note_names[
             note_number % 12
         ]
+
 
         octave = (
             note_number // 12
         ) - 1
 
+
         return f"{note_name}{octave}"
+
 
     except Exception:
 
@@ -335,300 +430,492 @@ def frequency_to_note(
 
 
 # ============================================================
-# PITCH DATA FOR FRONTEND
+# CREATE GRAPH DATA
 # ============================================================
 
 def create_pitch_data(
-    pitch
+    timeline
 ):
 
-    reduced = reduce_pitch_points(
-        pitch,
+    reduced = reduce_pitch_timeline(
+        timeline,
         MAX_GRAPH_POINTS
     )
 
-    result = []
-
-    for frequency in reduced:
-
-        result.append(
-            {
-                "frequency": frequency,
-                "note": frequency_to_note(
-                    frequency
-                )
-            }
-        )
-
-    return result
+    return reduced
 
 
 # ============================================================
-# RESAMPLE PITCH
+# CENTS ERROR
+#
+# Positive = user is HIGH
+# Negative = user is LOW
 # ============================================================
 
-def resample_pitch(
-    pitch,
-    target_length
-):
-
-    if not pitch:
-
-        return np.array(
-            [],
-            dtype=np.float32
-        )
-
-    if target_length <= 0:
-
-        return np.array(
-            [],
-            dtype=np.float32
-        )
-
-    pitch = np.asarray(
-        pitch,
-        dtype=np.float32
-    )
-
-    if len(pitch) == target_length:
-
-        return pitch
-
-    if len(pitch) == 1:
-
-        return np.repeat(
-            pitch,
-            target_length
-        )
-
-    old_x = np.linspace(
-        0,
-        1,
-        len(pitch)
-    )
-
-    new_x = np.linspace(
-        0,
-        1,
-        target_length
-    )
-
-    return np.interp(
-        new_x,
-        old_x,
-        pitch
-    )
-
-
-# ============================================================
-# PITCH ERROR IN CENTS
-# ============================================================
-
-def calculate_cents_error(
-    reference,
-    user
-):
-
-    reference = np.asarray(
-        reference,
-        dtype=np.float32
-    )
-
-    user = np.asarray(
-        user,
-        dtype=np.float32
-    )
-
-    if (
-        len(reference) == 0
-        or len(user) == 0
-    ):
-
-        return np.array(
-            [],
-            dtype=np.float32
-        )
-
-    minimum_length = min(
-        len(reference),
-        len(user)
-    )
-
-    reference = reference[
-        :minimum_length
-    ]
-
-    user = user[
-        :minimum_length
-    ]
-
-    valid = (
-        (reference > 0)
-        &
-        (user > 0)
-        &
-        np.isfinite(reference)
-        &
-        np.isfinite(user)
-    )
-
-    reference = reference[valid]
-    user = user[valid]
-
-    if len(reference) == 0:
-
-        return np.array(
-            [],
-            dtype=np.float32
-        )
-
-    cents = (
-        1200
-        * np.log2(
-            user / reference
-        )
-    )
-
-    return cents
-
-
-# ============================================================
-# CALCULATE MUSIC SCORE
-# ============================================================
-
-def calculate_music_score(
+def calculate_cents(
     reference,
     user
 ):
 
     if (
-        len(reference) == 0
-        or len(user) == 0
+        reference <= 0
+        or user <= 0
     ):
 
-        return {
-            "overall_score": 0,
-            "pitch_accuracy": 0,
-            "note_match": 0,
-            "stability": 0,
-            "average_pitch_error_cents": 0,
-            "feedback": [
-                "We could not detect enough pitch from the recording."
-            ]
-        }
+        return None
 
-    target_length = min(
-        len(reference),
-        len(user),
-        MAX_GRAPH_POINTS
-    )
 
-    reference_resampled = resample_pitch(
-        reference,
-        target_length
-    )
+    try:
 
-    user_resampled = resample_pitch(
-        user,
-        target_length
-    )
-
-    cents_error = calculate_cents_error(
-        reference_resampled,
-        user_resampled
-    )
-
-    if len(cents_error) == 0:
-
-        return {
-            "overall_score": 0,
-            "pitch_accuracy": 0,
-            "note_match": 0,
-            "stability": 0,
-            "average_pitch_error_cents": 0,
-            "feedback": [
-                "Your recording did not contain enough detectable pitch."
-            ]
-        }
-
-    absolute_error = np.abs(
-        cents_error
-    )
-
-    average_error = float(
-        np.mean(absolute_error)
-    )
-
-    # --------------------------------------------------------
-    # PITCH ACCURACY
-    # --------------------------------------------------------
-
-    pitch_accuracy = (
-        100
-        * np.mean(
-            np.exp(
-                -absolute_error / 100.0
+        return float(
+            1200
+            * np.log2(
+                user / reference
             )
         )
+
+    except Exception:
+
+        return None
+
+
+# ============================================================
+# PITCH ACCURACY FROM CENTS
+# ============================================================
+
+def cents_to_accuracy(
+    cents
+):
+
+    if cents is None:
+
+        return 0.0
+
+
+    absolute_error = abs(
+        cents
     )
 
-    pitch_accuracy = float(
+
+    # Very forgiving musical tolerance.
+    #
+    # 0 cents   = 100
+    # 25 cents  ≈ excellent
+    # 50 cents  ≈ good
+    # 100 cents ≈ one semitone
+    # 200 cents ≈ two semitones
+
+    accuracy = (
+        100
+        * np.exp(
+            -absolute_error / 100.0
+        )
+    )
+
+
+    return float(
         np.clip(
-            pitch_accuracy,
+            accuracy,
             0,
             100
         )
     )
 
+
+# ============================================================
+# TIME ALIGNMENT
+#
+# Instead of comparing array positions, compare the
+# reference and user recordings across normalized time.
+# ============================================================
+
+def interpolate_timeline(
+    timeline,
+    target_times
+):
+
+    if not timeline:
+
+        return np.zeros(
+            len(target_times),
+            dtype=np.float32
+        )
+
+
+    valid = [
+        point
+        for point in timeline
+        if point["frequency"] > 0
+    ]
+
+
+    if not valid:
+
+        return np.zeros(
+            len(target_times),
+            dtype=np.float32
+        )
+
+
+    source_times = np.array(
+        [
+            point["time"]
+            for point in valid
+        ],
+        dtype=np.float32
+    )
+
+
+    source_pitch = np.array(
+        [
+            point["frequency"]
+            for point in valid
+        ],
+        dtype=np.float32
+    )
+
+
+    if len(source_pitch) == 1:
+
+        return np.repeat(
+            source_pitch[0],
+            len(target_times)
+        )
+
+
+    return np.interp(
+        target_times,
+        source_times,
+        source_pitch
+    )
+
+
+# ============================================================
+# SCORE REFERENCE + USER
+# ============================================================
+
+def calculate_music_score_from_timelines(
+    reference_timeline,
+    user_timeline
+):
+
+    reference_valid = [
+        point
+        for point in reference_timeline
+        if point["frequency"] > 0
+    ]
+
+
+    user_valid = [
+        point
+        for point in user_timeline
+        if point["frequency"] > 0
+    ]
+
+
+    if not reference_valid:
+
+        return {
+            "overall_score": 0,
+            "pitch_accuracy": 0,
+            "note_match": 0,
+            "timing_accuracy": 0,
+            "stability": 0,
+            "average_pitch_error_cents": 0,
+            "feedback": [
+                "The reference song did not contain enough detectable melody."
+            ]
+        }
+
+
+    if not user_valid:
+
+        return {
+            "overall_score": 0,
+            "pitch_accuracy": 0,
+            "note_match": 0,
+            "timing_accuracy": 0,
+            "stability": 0,
+            "average_pitch_error_cents": 0,
+            "feedback": [
+                "We could not detect enough singing from your recording."
+            ]
+        }
+
+
+    # --------------------------------------------------------
+    # NORMALIZED TIME
+    # --------------------------------------------------------
+
+    reference_duration = max(
+        point["time"]
+        for point in reference_valid
+    )
+
+
+    user_duration = max(
+        point["time"]
+        for point in user_valid
+    )
+
+
+    if reference_duration <= 0:
+        reference_duration = 1
+
+
+    if user_duration <= 0:
+        user_duration = 1
+
+
+    comparison_duration = min(
+        reference_duration,
+        user_duration
+    )
+
+
+    sample_count = min(
+        MAX_GRAPH_POINTS,
+        max(
+            50,
+            int(
+                comparison_duration * 20
+            )
+        )
+    )
+
+
+    target_times = np.linspace(
+        0,
+        comparison_duration,
+        sample_count
+    )
+
+
+    reference_pitch = interpolate_timeline(
+        reference_timeline,
+        target_times
+    )
+
+
+    user_normalized_times = (
+        np.array(
+            [
+                point["time"]
+                for point in user_valid
+            ],
+            dtype=np.float32
+        )
+        / user_duration
+        * comparison_duration
+    )
+
+
+    user_pitch_values = np.array(
+        [
+            point["frequency"]
+            for point in user_valid
+        ],
+        dtype=np.float32
+    )
+
+
+    if len(user_pitch_values) > 1:
+
+        user_pitch = np.interp(
+            target_times,
+            user_normalized_times,
+            user_pitch_values
+        )
+
+    else:
+
+        user_pitch = np.repeat(
+            user_pitch_values[0],
+            len(target_times)
+        )
+
+
+    # --------------------------------------------------------
+    # CENTS
+    # --------------------------------------------------------
+
+    cents_errors = []
+
+    valid_indexes = []
+
+
+    for index in range(
+        len(target_times)
+    ):
+
+        reference_value = (
+            reference_pitch[index]
+        )
+
+        user_value = (
+            user_pitch[index]
+        )
+
+
+        cents = calculate_cents(
+            reference_value,
+            user_value
+        )
+
+
+        if cents is None:
+            continue
+
+
+        cents_errors.append(
+            cents
+        )
+
+        valid_indexes.append(
+            index
+        )
+
+
+    if not cents_errors:
+
+        return {
+            "overall_score": 0,
+            "pitch_accuracy": 0,
+            "note_match": 0,
+            "timing_accuracy": 0,
+            "stability": 0,
+            "average_pitch_error_cents": 0,
+            "feedback": [
+                "Not enough matching pitch information was found."
+            ]
+        }
+
+
+    cents_errors = np.asarray(
+        cents_errors,
+        dtype=np.float32
+    )
+
+
+    absolute_errors = np.abs(
+        cents_errors
+    )
+
+
+    # --------------------------------------------------------
+    # PITCH ACCURACY
+    # --------------------------------------------------------
+
+    pitch_accuracy = float(
+        np.mean(
+            np.exp(
+                -absolute_errors / 100.0
+            )
+        )
+        * 100
+    )
+
+
     # --------------------------------------------------------
     # NOTE MATCH
     #
-    # Within 50 cents = reasonably close to reference note.
+    # 50 cents = same musical note region.
+    # 80 cents = still reasonably close.
     # --------------------------------------------------------
 
     note_match = float(
         np.mean(
-            absolute_error <= 50
+            absolute_errors <= 50
         )
         * 100
     )
+
+
+    # --------------------------------------------------------
+    # TIMING ACCURACY
+    #
+    # Approximation based on how much usable singing overlaps
+    # the reference melody.
+    # --------------------------------------------------------
+
+    reference_active = np.array(
+        [
+            reference_pitch[index] > 0
+            for index in range(
+                len(reference_pitch)
+            )
+        ]
+    )
+
+
+    user_active = np.array(
+        [
+            user_pitch[index] > 0
+            for index in range(
+                len(user_pitch)
+            )
+        ]
+    )
+
+
+    if np.any(reference_active):
+
+        overlap = np.mean(
+            user_active[
+                reference_active
+            ]
+        )
+
+        timing_accuracy = float(
+            overlap * 100
+        )
+
+    else:
+
+        timing_accuracy = 0.0
+
 
     # --------------------------------------------------------
     # STABILITY
     # --------------------------------------------------------
 
-    if len(user_resampled) > 1:
+    if len(user_pitch) > 2:
 
         user_changes = np.diff(
-            user_resampled
+            user_pitch
         )
 
         user_variation = float(
-            np.std(user_changes)
+            np.std(
+                user_changes
+            )
         )
 
     else:
 
         user_variation = 0.0
 
-    if len(reference_resampled) > 1:
+
+    if len(reference_pitch) > 2:
 
         reference_changes = np.diff(
-            reference_resampled
+            reference_pitch
         )
 
         reference_variation = float(
-            np.std(reference_changes)
+            np.std(
+                reference_changes
+            )
         )
 
     else:
 
         reference_variation = 0.0
 
+
     if reference_variation > 0:
 
-        stability_difference = (
+        variation_difference = (
             abs(
                 user_variation
                 - reference_variation
@@ -639,13 +926,14 @@ def calculate_music_score(
         stability = (
             100
             * np.exp(
-                -stability_difference
+                -variation_difference
             )
         )
 
     else:
 
         stability = 100.0
+
 
     stability = float(
         np.clip(
@@ -655,15 +943,18 @@ def calculate_music_score(
         )
     )
 
+
     # --------------------------------------------------------
     # OVERALL SCORE
     # --------------------------------------------------------
 
     overall_score = (
-        pitch_accuracy * 0.55
-        + note_match * 0.30
-        + stability * 0.15
+        pitch_accuracy * 0.50
+        + note_match * 0.25
+        + timing_accuracy * 0.15
+        + stability * 0.10
     )
+
 
     overall_score = float(
         np.clip(
@@ -673,25 +964,27 @@ def calculate_music_score(
         )
     )
 
+
     # --------------------------------------------------------
     # FEEDBACK
     # --------------------------------------------------------
 
     feedback = []
 
-    if pitch_accuracy >= 85:
+
+    if pitch_accuracy >= 90:
 
         feedback.append(
-            "Excellent pitch matching."
+            "Excellent pitch control."
         )
 
-    elif pitch_accuracy >= 70:
+    elif pitch_accuracy >= 75:
 
         feedback.append(
-            "Good pitch control. Keep practising."
+            "Good pitch control with only small corrections needed."
         )
 
-    elif pitch_accuracy >= 50:
+    elif pitch_accuracy >= 55:
 
         feedback.append(
             "Your pitch is developing. Practise slowly with the reference."
@@ -700,46 +993,82 @@ def calculate_music_score(
     else:
 
         feedback.append(
-            "Try singing more slowly and focus on matching the reference pitch."
+            "Focus on matching the reference note before increasing speed."
         )
 
-    if note_match >= 80:
+
+    if note_match >= 85:
 
         feedback.append(
-            "Most of your notes are close to the reference."
+            "Most of your notes matched the reference closely."
         )
 
-    elif note_match >= 60:
+    elif note_match >= 65:
 
         feedback.append(
-            "Several notes are close, but some need pitch correction."
+            "Several notes matched, but some need pitch correction."
         )
 
     else:
 
         feedback.append(
-            "Work on matching each note before increasing singing speed."
+            "Try holding each note and matching its pitch carefully."
         )
 
-    if average_error <= 30:
+
+    if timing_accuracy >= 85:
 
         feedback.append(
-            "Your average pitch difference is very small."
+            "Your singing timing follows the reference well."
         )
 
-    elif average_error <= 70:
+    elif timing_accuracy >= 65:
 
         feedback.append(
-            "Your average pitch difference is moderate."
+            "Your timing is fairly good, but some sections need better alignment."
         )
 
     else:
 
         feedback.append(
-            "There is a noticeable pitch difference from the reference."
+            "Try following the reference rhythm and entering each phrase at the correct time."
         )
+
+
+    average_error = float(
+        np.mean(
+            absolute_errors
+        )
+    )
+
+
+    if average_error <= 25:
+
+        feedback.append(
+            "Your average pitch error is very small."
+        )
+
+    elif average_error <= 50:
+
+        feedback.append(
+            "Your average pitch error is within a good musical range."
+        )
+
+    elif average_error <= 100:
+
+        feedback.append(
+            "Some notes are noticeably sharp or flat."
+        )
+
+    else:
+
+        feedback.append(
+            "Several notes are significantly different from the reference."
+        )
+
 
     return {
+
         "overall_score": round(
             overall_score,
             2
@@ -755,6 +1084,11 @@ def calculate_music_score(
             2
         ),
 
+        "timing_accuracy": round(
+            timing_accuracy,
+            2
+        ),
+
         "stability": round(
             stability,
             2
@@ -765,12 +1099,36 @@ def calculate_music_score(
             2
         ),
 
-        "feedback": feedback
+        "feedback": feedback,
+
+        "reference_pitch": [
+            round(
+                float(value),
+                2
+            )
+            for value in reference_pitch
+        ],
+
+        "user_pitch": [
+            round(
+                float(value),
+                2
+            )
+            for value in user_pitch
+        ],
+
+        "comparison_times": [
+            round(
+                float(value),
+                3
+            )
+            for value in target_times
+        ]
     }
 
 
 # ============================================================
-# SAVE UPLOADED FILE
+# SAVE UPLOAD
 # ============================================================
 
 async def save_upload(
@@ -787,12 +1145,14 @@ async def save_upload(
 
         suffix = extension
 
+
     temporary_file = tempfile.NamedTemporaryFile(
         suffix=suffix,
         delete=False
     )
 
     file_path = temporary_file.name
+
 
     try:
 
@@ -809,16 +1169,21 @@ async def save_upload(
                 chunk
             )
 
+
         temporary_file.close()
 
         return file_path
+
 
     except Exception:
 
         temporary_file.close()
 
         if os.path.exists(file_path):
-            os.remove(file_path)
+
+            os.remove(
+                file_path
+            )
 
         raise
 
@@ -834,6 +1199,7 @@ async def analyze_song(
 
     file_path = None
 
+
     try:
 
         if not file.filename:
@@ -843,13 +1209,16 @@ async def analyze_song(
                 detail="No song file was selected."
             )
 
+
         file_path = await save_upload(
             file
         )
 
+
         audio, sample_rate = load_audio(
             file_path
         )
+
 
         if len(audio) == 0:
 
@@ -858,12 +1227,21 @@ async def analyze_song(
                 detail="The uploaded song contains no readable audio."
             )
 
-        pitch = detect_pitch(
+
+        timeline = detect_pitch_timeline(
             audio,
             sample_rate
         )
 
-        if len(pitch) == 0:
+
+        valid_pitch = [
+            point
+            for point in timeline
+            if point["frequency"] > 0
+        ]
+
+
+        if not valid_pitch:
 
             raise HTTPException(
                 status_code=400,
@@ -873,16 +1251,20 @@ async def analyze_song(
                 )
             )
 
+
         pitch_data = create_pitch_data(
-            pitch
+            timeline
         )
+
 
         duration = min(
             len(audio) / sample_rate,
             MAX_ANALYSIS_SECONDS
         )
 
+
         return {
+
             "success": True,
 
             "filename": file.filename,
@@ -893,20 +1275,22 @@ async def analyze_song(
             ),
 
             "total_pitch_points": len(
-                pitch
+                valid_pitch
             ),
 
             "pitch_data": pitch_data,
 
             "prototype_note": (
-                "The prototype currently analyses "
-                "the first 20 seconds of the uploaded song."
+                "The first 20 seconds are analysed. "
+                "Pitch points contain real time information."
             )
         }
+
 
     except HTTPException:
 
         raise
+
 
     except Exception as error:
 
@@ -915,6 +1299,7 @@ async def analyze_song(
             str(error)
         )
 
+
         raise HTTPException(
             status_code=500,
             detail=(
@@ -922,6 +1307,7 @@ async def analyze_song(
                 + str(error)
             )
         )
+
 
     finally:
 
@@ -932,8 +1318,13 @@ async def analyze_song(
         ):
 
             try:
-                os.remove(file_path)
+
+                os.remove(
+                    file_path
+                )
+
             except Exception:
+
                 pass
 
 
@@ -948,6 +1339,7 @@ async def analyze_voice(
 
     file_path = None
 
+
     try:
 
         if not file.filename:
@@ -957,13 +1349,16 @@ async def analyze_voice(
                 detail="No voice recording was selected."
             )
 
+
         file_path = await save_upload(
             file
         )
 
+
         audio, sample_rate = load_audio(
             file_path
         )
+
 
         if len(audio) == 0:
 
@@ -972,12 +1367,21 @@ async def analyze_voice(
                 detail="The recording contains no readable audio."
             )
 
-        pitch = detect_pitch(
+
+        timeline = detect_pitch_timeline(
             audio,
             sample_rate
         )
 
-        if len(pitch) == 0:
+
+        valid_pitch = [
+            point["frequency"]
+            for point in timeline
+            if point["frequency"] > 0
+        ]
+
+
+        if not valid_pitch:
 
             raise HTTPException(
                 status_code=400,
@@ -988,61 +1392,59 @@ async def analyze_voice(
                 )
             )
 
-        pitch_points = reduce_pitch_points(
-            pitch,
-            MAX_GRAPH_POINTS
-        )
 
         pitch_array = np.asarray(
-            pitch,
+            valid_pitch,
             dtype=np.float32
         )
 
-        average_pitch = float(
-            np.mean(pitch_array)
-        )
-
-        minimum_pitch = float(
-            np.min(pitch_array)
-        )
-
-        maximum_pitch = float(
-            np.max(pitch_array)
-        )
 
         return {
+
             "success": True,
 
-            "pitch": pitch_points,
+            "pitch_data":
+                create_pitch_data(
+                    timeline
+                ),
 
             "average_pitch": round(
-                average_pitch,
+                float(
+                    np.mean(
+                        pitch_array
+                    )
+                ),
                 2
             ),
 
             "minimum_pitch": round(
-                minimum_pitch,
+                float(
+                    np.min(
+                        pitch_array
+                    )
+                ),
                 2
             ),
 
             "maximum_pitch": round(
-                maximum_pitch,
+                float(
+                    np.max(
+                        pitch_array
+                    )
+                ),
                 2
             ),
 
             "total_pitch_points": len(
-                pitch
-            ),
-
-            "prototype_note": (
-                "This endpoint detects the pitch "
-                "of the uploaded voice recording."
+                valid_pitch
             )
         }
+
 
     except HTTPException:
 
         raise
+
 
     except Exception as error:
 
@@ -1051,6 +1453,7 @@ async def analyze_voice(
             str(error)
         )
 
+
         raise HTTPException(
             status_code=500,
             detail=(
@@ -1058,6 +1461,7 @@ async def analyze_voice(
                 + str(error)
             )
         )
+
 
     finally:
 
@@ -1068,8 +1472,13 @@ async def analyze_voice(
         ):
 
             try:
-                os.remove(file_path)
+
+                os.remove(
+                    file_path
+                )
+
             except Exception:
+
                 pass
 
 
@@ -1086,6 +1495,7 @@ async def compare_song_voice(
     song_path = None
     voice_path = None
 
+
     try:
 
         if not song.filename:
@@ -1095,6 +1505,7 @@ async def compare_song_voice(
                 detail="No song file was provided."
             )
 
+
         if not voice.filename:
 
             raise HTTPException(
@@ -1102,33 +1513,26 @@ async def compare_song_voice(
                 detail="No voice recording was provided."
             )
 
-        # ----------------------------------------------------
-        # SAVE FILES
-        # ----------------------------------------------------
 
         song_path = await save_upload(
             song
         )
 
+
         voice_path = await save_upload(
             voice
         )
 
-        # ----------------------------------------------------
-        # LOAD SONG
-        # ----------------------------------------------------
 
         song_audio, song_sample_rate = load_audio(
             song_path
         )
 
-        # ----------------------------------------------------
-        # LOAD USER VOICE
-        # ----------------------------------------------------
 
         voice_audio, voice_sample_rate = load_audio(
             voice_path
         )
+
 
         if len(song_audio) == 0:
 
@@ -1137,6 +1541,7 @@ async def compare_song_voice(
                 detail="The uploaded song contains no readable audio."
             )
 
+
         if len(voice_audio) == 0:
 
             raise HTTPException(
@@ -1144,25 +1549,23 @@ async def compare_song_voice(
                 detail="The voice recording contains no readable audio."
             )
 
-        # ----------------------------------------------------
-        # DETECT REFERENCE PITCH
-        # ----------------------------------------------------
 
-        reference_pitch = detect_pitch(
+        reference_timeline = detect_pitch_timeline(
             song_audio,
             song_sample_rate
         )
 
-        # ----------------------------------------------------
-        # DETECT USER PITCH
-        # ----------------------------------------------------
 
-        user_pitch = detect_pitch(
+        user_timeline = detect_pitch_timeline(
             voice_audio,
             voice_sample_rate
         )
 
-        if len(reference_pitch) == 0:
+
+        if not any(
+            point["frequency"] > 0
+            for point in reference_timeline
+        ):
 
             raise HTTPException(
                 status_code=400,
@@ -1172,7 +1575,11 @@ async def compare_song_voice(
                 )
             )
 
-        if len(user_pitch) == 0:
+
+        if not any(
+            point["frequency"] > 0
+            for point in user_timeline
+        ):
 
             raise HTTPException(
                 status_code=400,
@@ -1182,34 +1589,15 @@ async def compare_song_voice(
                 )
             )
 
-        # ----------------------------------------------------
-        # REDUCE DATA
-        # ----------------------------------------------------
 
-        reference_points = reduce_pitch_points(
-            reference_pitch,
-            MAX_GRAPH_POINTS
+        score = calculate_music_score_from_timelines(
+            reference_timeline,
+            user_timeline
         )
 
-        user_points = reduce_pitch_points(
-            user_pitch,
-            MAX_GRAPH_POINTS
-        )
-
-        # ----------------------------------------------------
-        # CALCULATE SCORE
-        # ----------------------------------------------------
-
-        score = calculate_music_score(
-            reference_points,
-            user_points
-        )
-
-        # ----------------------------------------------------
-        # FINAL RESPONSE
-        # ----------------------------------------------------
 
         return {
+
             "success": True,
 
             "overall_score":
@@ -1221,6 +1609,9 @@ async def compare_song_voice(
             "note_match":
                 score["note_match"],
 
+            "timing_accuracy":
+                score["timing_accuracy"],
+
             "stability":
                 score["stability"],
 
@@ -1229,35 +1620,45 @@ async def compare_song_voice(
                     "average_pitch_error_cents"
                 ],
 
-            "reference_pitch": [
-                round(
-                    float(value),
-                    2
-                )
-                for value in reference_points
-            ],
+            "reference_pitch":
+                score[
+                    "reference_pitch"
+                ],
 
-            "user_pitch": [
-                round(
-                    float(value),
-                    2
-                )
-                for value in user_points
-            ],
+            "user_pitch":
+                score[
+                    "user_pitch"
+                ],
+
+            "comparison_times":
+                score[
+                    "comparison_times"
+                ],
 
             "feedback":
                 score["feedback"],
 
+            "reference_timeline":
+                reduce_pitch_timeline(
+                    reference_timeline
+                ),
+
+            "user_timeline":
+                reduce_pitch_timeline(
+                    user_timeline
+                ),
+
             "prototype_note": (
-                "The prototype compares pitch "
-                "sequences from the first 20 seconds "
-                "of the reference song and voice recording."
+                "Pitch is compared using a "
+                "time-aware musical timeline."
             )
         }
+
 
     except HTTPException:
 
         raise
+
 
     except Exception as error:
 
@@ -1266,6 +1667,7 @@ async def compare_song_voice(
             str(error)
         )
 
+
         raise HTTPException(
             status_code=500,
             detail=(
@@ -1273,6 +1675,7 @@ async def compare_song_voice(
                 + str(error)
             )
         )
+
 
     finally:
 
@@ -1283,9 +1686,15 @@ async def compare_song_voice(
         ):
 
             try:
-                os.remove(song_path)
+
+                os.remove(
+                    song_path
+                )
+
             except Exception:
+
                 pass
+
 
         if (
             voice_path
@@ -1294,13 +1703,18 @@ async def compare_song_voice(
         ):
 
             try:
-                os.remove(voice_path)
+
+                os.remove(
+                    voice_path
+                )
+
             except Exception:
+
                 pass
 
 
 # ============================================================
-# STARTUP MESSAGE
+# STARTUP
 # ============================================================
 
 @app.on_event("startup")
@@ -1315,6 +1729,10 @@ async def startup_event():
     )
 
     print(
+        "Music analysis engine: ACTIVE"
+    )
+
+    print(
         f"Sample rate: {SAMPLE_RATE} Hz"
     )
 
@@ -1326,6 +1744,10 @@ async def startup_event():
     print(
         f"Maximum graph points: "
         f"{MAX_GRAPH_POINTS}"
+    )
+
+    print(
+        "Time-aware pitch comparison: ACTIVE"
     )
 
     print(
