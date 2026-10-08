@@ -4,7 +4,6 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 import tempfile
 import subprocess
-import shutil
 
 import numpy as np
 import librosa
@@ -41,12 +40,8 @@ app.add_middleware(
 
 SAMPLE_RATE = 16000
 
-# Maximum audio analyzed per request.
-# Keeping this at 20 seconds makes Render deployment
-# significantly faster than analyzing the entire song.
 MAX_ANALYSIS_SECONDS = 20
 
-# Maximum number of points returned to the frontend graph.
 MAX_GRAPH_POINTS = 200
 
 
@@ -80,14 +75,12 @@ def health():
 # ============================================================
 
 def get_ffmpeg_path():
-    """
-    Get the FFmpeg executable bundled/provided by
-    imageio-ffmpeg.
-    """
 
     try:
         return imageio_ffmpeg.get_ffmpeg_exe()
+
     except Exception as error:
+
         raise RuntimeError(
             f"FFmpeg could not be found: {str(error)}"
         )
@@ -97,35 +90,25 @@ def get_ffmpeg_path():
 # CONVERT UPLOAD TO WAV
 # ============================================================
 
-def convert_to_wav(input_path: str, output_path: str):
-    """
-    Convert uploaded audio/video into mono 16 kHz WAV.
-
-    This allows MP3, M4A, WebM, WAV and other formats
-    supported by FFmpeg to be processed consistently.
-    """
+def convert_to_wav(
+    input_path: str,
+    output_path: str
+):
 
     ffmpeg_path = get_ffmpeg_path()
 
     command = [
         ffmpeg_path,
-
         "-y",
-
         "-i",
         input_path,
-
         "-vn",
-
         "-ac",
         "1",
-
         "-ar",
         str(SAMPLE_RATE),
-
         "-sample_fmt",
         "s16",
-
         output_path
     ]
 
@@ -137,6 +120,7 @@ def convert_to_wav(input_path: str, output_path: str):
     )
 
     if result.returncode != 0:
+
         raise RuntimeError(
             "FFmpeg conversion failed:\n"
             + result.stderr[-2000:]
@@ -148,10 +132,6 @@ def convert_to_wav(input_path: str, output_path: str):
 # ============================================================
 
 def load_audio(file_path: str):
-    """
-    Convert file to WAV and load only the first
-    MAX_ANALYSIS_SECONDS seconds.
-    """
 
     temporary_wav = tempfile.NamedTemporaryFile(
         suffix=".wav",
@@ -181,6 +161,7 @@ def load_audio(file_path: str):
     finally:
 
         if os.path.exists(wav_path):
+
             os.remove(wav_path)
 
 
@@ -188,15 +169,10 @@ def load_audio(file_path: str):
 # PITCH DETECTION
 # ============================================================
 
-def detect_pitch(audio, sample_rate):
-    """
-    Detect fundamental frequency using librosa.yin().
-
-    Returns a list of valid frequency values in Hz.
-
-    Higher frequency = higher pitch
-    Lower frequency = lower pitch
-    """
+def detect_pitch(
+    audio,
+    sample_rate
+):
 
     audio = np.asarray(
         audio,
@@ -206,36 +182,39 @@ def detect_pitch(audio, sample_rate):
     if len(audio) == 0:
         return []
 
-    # Normalize audio.
     try:
-        audio = librosa.util.normalize(audio)
+
+        audio = librosa.util.normalize(
+            audio
+        )
+
     except Exception:
+
         pass
 
     try:
 
         pitch = librosa.yin(
             audio,
-
             fmin=librosa.note_to_hz("C2"),
-
             fmax=librosa.note_to_hz("C7"),
-
             sr=sample_rate,
-
             frame_length=1024,
-
             hop_length=1024
         )
 
     except Exception:
+
         return []
 
     valid_pitch = []
 
     for value in pitch:
 
-        if np.isfinite(value):
+        if (
+            np.isfinite(value)
+            and value > 0
+        ):
 
             valid_pitch.append(
                 float(value)
@@ -252,12 +231,6 @@ def reduce_pitch_points(
     pitch_data,
     max_points=MAX_GRAPH_POINTS
 ):
-    """
-    Reduce pitch data so the frontend does not receive
-    thousands of unnecessary graph points.
-
-    Average values inside each segment.
-    """
 
     if not pitch_data:
         return []
@@ -289,7 +262,9 @@ def reduce_pitch_points(
         reduced.append(
             float(
                 round(
-                    float(np.mean(chunk)),
+                    float(
+                        np.mean(chunk)
+                    ),
                     2
                 )
             )
@@ -302,10 +277,9 @@ def reduce_pitch_points(
 # FREQUENCY → MUSICAL NOTE
 # ============================================================
 
-def frequency_to_note(frequency):
-    """
-    Convert frequency in Hz to a musical note name.
-    """
+def frequency_to_note(
+    frequency
+):
 
     if frequency is None:
         return "Unknown"
@@ -319,7 +293,10 @@ def frequency_to_note(frequency):
     try:
 
         note_number = (
-            12 * np.log2(frequency / 440.0)
+            12
+            * np.log2(
+                frequency / 440.0
+            )
             + 69
         )
 
@@ -353,6 +330,7 @@ def frequency_to_note(frequency):
         return f"{note_name}{octave}"
 
     except Exception:
+
         return "Unknown"
 
 
@@ -360,18 +338,9 @@ def frequency_to_note(frequency):
 # PITCH DATA FOR FRONTEND
 # ============================================================
 
-def create_pitch_data(pitch):
-    """
-    Convert pitch frequencies into objects that the
-    frontend can use for its graph.
-
-    Example:
-
-    {
-        "frequency": 440.0,
-        "note": "A4"
-    }
-    """
+def create_pitch_data(
+    pitch
+):
 
     reduced = reduce_pitch_points(
         pitch,
@@ -395,25 +364,23 @@ def create_pitch_data(pitch):
 
 
 # ============================================================
-# RESAMPLE PITCH DATA
+# RESAMPLE PITCH
 # ============================================================
 
 def resample_pitch(
     pitch,
     target_length
 ):
-    """
-    Resize pitch sequence to a common length
-    so reference and user pitch can be compared.
-    """
 
     if not pitch:
+
         return np.array(
             [],
             dtype=np.float32
         )
 
     if target_length <= 0:
+
         return np.array(
             [],
             dtype=np.float32
@@ -425,6 +392,7 @@ def resample_pitch(
     )
 
     if len(pitch) == target_length:
+
         return pitch
 
     if len(pitch) == 1:
@@ -461,13 +429,6 @@ def calculate_cents_error(
     reference,
     user
 ):
-    """
-    Calculate pitch difference in cents.
-
-    100 cents = 1 semitone.
-
-    This uses the ratio between the two frequencies.
-    """
 
     reference = np.asarray(
         reference,
@@ -483,6 +444,7 @@ def calculate_cents_error(
         len(reference) == 0
         or len(user) == 0
     ):
+
         return np.array(
             [],
             dtype=np.float32
@@ -515,6 +477,7 @@ def calculate_cents_error(
     user = user[valid]
 
     if len(reference) == 0:
+
         return np.array(
             [],
             dtype=np.float32
@@ -522,8 +485,7 @@ def calculate_cents_error(
 
     cents = (
         1200
-        *
-        np.log2(
+        * np.log2(
             user / reference
         )
     )
@@ -539,18 +501,12 @@ def calculate_music_score(
     reference,
     user
 ):
-    """
-    Calculate prototype singing accuracy.
-
-    The comparison is based on pitch distance.
-
-    Smaller pitch error = higher accuracy.
-    """
 
     if (
         len(reference) == 0
         or len(user) == 0
     ):
+
         return {
             "overall_score": 0,
             "pitch_accuracy": 0,
@@ -605,16 +561,12 @@ def calculate_music_score(
     )
 
     # --------------------------------------------------------
-    # Pitch accuracy
-    #
-    # 0 cents = perfect match.
-    # The score gradually decreases as pitch error grows.
+    # PITCH ACCURACY
     # --------------------------------------------------------
 
     pitch_accuracy = (
         100
-        *
-        np.mean(
+        * np.mean(
             np.exp(
                 -absolute_error / 100.0
             )
@@ -630,9 +582,9 @@ def calculate_music_score(
     )
 
     # --------------------------------------------------------
-    # Note match
+    # NOTE MATCH
     #
-    # Count how many frames are within 50 cents.
+    # Within 50 cents = reasonably close to reference note.
     # --------------------------------------------------------
 
     note_match = float(
@@ -643,10 +595,7 @@ def calculate_music_score(
     )
 
     # --------------------------------------------------------
-    # Stability
-    #
-    # Measures how much the user's pitch changes
-    # relative to the reference.
+    # STABILITY
     # --------------------------------------------------------
 
     if len(user_resampled) > 1:
@@ -682,17 +631,14 @@ def calculate_music_score(
         stability_difference = (
             abs(
                 user_variation
-                -
-                reference_variation
+                - reference_variation
             )
-            /
-            reference_variation
+            / reference_variation
         )
 
         stability = (
             100
-            *
-            np.exp(
+            * np.exp(
                 -stability_difference
             )
         )
@@ -710,15 +656,13 @@ def calculate_music_score(
     )
 
     # --------------------------------------------------------
-    # Overall score
+    # OVERALL SCORE
     # --------------------------------------------------------
 
     overall_score = (
         pitch_accuracy * 0.55
-        +
-        note_match * 0.30
-        +
-        stability * 0.15
+        + note_match * 0.30
+        + stability * 0.15
     )
 
     overall_score = float(
@@ -730,7 +674,7 @@ def calculate_music_score(
     )
 
     # --------------------------------------------------------
-    # Feedback
+    # FEEDBACK
     # --------------------------------------------------------
 
     feedback = []
@@ -832,9 +776,6 @@ def calculate_music_score(
 async def save_upload(
     uploaded_file: UploadFile
 ):
-    """
-    Save an uploaded file to a temporary location.
-    """
 
     suffix = ""
 
@@ -890,11 +831,6 @@ async def save_upload(
 async def analyze_song(
     file: UploadFile = File(...)
 ):
-    """
-    Upload a song and extract its pitch.
-
-    Returns pitch_data for the frontend graph.
-    """
 
     file_path = None
 
@@ -969,6 +905,7 @@ async def analyze_song(
         }
 
     except HTTPException:
+
         raise
 
     except Exception as error:
@@ -1008,11 +945,6 @@ async def analyze_song(
 async def analyze_voice(
     file: UploadFile = File(...)
 ):
-    """
-    Analyze a user's voice recording independently.
-
-    Used by Learn From Scratch.
-    """
 
     file_path = None
 
@@ -1061,7 +993,6 @@ async def analyze_voice(
             MAX_GRAPH_POINTS
         )
 
-        # Basic prototype statistics.
         pitch_array = np.asarray(
             pitch,
             dtype=np.float32
@@ -1110,6 +1041,7 @@ async def analyze_voice(
         }
 
     except HTTPException:
+
         raise
 
     except Exception as error:
@@ -1150,20 +1082,6 @@ async def compare_song_voice(
     song: UploadFile = File(...),
     voice: UploadFile = File(...)
 ):
-    """
-    Compare the uploaded song's pitch with the
-    user's voice pitch.
-
-    Returns:
-        - overall score
-        - pitch accuracy
-        - note match
-        - stability
-        - average pitch error
-        - reference pitch points
-        - user pitch points
-        - feedback
-    """
 
     song_path = None
     voice_path = None
@@ -1227,7 +1145,7 @@ async def compare_song_voice(
             )
 
         # ----------------------------------------------------
-        # DETECT REFERENCE SONG PITCH
+        # DETECT REFERENCE PITCH
         # ----------------------------------------------------
 
         reference_pitch = detect_pitch(
@@ -1265,7 +1183,7 @@ async def compare_song_voice(
             )
 
         # ----------------------------------------------------
-        # REDUCE DATA FOR FRONTEND
+        # REDUCE DATA
         # ----------------------------------------------------
 
         reference_points = reduce_pitch_points(
@@ -1311,10 +1229,6 @@ async def compare_song_voice(
                     "average_pitch_error_cents"
                 ],
 
-            # -----------------------------------------------
-            # GRAPH DATA
-            # -----------------------------------------------
-
             "reference_pitch": [
                 round(
                     float(value),
@@ -1331,10 +1245,6 @@ async def compare_song_voice(
                 for value in user_points
             ],
 
-            # -----------------------------------------------
-            # FEEDBACK
-            # -----------------------------------------------
-
             "feedback":
                 score["feedback"],
 
@@ -1346,6 +1256,7 @@ async def compare_song_voice(
         }
 
     except HTTPException:
+
         raise
 
     except Exception as error:
@@ -1365,10 +1276,6 @@ async def compare_song_voice(
 
     finally:
 
-        # ----------------------------------------------------
-        # CLEAN TEMPORARY SONG
-        # ----------------------------------------------------
-
         if (
             song_path
             and
@@ -1379,10 +1286,6 @@ async def compare_song_voice(
                 os.remove(song_path)
             except Exception:
                 pass
-
-        # ----------------------------------------------------
-        # CLEAN TEMPORARY VOICE
-        # ----------------------------------------------------
 
         if (
             voice_path
