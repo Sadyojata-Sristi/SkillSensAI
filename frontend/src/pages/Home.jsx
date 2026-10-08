@@ -118,13 +118,7 @@ const TOTAL_LESSONS = 15;
 
 /* =========================================================
    CHARACTER OPTIONS
-   =========================================================
-   
-   For now we use the existing samurai image.
-
-   Later, when you upload your character images into /public,
-   we can simply add their filenames here.
-========================================================= */
+   ========================================================= */
 
 const defaultCharacters = [
   {
@@ -136,14 +130,14 @@ const defaultCharacters = [
   {
     id: "singer",
     name: "Singer",
-    image: "/samurai.png",
-    description: "Music character — image can be replaced later.",
+    image: "/singer.png",
+    description: "Music character.",
   },
   {
     id: "fighter",
     name: "Fighter",
-    image: "/samurai.png",
-    description: "Martial Arts character — image can be replaced later.",
+    image: "/fighter.png",
+    description: "Martial Arts character.",
   },
 ];
 
@@ -1610,6 +1604,7 @@ export default function Home() {
                         <span>
                           Logout
                         </span>
+
                       </button>
 
                     </div>
@@ -2013,7 +2008,6 @@ export default function Home() {
                               )}
 
                             </button>
-
                           )
                         )}
 
@@ -2830,7 +2824,9 @@ export default function Home() {
         )}
 
       </div>
+
       <AIChat />
+
     </div>
   );
 }
