@@ -529,18 +529,13 @@ function MusicLearn() {
     const nextLesson = lessons[currentIndex + 1];
 
     if (!nextLesson) {
-      // Last lesson completed
       navigate("/music");
       return;
     }
 
-    // Move immediately to the next lesson
+    resetPractice();
     setSelectedLesson(nextLesson);
 
-    // Reset only the previous lesson's practice state
-    resetPractice();
-
-    // Return to the top so the new lesson is immediately visible
     window.scrollTo({
       top: 0,
       behavior: "smooth",
@@ -705,7 +700,10 @@ function MusicLearn() {
 
         {/* SELECTED LESSON */}
 
-        <section className="selected-lesson-section">
+        <section
+          key={`lesson-${selectedLesson.id}`}
+          className="selected-lesson-section"
+        >
           <div className="selected-lesson-header">
             <div>
               <span>
@@ -757,7 +755,10 @@ function MusicLearn() {
 
         {/* PRACTICE */}
 
-        <section className="practice-section">
+        <section
+          key={`practice-${selectedLesson.id}`}
+          className="practice-section"
+        >
           <div className="practice-header">
             <div>
               <span>
@@ -1114,7 +1115,7 @@ function MusicLearn() {
                   </button>
 
                   <button
-                    className="learn-reset-button"
+                    className="learn-continue-button"
                     onClick={
                       continueToNextLesson
                     }
