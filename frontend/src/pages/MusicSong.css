@@ -1611,3 +1611,78 @@
     width: 100%;
   }
 }
+
+/* =========================================================
+   LIVE RECORDING — LAYOUT STABILITY
+   Prevents the page from jumping/shaking while recording
+========================================================= */
+
+.live-practice-panel {
+  width: 100%;
+  box-sizing: border-box;
+
+  /* Keep layout calculations inside this section */
+  contain: layout;
+}
+
+/* Reserve space for changing live feedback text */
+.live-feedback-slot {
+  width: 100%;
+  min-height: 72px;
+
+  box-sizing: border-box;
+}
+
+/* Keep the live graph at a fixed height */
+.live-graph-slot {
+  width: 100%;
+  min-height: 300px;
+
+  box-sizing: border-box;
+}
+
+/* Prevent SVG resizing during live updates */
+.live-graph-slot .pitch-graph-wrapper {
+  width: 100%;
+  height: 300px;
+  min-height: 300px;
+
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.live-graph-slot .pitch-svg {
+  display: block;
+
+  width: 100%;
+  height: 300px;
+
+  box-sizing: border-box;
+}
+
+/* Prevent browser scroll anchoring from moving the page
+   while live pitch values are changing */
+.music-song-page {
+  overflow-anchor: none;
+}
+
+
+/* =========================================================
+   MOBILE — LIVE GRAPH
+========================================================= */
+
+@media (max-width: 650px) {
+
+  .live-graph-slot {
+    min-height: 230px;
+  }
+
+  .live-graph-slot .pitch-graph-wrapper {
+    height: 230px;
+    min-height: 230px;
+  }
+
+  .live-graph-slot .pitch-svg {
+    height: 230px;
+  }
+}
