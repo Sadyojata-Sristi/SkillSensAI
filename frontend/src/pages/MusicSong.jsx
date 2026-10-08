@@ -28,7 +28,7 @@ import "./MusicSong.css";
 
 /* =========================================================
    API
-   ========================================================= */
+========================================================= */
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
@@ -37,7 +37,7 @@ const API_URL =
 
 /* =========================================================
    LIVE PITCH SETTINGS
-   ========================================================= */
+========================================================= */
 
 const LIVE_MIN_FREQUENCY = 65;
 const LIVE_MAX_FREQUENCY = 1000;
@@ -49,7 +49,7 @@ const LIVE_BUFFER_SIZE = 2048;
 
 /* =========================================================
    NOTE HELPERS
-   ========================================================= */
+========================================================= */
 
 function frequencyToNote(frequency) {
   if (!frequency || !Number.isFinite(frequency)) {
@@ -117,7 +117,7 @@ function frequencyToCents(
 /* =========================================================
    LIVE PITCH DETECTOR
    Autocorrelation-based browser pitch detection.
-   ========================================================= */
+========================================================= */
 
 function detectLivePitch(
   buffer,
@@ -134,7 +134,7 @@ function detectLivePitch(
   /* -------------------------------------------------------
      Calculate RMS.
      Ignore silence/noise.
-     ------------------------------------------------------- */
+  ------------------------------------------------------- */
 
   let rms = 0;
 
@@ -156,7 +156,7 @@ function detectLivePitch(
 
   /* -------------------------------------------------------
      Remove DC offset.
-     ------------------------------------------------------- */
+  ------------------------------------------------------- */
 
   let mean = 0;
 
@@ -181,7 +181,7 @@ function detectLivePitch(
 
   /* -------------------------------------------------------
      Autocorrelation.
-     ------------------------------------------------------- */
+  ------------------------------------------------------- */
 
   const minLag = Math.floor(
     sampleRate /
@@ -296,7 +296,7 @@ function detectLivePitch(
 
 /* =========================================================
    PITCH GRAPH
-   ========================================================= */
+========================================================= */
 
 function PitchGraph({
   data = [],
@@ -520,7 +520,7 @@ function PitchGraph({
 
         {/* -------------------------------------------------
             Horizontal guide lines
-            ------------------------------------------------- */}
+        ------------------------------------------------- */}
 
         {[0, 0.25, 0.5, 0.75, 1].map(
           (ratio) => {
@@ -548,7 +548,7 @@ function PitchGraph({
 
         {/* -------------------------------------------------
             Reference pitch
-            ------------------------------------------------- */}
+        ------------------------------------------------- */}
 
         {referencePath && (
           <path
@@ -561,7 +561,7 @@ function PitchGraph({
 
         {/* -------------------------------------------------
             User pitch
-            ------------------------------------------------- */}
+        ------------------------------------------------- */}
 
         {userPath && (
           <path
@@ -574,7 +574,7 @@ function PitchGraph({
 
         {/* -------------------------------------------------
             Live position
-            ------------------------------------------------- */}
+        ------------------------------------------------- */}
 
         {liveMode && (
           <>
@@ -612,7 +612,7 @@ function PitchGraph({
 
         {/* -------------------------------------------------
             Axis labels
-            ------------------------------------------------- */}
+        ------------------------------------------------- */}
 
         <text
           x="12"
@@ -668,7 +668,7 @@ function PitchGraph({
 
 /* =========================================================
    LIVE FEEDBACK CARD
-   ========================================================= */
+========================================================= */
 
 function LiveFeedback({
   referenceFrequency,
@@ -772,7 +772,7 @@ function LiveFeedback({
 
 /* =========================================================
    MAIN COMPONENT
-   ========================================================= */
+========================================================= */
 
 export default function MusicSong() {
 
@@ -782,7 +782,7 @@ export default function MusicSong() {
 
   /* -------------------------------------------------------
      Song state
-     ------------------------------------------------------- */
+  ------------------------------------------------------- */
 
   const [
     selectedSong,
@@ -816,7 +816,7 @@ export default function MusicSong() {
 
   /* -------------------------------------------------------
      Voice state
-     ------------------------------------------------------- */
+  ------------------------------------------------------- */
 
   const [
     isRecording,
@@ -856,7 +856,7 @@ export default function MusicSong() {
 
   /* -------------------------------------------------------
      Live state
-     ------------------------------------------------------- */
+  ------------------------------------------------------- */
 
   const [
     livePitch,
@@ -890,7 +890,7 @@ export default function MusicSong() {
 
   /* -------------------------------------------------------
      Refs
-     ------------------------------------------------------- */
+  ------------------------------------------------------- */
 
   const mediaRecorderRef =
     useRef(null);
@@ -922,10 +922,20 @@ export default function MusicSong() {
   const liveHistoryRef =
     useRef([]);
 
+  /*
+     IMPORTANT:
+     The microphone analyser can run many times per
+     second. We keep collecting pitch points normally,
+     but update the React graph state only periodically.
+     This reduces page re-rendering and prevents shaking.
+  */
+  const lastGraphUpdateRef =
+    useRef(0);
+
 
   /* =======================================================
      CLEANUP
-     ======================================================= */
+  ======================================================= */
 
   useEffect(() => {
 
@@ -957,7 +967,7 @@ export default function MusicSong() {
 
   /* =======================================================
      STOP LIVE AUDIO
-     ======================================================= */
+  ======================================================= */
 
   function stopLiveAudio() {
 
@@ -1020,7 +1030,7 @@ export default function MusicSong() {
 
   /* =======================================================
      GET REFERENCE PITCH AT CURRENT TIME
-     ======================================================= */
+  ======================================================= */
 
   function getReferencePitch(
     currentTime
@@ -1089,7 +1099,7 @@ export default function MusicSong() {
 
   /* =======================================================
      LIVE AUDIO LOOP
-     ======================================================= */
+  ======================================================= */
 
   function processLivePitch() {
 
@@ -1168,9 +1178,28 @@ export default function MusicSong() {
         ].slice(-250);
 
 
-      setLivePitchHistory(
-        liveHistoryRef.current
-      );
+      /*
+       * Keep collecting live pitch points on every
+       * analyser frame, but do not force React to
+       * redraw the entire graph on every frame.
+       */
+      const now =
+        performance.now();
+
+
+      if (
+        now -
+          lastGraphUpdateRef.current >=
+        80
+      ) {
+
+        lastGraphUpdateRef.current =
+          now;
+
+        setLivePitchHistory([
+          ...liveHistoryRef.current,
+        ]);
+      }
 
 
       if (
@@ -1224,7 +1253,7 @@ export default function MusicSong() {
 
   /* =======================================================
      START LIVE PITCH
-     ======================================================= */
+  ======================================================= */
 
   async function startLivePitch() {
 
@@ -1315,6 +1344,14 @@ export default function MusicSong() {
       );
 
 
+      /*
+       * Reset the graph update timer whenever
+       * a new recording begins.
+       */
+      lastGraphUpdateRef.current =
+        performance.now();
+
+
       setIsRecording(true);
 
 
@@ -1340,7 +1377,7 @@ export default function MusicSong() {
 
   /* =======================================================
      STOP RECORDING
-     ======================================================= */
+  ======================================================= */
 
   function stopRecording() {
 
@@ -1382,7 +1419,7 @@ export default function MusicSong() {
 
   /* =======================================================
      START RECORDING
-     ======================================================= */
+  ======================================================= */
 
   async function startRecording() {
 
@@ -1535,7 +1572,7 @@ export default function MusicSong() {
 
           /* ---------------------------------------------
              Also stop live pitch system.
-             --------------------------------------------- */
+          --------------------------------------------- */
 
           stopLiveAudio();
 
@@ -1573,7 +1610,7 @@ export default function MusicSong() {
 
       /* ---------------------------------------------
          Start the live pitch system separately.
-         --------------------------------------------- */
+      --------------------------------------------- */
 
       await startLivePitch();
 
@@ -1592,7 +1629,7 @@ export default function MusicSong() {
 
   /* =======================================================
      STOP EVERYTHING
-     ======================================================= */
+  ======================================================= */
 
   function stopAllRecording() {
 
@@ -1612,7 +1649,7 @@ export default function MusicSong() {
 
   /* =======================================================
      HANDLE SONG FILE
-     ======================================================= */
+  ======================================================= */
 
   async function handleSongUpload(
     event
@@ -1716,7 +1753,7 @@ export default function MusicSong() {
 
   /* =======================================================
      SEARCH WEB
-     ======================================================= */
+  ======================================================= */
 
   function searchSongOnWeb() {
 
@@ -1754,7 +1791,7 @@ export default function MusicSong() {
 
   /* =======================================================
      HANDLE VOICE FILE
-     ======================================================= */
+  ======================================================= */
 
   function handleVoiceFile(
     event
@@ -1798,7 +1835,7 @@ export default function MusicSong() {
 
   /* =======================================================
      ANALYSE VOICE
-     ======================================================= */
+  ======================================================= */
 
   async function analyzeVoice() {
 
@@ -1905,7 +1942,7 @@ export default function MusicSong() {
 
   /* =======================================================
      FORMAT TIME
-     ======================================================= */
+  ======================================================= */
 
   function formatTime(
     seconds
@@ -1938,7 +1975,7 @@ export default function MusicSong() {
 
   /* =======================================================
      RESET
-     ======================================================= */
+  ======================================================= */
 
   function resetPage() {
 
@@ -1971,7 +2008,7 @@ export default function MusicSong() {
 
   /* =======================================================
      REFERENCE CURRENT NOTE
-     ======================================================= */
+  ======================================================= */
 
   const currentReferenceNote =
     liveReferencePitch
@@ -1991,14 +2028,14 @@ export default function MusicSong() {
 
   /* =======================================================
      RENDER
-     ======================================================= */
+  ======================================================= */
 
   return (
     <div className="music-song-page">
 
       {/* ===================================================
           BACK
-          =================================================== */}
+      =================================================== */}
 
       <button
         className="music-song-back"
@@ -2013,7 +2050,7 @@ export default function MusicSong() {
 
       {/* ===================================================
           HEADER
-          =================================================== */}
+      =================================================== */}
 
       <header className="music-song-header">
 
@@ -2045,7 +2082,7 @@ export default function MusicSong() {
 
         {/* =================================================
             ERROR
-            ================================================= */}
+        ================================================= */}
 
         {error && (
           <div className="music-song-error">
@@ -2060,7 +2097,7 @@ export default function MusicSong() {
 
         {/* =================================================
             STEP 1
-            ================================================= */}
+        ================================================= */}
 
         <section className="music-step-card">
 
@@ -2091,7 +2128,7 @@ export default function MusicSong() {
 
               {/* -------------------------------------------
                   Local upload
-                  ------------------------------------------- */}
+              ------------------------------------------- */}
 
               <label className="upload-song-button">
 
@@ -2113,7 +2150,7 @@ export default function MusicSong() {
 
               {/* -------------------------------------------
                   Search
-                  ------------------------------------------- */}
+              ------------------------------------------- */}
 
               <button
                 className="voice-upload-button"
@@ -2132,7 +2169,7 @@ export default function MusicSong() {
 
             {/* =============================================
                 SEARCH BOX
-                ============================================= */}
+            ============================================= */}
 
             {showSearch && (
               <div className="song-search-box">
@@ -2191,7 +2228,7 @@ export default function MusicSong() {
 
             {/* =============================================
                 SELECTED SONG
-                ============================================= */}
+            ============================================= */}
 
             {selectedSong && (
               <div className="selected-file">
@@ -2232,7 +2269,7 @@ export default function MusicSong() {
 
             {/* =============================================
                 LOADING
-                ============================================= */}
+            ============================================= */}
 
             {songLoading && (
               <div className="loading-box">
@@ -2256,7 +2293,7 @@ export default function MusicSong() {
 
         {/* =================================================
             SONG ANALYSIS
-            ================================================= */}
+        ================================================= */}
 
         {songAnalysis && (
           <section className="analysis-result-card">
@@ -2310,7 +2347,7 @@ export default function MusicSong() {
 
             {/* =========================================
                 AUDIO PLAYER
-                ========================================= */}
+            ========================================= */}
 
             {songAnalysis.audioUrl && (
               <div className="audio-preview-box">
@@ -2363,7 +2400,7 @@ export default function MusicSong() {
 
         {/* =================================================
             STEP 2
-            ================================================= */}
+        ================================================= */}
 
         {songAnalysis && (
           <section className="music-step-card voice-step">
@@ -2394,7 +2431,7 @@ export default function MusicSong() {
 
               {/* =========================================
                   VOICE OPTIONS
-                  ========================================= */}
+              ========================================= */}
 
               <div className="voice-options">
 
@@ -2443,7 +2480,7 @@ export default function MusicSong() {
 
               {/* =========================================
                   RECORDING STATUS
-                  ========================================= */}
+              ========================================= */}
 
               {isRecording && (
                 <div className="recording-status">
@@ -2466,7 +2503,7 @@ export default function MusicSong() {
 
               {/* =========================================
                   LIVE PRACTICE
-                  ========================================= */}
+              ========================================= */}
 
               {isRecording && (
                 <div className="live-practice-panel">
@@ -2495,14 +2532,22 @@ export default function MusicSong() {
                   </div>
 
 
-                  <LiveFeedback
-                    referenceFrequency={
-                      liveReferencePitch
-                    }
-                    userFrequency={
-                      livePitch
-                    }
-                  />
+                  {/* ---------------------------------------
+                      Stable feedback area
+                  --------------------------------------- */}
+
+                  <div className="live-feedback-slot">
+
+                    <LiveFeedback
+                      referenceFrequency={
+                        liveReferencePitch
+                      }
+                      userFrequency={
+                        livePitch
+                      }
+                    />
+
+                  </div>
 
 
                   <div className="live-note-grid">
@@ -2553,19 +2598,27 @@ export default function MusicSong() {
                   </div>
 
 
-                  <PitchGraph
-                    data={
-                      songAnalysis.pitch_data ||
-                      []
-                    }
-                    userData={
-                      livePitchHistory
-                    }
-                    liveTime={
-                      recordingTime
-                    }
-                    liveMode
-                  />
+                  {/* ---------------------------------------
+                      Stable graph area
+                  --------------------------------------- */}
+
+                  <div className="live-graph-slot">
+
+                    <PitchGraph
+                      data={
+                        songAnalysis.pitch_data ||
+                        []
+                      }
+                      userData={
+                        livePitchHistory
+                      }
+                      liveTime={
+                        recordingTime
+                      }
+                      liveMode
+                    />
+
+                  </div>
 
                 </div>
               )}
@@ -2573,7 +2626,7 @@ export default function MusicSong() {
 
               {/* =========================================
                   VOICE FILE
-                  ========================================= */}
+              ========================================= */}
 
               {voiceFile && !isRecording && (
                 <div className="voice-file-box">
@@ -2601,7 +2654,7 @@ export default function MusicSong() {
 
               {/* =========================================
                   AUDIO PREVIEW
-                  ========================================= */}
+              ========================================= */}
 
               {voicePreview &&
                 !isRecording && (
@@ -2622,7 +2675,7 @@ export default function MusicSong() {
 
               {/* =========================================
                   COMPARE
-                  ========================================= */}
+              ========================================= */}
 
               {voiceFile &&
                 !isRecording && (
@@ -2664,7 +2717,7 @@ export default function MusicSong() {
 
         {/* =================================================
             COMPARISON RESULTS
-            ================================================= */}
+        ================================================= */}
 
         {comparison && (
           <section className="comparison-results">
@@ -2698,7 +2751,7 @@ export default function MusicSong() {
 
             {/* =============================================
                 METRICS
-                ============================================= */}
+            ============================================= */}
 
             <div className="metrics-grid">
 
@@ -2837,7 +2890,7 @@ export default function MusicSong() {
 
             {/* =============================================
                 COMPARISON GRAPH
-                ============================================= */}
+            ============================================= */}
 
             <div className="comparison-graph-card">
 
@@ -2896,7 +2949,7 @@ export default function MusicSong() {
 
             {/* =============================================
                 FEEDBACK
-                ============================================= */}
+            ============================================= */}
 
             <div className="feedback-card">
 
@@ -2932,6 +2985,7 @@ export default function MusicSong() {
                       <span>
                         {message}
                       </span>
+
                     </div>
                   )
                 )}
@@ -2943,7 +2997,7 @@ export default function MusicSong() {
 
             {/* =============================================
                 RESET
-                ============================================= */}
+            ============================================= */}
 
             <button
               className="reset-button"
