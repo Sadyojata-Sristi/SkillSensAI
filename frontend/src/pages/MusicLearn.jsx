@@ -517,6 +517,38 @@ function MusicLearn() {
 
   /*
   ============================================================
+  CONTINUE TO NEXT LESSON
+  ============================================================
+  */
+
+  const continueToNextLesson = () => {
+    const currentIndex = lessons.findIndex(
+      (lesson) => lesson.id === selectedLesson.id
+    );
+
+    const nextLesson = lessons[currentIndex + 1];
+
+    if (!nextLesson) {
+      // Last lesson completed
+      navigate("/music");
+      return;
+    }
+
+    // Move immediately to the next lesson
+    setSelectedLesson(nextLesson);
+
+    // Reset only the previous lesson's practice state
+    resetPractice();
+
+    // Return to the top so the new lesson is immediately visible
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  /*
+  ============================================================
   FORMAT TIME
   ============================================================
   */
@@ -1069,16 +1101,36 @@ function MusicLearn() {
                   </ul>
                 </div>
 
-                <button
-                  className="learn-reset-button"
-                  onClick={
-                    resetPractice
-                  }
-                >
-                  <RotateCcw size={18} />
+                <div className="learn-result-actions">
+                  <button
+                    className="learn-reset-button"
+                    onClick={
+                      resetPractice
+                    }
+                  >
+                    <RotateCcw size={18} />
 
-                  Practise Again
-                </button>
+                    Practise Again
+                  </button>
+
+                  <button
+                    className="learn-reset-button"
+                    onClick={
+                      continueToNextLesson
+                    }
+                  >
+                    {selectedLesson.id === lessons.length
+                      ? "Finish Learning"
+                      : "Continue"}
+
+                    <ArrowLeft
+                      size={18}
+                      style={{
+                        transform: "rotate(180deg)",
+                      }}
+                    />
+                  </button>
+                </div>
               </div>
             )}
           </div>
