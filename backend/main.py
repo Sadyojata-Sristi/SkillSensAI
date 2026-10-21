@@ -1462,6 +1462,22 @@ def calculate_music_score_from_timelines(
             2
         ),
 
+        # Exact model features, exposed for dataset collection.
+        # Keep these values sourced from the same vector used for prediction.
+        "voiced_ratio": round(
+            float(ai_features[5]),
+            4
+        ),
+
+        "training_features": {
+            "pitch_accuracy": round(float(ai_features[0]), 2),
+            "note_match": round(float(ai_features[1]), 2),
+            "timing_accuracy": round(float(ai_features[2]), 2),
+            "stability": round(float(ai_features[3]), 2),
+            "average_pitch_error_cents": round(float(ai_features[4]), 2),
+            "voiced_ratio": round(float(ai_features[5]), 4)
+        },
+
         "average_pitch_error_cents": round(
             average_error,
             2
@@ -1985,6 +2001,14 @@ async def compare_song_voice(
 
             "stability":
                 score["stability"],
+
+            # These fields are used by the labeled-data collection workflow.
+            # Error/early-return cases may not have feature values, so use .get().
+            "voiced_ratio":
+                score.get("voiced_ratio"),
+
+            "training_features":
+                score.get("training_features"),
 
             "average_pitch_error_cents":
                 score[
