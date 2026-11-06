@@ -6,6 +6,7 @@ import os
 import tempfile
 import subprocess
 import urllib.request
+import re
 
 import numpy as np
 import librosa
@@ -34,7 +35,9 @@ app.add_middleware(
 )
 
 SAMPLE_RATE = 16000
-MAX_ANALYSIS_SECONDS = 20
+MAX_ANALYSIS_SECONDS = 20  # Current pitch-analysis window; longer uploads are validated but only this window is scored.
+MAX_UPLOAD_BYTES = 100 * 1024 * 1024
+MAX_TRACK_SECONDS = 5 * 60
 MAX_GRAPH_POINTS = 250
 FRAME_LENGTH = 2048
 HOP_LENGTH = 512
@@ -761,20 +764,28 @@ def calculate_music_score_from_timelines(
 
 async def save_upload(uploaded_file):
     suffix = os.path.splitext(uploaded_file.filename or "")[1]
-
     temporary_file = tempfile.NamedTemporaryFile(
         suffix=suffix, delete=False
     )
     path = temporary_file.name
+    total_bytes = 0
 
     try:
         while True:
             chunk = await uploaded_file.read(1024 * 1024)
             if not chunk:
                 break
+            total_bytes += len(chunk)
+            if total_bytes > MAX_UPLOAD_BYTES:
+                raise HTTPException(
+                    status_code=413,
+                    detail="Audio file exceeds the 100 MB upload limit."
+                )
             temporary_file.write(chunk)
 
         temporary_file.close()
+        if total_bytes == 0:
+            raise HTTPException(status_code=400, detail="The uploaded file is empty.")
         return path
 
     except Exception:
@@ -782,6 +793,41 @@ async def save_upload(uploaded_file):
         if os.path.exists(path):
             os.remove(path)
         raise
+
+
+def validate_audio_duration(path):
+    """Reject unsupported long tracks before running expensive audio processing."""
+    try:
+        result = subprocess.run(
+            [get_ffmpeg_path(), "-i", path],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            timeout=30
+        )
+        details = result.stderr or ""
+        match = re.search(r"Duration:\s*(\d+):(\d+):(\d+(?:\.\d+)?)", details)
+        if not match:
+            raise HTTPException(
+                status_code=400,
+                detail="Could not read the audio duration. Please try a valid audio file."
+            )
+        hours, minutes, seconds = match.groups()
+        duration = int(hours) * 3600 + int(minutes) * 60 + float(seconds)
+        if duration <= 0:
+            raise HTTPException(status_code=400, detail="The audio file has no usable duration.")
+        if duration > MAX_TRACK_SECONDS:
+            raise HTTPException(
+                status_code=413,
+                detail="Audio must be 5 minutes or shorter. Please upload a shorter song or section."
+            )
+        return duration
+    except HTTPException:
+        raise
+    except subprocess.TimeoutExpired:
+        raise HTTPException(status_code=408, detail="Reading audio duration timed out. Try a shorter file.")
+    except Exception as error:
+        raise HTTPException(status_code=400, detail=f"Could not validate this audio file: {error}")
 
 
 def safe_remove(path):
@@ -806,6 +852,7 @@ async def analyze_song(file: UploadFile = File(...)):
             raise HTTPException(400, "No song file was selected.")
 
         file_path = await save_upload(file)
+        validate_audio_duration(file_path)
 
         # Analyse the separated vocals, not the full instrumental mix.
         vocal_path = separate_lead_vocals(file_path)
@@ -861,6 +908,7 @@ async def analyze_voice(file: UploadFile = File(...)):
             raise HTTPException(400, "No voice recording was selected.")
 
         file_path = await save_upload(file)
+        validate_audio_duration(file_path)
         audio, sr = load_audio(file_path)
 
         if len(audio) == 0:
@@ -921,6 +969,8 @@ async def compare_song_voice(
 
         song_path = await save_upload(song)
         voice_path = await save_upload(voice)
+        validate_audio_duration(song_path)
+        validate_audio_duration(voice_path)
 
         # Separate reference vocals only; preserve user's original recording.
         vocal_path = separate_lead_vocals(song_path)
