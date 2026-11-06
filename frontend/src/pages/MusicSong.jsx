@@ -1013,6 +1013,11 @@ export default function MusicSong() {
 
   function stopLiveAudio() {
 
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+      mediaStreamRef.current = null;
+    }
+
     if (
       animationRef.current
     ) {
@@ -1170,7 +1175,7 @@ export default function MusicSong() {
     const result =
       detectLivePitch(
         buffer,
-        LIVE_SAMPLE_RATE
+        audioContextRef.current?.sampleRate || LIVE_SAMPLE_RATE
       );
 
 
@@ -1297,7 +1302,7 @@ export default function MusicSong() {
      START LIVE PITCH
   ======================================================= */
 
-  async function startLivePitch() {
+  async function startLivePitch(stream = mediaStreamRef.current) {
 
     if (
       !songAnalysis
@@ -1316,19 +1321,9 @@ export default function MusicSong() {
       setError("");
 
 
-      const stream =
-        await navigator.mediaDevices
-          .getUserMedia({
-            audio: {
-              echoCancellation: true,
-              noiseSuppression: true,
-              autoGainControl: true,
-            },
-          });
-
-
-      mediaStreamRef.current =
-        stream;
+      if (!stream || stream.getAudioTracks().length === 0) {
+        throw new Error("Microphone stream is unavailable.");
+      }
 
 
       const AudioContext =
@@ -1413,6 +1408,7 @@ export default function MusicSong() {
       setError(
         "Microphone access was denied or is unavailable."
       );
+      throw err;
     }
   }
 
@@ -1654,16 +1650,20 @@ export default function MusicSong() {
          Start the live pitch system separately.
       --------------------------------------------- */
 
-      await startLivePitch();
+      await startLivePitch(stream);
 
 
     } catch (err) {
 
       console.error(err);
 
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+        try { mediaRecorderRef.current.stop(); } catch {}
+      }
+      stopRecording();
 
       setError(
-        "Could not access your microphone."
+        "Could not access your microphone. Please check microphone permissions and try again."
       );
     }
   }
@@ -1913,6 +1913,18 @@ export default function MusicSong() {
         "Please record your voice or upload a recording."
       );
 
+      return;
+    }
+
+
+    if (
+      selectedSong.name === voiceFile.name &&
+      selectedSong.size === voiceFile.size &&
+      selectedSong.lastModified === voiceFile.lastModified
+    ) {
+      setError(
+        "The reference song and voice recording appear to be the same file. Please upload a recording of your own singing."
+      );
       return;
     }
 
@@ -2371,6 +2383,13 @@ export default function MusicSong() {
 
             </div>
 
+            {songAnalysis.warning && (
+              <div className="music-song-error" role="alert">
+                <AlertCircle size={20} />
+                <span>{songAnalysis.warning}</span>
+              </div>
+            )}
+
 
             <div className="pitch-range">
 
@@ -2776,6 +2795,15 @@ export default function MusicSong() {
         {comparison && (
           <section className="comparison-results">
 
+            {(comparison.warning || comparison.prototype_note) && (
+              <div className="music-song-error" role="alert">
+                <AlertCircle size={20} />
+                <span>
+                  {[comparison.warning, comparison.prototype_note].filter(Boolean).join(" ")}
+                </span>
+              </div>
+            )}
+
             <div className="score-card">
 
               <div className="score-icon">
@@ -2872,24 +2900,26 @@ export default function MusicSong() {
                 </span>
 
                 <strong>
-                  {
-                    Math.round(
-                      comparison.timing_accuracy ??
-                      0
-                    )
-                  }
-                  %
+                  {comparison.timing_accuracy !== null &&
+                  comparison.timing_accuracy !== undefined &&
+                  comparison.timing_accuracy !== "" &&
+                  Number.isFinite(Number(comparison.timing_accuracy))
+                    ? `${Math.round(Number(comparison.timing_accuracy))}%`
+                    : "Not evaluated"}
                 </strong>
 
-                <div className="metric-bar">
-
-                  <span
-                    style={{
-                      width: `${comparison.timing_accuracy ?? 0}%`,
-                    }}
-                  />
-
-                </div>
+                {comparison.timing_accuracy !== null &&
+                comparison.timing_accuracy !== undefined &&
+                comparison.timing_accuracy !== "" &&
+                Number.isFinite(Number(comparison.timing_accuracy)) && (
+                  <div className="metric-bar">
+                    <span
+                      style={{
+                        width: `${Math.max(0, Math.min(100, Number(comparison.timing_accuracy)))}%`,
+                      }}
+                    />
+                  </div>
+                )}
 
               </div>
 
