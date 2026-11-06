@@ -39,6 +39,48 @@ const API_URL =
    LIVE PITCH SETTINGS
 ========================================================= */
 
+const MAX_AUDIO_FILE_BYTES = 100 * 1024 * 1024;
+const MAX_AUDIO_DURATION_SECONDS = 5 * 60;
+const SUPPORTED_AUDIO_EXTENSIONS = new Set([
+  "mp3", "wav", "m4a", "aac", "ogg", "webm"
+]);
+
+async function validateAudioFile(file) {
+  if (file.size > MAX_AUDIO_FILE_BYTES) {
+    return "This file is larger than 100 MB. Please choose a smaller audio file.";
+  }
+
+  const extension = file.name.split(".").pop()?.toLowerCase();
+  if (!extension || !SUPPORTED_AUDIO_EXTENSIONS.has(extension)) {
+    return "Unsupported file format. Please use MP3, WAV, M4A, AAC, OGG, or WebM.";
+  }
+
+  const temporaryUrl = URL.createObjectURL(file);
+  try {
+    const duration = await new Promise((resolve, reject) => {
+      const audio = new Audio();
+      audio.preload = "metadata";
+      audio.onloadedmetadata = () => resolve(audio.duration);
+      audio.onerror = () => reject(new Error("Audio metadata could not be read."));
+      audio.src = temporaryUrl;
+    });
+
+    if (!Number.isFinite(duration) || duration <= 0) {
+      return "This file has no readable audio duration. Please choose another file.";
+    }
+    if (duration > MAX_AUDIO_DURATION_SECONDS) {
+      return "Audio must be 5 minutes or shorter. Please choose a shorter song or recording.";
+    }
+  } catch {
+    // The backend performs a second validation, including formats the browser cannot preview.
+  } finally {
+    URL.revokeObjectURL(temporaryUrl);
+  }
+
+  return null;
+}
+
+
 const LIVE_MIN_FREQUENCY = 65;
 const LIVE_MAX_FREQUENCY = 1000;
 
@@ -1663,6 +1705,12 @@ export default function MusicSong() {
       return;
     }
 
+    const validationError = await validateAudioFile(file);
+    if (validationError) {
+      setError(validationError);
+      event.target.value = "";
+      return;
+    }
 
     setSelectedSong(
       file
@@ -1793,7 +1841,7 @@ export default function MusicSong() {
      HANDLE VOICE FILE
   ======================================================= */
 
-  function handleVoiceFile(
+  async function handleVoiceFile(
     event
   ) {
 
@@ -1805,6 +1853,12 @@ export default function MusicSong() {
       return;
     }
 
+    const validationError = await validateAudioFile(file);
+    if (validationError) {
+      setError(validationError);
+      event.target.value = "";
+      return;
+    }
 
     setVoiceFile(
       file
@@ -2138,7 +2192,7 @@ export default function MusicSong() {
 
                 <input
                   type="file"
-                  accept="audio/*,video/*"
+                  accept=".mp3,.wav,.m4a,.aac,.ogg,.webm,audio/mpeg,audio/wav,audio/mp4,audio/aac,audio/ogg,audio/webm"
                   onChange={
                     handleSongUpload
                   }
@@ -2466,7 +2520,7 @@ export default function MusicSong() {
 
                   <input
                     type="file"
-                    accept="audio/*,video/*"
+                    accept=".mp3,.wav,.m4a,.aac,.ogg,.webm,audio/mpeg,audio/wav,audio/mp4,audio/aac,audio/ogg,audio/webm"
                     onChange={
                       handleVoiceFile
                     }
