@@ -23,7 +23,7 @@ import replicate
 app = FastAPI(
     title="SkillSensAI Backend",
     description="AI-powered skill learning backend for SkillSensAI",
-    version="5.0.0"
+    version="5.1.0"
 )
 
 app.add_middleware(
@@ -74,7 +74,7 @@ def root():
     return {
         "message": "SkillSensAI backend is running!",
         "status": "online",
-        "version": "5.0.0",
+        "version": "5.1.0",
         "music_ai": "active" if music_model is not None else "unavailable",
         "music_ai_model": (
             "Random Forest Regressor"
@@ -196,9 +196,8 @@ def separate_lead_vocals(input_path):
     """
 
     if not os.getenv("REPLICATE_API_TOKEN"):
-        raise RuntimeError(
-            "REPLICATE_API_TOKEN is missing in Render Environment."
-        )
+        print("VOCAL SEPARATION SKIPPED: REPLICATE_API_TOKEN is not configured.")
+        return None
 
     clip = tempfile.NamedTemporaryFile(
         suffix=".mp3", delete=False
@@ -299,11 +298,12 @@ def separate_lead_vocals(input_path):
         if os.path.exists(vocal_path):
             os.remove(vocal_path)
 
-        print("VOCAL SEPARATION ERROR:", str(error))
-        raise RuntimeError(
-            "Vocal separation failed. Please retry with a supported "
-            "audio file. Details: " + str(error)
-        ) from error
+        # Do not block the whole practice session if the external service
+        # is out of credit, unavailable, or fails. Callers must use the
+        # original audio and explicitly warn that background music can
+        # reduce pitch-analysis accuracy.
+        print("VOCAL SEPARATION UNAVAILABLE; falling back to original audio:", str(error))
+        return None
 
     finally:
         if os.path.exists(clip_path):
@@ -854,9 +854,12 @@ async def analyze_song(file: UploadFile = File(...)):
         file_path = await save_upload(file)
         validate_audio_duration(file_path)
 
-        # Analyse the separated vocals, not the full instrumental mix.
+        # Prefer isolated vocals. If Replicate is unavailable (including
+        # HTTP 402 insufficient credit), analyse the original track instead.
         vocal_path = separate_lead_vocals(file_path)
-        audio, sr = load_audio(vocal_path)
+        analysis_path = vocal_path or file_path
+        separation_used = vocal_path is not None
+        audio, sr = load_audio(analysis_path)
 
         if len(audio) == 0:
             raise HTTPException(400, "No readable vocal audio was returned.")
@@ -876,9 +879,14 @@ async def analyze_song(file: UploadFile = File(...)):
             "duration": round(float(len(audio) / sr), 2),
             "total_pitch_points": len(valid),
             "pitch_data": create_pitch_data(timeline),
+            "vocal_separation_used": separation_used,
+            "warning": None if separation_used else (
+                "Vocal separation was unavailable, so the original song was "
+                "analysed. Background music may reduce pitch accuracy."
+            ),
             "prototype_note": (
-                "Vocal separation is enabled. The first 20 seconds are "
-                "analysed; residual accompaniment may still affect pitch."
+                "The first 20 seconds are analysed. Pitch detection is an "
+                "estimate and may be affected by accompaniment."
             )
         }
 
@@ -972,10 +980,13 @@ async def compare_song_voice(
         validate_audio_duration(song_path)
         validate_audio_duration(voice_path)
 
-        # Separate reference vocals only; preserve user's original recording.
+        # Prefer isolated reference vocals. If Replicate fails or is out of
+        # credit, continue using the original song and report reduced quality.
         vocal_path = separate_lead_vocals(song_path)
+        reference_path = vocal_path or song_path
+        separation_used = vocal_path is not None
 
-        song_audio, song_sr = load_audio(vocal_path)
+        song_audio, song_sr = load_audio(reference_path)
         voice_audio, voice_sr = load_audio(voice_path)
 
         if len(song_audio) == 0:
@@ -989,7 +1000,9 @@ async def compare_song_voice(
 
         if not any(p["frequency"] > 0 for p in reference_timeline):
             raise HTTPException(
-                422, "Could not detect enough melody in the separated vocals."
+                422,
+                "Could not detect enough melody in the reference audio. "
+                "Try a clearer song or a shorter section."
             )
 
         if not any(p["frequency"] > 0 for p in user_timeline):
@@ -1023,10 +1036,14 @@ async def compare_song_voice(
             "feedback": score["feedback"],
             "reference_timeline": reduce_pitch_timeline(reference_timeline),
             "user_timeline": reduce_pitch_timeline(user_timeline),
+            "vocal_separation_used": separation_used,
+            "warning": None if separation_used else (
+                "Vocal separation was unavailable, so the original reference "
+                "song was used. Background music may reduce score accuracy."
+            ),
             "prototype_note": (
-                "The reference vocal stem is extracted with Demucs. "
-                "Pitch metrics are estimated and require validation against "
-                "real singing recordings."
+                "Pitch metrics are estimates. Results may be less accurate "
+                "when the reference includes instrumental accompaniment."
             )
         }
 
@@ -1052,7 +1069,7 @@ async def compare_song_voice(
 async def startup_event():
     print("==========================================")
     print("SkillSensAI Backend Started")
-    print("Version: 5.0.0")
+    print("Version: 5.1.0")
     print(f"Sample rate: {SAMPLE_RATE} Hz")
     print(f"Maximum analysis: {MAX_ANALYSIS_SECONDS} seconds")
     print(f"Maximum graph points: {MAX_GRAPH_POINTS}")
