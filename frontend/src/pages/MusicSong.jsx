@@ -2463,27 +2463,28 @@ export default function MusicSong() {
               </div>
             )}
 
-            {/* Lyrics are displayed when the API returns transcription text. */}
-            <div className="song-lyrics-panel">
-              <h3>Lyrics</h3>
+            {/* Show lyrics from supported backend response shapes; never imply they were generated if absent. */}
+            <div className="song-lyrics-panel" aria-live="polite">
+              <h3>Song Lyrics</h3>
               {(() => {
-                const lyricValue =
-                  songAnalysis.lyrics ??
-                  songAnalysis.transcript ??
-                  songAnalysis.transcription ??
-                  songAnalysis.lyrics_text;
+                const payload = songAnalysis?.data && typeof songAnalysis.data === "object"
+                  ? { ...songAnalysis.data, ...songAnalysis }
+                  : songAnalysis;
+                const lyricValue = payload.lyrics ?? payload.lyrics_text ?? payload.transcript ??
+                  payload.transcription ?? payload.transcribed_text ?? payload.text ??
+                  payload?.transcription_result?.text ?? payload?.transcription?.text;
                 const lyricText = typeof lyricValue === "string"
                   ? lyricValue.trim()
                   : Array.isArray(lyricValue)
-                    ? lyricValue.map((item) => typeof item === "string" ? item : item?.text || item?.lyric || "").filter(Boolean).join("\n")
+                    ? lyricValue.map((item) => typeof item === "string" ? item : item?.text || item?.lyric || item?.word || "").filter(Boolean).join("\n")
                     : "";
                 return lyricText ? (
                   <pre className="song-lyrics-text">{lyricText}</pre>
                 ) : (
                   <div className="song-lyrics-unavailable" role="status">
-                    <strong>Lyrics could not be transcribed for this upload.</strong>
-                    <p>{songAnalysis.lyrics_warning || "SkillSensAI tried to retrieve lyrics, but the transcription service did not return text."}</p>
-                    <p>Pitch analysis can still work without lyrics. Clear vocals and a supported transcription service improve the chance of recognition; some songs may still be transcribed inaccurately.</p>
+                    <strong>Lyrics are not available for this song yet.</strong>
+                    <p>{payload.lyrics_warning || payload.transcription_warning || "The current /analyze-song backend returns pitch data but does not return a lyrics/transcription field."}</p>
+                    <p>Your song's pitch analysis is still available. To display actual lyrics here, a lyrics lookup or speech-to-text transcription service must be connected to the backend; this screen cannot reliably create lyrics from pitch data alone.</p>
                   </div>
                 );
               })()}
