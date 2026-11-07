@@ -922,6 +922,12 @@ export default function MusicSong() {
     }
   });
 
+  // Free lyrics fallback: learners may paste lyrics they have permission to use.
+  // Phrase-to-section labels are explicitly estimates, not forced alignment.
+  const [manualLyrics, setManualLyrics] = useState("");
+  const [savedManualLyrics, setSavedManualLyrics] = useState("");
+  const [manualLyricsNotice, setManualLyricsNotice] = useState("");
+
 
   /* -------------------------------------------------------
      Live state
@@ -2136,6 +2142,9 @@ export default function MusicSong() {
     setVoiceFile(null);
     setVoicePreview("");
     setComparison(null);
+    setManualLyrics("");
+    setSavedManualLyrics("");
+    setManualLyricsNotice("");
     setRecordingTime(0);
     setLivePitch(null);
     setLiveReferencePitch(null);
@@ -2488,6 +2497,35 @@ export default function MusicSong() {
                   </div>
                 );
               })()}
+              <div className="manual-lyrics-fallback" style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(124,92,252,.18)" }}>
+                <strong style={{ display: "block", marginBottom: 6 }}>Free option: add lyrics manually</strong>
+                <p style={{ margin: "0 0 10px", fontSize: 13, lineHeight: 1.6, opacity: 0.82 }}>
+                  Automatic transcription is currently disabled to avoid paid API calls. Paste lyrics you have permission to use, with one phrase or line per row. SkillSensAI can then attach these lines to practice sections as an estimate; it does not yet detect exact lyric timestamps automatically.
+                </p>
+                <textarea
+                  value={manualLyrics}
+                  onChange={(event) => { setManualLyrics(event.target.value); setManualLyricsNotice(""); }}
+                  placeholder={"Paste lyrics here, one phrase per line…\nFirst phrase\nSecond phrase\nThird phrase"}
+                  rows={5}
+                  aria-label="Paste song lyrics, one phrase per line"
+                  style={{ width: "100%", boxSizing: "border-box", resize: "vertical", borderRadius: 10, padding: 12, border: "1px solid rgba(124,92,252,.35)", background: "rgba(255,255,255,.72)", color: "#30294a", font: "inherit", lineHeight: 1.6 }}
+                />
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 9, marginTop: 10 }}>
+                  <button type="button" onClick={() => {
+                    const cleaned = manualLyrics.split(/\r?\n/).map((line) => line.trim()).filter(Boolean).join("\n");
+                    setSavedManualLyrics(cleaned);
+                    setManualLyrics(cleaned);
+                    setManualLyricsNotice(cleaned ? `Saved ${cleaned.split("\n").length} lyric lines for this practice session.` : "Paste at least one lyric line first.");
+                  }}>
+                    Use these lyrics
+                  </button>
+                  <button type="button" onClick={() => { setManualLyrics(""); setSavedManualLyrics(""); setManualLyricsNotice("Manual lyrics cleared."); }}>
+                    Clear lyrics
+                  </button>
+                </div>
+                {manualLyricsNotice && <p role="status" style={{ margin: "8px 0 0", fontSize: 13 }}>{manualLyricsNotice}</p>}
+                {savedManualLyrics && <p style={{ margin: "8px 0 0", fontSize: 12, opacity: 0.75 }}>Manual lyrics are active for this session. They are not uploaded to the backend.</p>}
+              </div>
             </div>
 
             <div className="pitch-range">
@@ -3219,6 +3257,18 @@ export default function MusicSong() {
                           ) : "Not enough matching singing to calculate a reliable section score."}
                         </p>
                         <p style={{ margin: "5px 0" }}>{section.feedback}</p>
+                        {savedManualLyrics.split("\n").filter(Boolean).length > 0 && (() => {
+                          const lyricLines = savedManualLyrics.split("\n").filter(Boolean);
+                          const sections = comparison.sections || [];
+                          const estimatedLineIndex = Math.min(lyricLines.length - 1, Math.floor(((Number(section.section_number) - 1) / Math.max(1, sections.length)) * lyricLines.length));
+                          return (
+                            <div style={{ marginTop: 8, padding: "9px 11px", borderRadius: 8, background: "rgba(124,92,252,.08)", borderLeft: "3px solid #7c5cfc" }}>
+                              <span style={{ display: "block", fontSize: 11, fontWeight: 700, letterSpacing: ".03em", opacity: .75 }}>SUGGESTED LYRIC LINE · ESTIMATED</span>
+                              <span>{lyricLines[estimatedLineIndex]}</span>
+                              <span style={{ display: "block", marginTop: 4, fontSize: 11, opacity: .72 }}>Line placement is evenly estimated across sections; use it as a guide, not exact word timing.</span>
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
                   ))}
