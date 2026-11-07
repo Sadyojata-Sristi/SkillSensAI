@@ -1744,17 +1744,15 @@ export default function MusicSong() {
       );
 
 
-      const response =
-        await axios.post(
-          `${API_URL}/analyze-song`,
-          formData,
-          {
-            headers: {
-              "Content-Type":
-                "multipart/form-data",
-            },
-          }
-        );
+      // Let the browser/Axios create the multipart boundary automatically.
+      const response = await axios.post(
+        `${API_URL.replace(/\/$/, "")}/analyze-song`,
+        formData,
+        {
+          timeout: 180000,
+          headers: { Accept: "application/json" },
+        }
+      );
 
 
       if (
@@ -1786,7 +1784,11 @@ export default function MusicSong() {
 
       setError(
         err.response?.data?.detail ||
-        "Could not analyse the selected song."
+        (err.code === "ECONNABORTED"
+          ? "Song analysis took too long. Try a shorter audio clip (under 20 seconds)."
+          : !err.response
+            ? "Could not reach the SkillSensAI backend. Check your internet connection and try again."
+            : err.message || "Could not analyse the selected song.")
       );
 
 
@@ -1958,42 +1960,43 @@ export default function MusicSong() {
       );
 
 
-      const response =
-        await axios.post(
-          `${API_URL}/compare-song-voice`,
-          formData,
-          {
-            headers: {
-              "Content-Type":
-                "multipart/form-data",
-            },
-          }
-        );
+      // Let Axios/browser set the multipart boundary automatically.
+      // The backend may need time to load or analyse audio, so allow up to 3 minutes.
+      const response = await axios.post(
+        `${API_URL.replace(/\/$/, "")}/compare-song-voice`,
+        formData,
+        {
+          timeout: 180000,
+          headers: {
+            Accept: "application/json",
+          },
+        }
+      );
 
-
-      if (
-        !response.data.success
-      ) {
-
+      if (!response.data || response.data.success !== true) {
         throw new Error(
-          "Comparison failed."
+          response.data?.detail ||
+          response.data?.message ||
+          "The server did not return a successful comparison."
         );
       }
 
-
-      setComparison(
-        response.data
-      );
-
+      setComparison(response.data);
 
     } catch (err) {
+      console.error("SkillSensAI voice comparison failed:", err);
 
-      console.error(err);
-
+      const serverMessage =
+        err.response?.data?.detail ||
+        err.response?.data?.message;
 
       setError(
-        err.response?.data?.detail ||
-        "Could not compare your recording with the song."
+        serverMessage ||
+        (err.code === "ECONNABORTED"
+          ? "Voice comparison took too long. Please try a shorter recording (under 20 seconds) and try again."
+          : !err.response
+            ? "Could not reach the SkillSensAI backend. Please check your internet connection and try again."
+            : err.message || "Could not compare your recording with the song.")
       );
 
 
@@ -2390,6 +2393,29 @@ export default function MusicSong() {
               </div>
             )}
 
+            {/* Lyrics are displayed when the API returns transcription text. */}
+            <div className="song-lyrics-panel">
+              <h3>Lyrics</h3>
+              {(() => {
+                const lyricValue =
+                  songAnalysis.lyrics ??
+                  songAnalysis.transcript ??
+                  songAnalysis.transcription ??
+                  songAnalysis.lyrics_text;
+                const lyricText = typeof lyricValue === "string"
+                  ? lyricValue.trim()
+                  : Array.isArray(lyricValue)
+                    ? lyricValue.map((item) => typeof item === "string" ? item : item?.text || item?.lyric || "").filter(Boolean).join("\n")
+                    : "";
+                return lyricText ? (
+                  <pre className="song-lyrics-text">{lyricText}</pre>
+                ) : (
+                  <p className="song-lyrics-unavailable">
+                    Lyrics are not being returned by the current backend. Song analysis currently returns pitch data only, so lyrics transcription must be added to the backend before lyrics can appear here.
+                  </p>
+                );
+              })()}
+            </div>
 
             <div className="pitch-range">
 
