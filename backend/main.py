@@ -23,7 +23,7 @@ import replicate
 app = FastAPI(
     title="SkillSensAI Backend",
     description="AI-powered skill learning backend for SkillSensAI",
-    version="5.1.0"
+    version="5.2.0"
 )
 
 app.add_middleware(
@@ -74,7 +74,7 @@ def root():
     return {
         "message": "SkillSensAI backend is running!",
         "status": "online",
-        "version": "5.1.0",
+        "version": "5.2.0",
         "music_ai": "active" if music_model is not None else "unavailable",
         "music_ai_model": (
             "Random Forest Regressor"
@@ -946,6 +946,80 @@ def safe_remove(path):
             print("TEMP FILE CLEANUP WARNING:", str(error))
 
 
+def transcribe_song_lyrics(input_path):
+    """Attempt song lyric transcription with Replicate Whisper.
+
+    Transcription is best-effort: music, harmonies, accents and instrumental
+    backing can prevent accurate lyrics. A failure never blocks pitch analysis.
+    This API call may consume Replicate credits when configured.
+    Returns (lyrics_text, warning).
+    """
+    if not os.getenv("REPLICATE_API_TOKEN"):
+        return None, (
+            "Lyrics transcription is not configured. Add REPLICATE_API_TOKEN "
+            "and ensure the transcription service is available."
+        )
+
+    try:
+        with open(input_path, "rb") as audio_file:
+            output = replicate.run(
+                "openai/whisper",
+                input={
+                    "audio": audio_file,
+                    "model": "large-v3",
+                    "transcription": "plain text",
+                    "translate": False,
+                    "temperature": 0,
+                    "suppress_tokens": "-1",
+                    "condition_on_previous_text": True,
+                    "word_timestamps": False,
+                },
+            )
+
+        text_value = None
+        if isinstance(output, str):
+            text_value = output
+        elif isinstance(output, dict):
+            text_value = (
+                output.get("transcription")
+                or output.get("text")
+                or output.get("transcript")
+            )
+            if not text_value and isinstance(output.get("segments"), list):
+                text_value = "\n".join(
+                    str(segment.get("text", "")).strip()
+                    for segment in output["segments"]
+                    if isinstance(segment, dict) and segment.get("text")
+                )
+
+        lyrics = str(text_value).strip() if text_value else ""
+        if lyrics:
+            return lyrics, None
+        return None, (
+            "The transcription service did not detect clear lyrics in this song. "
+            "Try a version with clearer vocals or a shorter section."
+        )
+    except Exception as error:
+        message = str(error)
+        print("LYRICS TRANSCRIPTION UNAVAILABLE:", message)
+        if "402" in message or "insufficient credit" in message.lower():
+            warning = (
+                "Lyrics could not be transcribed because the Replicate account "
+                "has insufficient credits. Add credits to enable this service."
+            )
+        elif "401" in message or "unauthorized" in message.lower():
+            warning = (
+                "Lyrics transcription could not authenticate. Check the "
+                "REPLICATE_API_TOKEN setting in Render."
+            )
+        else:
+            warning = (
+                "The lyrics transcription service is temporarily unavailable. "
+                "Pitch analysis is still available."
+            )
+        return None, warning
+
+
 # ============================================================
 # ANALYZE SONG - RETURNS VOCAL PITCH GRAPH
 # ============================================================
@@ -981,11 +1055,18 @@ async def analyze_song(file: UploadFile = File(...)):
                 "Could not detect a clear melody in the separated vocals."
             )
 
+        # Transcribe the full uploaded song independently from the 20-second
+        # pitch-analysis window. Failure is non-fatal and is surfaced to the UI.
+        lyrics, lyrics_warning = transcribe_song_lyrics(file_path)
+
         return {
             "success": True,
             "filename": file.filename,
             "duration": round(float(len(audio) / sr), 2),
             "total_pitch_points": len(valid),
+            "lyrics": lyrics,
+            "lyrics_status": "available" if lyrics else "unavailable",
+            "lyrics_warning": lyrics_warning,
             "pitch_data": create_pitch_data(timeline),
             "vocal_separation_used": separation_used,
             "warning": None if separation_used else (
@@ -1198,7 +1279,7 @@ async def compare_song_voice(
 async def startup_event():
     print("==========================================")
     print("SkillSensAI Backend Started")
-    print("Version: 5.1.0")
+    print("Version: 5.2.0")
     print(f"Sample rate: {SAMPLE_RATE} Hz")
     print(f"Maximum analysis: {MAX_ANALYSIS_SECONDS} seconds")
     print(f"Maximum graph points: {MAX_GRAPH_POINTS}")
