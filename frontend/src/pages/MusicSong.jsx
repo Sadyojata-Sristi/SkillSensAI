@@ -2247,6 +2247,24 @@ export default function MusicSong() {
     };
   })();
 
+  const historyStats = (() => {
+    const valid = (saveProgress ? progressHistory : [])
+      .filter((entry) => Number.isFinite(Number(entry.overall_score)))
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    const recent = valid.slice(-8);
+    const scores = valid.map((entry) => Number(entry.overall_score));
+    const latest = scores.length ? scores[scores.length - 1] : null;
+    const previous = scores.length > 1 ? scores[scores.length - 2] : null;
+    return {
+      total: valid.length,
+      average: scores.length ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length) : null,
+      best: scores.length ? Math.round(Math.max(...scores)) : null,
+      latest: latest === null ? null : Math.round(latest),
+      change: latest !== null && previous !== null ? Math.round(latest - previous) : null,
+      recent,
+    };
+  })();
+
   /* =======================================================
      RENDER
   ======================================================= */
@@ -3463,6 +3481,44 @@ export default function MusicSong() {
               <p style={{ fontSize: 13, opacity: 0.8 }}>
                 Only score summaries are saved here; audio recordings are not saved in this history. Turn this off to stop saving future results.
               </p>
+              {saveProgress && progressHistory.length > 0 && (
+                <div className="music-history-dashboard" style={{ margin: "16px 0 18px" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(115px, 1fr))", gap: 10, marginBottom: 16 }}>
+                    {[
+                      { label: "Practice attempts", value: historyStats.total },
+                      { label: "Average score", value: historyStats.average === null ? "—" : `${historyStats.average}/100` },
+                      { label: "Personal best", value: historyStats.best === null ? "—" : `${historyStats.best}/100` },
+                      { label: "Latest score", value: historyStats.latest === null ? "—" : `${historyStats.latest}/100` },
+                    ].map((stat) => (
+                      <div key={stat.label} style={{ border: "1px solid rgba(139,108,255,.3)", borderRadius: 12, padding: "12px 13px", background: "rgba(124,92,252,.07)", minWidth: 0 }}>
+                        <div style={{ fontSize: 11, opacity: .78, marginBottom: 7 }}>{stat.label}</div>
+                        <strong style={{ fontSize: 21, lineHeight: 1.2 }}>{stat.value}</strong>
+                      </div>
+                    ))}
+                  </div>
+                  {historyStats.change !== null && (
+                    <p style={{ margin: "0 0 12px", fontSize: 13 }}>
+                      <strong>Latest change:</strong> <span style={{ color: historyStats.change > 0 ? "#2e9b73" : historyStats.change < 0 ? "#d66b78" : "inherit", fontWeight: 800 }}>{historyStats.change > 0 ? "+" : ""}{historyStats.change} points</span> compared with your previous saved attempt.
+                    </p>
+                  )}
+                  <div style={{ border: "1px solid rgba(139,108,255,.22)", borderRadius: 12, padding: 13 }}>
+                    <strong style={{ display: "block", fontSize: 13, marginBottom: 12 }}>Recent score trend</strong>
+                    <div role="img" aria-label="Bar chart of the last eight saved overall scores" style={{ height: 125, display: "flex", alignItems: "flex-end", gap: 9, padding: "4px 2px 0", borderBottom: "1px solid rgba(139,108,255,.28)" }}>
+                      {historyStats.recent.map((entry, index) => {
+                        const score = Math.max(0, Math.min(100, Number(entry.overall_score) || 0));
+                        return (
+                          <div key={entry.id || `${entry.date}-${index}`} title={`${entry.song || "Practice"}: ${Math.round(score)}/100`} style={{ flex: "1 1 0", minWidth: 0, height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", gap: 5 }}>
+                            <span style={{ fontSize: 10, fontWeight: 700 }}>{Math.round(score)}</span>
+                            <div style={{ width: "min(100%, 34px)", height: `${Math.max(5, score)}%`, minHeight: 5, borderRadius: "6px 6px 0 0", background: "linear-gradient(180deg, #9b82ff, #6245d8)" }} />
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginTop: 7, fontSize: 10, opacity: .72 }}><span>Older attempts</span><span>Most recent</span></div>
+                  </div>
+                  <p style={{ fontSize: 11, opacity: .7, margin: "9px 0 0" }}>Scores are stored only in this browser on this device. The trend uses saved overall scores and does not include audio recordings.</p>
+                </div>
+              )}
               {saveProgress && progressHistory.length > 0 && (
                 <div className="feedback-list">
                   {progressHistory.slice(0, 5).map((entry) => (
