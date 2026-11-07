@@ -23,7 +23,7 @@ import replicate
 app = FastAPI(
     title="SkillSensAI Backend",
     description="AI-powered skill learning backend for SkillSensAI",
-    version="5.2.0"
+    version="5.3.0"
 )
 
 app.add_middleware(
@@ -41,6 +41,19 @@ MAX_TRACK_SECONDS = 5 * 60
 MAX_GRAPH_POINTS = 250
 FRAME_LENGTH = 2048
 HOP_LENGTH = 512
+
+# Paid Replicate features are OFF by default so normal practice sessions
+# never make paid API calls accidentally. Enable each one explicitly only
+# when credits are available and the owner wants to use them.
+ENABLE_REPLICATE_VOCAL_SEPARATION = (
+    os.getenv("SKILLSENSAI_ENABLE_REPLICATE_VOCAL_SEPARATION", "false").lower()
+    in {"1", "true", "yes", "on"}
+)
+ENABLE_REPLICATE_LYRICS = (
+    os.getenv("SKILLSENSAI_ENABLE_REPLICATE_LYRICS", "false").lower()
+    in {"1", "true", "yes", "on"}
+)
+REPLICATE_TOKEN_AVAILABLE = bool(os.getenv("REPLICATE_API_TOKEN"))
 
 DEMUCS_MODEL = (
     "cjwbw/demucs:"
@@ -74,16 +87,21 @@ def root():
     return {
         "message": "SkillSensAI backend is running!",
         "status": "online",
-        "version": "5.2.0",
+        "version": "5.3.0",
         "music_ai": "active" if music_model is not None else "unavailable",
         "music_ai_model": (
             "Random Forest Regressor"
             if music_model is not None else None
         ),
         "vocal_separation": (
-            "configured"
-            if os.getenv("REPLICATE_API_TOKEN")
-            else "missing_api_token"
+            "enabled"
+            if ENABLE_REPLICATE_VOCAL_SEPARATION and REPLICATE_TOKEN_AVAILABLE
+            else "disabled_to_avoid_paid_api_calls"
+        ),
+        "lyrics_transcription": (
+            "enabled"
+            if ENABLE_REPLICATE_LYRICS and REPLICATE_TOKEN_AVAILABLE
+            else "disabled_to_avoid_paid_api_calls"
         )
     }
 
@@ -94,8 +112,11 @@ def health():
         "success": True,
         "status": "healthy",
         "music_ai": "active" if music_model is not None else "unavailable",
-        "vocal_separation_configured": bool(
-            os.getenv("REPLICATE_API_TOKEN")
+        "vocal_separation_enabled": (
+            ENABLE_REPLICATE_VOCAL_SEPARATION and REPLICATE_TOKEN_AVAILABLE
+        ),
+        "lyrics_transcription_enabled": (
+            ENABLE_REPLICATE_LYRICS and REPLICATE_TOKEN_AVAILABLE
         )
     }
 
@@ -118,8 +139,11 @@ def model_status():
             "average_pitch_error_cents",
             "voiced_ratio"
         ],
-        "vocal_separation_configured": bool(
-            os.getenv("REPLICATE_API_TOKEN")
+        "vocal_separation_enabled": (
+            ENABLE_REPLICATE_VOCAL_SEPARATION and REPLICATE_TOKEN_AVAILABLE
+        ),
+        "lyrics_transcription_enabled": (
+            ENABLE_REPLICATE_LYRICS and REPLICATE_TOKEN_AVAILABLE
         )
     }
 
@@ -195,7 +219,11 @@ def separate_lead_vocals(input_path):
     Caller is responsible for deleting the returned file.
     """
 
-    if not os.getenv("REPLICATE_API_TOKEN"):
+    if not ENABLE_REPLICATE_VOCAL_SEPARATION:
+        print("VOCAL SEPARATION SKIPPED: paid Replicate calls are disabled by default.")
+        return None
+
+    if not REPLICATE_TOKEN_AVAILABLE:
         print("VOCAL SEPARATION SKIPPED: REPLICATE_API_TOKEN is not configured.")
         return None
 
@@ -954,10 +982,17 @@ def transcribe_song_lyrics(input_path):
     This API call may consume Replicate credits when configured.
     Returns (lyrics_text, warning).
     """
-    if not os.getenv("REPLICATE_API_TOKEN"):
+    if not ENABLE_REPLICATE_LYRICS:
         return None, (
-            "Lyrics transcription is not configured. Add REPLICATE_API_TOKEN "
-            "and ensure the transcription service is available."
+            "Automatic lyrics transcription is disabled to avoid paid API calls. "
+            "Pitch analysis is still available. Lyrics can be shown when a "
+            "no-cost transcription option is configured or supplied separately."
+        )
+
+    if not REPLICATE_TOKEN_AVAILABLE:
+        return None, (
+            "Lyrics transcription is not configured because no API token is available. "
+            "Pitch analysis is still available."
         )
 
     try:
