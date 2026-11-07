@@ -23,7 +23,7 @@ import replicate
 app = FastAPI(
     title="SkillSensAI Backend",
     description="AI-powered skill learning backend for SkillSensAI",
-    version="5.3.0"
+    version="5.4.0"
 )
 
 app.add_middleware(
@@ -87,7 +87,7 @@ def root():
     return {
         "message": "SkillSensAI backend is running!",
         "status": "online",
-        "version": "5.3.0",
+        "version": "5.4.0",
         "music_ai": "active" if music_model is not None else "unavailable",
         "music_ai_model": (
             "Random Forest Regressor"
@@ -606,6 +606,71 @@ def build_mistake_report(reference_pitch, user_pitch, target_times, both_active,
     return report[:15]
 
 
+def build_section_report(target_times, reference_pitch, user_pitch, both_active, section_seconds=5.0):
+    """Summarize pitch matching in short time windows; these are time sections, not lyric/verse labels."""
+    if len(target_times) == 0:
+        return []
+    duration = float(max(target_times)) if len(target_times) else 0.0
+    if duration <= 0:
+        return []
+    section_count = max(1, int(np.ceil((duration + 1e-6) / section_seconds)))
+    report = []
+    for section_index in range(section_count):
+        start = section_index * section_seconds
+        end = min((section_index + 1) * section_seconds, duration)
+        in_section = (target_times >= start) & (target_times < end if end < duration else target_times <= end)
+        valid = in_section & both_active
+        indices = np.where(valid)[0]
+        # Do not display a score for sections without enough simultaneous voiced frames.
+        if len(indices) < 3:
+            report.append({
+                "section_number": section_index + 1,
+                "start_time": round(float(start), 2),
+                "end_time": round(float(end), 2),
+                "status": "insufficient_overlap",
+                "score": None,
+                "pitch_accuracy": None,
+                "note_match": None,
+                "average_pitch_error_cents": None,
+                "feedback": "Not enough simultaneous singing was detected in this time range. Try recording the same section again."
+            })
+            continue
+        cents_errors = []
+        matched_notes = []
+        for idx in indices:
+            ref_hz = float(reference_pitch[idx])
+            usr_hz = float(user_pitch[idx])
+            cents = calculate_cents(ref_hz, usr_hz)
+            if cents is None or not np.isfinite(cents):
+                continue
+            cents_errors.append(abs(float(cents)))
+            matched_notes.append(abs(float(cents)) <= 50)
+        if not cents_errors:
+            continue
+        avg_error = float(np.mean(cents_errors))
+        pitch_accuracy_section = float(np.mean(np.array(cents_errors) <= 50) * 100)
+        note_match_section = float(np.mean(matched_notes) * 100)
+        section_score = pitch_accuracy_section * 0.65 + note_match_section * 0.35
+        if avg_error <= 35:
+            feedback = "Good pitch match here. Keep the same control and consistency."
+        elif avg_error <= 80:
+            feedback = "Small pitch differences detected. Repeat this short section slowly and match each note."
+        else:
+            feedback = "This section needs more practice. Hum the reference notes first, then sing the phrase slowly."
+        report.append({
+            "section_number": section_index + 1,
+            "start_time": round(float(start), 2),
+            "end_time": round(float(end), 2),
+            "status": "scored",
+            "score": round(float(np.clip(section_score, 0, 100)), 1),
+            "pitch_accuracy": round(float(np.clip(pitch_accuracy_section, 0, 100)), 1),
+            "note_match": round(float(np.clip(note_match_section, 0, 100)), 1),
+            "average_pitch_error_cents": round(avg_error, 1),
+            "feedback": feedback
+        })
+    return report
+
+
 def level_coaching(level, pitch_accuracy, note_match, timing_accuracy, stability, mistakes):
     level = level if level in {"beginner", "intermediate", "advanced"} else "beginner"
     if level == "beginner":
@@ -648,6 +713,7 @@ def calculate_music_score_from_timelines(
         "reference_pitch": [],
         "user_pitch": [],
         "comparison_times": [],
+        "sections": [],
         "skill_scores": {
             "pitch_accuracy": {"score": None, "evaluated": False},
             "note_match": {"score": None, "evaluated": False},
@@ -850,6 +916,9 @@ def calculate_music_score_from_timelines(
     mistakes = build_mistake_report(
         reference_pitch, user_pitch, target_times, both_active
     )
+    sections = build_section_report(
+        target_times, reference_pitch, user_pitch, both_active
+    )
     skill_scores = {
         "pitch_accuracy": {"score": round(pitch_accuracy, 2), "evaluated": True},
         "note_match": {"score": round(note_match, 2), "evaluated": True},
@@ -886,6 +955,7 @@ def calculate_music_score_from_timelines(
         "average_pitch_error_cents": round(average_error, 2),
         "skill_scores": skill_scores,
         "mistakes": mistakes,
+        "sections": sections,
         "coaching": coaching,
         "feedback": feedback,
         "reference_pitch": [round(float(x), 2) for x in reference_pitch],
@@ -1274,6 +1344,7 @@ async def compare_song_voice(
             ],
             "skill_scores": score.get("skill_scores", {}),
             "mistakes": score.get("mistakes", []),
+            "sections": score.get("sections", []),
             "coaching": score.get("coaching", {}),
             "reference_pitch": score.get("reference_pitch", []),
             "user_pitch": score.get("user_pitch", []),
