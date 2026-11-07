@@ -1,5 +1,5 @@
 
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 import os
@@ -518,26 +518,117 @@ def predict_ai_score(features):
 # SCORING
 # ============================================================
 
+def build_mistake_report(reference_pitch, user_pitch, target_times, both_active, cents_limit=50):
+    """Group sustained pitch mismatches into timestamped coaching items."""
+    frames = []
+    for index in np.where(both_active)[0]:
+        ref_hz = float(reference_pitch[index])
+        user_hz = float(user_pitch[index])
+        cents = calculate_cents(ref_hz, user_hz)
+        if cents is None or not np.isfinite(cents) or abs(cents) < cents_limit:
+            continue
+        frames.append({
+            "time": float(target_times[index]),
+            "reference_note": frequency_to_note(ref_hz),
+            "user_note": frequency_to_note(user_hz),
+            "cents_error": float(cents),
+            "absolute_error": abs(float(cents)),
+        })
+
+    if not frames:
+        return []
+
+    groups = []
+    current = [frames[0]]
+    for frame in frames[1:]:
+        if frame["time"] - current[-1]["time"] <= 0.45:
+            current.append(frame)
+        else:
+            groups.append(current)
+            current = [frame]
+    groups.append(current)
+
+    report = []
+    for group in groups:
+        # Ignore single isolated frames: they are often pitch-detection noise.
+        if len(group) < 2:
+            continue
+        mean_error = float(np.mean([item["cents_error"] for item in group]))
+        magnitude = abs(mean_error)
+        if magnitude >= 150:
+            severity = "high"
+            exercise = "Slow the phrase down and match one reference note at a time before singing the full phrase."
+        elif magnitude >= 80:
+            severity = "medium"
+            exercise = "Replay this short phrase, hum the reference note, then sing it again while holding the pitch steady."
+        else:
+            severity = "low"
+            exercise = "Repeat this phrase slowly and make a small pitch adjustment toward the reference."
+        report.append({
+            "start_time": round(group[0]["time"], 2),
+            "end_time": round(group[-1]["time"], 2),
+            "reference_note": group[len(group) // 2]["reference_note"],
+            "user_note": group[len(group) // 2]["user_note"],
+            "average_cents_error": round(mean_error, 1),
+            "severity": severity,
+            "title": "Singing pitch differs from the reference",
+            "explanation": ("Your detected pitch is " + ("sharp" if mean_error > 0 else "flat") + " compared with the reference in this section. Pitch detection can be affected by background music."),
+            "exercise": exercise,
+        })
+    return report[:15]
+
+
+def level_coaching(level, pitch_accuracy, note_match, timing_accuracy, stability, mistakes):
+    level = level if level in {"beginner", "intermediate", "advanced"} else "beginner"
+    if level == "beginner":
+        focus = "Start with short phrases, hum each reference note, then sing at a comfortable speed."
+    elif level == "intermediate":
+        focus = "Practise the weakest metric in 2–4 second sections, then repeat at normal tempo."
+    else:
+        focus = "Work on precise note transitions and phrase consistency; repeat difficult sections at reduced speed, then at original tempo."
+    weakest = min(
+        [("pitch accuracy", pitch_accuracy), ("note matching", note_match),
+         ("timing", timing_accuracy), ("stability", stability)],
+        key=lambda item: item[1]
+    )[0]
+    return {
+        "starting_level": level,
+        "focus_metric": weakest,
+        "next_exercise": focus,
+        "mistake_count": len(mistakes),
+        "progression_rule": "Repeat this exercise after each attempt. Increase difficulty after two attempts improve the focus metric; otherwise keep the section short and slow."
+    }
+
+
 def calculate_music_score_from_timelines(
     reference_timeline,
     user_timeline
 ):
     empty_result = {
-        "overall_score": 0,
+        "overall_score": None,
         "ai_score": None,
-        "rule_based_score": 0,
+        "rule_based_score": None,
         "ai_model": "Unavailable",
         "ai_model_used": False,
-        "pitch_accuracy": 0,
-        "note_match": 0,
-        "timing_accuracy": 0,
-        "stability": 0,
-        "average_pitch_error_cents": 0,
-        "voiced_ratio": 0,
+        "pitch_accuracy": None,
+        "note_match": None,
+        "timing_accuracy": None,
+        "stability": None,
+        "average_pitch_error_cents": None,
+        "voiced_ratio": None,
         "training_features": None,
         "reference_pitch": [],
         "user_pitch": [],
         "comparison_times": [],
+        "skill_scores": {
+            "pitch_accuracy": {"score": None, "evaluated": False},
+            "note_match": {"score": None, "evaluated": False},
+            "timing_accuracy": {"score": None, "evaluated": False},
+            "stability": {"score": None, "evaluated": False},
+        },
+        "mistakes": [],
+        "coaching": {},
+        "analysis_status": "insufficient_data",
         "feedback": []
     }
 
@@ -728,7 +819,21 @@ def calculate_music_score_from_timelines(
         "and timing alignment can still make mistakes."
     )
 
+    mistakes = build_mistake_report(
+        reference_pitch, user_pitch, target_times, both_active
+    )
+    skill_scores = {
+        "pitch_accuracy": {"score": round(pitch_accuracy, 2), "evaluated": True},
+        "note_match": {"score": round(note_match, 2), "evaluated": True},
+        "timing_accuracy": {"score": round(float(np.clip(timing_accuracy, 0, 100)), 2), "evaluated": True},
+        "stability": {"score": round(float(np.clip(stability, 0, 100)), 2), "evaluated": len(ref_active_pitch) > 2 and len(usr_active_pitch) > 2},
+    }
+    coaching = level_coaching(
+        "beginner", pitch_accuracy, note_match, timing_accuracy, stability, mistakes
+    )
+
     return {
+        "analysis_status": "scored",
         "overall_score": round(float(np.clip(overall_score, 0, 100)), 2),
         "ai_score": round(ai_score, 2) if ai_score is not None else None,
         "rule_based_score": round(rule_based_score, 2),
@@ -751,6 +856,9 @@ def calculate_music_score_from_timelines(
             "voiced_ratio": round(float(features[5]), 4)
         },
         "average_pitch_error_cents": round(average_error, 2),
+        "skill_scores": skill_scores,
+        "mistakes": mistakes,
+        "coaching": coaching,
         "feedback": feedback,
         "reference_pitch": [round(float(x), 2) for x in reference_pitch],
         "user_pitch": [round(float(x), 2) for x in user_pitch],
@@ -962,7 +1070,8 @@ async def analyze_voice(file: UploadFile = File(...)):
 @app.post("/compare-song-voice")
 async def compare_song_voice(
     song: UploadFile = File(...),
-    voice: UploadFile = File(...)
+    voice: UploadFile = File(...),
+    level: str = Form("beginner")
 ):
     song_path = None
     voice_path = None
@@ -1013,9 +1122,26 @@ async def compare_song_voice(
         score = calculate_music_score_from_timelines(
             reference_timeline, user_timeline
         )
+        if score.get("overall_score") is not None:
+            score["coaching"] = level_coaching(
+                level,
+                score.get("pitch_accuracy", 0),
+                score.get("note_match", 0),
+                score.get("timing_accuracy", 0),
+                score.get("stability", 0),
+                score.get("mistakes", [])
+            )
+        else:
+            score["coaching"] = {
+                "starting_level": level if level in {"beginner", "intermediate", "advanced"} else "beginner",
+                "focus_metric": "not evaluated",
+                "next_exercise": "Record a clearer, matching section with both recordings containing audible singing, then compare again.",
+                "progression_rule": "A score and adaptive difficulty will be assigned only after enough overlapping pitch is detected."
+            }
 
         return {
             "success": True,
+            "analysis_status": score.get("analysis_status", "insufficient_data"),
             "overall_score": score["overall_score"],
             "ai_score": score["ai_score"],
             "rule_based_score": score["rule_based_score"],
@@ -1030,6 +1156,9 @@ async def compare_song_voice(
             "average_pitch_error_cents": score[
                 "average_pitch_error_cents"
             ],
+            "skill_scores": score.get("skill_scores", {}),
+            "mistakes": score.get("mistakes", []),
+            "coaching": score.get("coaching", {}),
             "reference_pitch": score.get("reference_pitch", []),
             "user_pitch": score.get("user_pitch", []),
             "comparison_times": score.get("comparison_times", []),
