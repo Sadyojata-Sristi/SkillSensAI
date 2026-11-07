@@ -928,6 +928,45 @@ export default function MusicSong() {
   const [savedManualLyrics, setSavedManualLyrics] = useState("");
   const [manualLyricsNotice, setManualLyricsNotice] = useState("");
 
+  // Free practice-track controls. These accept user-provided stems; they do not
+  // claim to separate vocals from a mixed song automatically.
+  const [vocalPracticeTrack, setVocalPracticeTrack] = useState(null);
+  const [instrumentalPracticeTrack, setInstrumentalPracticeTrack] = useState(null);
+  const [playbackMode, setPlaybackMode] = useState("original");
+
+  function handlePracticeTrackUpload(event, trackType) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const validationError = file.size > MAX_AUDIO_FILE_BYTES
+      ? "This file is larger than 100 MB. Please choose a smaller audio file."
+      : !SUPPORTED_AUDIO_EXTENSIONS.has(file.name.split(".").pop()?.toLowerCase())
+        ? "Choose a supported audio file."
+        : "";
+    if (validationError) {
+      setError(validationError);
+      event.target.value = "";
+      return;
+    }
+    const track = { file, name: file.name, url: URL.createObjectURL(file) };
+    if (trackType === "vocal") setVocalPracticeTrack(track);
+    else setInstrumentalPracticeTrack(track);
+    setPlaybackMode(trackType);
+    setError("");
+    event.target.value = "";
+  }
+
+  function clearPracticeTrack(trackType) {
+    const track = trackType === "vocal" ? vocalPracticeTrack : instrumentalPracticeTrack;
+    if (track?.url) URL.revokeObjectURL(track.url);
+    if (trackType === "vocal") {
+      setVocalPracticeTrack(null);
+      if (playbackMode === "vocal") setPlaybackMode("original");
+    } else {
+      setInstrumentalPracticeTrack(null);
+      if (playbackMode === "instrumental") setPlaybackMode("original");
+    }
+  }
+
 
   /* -------------------------------------------------------
      Live state
@@ -2594,17 +2633,35 @@ export default function MusicSong() {
             ========================================= */}
 
             {songAnalysis.audioUrl && (
-              <div className="audio-preview-box">
-
-                <Volume2 size={20} />
-
-                <audio
-                  controls
-                  src={
-                    songAnalysis.audioUrl
-                  }
-                />
-
+              <div className="audio-preview-box" style={{ display: "block" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
+                  <Volume2 size={20} />
+                  <strong>Practice audio controls</strong>
+                </div>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+                  <button type="button" aria-pressed={playbackMode === "original"} onClick={() => setPlaybackMode("original")}>Original song</button>
+                  <button type="button" aria-pressed={playbackMode === "vocal"} disabled={!vocalPracticeTrack} onClick={() => setPlaybackMode("vocal")}>Vocal track</button>
+                  <button type="button" aria-pressed={playbackMode === "instrumental"} disabled={!instrumentalPracticeTrack} onClick={() => setPlaybackMode("instrumental")}>Instrumental / backing track</button>
+                </div>
+                <p style={{ margin: "0 0 10px", fontSize: 13, lineHeight: 1.55, opacity: 0.8 }}>
+                  Upload vocal-only or instrumental files if you already have them. The free version switches between tracks but does not automatically separate vocals from a mixed song.
+                </p>
+                <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 12 }}>
+                  <label style={{ display: "inline-flex", alignItems: "center", gap: 7, cursor: "pointer" }}>
+                    <span>Upload vocal track</span>
+                    <input type="file" accept="audio/*,.mp3,.wav,.m4a,.ogg,.webm,.aac" onChange={(event) => handlePracticeTrackUpload(event, "vocal")} />
+                  </label>
+                  {vocalPracticeTrack && <button type="button" onClick={() => clearPracticeTrack("vocal")}>Remove vocal</button>}
+                  <label style={{ display: "inline-flex", alignItems: "center", gap: 7, cursor: "pointer" }}>
+                    <span>Upload backing track</span>
+                    <input type="file" accept="audio/*,.mp3,.wav,.m4a,.ogg,.webm,.aac" onChange={(event) => handlePracticeTrackUpload(event, "instrumental")} />
+                  </label>
+                  {instrumentalPracticeTrack && <button type="button" onClick={() => clearPracticeTrack("instrumental")}>Remove backing</button>}
+                </div>
+                <div style={{ fontSize: 13, marginBottom: 8, opacity: 0.82 }}>
+                  {playbackMode === "original" ? `Playing: ${selectedSong?.name || "Original song"}` : playbackMode === "vocal" ? `Playing vocal track: ${vocalPracticeTrack?.name || ""}` : `Playing backing track: ${instrumentalPracticeTrack?.name || ""}`}
+                </div>
+                <audio controls preload="metadata" style={{ width: "100%" }} key={`${playbackMode}-${playbackMode === "vocal" ? vocalPracticeTrack?.name : playbackMode === "instrumental" ? instrumentalPracticeTrack?.name : selectedSong?.name}`} src={playbackMode === "vocal" ? vocalPracticeTrack?.url : playbackMode === "instrumental" ? instrumentalPracticeTrack?.url : songAnalysis.audioUrl} />
               </div>
             )}
 
