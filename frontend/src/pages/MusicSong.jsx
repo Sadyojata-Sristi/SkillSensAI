@@ -2174,6 +2174,40 @@ export default function MusicSong() {
       : "—";
 
 
+  const adaptiveCoaching = (() => {
+    if (!comparison) return null;
+    const metricOptions = [
+      { key: "pitch_accuracy", label: "Pitch accuracy", value: comparison.pitch_accuracy, exercise: "Sing one short phrase slowly on a comfortable vowel. Match each note, pause, then repeat the phrase at normal speed." },
+      { key: "note_match", label: "Note matching", value: comparison.note_match, exercise: "Play or listen to one reference note, hum it back, and repeat three times before singing the full phrase." },
+      { key: "timing_accuracy", label: "Timing", value: comparison.timing_accuracy, exercise: "Clap or tap the beat first, then sing the phrase while keeping the beat steady." },
+      { key: "stability", label: "Pitch stability", value: comparison.stability, exercise: "Hold a comfortable note for 3–4 seconds with relaxed breathing. Keep the volume gentle and avoid forcing the sound." },
+    ].map((metric) => ({ ...metric, numeric: Number(metric.value) }))
+      .filter((metric) => metric.value !== null && metric.value !== undefined && metric.value !== "" && Number.isFinite(metric.numeric));
+    if (!metricOptions.length) return { focus: "Consistent practice", exercise: "Repeat a short phrase, rest briefly, and compare another attempt when the recording is clear enough to evaluate." };
+    const weakest = [...metricOptions].sort((a, b) => a.numeric - b.numeric)[0];
+    const songName = selectedSong?.name || "Practice song";
+    const songAttempts = saveProgress
+      ? progressHistory.filter((entry) => entry.song === songName && Number.isFinite(Number(entry.overall_score))).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      : [];
+    // The newest entry may be the report currently on screen; skip just that one if it was saved moments ago.
+    const previousAttempts = songAttempts.length && Date.now() - new Date(songAttempts[0].date).getTime() < 90000
+      ? songAttempts.slice(1, 6)
+      : songAttempts.slice(0, 5);
+    const latestPrevious = previousAttempts[0];
+    const currentScore = Number(comparison.overall_score);
+    const scoreChange = latestPrevious && Number.isFinite(currentScore) ? currentScore - Number(latestPrevious.overall_score) : null;
+    const sameWeakMetric = previousAttempts.slice(0, 3).filter((entry) => Number(entry[weakest.key]) < 70).length;
+    const repeated = previousAttempts.length >= 2 && sameWeakMetric >= 2;
+    return {
+      focus: weakest.label,
+      exercise: weakest.exercise,
+      repeated,
+      previousCount: previousAttempts.length,
+      scoreChange: Number.isFinite(scoreChange) ? scoreChange : null,
+      previousScore: latestPrevious ? Number(latestPrevious.overall_score) : null,
+    };
+  })();
+
   /* =======================================================
      RENDER
   ======================================================= */
@@ -3234,6 +3268,32 @@ export default function MusicSong() {
                 {comparison.coaching?.progression_rule || "Repeat the exercise after each attempt and increase difficulty as your score improves."}
               </p>
             </div>
+
+            {adaptiveCoaching && (
+              <div className="feedback-card" style={{ marginTop: 18, borderLeft: "3px solid #7c5cfc" }}>
+                <div className="feedback-header">
+                  <Activity size={22} />
+                  <h3>Adaptive next practice</h3>
+                </div>
+                <p style={{ marginTop: 8 }}>
+                  <strong>Today's focus:</strong> {adaptiveCoaching.focus}
+                </p>
+                <p>{adaptiveCoaching.exercise}</p>
+                {adaptiveCoaching.repeated && (
+                  <p style={{ padding: "10px 12px", borderRadius: 8, background: "rgba(124,92,252,.10)" }}>
+                    <strong>Repeated focus detected:</strong> this skill has been below 70 in at least two of your recent saved attempts. Keep the next practice short and repeat this exercise before moving on.
+                  </p>
+                )}
+                {adaptiveCoaching.scoreChange !== null && (
+                  <p style={{ fontSize: 13, opacity: 0.85 }}>
+                    Compared with your previous saved attempt for this song: {adaptiveCoaching.scoreChange > 0 ? "+" : ""}{Math.round(adaptiveCoaching.scoreChange)} points ({Math.round(adaptiveCoaching.previousScore)}/100 previously).
+                  </p>
+                )}
+                <p style={{ fontSize: 12, opacity: 0.72 }}>
+                  Recommendations use the metrics available in this report. Trend comparison is available when score history is enabled on this device.
+                </p>
+              </div>
+            )}
 
             {(comparison.sections || []).length > 0 && (
               <details className="feedback-card" style={{ marginTop: 18, padding: 18 }} open>
