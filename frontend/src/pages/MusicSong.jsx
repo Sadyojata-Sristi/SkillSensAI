@@ -24,6 +24,7 @@ import {
 import axios from "axios";
 
 import "./MusicSong.css";
+import "./MusicSong-ux.css";
 
 
 /* =========================================================
@@ -2479,9 +2480,11 @@ export default function MusicSong() {
                 return lyricText ? (
                   <pre className="song-lyrics-text">{lyricText}</pre>
                 ) : (
-                  <p className="song-lyrics-unavailable">
-                    Lyrics are not being returned by the current backend. Song analysis currently returns pitch data only, so lyrics transcription must be added to the backend before lyrics can appear here.
-                  </p>
+                  <div className="song-lyrics-unavailable" role="status">
+                    <strong>Lyrics could not be transcribed for this upload.</strong>
+                    <p>{songAnalysis.lyrics_warning || "SkillSensAI tried to retrieve lyrics, but the transcription service did not return text."}</p>
+                    <p>Pitch analysis can still work without lyrics. Clear vocals and a supported transcription service improve the chance of recognition; some songs may still be transcribed inaccurately.</p>
+                  </div>
                 );
               })()}
             </div>
@@ -2963,8 +2966,8 @@ export default function MusicSong() {
 
               <div className="metric-card">
 
-                <span>
-                  Pitch Accuracy
+                <span className="metric-label-help" title="Pitch accuracy estimates how closely the notes you sang match the reference melody. Higher is better. Hover over this label any time for an explanation." tabIndex={0}>
+                  Pitch Accuracy <span aria-hidden="true">ⓘ</span>
                 </span>
 
                 <strong>
@@ -2982,8 +2985,8 @@ export default function MusicSong() {
 
               <div className="metric-card">
 
-                <span>
-                  Note Matching
+                <span className="metric-label-help" title="Note matching estimates how often your detected musical notes match the reference notes. It can be affected by background instruments or unclear vocals." tabIndex={0}>
+                  Note Matching <span aria-hidden="true">ⓘ</span>
                 </span>
 
                 <strong>
@@ -3001,8 +3004,8 @@ export default function MusicSong() {
 
               <div className="metric-card">
 
-                <span>
-                  Timing Accuracy
+                <span className="metric-label-help" title="Timing accuracy estimates whether your note changes happen at roughly the same times as the reference. It is an estimate, not word-level rhythm recognition." tabIndex={0}>
+                  Timing Accuracy <span aria-hidden="true">ⓘ</span>
                 </span>
 
                 <strong>
@@ -3032,8 +3035,8 @@ export default function MusicSong() {
 
               <div className="metric-card">
 
-                <span>
-                  Stability
+                <span className="metric-label-help" title="Stability estimates how consistently your detected pitch is held rather than wavering unexpectedly. Natural vibrato can affect this estimate." tabIndex={0}>
+                  Stability <span aria-hidden="true">ⓘ</span>
                 </span>
 
                 <strong>
@@ -3051,8 +3054,8 @@ export default function MusicSong() {
 
               <div className="metric-card">
 
-                <span>
-                  Avg Pitch Error
+                <span className="metric-label-help" title="Average pitch error measures the average difference between your pitch and the reference in cents. 100 cents equals one semitone; lower is better." tabIndex={0}>
+                  Average Pitch Error <span aria-hidden="true">ⓘ</span>
                 </span>
 
                 <strong>
@@ -3065,6 +3068,10 @@ export default function MusicSong() {
 
             </div>
 
+
+            <details className="comparison-details">
+              <summary>Explore detailed feedback, pitch graph and practice exercises</summary>
+              <div className="comparison-details-content">
 
             {/* =============================================
                 COMPARISON GRAPH
@@ -3219,6 +3226,9 @@ export default function MusicSong() {
               <p style={{ opacity: 0.75, fontSize: 12, marginTop: 12 }}>
                 Mistakes are inferred from detected pitch differences, not verified lyric or word-level errors. Timestamp accuracy depends on how closely the recordings align.
               </p>
+            </details>
+
+              </div>
             </details>
 
             <div className="feedback-card" style={{ marginTop: 18 }}>
