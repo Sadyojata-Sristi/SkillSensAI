@@ -2573,12 +2573,12 @@ export default function MusicSong() {
               <div className="manual-lyrics-fallback" style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(124,92,252,.18)" }}>
                 <strong style={{ display: "block", marginBottom: 6 }}>Free option: add lyrics manually</strong>
                 <p style={{ margin: "0 0 10px", fontSize: 13, lineHeight: 1.6, opacity: 0.82 }}>
-                  Automatic transcription is currently disabled to avoid paid API calls. Paste lyrics you have permission to use, with one phrase or line per row. SkillSensAI can then attach these lines to practice sections as an estimate; it does not yet detect exact lyric timestamps automatically.
+                  Automatic transcription is disabled to avoid paid API calls. For better alignment, add a timestamp before each line in mm:ss format (for example, 00:12 First lyric phrase). Timestamped lines are matched to section time ranges; lines without timestamps are spread across sections as estimates.
                 </p>
                 <textarea
                   value={manualLyrics}
                   onChange={(event) => { setManualLyrics(event.target.value); setManualLyricsNotice(""); }}
-                  placeholder={"Paste lyrics here, one phrase per line…\nFirst phrase\nSecond phrase\nThird phrase"}
+                  placeholder={"Paste lyrics one phrase per line…\n00:12 First phrase\n00:18 Second phrase\n00:25 Third phrase"}
                   rows={5}
                   aria-label="Paste song lyrics, one phrase per line"
                   style={{ width: "100%", boxSizing: "border-box", resize: "vertical", borderRadius: 10, padding: 12, border: "1px solid rgba(124,92,252,.35)", background: "rgba(255,255,255,.72)", color: "#30294a", font: "inherit", lineHeight: 1.6 }}
@@ -2588,7 +2588,8 @@ export default function MusicSong() {
                     const cleaned = manualLyrics.split(/\r?\n/).map((line) => line.trim()).filter(Boolean).join("\n");
                     setSavedManualLyrics(cleaned);
                     setManualLyrics(cleaned);
-                    setManualLyricsNotice(cleaned ? `Saved ${cleaned.split("\n").length} lyric lines for this practice session.` : "Paste at least one lyric line first.");
+                    const timestamped = cleaned.split("\n").filter((line) => /^\s*\d{1,2}:\d{2}\s+.+/.test(line)).length;
+                    setManualLyricsNotice(cleaned ? `Saved ${cleaned.split("\n").length} lyric lines (${timestamped} with timestamps) for this practice session.` : "Paste at least one lyric line first.");
                   }}>
                     Use these lyrics
                   </button>
@@ -2638,25 +2639,31 @@ export default function MusicSong() {
                   <Volume2 size={20} />
                   <strong>Practice audio controls</strong>
                 </div>
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
-                  <button type="button" aria-pressed={playbackMode === "original"} onClick={() => setPlaybackMode("original")}>Original song</button>
-                  <button type="button" aria-pressed={playbackMode === "vocal"} disabled={!vocalPracticeTrack} onClick={() => setPlaybackMode("vocal")}>Vocal track</button>
-                  <button type="button" aria-pressed={playbackMode === "instrumental"} disabled={!instrumentalPracticeTrack} onClick={() => setPlaybackMode("instrumental")}>Instrumental / backing track</button>
+                <div className="practice-track-mode-buttons" style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 14 }}>
+                  <button className={`practice-track-mode-button ${playbackMode === "original" ? "is-active" : ""}`} type="button" aria-pressed={playbackMode === "original"} onClick={() => setPlaybackMode("original")}>
+                    <span aria-hidden="true">♫</span> Original song
+                  </button>
+                  <button className={`practice-track-mode-button ${playbackMode === "vocal" ? "is-active" : ""}`} type="button" aria-pressed={playbackMode === "vocal"} disabled={!vocalPracticeTrack} onClick={() => setPlaybackMode("vocal")}>
+                    <span aria-hidden="true">🎤</span> Vocal track
+                  </button>
+                  <button className={`practice-track-mode-button ${playbackMode === "instrumental" ? "is-active" : ""}`} type="button" aria-pressed={playbackMode === "instrumental"} disabled={!instrumentalPracticeTrack} onClick={() => setPlaybackMode("instrumental")}>
+                    <span aria-hidden="true">🎹</span> Instrumental / backing track
+                  </button>
                 </div>
                 <p style={{ margin: "0 0 10px", fontSize: 13, lineHeight: 1.55, opacity: 0.8 }}>
                   Upload vocal-only or instrumental files if you already have them. The free version switches between tracks but does not automatically separate vocals from a mixed song.
                 </p>
-                <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 12 }}>
-                  <label style={{ display: "inline-flex", alignItems: "center", gap: 7, cursor: "pointer" }}>
-                    <span>Upload vocal track</span>
+                <div className="practice-track-upload-actions" style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
+                  <label className="practice-track-upload-button" style={{ display: "inline-flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+                    <span aria-hidden="true">＋</span><span>Upload vocal track</span>
                     <input type="file" accept="audio/*,.mp3,.wav,.m4a,.ogg,.webm,.aac" onChange={(event) => handlePracticeTrackUpload(event, "vocal")} />
                   </label>
-                  {vocalPracticeTrack && <button type="button" onClick={() => clearPracticeTrack("vocal")}>Remove vocal</button>}
-                  <label style={{ display: "inline-flex", alignItems: "center", gap: 7, cursor: "pointer" }}>
-                    <span>Upload backing track</span>
+                  {vocalPracticeTrack && <button className="practice-track-remove-button" type="button" onClick={() => clearPracticeTrack("vocal")}>Remove vocal</button>}
+                  <label className="practice-track-upload-button" style={{ display: "inline-flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+                    <span aria-hidden="true">＋</span><span>Upload backing track</span>
                     <input type="file" accept="audio/*,.mp3,.wav,.m4a,.ogg,.webm,.aac" onChange={(event) => handlePracticeTrackUpload(event, "instrumental")} />
                   </label>
-                  {instrumentalPracticeTrack && <button type="button" onClick={() => clearPracticeTrack("instrumental")}>Remove backing</button>}
+                  {instrumentalPracticeTrack && <button className="practice-track-remove-button" type="button" onClick={() => clearPracticeTrack("instrumental")}>Remove backing</button>}
                 </div>
                 <div style={{ fontSize: 13, marginBottom: 8, opacity: 0.82 }}>
                   {playbackMode === "original" ? `Playing: ${selectedSong?.name || "Original song"}` : playbackMode === "vocal" ? `Playing vocal track: ${vocalPracticeTrack?.name || ""}` : `Playing backing track: ${instrumentalPracticeTrack?.name || ""}`}
@@ -3375,14 +3382,30 @@ export default function MusicSong() {
                         </p>
                         <p style={{ margin: "5px 0" }}>{section.feedback}</p>
                         {savedManualLyrics.split("\n").filter(Boolean).length > 0 && (() => {
-                          const lyricLines = savedManualLyrics.split("\n").filter(Boolean);
-                          const sections = comparison.sections || [];
-                          const estimatedLineIndex = Math.min(lyricLines.length - 1, Math.floor(((Number(section.section_number) - 1) / Math.max(1, sections.length)) * lyricLines.length));
+                          const rawLines = savedManualLyrics.split("\n").map((line) => line.trim()).filter(Boolean);
+                          const lyricLines = rawLines.map((raw, index) => {
+                            const match = raw.match(/^(\d{1,2}):(\d{2})\s+(.+)$/);
+                            return match
+                              ? { text: match[3].trim(), time: Number(match[1]) * 60 + Number(match[2]), index, timestamped: true }
+                              : { text: raw, time: null, index, timestamped: false };
+                          });
+                          const timedLines = lyricLines.filter((line) => line.timestamped).sort((a, b) => a.time - b.time);
+                          const sectionStart = Number(section.start_time) || 0;
+                          const sectionEnd = Number(section.end_time) || sectionStart;
+                          const sectionMid = (sectionStart + sectionEnd) / 2;
+                          let matchedLine = null;
+                          if (timedLines.length) {
+                            matchedLine = [...timedLines].reverse().find((line) => line.time <= sectionMid) || timedLines[0];
+                          } else {
+                            const sections = comparison.sections || [];
+                            const estimatedLineIndex = Math.min(lyricLines.length - 1, Math.floor(((Number(section.section_number) - 1) / Math.max(1, sections.length)) * lyricLines.length));
+                            matchedLine = lyricLines[estimatedLineIndex];
+                          }
                           return (
                             <div style={{ marginTop: 8, padding: "9px 11px", borderRadius: 8, background: "rgba(124,92,252,.08)", borderLeft: "3px solid #7c5cfc" }}>
-                              <span style={{ display: "block", fontSize: 11, fontWeight: 700, letterSpacing: ".03em", opacity: .75 }}>SUGGESTED LYRIC LINE · ESTIMATED</span>
-                              <span>{lyricLines[estimatedLineIndex]}</span>
-                              <span style={{ display: "block", marginTop: 4, fontSize: 11, opacity: .72 }}>Line placement is evenly estimated across sections; use it as a guide, not exact word timing.</span>
+                              <span style={{ display: "block", fontSize: 11, fontWeight: 700, letterSpacing: ".03em", opacity: .75 }}>{matchedLine.timestamped ? `TIMESTAMPED LYRIC GUIDE · ${formatTime(matchedLine.time)}` : "SUGGESTED LYRIC LINE · ESTIMATED"}</span>
+                              <span>{matchedLine.text}</span>
+                              <span style={{ display: "block", marginTop: 4, fontSize: 11, opacity: .72 }}>{matchedLine.timestamped ? "Matched using the timestamp you entered and this section's time range. Check the placement by listening; this is phrase-level guidance, not automatic word alignment." : "No timestamps were supplied, so this line is distributed across sections as an estimate. Add mm:ss timestamps to improve alignment."}</span>
                             </div>
                           );
                         })()}
