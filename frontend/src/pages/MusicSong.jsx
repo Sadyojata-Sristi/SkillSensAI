@@ -895,6 +895,32 @@ export default function MusicSong() {
     setComparison,
   ] = useState(null);
 
+  const [skillLevel, setSkillLevel] = useState(() => {
+    try {
+      return localStorage.getItem("skillsensai-music-level") || "beginner";
+    } catch {
+      return "beginner";
+    }
+  });
+
+  const [saveProgress, setSaveProgress] = useState(() => {
+    try {
+      return localStorage.getItem("skillsensai-save-music-progress") !== "false";
+    } catch {
+      return true;
+    }
+  });
+
+  const [progressHistory, setProgressHistory] = useState(() => {
+    try {
+      const saved = localStorage.getItem("skillsensai-music-progress-history");
+      const parsed = saved ? JSON.parse(saved) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  });
+
 
   /* -------------------------------------------------------
      Live state
@@ -973,6 +999,48 @@ export default function MusicSong() {
   */
   const lastGraphUpdateRef =
     useRef(0);
+
+  const lastHandledComparisonRef =
+    useRef(null);
+
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("skillsensai-music-level", skillLevel);
+    } catch (storageError) {
+      console.warn("Could not save music skill level", storageError);
+    }
+  }, [skillLevel]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("skillsensai-save-music-progress", String(saveProgress));
+      if (saveProgress) {
+        localStorage.setItem("skillsensai-music-progress-history", JSON.stringify(progressHistory));
+      }
+    } catch (storageError) {
+      console.warn("Could not save music progress history", storageError);
+    }
+  }, [saveProgress, progressHistory]);
+
+  useEffect(() => {
+    if (!comparison || comparison.success !== true) return;
+    if (lastHandledComparisonRef.current === comparison) return;
+    lastHandledComparisonRef.current = comparison;
+    if (!saveProgress) return;
+    const entry = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      date: new Date().toISOString(),
+      song: selectedSong?.name || "Practice song",
+      level: skillLevel,
+      overall_score: Number(comparison.overall_score),
+      pitch_accuracy: comparison.pitch_accuracy,
+      note_match: comparison.note_match,
+      timing_accuracy: comparison.timing_accuracy,
+      stability: comparison.stability,
+    };
+    setProgressHistory((previous) => [entry, ...previous].slice(0, 30));
+  }, [comparison, saveProgress]);
 
 
   /* =======================================================
@@ -1958,6 +2026,7 @@ export default function MusicSong() {
         voiceFile,
         voiceFile.name
       );
+      formData.append("level", skillLevel);
 
 
       // Let Axios/browser set the multipart boundary automatically.
@@ -2772,6 +2841,26 @@ export default function MusicSong() {
                 )}
 
 
+              {/* Starting level for the adaptive singing coach */}
+              <div className="feedback-card" style={{ marginTop: 18 }}>
+                <label htmlFor="music-skill-level" style={{ display: "block", fontWeight: 700, marginBottom: 8 }}>
+                  Your starting level
+                </label>
+                <select
+                  id="music-skill-level"
+                  value={skillLevel}
+                  onChange={(event) => setSkillLevel(event.target.value)}
+                  style={{ padding: "10px 12px", borderRadius: 10, width: "100%", maxWidth: 360 }}
+                >
+                  <option value="beginner">Beginner — build pitch confidence</option>
+                  <option value="intermediate">Intermediate — improve consistency</option>
+                  <option value="advanced">Advanced — refine precision</option>
+                </select>
+                <p style={{ margin: "8px 0 0", opacity: 0.8 }}>
+                  Exercises and coaching suggestions use this level and the results of your latest attempt.
+                </p>
+              </div>
+
               {/* =========================================
                   COMPARE
               ========================================= */}
@@ -2844,18 +2933,27 @@ export default function MusicSong() {
                 </span>
 
                 <strong>
-                  {Math.round(
-                    comparison.overall_score
+                  {comparison.overall_score !== null && comparison.overall_score !== undefined && Number.isFinite(Number(comparison.overall_score))
+                    ? Math.round(Number(comparison.overall_score))
+                    : "Not evaluated"}
+                  {comparison.overall_score !== null && comparison.overall_score !== undefined && Number.isFinite(Number(comparison.overall_score)) && (
+                    <small>/100</small>
                   )}
-                  <small>
-                    /100
-                  </small>
                 </strong>
 
               </div>
 
             </div>
 
+            <p style={{ margin: "12px 0 18px", lineHeight: 1.5 }}>
+              {comparison.overall_score !== null && comparison.overall_score !== undefined && Number.isFinite(Number(comparison.overall_score))
+                ? Number(comparison.overall_score) >= 85
+                  ? "Strong attempt. Review the detailed report to refine the few sections that still differ from the reference."
+                  : Number(comparison.overall_score) >= 65
+                    ? "Good practice progress. Use the targeted exercises below to improve the weakest measured skill."
+                    : "Use this as a baseline, not a judgement. Practise a short phrase slowly and compare again."
+                : "There was not enough reliable overlapping pitch to calculate a score. Metrics are marked Not evaluated instead of showing a misleading zero."}
+            </p>
 
             {/* =============================================
                 METRICS
@@ -2870,23 +2968,14 @@ export default function MusicSong() {
                 </span>
 
                 <strong>
-                  {
-                    Math.round(
-                      comparison.pitch_accuracy
-                    )
-                  }
-                  %
+                  {comparison.pitch_accuracy !== null && comparison.pitch_accuracy !== undefined && Number.isFinite(Number(comparison.pitch_accuracy))
+                    ? `${Math.round(Number(comparison.pitch_accuracy))}%`
+                    : "Not evaluated"}
                 </strong>
 
-                <div className="metric-bar">
-
-                  <span
-                    style={{
-                      width: `${comparison.pitch_accuracy}%`,
-                    }}
-                  />
-
-                </div>
+                {comparison.pitch_accuracy !== null && comparison.pitch_accuracy !== undefined && Number.isFinite(Number(comparison.pitch_accuracy)) && (
+                  <div className="metric-bar"><span style={{ width: `${Math.max(0, Math.min(100, Number(comparison.pitch_accuracy)))}%` }} /></div>
+                )}
 
               </div>
 
@@ -2898,23 +2987,14 @@ export default function MusicSong() {
                 </span>
 
                 <strong>
-                  {
-                    Math.round(
-                      comparison.note_match
-                    )
-                  }
-                  %
+                  {comparison.note_match !== null && comparison.note_match !== undefined && Number.isFinite(Number(comparison.note_match))
+                    ? `${Math.round(Number(comparison.note_match))}%`
+                    : "Not evaluated"}
                 </strong>
 
-                <div className="metric-bar">
-
-                  <span
-                    style={{
-                      width: `${comparison.note_match}%`,
-                    }}
-                  />
-
-                </div>
+                {comparison.note_match !== null && comparison.note_match !== undefined && Number.isFinite(Number(comparison.note_match)) && (
+                  <div className="metric-bar"><span style={{ width: `${Math.max(0, Math.min(100, Number(comparison.note_match)))}%` }} /></div>
+                )}
 
               </div>
 
@@ -2957,23 +3037,14 @@ export default function MusicSong() {
                 </span>
 
                 <strong>
-                  {
-                    Math.round(
-                      comparison.stability
-                    )
-                  }
-                  %
+                  {comparison.stability !== null && comparison.stability !== undefined && Number.isFinite(Number(comparison.stability))
+                    ? `${Math.round(Number(comparison.stability))}%`
+                    : "Not evaluated"}
                 </strong>
 
-                <div className="metric-bar">
-
-                  <span
-                    style={{
-                      width: `${comparison.stability}%`,
-                    }}
-                  />
-
-                </div>
+                {comparison.stability !== null && comparison.stability !== undefined && Number.isFinite(Number(comparison.stability)) && (
+                  <div className="metric-bar"><span style={{ width: `${Math.max(0, Math.min(100, Number(comparison.stability)))}%` }} /></div>
+                )}
 
               </div>
 
@@ -2985,12 +3056,9 @@ export default function MusicSong() {
                 </span>
 
                 <strong>
-                  {
-                    Math.round(
-                      comparison.average_pitch_error_cents
-                    )
-                  }
-                  ¢
+                  {comparison.average_pitch_error_cents !== null && comparison.average_pitch_error_cents !== undefined && Number.isFinite(Number(comparison.average_pitch_error_cents))
+                    ? `${Math.round(Number(comparison.average_pitch_error_cents))}¢`
+                    : "Not evaluated"}
                 </strong>
 
               </div>
@@ -3102,6 +3170,86 @@ export default function MusicSong() {
 
               </div>
 
+            </div>
+
+            <div className="feedback-card" style={{ marginTop: 18 }}>
+              <div className="feedback-header">
+                <Activity size={22} />
+                <h3>Personal coaching plan</h3>
+              </div>
+              <p style={{ marginTop: 8 }}>
+                <strong>Starting level:</strong> {comparison.coaching?.starting_level || skillLevel}
+              </p>
+              <p>
+                <strong>Priority:</strong> Focus on {comparison.coaching?.focus_metric || "the skill that needs the most work"}.
+              </p>
+              <p>{comparison.coaching?.next_exercise || "Repeat a short phrase slowly, then try it again at the original tempo."}</p>
+              <p style={{ opacity: 0.8, fontSize: 13 }}>
+                {comparison.coaching?.progression_rule || "Repeat the exercise after each attempt and increase difficulty as your score improves."}
+              </p>
+            </div>
+
+            <details className="feedback-card" style={{ marginTop: 18, padding: 18 }}>
+              <summary style={{ cursor: "pointer", fontWeight: 700 }}>
+                Detailed report: mistakes, timestamps and exercises ({(comparison.mistakes || []).length})
+              </summary>
+              {(comparison.mistakes || []).length ? (
+                <div className="feedback-list" style={{ marginTop: 14 }}>
+                  {(comparison.mistakes || []).map((mistake, index) => (
+                    <div className="feedback-item" key={`${mistake.start_time}-${index}`} style={{ alignItems: "flex-start", gap: 10 }}>
+                      <AlertCircle size={17} />
+                      <div>
+                        <strong>
+                          {formatTime(mistake.start_time)}–{formatTime(mistake.end_time)} · {mistake.severity || "practice"} priority
+                        </strong>
+                        <p style={{ margin: "5px 0" }}>
+                          Reference: {mistake.reference_note || "Not identified"} · Your detected note: {mistake.user_note || "Not identified"} · Pitch difference: {Math.round(Number(mistake.average_cents_error) || 0)} cents
+                        </p>
+                        <p style={{ margin: "5px 0" }}>{mistake.explanation}</p>
+                        <p style={{ margin: "5px 0" }}><strong>Try this:</strong> {mistake.exercise}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p style={{ marginTop: 12 }}>
+                  No sustained pitch mismatches were confidently detected in the analysed overlap. This does not guarantee a perfect performance; try a cleaner vocal reference if background music is present.
+                </p>
+              )}
+              <p style={{ opacity: 0.75, fontSize: 12, marginTop: 12 }}>
+                Mistakes are inferred from detected pitch differences, not verified lyric or word-level errors. Timestamp accuracy depends on how closely the recordings align.
+              </p>
+            </details>
+
+            <div className="feedback-card" style={{ marginTop: 18 }}>
+              <div className="feedback-header">
+                <CheckCircle2 size={22} />
+                <h3>Practice progress</h3>
+              </div>
+              <label style={{ display: "flex", gap: 10, alignItems: "center", margin: "10px 0" }}>
+                <input type="checkbox" checked={saveProgress} onChange={(event) => setSaveProgress(event.target.checked)} />
+                Save scores and progress on this device
+              </label>
+              <p style={{ fontSize: 13, opacity: 0.8 }}>
+                Only score summaries are saved here; audio recordings are not saved in this history. Turn this off to stop saving future results.
+              </p>
+              {saveProgress && progressHistory.length > 0 && (
+                <div className="feedback-list">
+                  {progressHistory.slice(0, 5).map((entry) => (
+                    <div className="feedback-item" key={entry.id}>
+                      <BarChart3 size={17} />
+                      <span>
+                        <strong>{entry.song}</strong> — {Number.isFinite(Number(entry.overall_score)) ? `${Math.round(Number(entry.overall_score))}/100` : "Score unavailable"} · {new Date(entry.date).toLocaleDateString()} · {entry.level}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {saveProgress && progressHistory.length > 0 && (
+                <button type="button" className="reset-button" onClick={() => setProgressHistory([])} style={{ marginTop: 12 }}>
+                  Clear saved score history
+                </button>
+              )}
             </div>
 
 
