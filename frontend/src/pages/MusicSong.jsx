@@ -3197,6 +3197,35 @@ export default function MusicSong() {
               </p>
             </div>
 
+            {(comparison.sections || []).length > 0 && (
+              <details className="feedback-card" style={{ marginTop: 18, padding: 18 }} open>
+                <summary style={{ cursor: "pointer", fontWeight: 700 }}>
+                  Section-by-section practice report ({comparison.sections.length} time ranges)
+                </summary>
+                <p style={{ marginTop: 10, opacity: 0.82, fontSize: 13 }}>
+                  The analysed audio is divided into short time ranges. These are not automatically identified as verses or choruses, and sections without enough overlapping singing are left unscored.
+                </p>
+                <div className="feedback-list" style={{ marginTop: 12 }}>
+                  {comparison.sections.map((section) => (
+                    <div className="feedback-item" key={`section-${section.section_number}`} style={{ alignItems: "flex-start", gap: 10 }}>
+                      <BarChart3 size={18} />
+                      <div style={{ width: "100%" }}>
+                        <strong>
+                          Section {section.section_number} · {formatTime(section.start_time)}–{formatTime(section.end_time)}
+                        </strong>
+                        <p style={{ margin: "5px 0" }}>
+                          {section.status === "scored" ? (
+                            <>Section score: <strong>{Math.round(Number(section.score) || 0)}/100</strong> · Pitch accuracy: {Math.round(Number(section.pitch_accuracy) || 0)}% · Note match: {Math.round(Number(section.note_match) || 0)}% · Average pitch difference: {Math.round(Number(section.average_pitch_error_cents) || 0)} cents</>
+                          ) : "Not enough matching singing to calculate a reliable section score."}
+                        </p>
+                        <p style={{ margin: "5px 0" }}>{section.feedback}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </details>
+            )}
+
             <details className="feedback-card" style={{ marginTop: 18, padding: 18 }}>
               <summary style={{ cursor: "pointer", fontWeight: 700 }}>
                 Detailed report: mistakes, timestamps and exercises ({(comparison.mistakes || []).length})
