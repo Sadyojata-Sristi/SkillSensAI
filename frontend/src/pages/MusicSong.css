@@ -1848,15 +1848,106 @@
   .music-song-page .synced-lyric-line { padding: 8px; gap: 8px; }
 }
 
-
-/* Multi-screen song practice workflow */
-.music-song-page .music-workflow-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 0 0 22px; padding: 8px; border: 1px solid rgba(124, 92, 252, .18); border-radius: 16px; background: rgba(255, 255, 255, .72); }
-.music-song-page .music-workflow-nav button { display: flex; align-items: center; gap: 11px; min-width: 0; padding: 12px; border: 1px solid transparent; border-radius: 11px; color: #69627d; background: transparent; text-align: left; transition: background .18s ease, border-color .18s ease, transform .18s ease; }
-.music-song-page .music-workflow-nav button:not(:disabled):hover { transform: translateY(-1px); background: rgba(124, 92, 252, .07); }
-.music-song-page .music-workflow-nav button.is-active { border-color: rgba(124, 92, 252, .28); color: #433475; background: linear-gradient(135deg, rgba(124, 92, 252, .13), rgba(124, 92, 252, .04)); }
-.music-song-page .music-workflow-nav button:disabled { cursor: not-allowed; opacity: .48; }
-.music-song-page .music-workflow-number { display: grid; place-items: center; width: 34px; height: 34px; flex: 0 0 auto; border-radius: 10px; color: #6245d8; background: rgba(124, 92, 252, .12); font-size: 13px; font-weight: 850; }
-.music-song-page .music-workflow-nav button > span:last-child { display: grid; gap: 4px; min-width: 0; }
-.music-song-page .music-workflow-nav strong { font-size: 12px; }
-.music-song-page .music-workflow-nav small { color: #89829d; font-size: 10px; line-height: 1.35; }
-@media (max-width: 620px) { .music-song-page .music-workflow-nav { grid-template-columns: 1fr; gap: 5px; padding: 6px; } .music-song-page .music-workflow-nav button { padding: 10px; } }
+/* =========================================================
+   SONG SEARCH — polished, app-like controls
+   ========================================================= */
+.music-song-page .music-step-card .voice-options .voice-upload-button {
+  min-height: 52px;
+  padding: 13px 20px;
+  border: 1px solid #7657f6;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #7657f6 0%, #5a3bd1 100%);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  box-shadow: 0 8px 18px rgba(103, 75, 225, 0.22);
+}
+.music-song-page .music-step-card .voice-options .voice-upload-button:hover {
+  border-color: #4d31c0;
+  background: linear-gradient(135deg, #6847eb 0%, #4e2ec4 100%);
+  color: #fff;
+  box-shadow: 0 11px 24px rgba(103, 75, 225, 0.3);
+  transform: translateY(-2px);
+}
+.music-song-page .song-search-box {
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid #e1dcff;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #fbfaff 0%, #f3f0ff 100%);
+  box-shadow: 0 12px 30px rgba(66, 45, 150, 0.08);
+  animation: songSearchReveal 180ms ease-out;
+}
+.music-song-page .song-search-input-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 54px;
+  padding: 6px 7px 6px 14px;
+  border: 1px solid #d9d3f6;
+  border-radius: 13px;
+  background: #fff;
+  color: #7257d8;
+  box-shadow: 0 3px 10px rgba(43, 31, 102, 0.04);
+}
+.music-song-page .song-search-input-row:focus-within {
+  border-color: #8065f2;
+  box-shadow: 0 0 0 4px rgba(118, 87, 246, 0.13);
+}
+.music-song-page .song-search-input-row input {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  padding: 0 4px;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: #20203a;
+  font: inherit;
+  font-size: 14px;
+}
+.music-song-page .song-search-input-row input::placeholder {
+  color: #9692ad;
+}
+.music-song-page .song-search-input-row button {
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #7657f6 0%, #5838ce 100%);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 5px 12px rgba(103, 75, 225, 0.22);
+  transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+}
+.music-song-page .song-search-input-row button:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(103, 75, 225, 0.28);
+}
+.music-song-page .song-search-input-row button:active {
+  transform: translateY(0);
+}
+.music-song-page .song-search-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 13px 2px 0;
+  color: #716b8c;
+  font-size: 12px;
+  line-height: 1.65;
+}
+@keyframes songSearchReveal {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 560px) {
+  .music-song-page .song-search-box { padding: 12px; }
+  .music-song-page .song-search-input-row { gap: 7px; padding-left: 10px; }
+  .music-song-page .song-search-input-row button { padding: 0 12px; }
+  .music-song-page .music-step-card .voice-options .voice-upload-button,
+  .music-song-page .music-step-card .voice-options .upload-song-button { width: 100%; }
+}
