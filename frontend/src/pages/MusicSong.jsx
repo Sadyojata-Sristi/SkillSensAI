@@ -13,7 +13,6 @@ import {
   Activity,
   Volume2,
   AlertCircle,
-  Download,
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
@@ -822,6 +821,26 @@ export default function MusicSong() {
 
   const navigate =
     useNavigate();
+
+  // Keep the Upload Song page in sync with the Music Room theme.
+  const [darkMode, setDarkMode] = useState(() =>
+    localStorage.getItem("skillsensai_theme") === "dark"
+  );
+
+  useEffect(() => {
+    const syncTheme = () => {
+      setDarkMode(localStorage.getItem("skillsensai_theme") === "dark");
+    };
+
+    syncTheme();
+    window.addEventListener("skillsensai-theme-updated", syncTheme);
+    window.addEventListener("storage", syncTheme);
+
+    return () => {
+      window.removeEventListener("skillsensai-theme-updated", syncTheme);
+      window.removeEventListener("storage", syncTheme);
+    };
+  }, []);
 
 
   /* -------------------------------------------------------
@@ -2276,106 +2295,12 @@ export default function MusicSong() {
     };
   })();
 
-  function getLyricsTextForExport() {
-    const manual = String(savedManualLyrics || manualLyrics || "").trim();
-    if (manual) return manual;
-    const payload = songAnalysis?.data && typeof songAnalysis.data === "object"
-      ? { ...songAnalysis.data, ...songAnalysis }
-      : songAnalysis || {};
-    const lyricValue = payload.lyrics ?? payload.lyrics_text ?? payload.transcript ??
-      payload.transcription ?? payload.transcribed_text ?? payload.text ??
-      payload?.transcription_result?.text ?? payload?.transcription?.text;
-    if (typeof lyricValue === "string") return lyricValue.trim();
-    if (Array.isArray(lyricValue)) {
-      return lyricValue
-        .map((item) => typeof item === "string" ? item : item?.text || item?.lyric || item?.word || "")
-        .filter(Boolean)
-        .join("\n")
-        .trim();
-    }
-    return "";
-  }
-
-  function downloadTextFile(filename, content) {
-    const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-  }
-
-  function handleExportReport() {
-    if (!comparison) return;
-    const score = Number(comparison.overall_score);
-    const metricRows = [
-      ["Pitch accuracy", comparison.pitch_accuracy, "%"],
-      ["Note matching", comparison.note_match, "%"],
-      ["Timing accuracy", comparison.timing_accuracy, "%"],
-      ["Pitch stability", comparison.stability, "%"],
-      ["Average pitch error", comparison.average_pitch_error_cents, " cents"],
-    ];
-    const feedbackItems = Array.isArray(comparison.feedback)
-      ? comparison.feedback
-      : comparison.feedback ? [comparison.feedback] : [];
-    const mistakes = Array.isArray(comparison.mistakes) ? comparison.mistakes : [];
-    const sections = Array.isArray(comparison.sections) ? comparison.sections : [];
-    const lines = [
-      "SkillSensAI — AI Singing Practice Report",
-      `Song: ${selectedSong?.name || "Practice song"}`,
-      `Generated: ${new Date().toLocaleString()}`,
-      `Starting level: ${comparison.coaching?.starting_level || skillLevel}`,
-      "",
-      "OVERALL PERFORMANCE",
-      Number.isFinite(score) ? `${Math.round(score)}/100` : "Not evaluated",
-      "",
-      "MEASURED SKILLS",
-      ...metricRows.map(([label, value, suffix]) => {
-        const numeric = Number(value);
-        return `${label}: ${value !== null && value !== undefined && value !== "" && Number.isFinite(numeric) ? `${Math.round(numeric * (suffix === " cents" ? 1 : 1))}${suffix}` : "Not evaluated"}`;
-      }),
-      "",
-      "AI FEEDBACK",
-      ...(feedbackItems.length ? feedbackItems.map((item) => `- ${typeof item === "string" ? item : item?.message || item?.text || JSON.stringify(item)}`) : ["No additional feedback returned."]),
-      "",
-      "COACHING",
-      `Focus skill: ${adaptiveCoaching?.focus || comparison.coaching?.focus_metric || "Consistent practice"}`,
-      `Suggested exercise: ${adaptiveCoaching?.exercise || comparison.coaching?.next_exercise || "Repeat a short phrase slowly, then compare again."}`,
-      comparison.coaching?.progression_rule ? `Progression: ${comparison.coaching.progression_rule}` : "",
-      "",
-      `DETECTED PITCH MISMATCHES (${mistakes.length})`,
-      ...(mistakes.length ? mistakes.map((mistake, index) =>
-        `${index + 1}. ${formatTime(mistake.start_time)}–${formatTime(mistake.end_time)} | Priority: ${mistake.severity || "practice"} | Reference: ${mistake.reference_note || "Not identified"} | Your note: ${mistake.user_note || "Not identified"} | Difference: ${Math.round(Number(mistake.average_cents_error) || 0)} cents\n   ${mistake.explanation || ""}\n   Try: ${mistake.exercise || "Repeat the phrase slowly."}`
-      ) : ["No sustained pitch mismatches were confidently detected."]),
-      "",
-      `SECTION ANALYSIS (${sections.length})`,
-      ...(sections.length ? sections.map((section, index) =>
-        `${index + 1}. ${formatTime(section.start_time)}–${formatTime(section.end_time)} | ${section.label || section.title || "Section"} | Score: ${section.score ?? "Not evaluated"}`
-      ) : ["No section-by-section data was returned."]),
-      "",
-      "LIMITATIONS",
-      "Scores reflect detected pitch/timing overlap and can be affected by background music, recording quality, and alignment. Mistakes are pitch-based estimates, not verified lyric or word-level errors.",
-    ].filter((line) => line !== undefined && line !== null);
-    const safeBase = (selectedSong?.name || "practice-song").replace(/\.[^.]+$/, "").replace(/[^a-z0-9-_]+/gi, "-").replace(/^-+|-+$/g, "") || "practice-song";
-    downloadTextFile(`SkillSensAI-${safeBase}-report.txt`, lines.join("\n"));
-  }
-
-  function handleExportLyrics() {
-    const lyrics = getLyricsTextForExport();
-    if (!lyrics) return;
-    const safeBase = (selectedSong?.name || "practice-song").replace(/\.[^.]+$/, "").replace(/[^a-z0-9-_]+/gi, "-").replace(/^-+|-+$/g, "") || "practice-song";
-    downloadTextFile(`SkillSensAI-${safeBase}-lyrics.txt`, lyrics);
-  }
-
   /* =======================================================
      RENDER
   ======================================================= */
 
   return (
-    <div className="music-song-page">
+    <div className={`music-song-page ${darkMode ? "music-song-dark-mode" : "music-song-light-mode"}`}>
 
       {/* ===================================================
           BACK
@@ -3326,23 +3251,6 @@ export default function MusicSong() {
                     : "Use this as a baseline, not a judgement. Practise a short phrase slowly and compare again."
                 : "There was not enough reliable overlapping pitch to calculate a score. Metrics are marked Not evaluated instead of showing a misleading zero."}
             </p>
-
-            <div className="report-export-actions" aria-label="Export practice results">
-              <button type="button" className="report-export-primary" onClick={handleExportReport}>
-                <Download size={17} />
-                Download AI report
-              </button>
-              <button
-                type="button"
-                className="report-export-secondary"
-                onClick={handleExportLyrics}
-                disabled={!getLyricsTextForExport()}
-                title={!getLyricsTextForExport() ? "Lyrics are not available to export yet. Add lyrics manually or use lyrics returned by the backend." : "Download the available lyrics as a text file."}
-              >
-                <Download size={17} />
-                Download lyrics
-              </button>
-            </div>
 
             {/* =============================================
                 METRICS
