@@ -1986,6 +1986,9 @@ export default function MusicSong() {
       file
     );
 
+    // After a recording is selected from the Song & Lyrics screen,
+    // take the learner to Practice so the chosen file and analysis controls are visible.
+    setActivePracticeView("practice");
 
     if (
       voicePreview
@@ -2344,13 +2347,13 @@ export default function MusicSong() {
 
         <nav className="music-workflow-nav" aria-label="Song practice steps">
           <button type="button" className={activePracticeView === "song" ? "is-active" : ""} onClick={() => setActivePracticeView("song")}>
-            <span className="music-workflow-number">1</span><span><strong>Song & lyrics</strong><small>Choose a reference track</small></span>
+            <span className="music-workflow-number">1</span><span><strong>Song &amp; lyrics</strong><small>Choose reference</small></span>
           </button>
           <button type="button" disabled={!songAnalysis} className={activePracticeView === "practice" ? "is-active" : ""} onClick={() => setActivePracticeView("practice")}>
-            <span className="music-workflow-number">2</span><span><strong>Practice</strong><small>Record or upload your voice</small></span>
+            <span className="music-workflow-number">2</span><span><strong>Practice</strong><small>Sing or upload</small></span>
           </button>
           <button type="button" disabled={!comparison} className={activePracticeView === "report" ? "is-active" : ""} onClick={() => setActivePracticeView("report")}>
-            <span className="music-workflow-number">3</span><span><strong>AI report</strong><small>Scores and coaching</small></span>
+            <span className="music-workflow-number">3</span><span><strong>AI report</strong><small>Scores &amp; feedback</small></span>
           </button>
         </nav>
 
