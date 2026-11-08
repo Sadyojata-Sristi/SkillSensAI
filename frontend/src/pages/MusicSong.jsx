@@ -2729,7 +2729,7 @@ export default function MusicSong() {
         ================================================= */}
 
         {songAnalysis && (
-          <section className="music-step-card voice-step">
+          <section id="voice-practice-section" className="music-step-card voice-step">
 
             <div className="step-number">
               2
@@ -3361,6 +3361,18 @@ export default function MusicSong() {
                   <strong>Today's focus:</strong> {adaptiveCoaching.focus}
                 </p>
                 <p>{adaptiveCoaching.exercise}</p>
+                <button
+                  type="button"
+                  className="adaptive-practice-button"
+                  onClick={() => {
+                    document
+                      .getElementById("voice-practice-section")
+                      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }}
+                >
+                  <Mic2 size={17} />
+                  Practise this skill now
+                </button>
                 {adaptiveCoaching.repeated && (
                   <p style={{ padding: "10px 12px", borderRadius: 8, background: "rgba(124,92,252,.10)" }}>
                     <strong>Repeated focus detected:</strong> this skill has been below 70 in at least two of your recent saved attempts. Keep the next practice short and repeat this exercise before moving on.
