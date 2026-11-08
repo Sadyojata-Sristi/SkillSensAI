@@ -2585,6 +2585,32 @@ export default function MusicSong() {
               </div>
             )}
 
+            {/* Keep the reference-song analysis visible while making both practice choices available. */}
+            <div className="analysis-practice-actions" style={{ margin: "18px 0 22px", padding: 16, borderRadius: 14, background: "rgba(124,92,252,.08)", border: "1px solid rgba(124,92,252,.2)" }}>
+              <h3 style={{ margin: "0 0 6px" }}>Ready to practise?</h3>
+              <p style={{ margin: "0 0 14px", fontSize: 14, lineHeight: 1.5 }}>Your original song analysis is ready. Sing with the microphone or upload a recording to compare your voice with the reference.</p>
+              <div className="voice-options">
+                <button
+                  type="button"
+                  className="record-button"
+                  onClick={() => setActivePracticeView("practice")}
+                >
+                  <Mic2 size={21} />
+                  Sing Live
+                </button>
+                <label className="voice-upload-button">
+                  <Upload size={20} />
+                  Upload Recording
+                  <input
+                    type="file"
+                    accept=".mp3,.wav,.m4a,.aac,.ogg,.webm,audio/mpeg,audio/wav,audio/mp4,audio/aac,audio/ogg,audio/webm"
+                    onChange={handleVoiceFile}
+                    hidden
+                  />
+                </label>
+              </div>
+            </div>
+
             {/* Show lyrics from supported backend response shapes; never imply they were generated if absent. */}
             <div className="song-lyrics-panel" aria-live="polite">
               <h3>Song Lyrics</h3>
