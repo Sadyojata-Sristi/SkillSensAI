@@ -928,6 +928,7 @@ export default function MusicSong() {
   const [savedManualLyrics, setSavedManualLyrics] = useState("");
   const [manualLyricsNotice, setManualLyricsNotice] = useState("");
   const [playbackCurrentTime, setPlaybackCurrentTime] = useState(0);
+  const [activePracticeView, setActivePracticeView] = useState("song");
 
   // Free practice-track controls. These accept user-provided stems; they do not
   // claim to separate vocals from a mixed song automatically.
@@ -2098,6 +2099,7 @@ export default function MusicSong() {
       }
 
       setComparison(response.data);
+      setActivePracticeView("report");
 
     } catch (err) {
       console.error("SkillSensAI voice comparison failed:", err);
@@ -2182,6 +2184,7 @@ export default function MusicSong() {
     setVoiceFile(null);
     setVoicePreview("");
     setComparison(null);
+    setActivePracticeView("song");
     setManualLyrics("");
     setSavedManualLyrics("");
     setManualLyricsNotice("");
@@ -2335,10 +2338,23 @@ export default function MusicSong() {
         )}
 
 
+        <nav className="music-workflow-nav" aria-label="Song practice steps">
+          <button type="button" className={activePracticeView === "song" ? "is-active" : ""} onClick={() => setActivePracticeView("song")}>
+            <span className="music-workflow-number">1</span><span><strong>Song & lyrics</strong><small>Choose a reference track</small></span>
+          </button>
+          <button type="button" disabled={!songAnalysis} className={activePracticeView === "practice" ? "is-active" : ""} onClick={() => setActivePracticeView("practice")}>
+            <span className="music-workflow-number">2</span><span><strong>Practice</strong><small>Record or upload your voice</small></span>
+          </button>
+          <button type="button" disabled={!comparison} className={activePracticeView === "report" ? "is-active" : ""} onClick={() => setActivePracticeView("report")}>
+            <span className="music-workflow-number">3</span><span><strong>AI report</strong><small>Scores and coaching</small></span>
+          </button>
+        </nav>
+
         {/* =================================================
             STEP 1
         ================================================= */}
 
+        {activePracticeView === "song" && (
         <section className="music-step-card">
 
           <div className="step-number">
@@ -2529,13 +2545,14 @@ export default function MusicSong() {
           </div>
 
         </section>
+        )}
 
 
         {/* =================================================
             SONG ANALYSIS
         ================================================= */}
 
-        {songAnalysis && (
+        {songAnalysis && activePracticeView === "song" && (
           <section className="analysis-result-card">
 
             <div className="analysis-success">
@@ -2789,7 +2806,7 @@ export default function MusicSong() {
             STEP 2
         ================================================= */}
 
-        {songAnalysis && (
+        {songAnalysis && activePracticeView === "practice" && (
           <section id="voice-practice-section" className="music-step-card voice-step">
 
             <div className="step-number">
@@ -3126,7 +3143,7 @@ export default function MusicSong() {
             COMPARISON RESULTS
         ================================================= */}
 
-        {comparison && (
+        {comparison && activePracticeView === "report" && (
           <section className="comparison-results">
 
             {(comparison.warning || comparison.prototype_note) && (
@@ -3426,9 +3443,12 @@ export default function MusicSong() {
                   type="button"
                   className="adaptive-practice-button"
                   onClick={() => {
-                    document
-                      .getElementById("voice-practice-section")
-                      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    setActivePracticeView("practice");
+                    window.setTimeout(() => {
+                      document
+                        .getElementById("voice-practice-section")
+                        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }, 60);
                   }}
                 >
                   <Mic2 size={17} />
