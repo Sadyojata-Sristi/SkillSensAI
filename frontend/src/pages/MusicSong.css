@@ -2034,64 +2034,70 @@
 }
 
 
-/* Consolidated AI report export actions */
-.music-song-page .report-export-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-  margin: 4px 0 2px;
+/* =========================================================
+   THEME SYNC — UPLOAD SONG / PRACTICE PAGE DARK MODE
+   Mirrors the Music Room's skillsensai_theme preference.
+========================================================= */
+.music-song-page.music-song-dark-mode {
+  --skill-color: #a99aff;
+  --skill-dark: #c2b7ff;
+  --skill-light: #29213f;
+  --skill-lighter: #201a31;
+  --skill-border: #51446f;
+  --skill-glow: rgba(157, 132, 255, 0.2);
+  background: radial-gradient(circle at 50% 0%, rgba(124, 92, 252, 0.18), transparent 38%), #100d19;
+  color: #f3f0ff;
+  color-scheme: dark;
 }
-
-.music-song-page .report-export-actions button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
-  min-height: 44px;
-  padding: 11px 17px;
-  border-radius: 12px;
-  border: 1px solid transparent;
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+.music-song-page.music-song-dark-mode .music-song-back,
+.music-song-page.music-song-dark-mode .music-step-card,
+.music-song-page.music-song-dark-mode .song-search-box,
+.music-song-page.music-song-dark-mode .song-search-input-row,
+.music-song-page.music-song-dark-mode .music-workflow-nav,
+.music-song-page.music-song-dark-mode .music-report-card,
+.music-song-page.music-song-dark-mode .music-metric-card,
+.music-song-page.music-song-dark-mode .lyrics-panel,
+.music-song-page.music-song-dark-mode .song-analysis-card,
+.music-song-page.music-song-dark-mode .music-song-panel,
+.music-song-page.music-song-dark-mode .music-report-section {
+  background-color: #1b1727;
+  color: #f3f0ff;
+  border-color: #39304d;
 }
-
-.music-song-page .report-export-primary {
-  color: #fff;
-  background: linear-gradient(135deg, #8064ff, #6245d8);
-  box-shadow: 0 8px 18px rgba(98, 69, 216, .2);
+.music-song-page.music-song-dark-mode h1,
+.music-song-page.music-song-dark-mode h2,
+.music-song-page.music-song-dark-mode h3,
+.music-song-page.music-song-dark-mode h4,
+.music-song-page.music-song-dark-mode p,
+.music-song-page.music-song-dark-mode label,
+.music-song-page.music-song-dark-mode .step-label,
+.music-song-page.music-song-dark-mode .music-song-label,
+.music-song-page.music-song-dark-mode .music-workflow-nav strong,
+.music-song-page.music-song-dark-mode .music-workflow-nav small {
+  color: #f3f0ff;
 }
-
-.music-song-page .report-export-secondary {
-  color: #6245d8;
-  background: #fff;
-  border-color: #d9d0ff !important;
+.music-song-page.music-song-dark-mode input:not([type="file"]),
+.music-song-page.music-song-dark-mode textarea,
+.music-song-page.music-song-dark-mode select {
+  background: #15111f;
+  color: #f7f4ff;
+  border-color: #51446f;
 }
-
-.music-song-page .report-export-actions button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 22px rgba(98, 69, 216, .18);
+.music-song-page.music-song-dark-mode input::placeholder,
+.music-song-page.music-song-dark-mode textarea::placeholder { color: #aaa0c2; }
+.music-song-page.music-song-dark-mode .upload-song-button,
+.music-song-page.music-song-dark-mode .voice-upload-button,
+.music-song-page.music-song-dark-mode .music-workflow-nav button {
+  color: #f6f2ff;
+  border-color: #554574;
 }
-
-.music-song-page .report-export-actions button:focus-visible {
-  outline: 3px solid rgba(124, 92, 252, .35);
-  outline-offset: 3px;
+.music-song-page.music-song-dark-mode .music-workflow-nav button:not(.is-active) { background: #211b30; }
+.music-song-page.music-song-dark-mode .music-workflow-nav button.is-active {
+  background: linear-gradient(135deg, #514080, #382953);
+  border-color: #9c86ee;
 }
-
-.music-song-page .report-export-actions button:disabled {
-  opacity: .5;
-  cursor: not-allowed;
-}
-
-@media (max-width: 560px) {
-  .music-song-page .report-export-actions {
-    display: grid;
-    grid-template-columns: 1fr;
-  }
-
-  .music-song-page .report-export-actions button {
-    width: 100%;
-  }
-}
+.music-song-page.music-song-dark-mode .music-song-icon { background: #29213f; border-color: #51446f; }
+.music-song-page.music-song-dark-mode .music-song-error { background: #351d2a; color: #ffdbe6; border-color: #714052; }
+.music-song-page.music-song-dark-mode .music-song-page button:disabled { opacity: .48; }
+.music-song-page.music-song-dark-mode .music-step-card *,
+.music-song-page.music-song-dark-mode .song-search-box * { color-scheme: dark; }
