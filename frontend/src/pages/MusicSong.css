@@ -2032,3 +2032,66 @@
   .music-song-page .music-workflow-nav strong { font-size: 13px; }
   .music-song-page .music-workflow-nav small { font-size: 11px; }
 }
+
+
+/* Consolidated AI report export actions */
+.music-song-page .report-export-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0 2px;
+}
+
+.music-song-page .report-export-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 11px 17px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.music-song-page .report-export-primary {
+  color: #fff;
+  background: linear-gradient(135deg, #8064ff, #6245d8);
+  box-shadow: 0 8px 18px rgba(98, 69, 216, .2);
+}
+
+.music-song-page .report-export-secondary {
+  color: #6245d8;
+  background: #fff;
+  border-color: #d9d0ff !important;
+}
+
+.music-song-page .report-export-actions button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(98, 69, 216, .18);
+}
+
+.music-song-page .report-export-actions button:focus-visible {
+  outline: 3px solid rgba(124, 92, 252, .35);
+  outline-offset: 3px;
+}
+
+.music-song-page .report-export-actions button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 560px) {
+  .music-song-page .report-export-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .music-song-page .report-export-actions button {
+    width: 100%;
+  }
+}
