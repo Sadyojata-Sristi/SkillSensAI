@@ -1718,3 +1718,48 @@
 .music-song-page .practice-track-remove-button { padding: 9px 12px; border: 1px solid #f0caca; border-radius: 10px; background: #fff5f5; color: #bd424b; font-size: 12px; font-weight: 700; cursor: pointer; }
 .music-song-page .practice-track-remove-button:hover { background: #ffe9e9; border-color: #e8a4a8; }
 @media (max-width: 600px) { .music-song-page .practice-track-mode-button { flex: 1 1 145px; } .music-song-page .practice-track-upload-button { width: 100%; justify-content: center; } }
+
+
+/* =========================================================
+   ADAPTIVE COACHING — JUMP BACK INTO PRACTICE
+========================================================= */
+
+.adaptive-practice-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin-top: 8px;
+  padding: 12px 17px;
+  border: 1px solid #6c50e8;
+  border-radius: 11px;
+  background: linear-gradient(100deg, #7c5cfc, #6c70e8);
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 7px 18px rgba(124, 92, 252, 0.18);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.adaptive-practice-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(124, 92, 252, 0.25);
+  filter: brightness(1.04);
+}
+
+.adaptive-practice-button:focus-visible {
+  outline: 3px solid rgba(124, 92, 252, 0.35);
+  outline-offset: 3px;
+}
+
+#voice-practice-section {
+  scroll-margin-top: 24px;
+}
+
+@media (max-width: 600px) {
+  .adaptive-practice-button {
+    width: 100%;
+  }
+}
