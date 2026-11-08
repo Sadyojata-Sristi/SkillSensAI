@@ -1887,9 +1887,9 @@ export default function MusicSong() {
           objectUrl,
       });
 
-      // Move directly to voice practice once the reference song is analysed,
-      // so the live-singing and upload controls are immediately visible.
-      setActivePracticeView("practice");
+      // Keep the user on Song & Lyrics so the original-song analysis is visible
+      // first. They can move to Practice when they are ready.
+      setActivePracticeView("song");
 
 
     } catch (err) {
