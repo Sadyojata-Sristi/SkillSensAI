@@ -890,6 +890,7 @@ export default function MusicSong() {
     setVoiceLoading,
   ] = useState(false);
 
+  const [comparisonStatus, setComparisonStatus] = useState("");
 
   const [
     comparison,
@@ -1702,9 +1703,8 @@ export default function MusicSong() {
             );
 
 
-          setVoiceFile(
-            file
-          );
+          setVoiceFile(file);
+          setComparisonStatus("Live recording saved. Click Compare My Voice to run the analysis.");
 
 
           if (
@@ -1982,9 +1982,8 @@ export default function MusicSong() {
       return;
     }
 
-    setVoiceFile(
-      file
-    );
+    setVoiceFile(file);
+    setComparisonStatus("Recording selected. Click Compare My Voice to run the analysis.");
 
     // After a recording is selected from the Song & Lyrics screen,
     // take the learner to Practice so the chosen file and analysis controls are visible.
@@ -2025,6 +2024,7 @@ export default function MusicSong() {
       setError(
         "Please select a song first."
       );
+      setComparisonStatus("Select and analyse a reference song before comparing.");
 
       return;
     }
@@ -2037,6 +2037,7 @@ export default function MusicSong() {
       setError(
         "Please record your voice or upload a recording."
       );
+      setComparisonStatus("Record or upload your singing first.");
 
       return;
     }
@@ -2047,18 +2048,15 @@ export default function MusicSong() {
       selectedSong.size === voiceFile.size &&
       selectedSong.lastModified === voiceFile.lastModified
     ) {
-      setError(
-        "The reference song and voice recording appear to be the same file. Please upload a recording of your own singing."
-      );
+      const message = "The reference song and voice recording appear to be the same file. Please upload a recording of your own singing.";
+      setError(message);
+      setComparisonStatus(message);
       return;
     }
 
 
-    setVoiceLoading(
-      true
-    );
-
-
+    setVoiceLoading(true);
+    setComparisonStatus("Uploading your reference song and recording for AI comparison. This may take a minute on the free backend.");
     setError("");
     setComparison(null);
 
@@ -2106,6 +2104,7 @@ export default function MusicSong() {
       }
 
       setComparison(response.data);
+      setComparisonStatus("Comparison complete. Opening your AI report...");
       setActivePracticeView("report");
 
     } catch (err) {
@@ -2115,14 +2114,14 @@ export default function MusicSong() {
         err.response?.data?.detail ||
         err.response?.data?.message;
 
-      setError(
-        serverMessage ||
+      const message = serverMessage ||
         (err.code === "ECONNABORTED"
           ? "Voice comparison took too long. Please try a shorter recording (under 20 seconds) and try again."
           : !err.response
             ? "Could not reach the SkillSensAI backend. Please check your internet connection and try again."
-            : err.message || "Could not compare your recording with the song.")
-      );
+            : err.message || "Could not compare your recording with the song.");
+      setError(message);
+      setComparisonStatus(`Comparison failed: ${message}`);
 
 
     } finally {
@@ -3137,13 +3136,11 @@ export default function MusicSong() {
               {voiceFile &&
                 !isRecording && (
                   <button
+                    type="button"
                     className="analyze-voice-button"
-                    onClick={
-                      analyzeVoice
-                    }
-                    disabled={
-                      voiceLoading
-                    }
+                    onClick={() => { void analyzeVoice(); }}
+                    disabled={voiceLoading}
+                    aria-busy={voiceLoading}
                   >
 
                     {voiceLoading ? (
@@ -3165,6 +3162,17 @@ export default function MusicSong() {
 
                   </button>
                 )}
+
+              {(comparisonStatus || (error && voiceFile)) && (
+                <div
+                  className={voiceLoading ? "comparison-status is-loading" : "comparison-status"}
+                  role={error && !voiceLoading ? "alert" : "status"}
+                  aria-live="polite"
+                  style={{ marginTop: 12, padding: "12px 14px", borderRadius: 10, fontSize: 13, lineHeight: 1.5, background: error && !voiceLoading ? "rgba(220, 65, 80, .10)" : "rgba(124, 92, 252, .09)", border: `1px solid ${error && !voiceLoading ? "rgba(220, 65, 80, .3)" : "rgba(124, 92, 252, .22)"}` }}
+                >
+                  {error && !voiceLoading ? error : comparisonStatus}
+                </div>
+              )}
 
             </div>
 
