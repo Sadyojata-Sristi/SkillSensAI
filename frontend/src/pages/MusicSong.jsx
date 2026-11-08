@@ -927,6 +927,7 @@ export default function MusicSong() {
   const [manualLyrics, setManualLyrics] = useState("");
   const [savedManualLyrics, setSavedManualLyrics] = useState("");
   const [manualLyricsNotice, setManualLyricsNotice] = useState("");
+  const [playbackCurrentTime, setPlaybackCurrentTime] = useState(0);
 
   // Free practice-track controls. These accept user-provided stems; they do not
   // claim to separate vocals from a mixed song automatically.
@@ -2686,7 +2687,67 @@ export default function MusicSong() {
                 <div style={{ fontSize: 13, marginBottom: 8, opacity: 0.82 }}>
                   {playbackMode === "original" ? `Playing: ${selectedSong?.name || "Original song"}` : playbackMode === "vocal" ? `Playing vocal track: ${vocalPracticeTrack?.name || ""}` : `Playing backing track: ${instrumentalPracticeTrack?.name || ""}`}
                 </div>
-                <audio controls preload="metadata" style={{ width: "100%" }} key={`${playbackMode}-${playbackMode === "vocal" ? vocalPracticeTrack?.name : playbackMode === "instrumental" ? instrumentalPracticeTrack?.name : selectedSong?.name}`} src={playbackMode === "vocal" ? vocalPracticeTrack?.url : playbackMode === "instrumental" ? instrumentalPracticeTrack?.url : songAnalysis.audioUrl} />
+                <audio
+                  controls
+                  preload="metadata"
+                  style={{ width: "100%" }}
+                  key={`${playbackMode}-${playbackMode === "vocal" ? vocalPracticeTrack?.name : playbackMode === "instrumental" ? instrumentalPracticeTrack?.name : selectedSong?.name}`}
+                  src={playbackMode === "vocal" ? vocalPracticeTrack?.url : playbackMode === "instrumental" ? instrumentalPracticeTrack?.url : songAnalysis.audioUrl}
+                  onTimeUpdate={(event) => setPlaybackCurrentTime(event.currentTarget.currentTime || 0)}
+                  onSeeked={(event) => setPlaybackCurrentTime(event.currentTarget.currentTime || 0)}
+                  onLoadedMetadata={(event) => setPlaybackCurrentTime(event.currentTarget.currentTime || 0)}
+                />
+                {savedManualLyrics.trim() && (
+                  <div className="synced-lyrics-panel" aria-live="polite">
+                    <div className="synced-lyrics-heading">
+                      <div>
+                        <h4>Follow along with lyrics</h4>
+                        <p>Timestamped lines highlight as the audio plays. Timing is based on the timestamps you entered.</p>
+                      </div>
+                      <span className="synced-lyrics-clock">{formatTime(playbackCurrentTime)}</span>
+                    </div>
+                    {(() => {
+                      const lines = savedManualLyrics
+                        .split(/\r?\n/)
+                        .map((raw, index) => {
+                          const trimmed = raw.trim();
+                          const match = trimmed.match(/^(\d{1,2}):(\d{2})\s+(.+)$/);
+                          return match
+                            ? { text: match[3].trim(), time: Number(match[1]) * 60 + Number(match[2]), index }
+                            : { text: trimmed, time: null, index };
+                        })
+                        .filter((line) => line.text);
+                      const timedLines = lines.filter((line) => line.time !== null).sort((a, b) => a.time - b.time);
+                      if (!timedLines.length) {
+                        return (
+                          <div className="synced-lyrics-empty">
+                            Add a timestamp before each line (for example, <strong>00:12 First lyric phrase</strong>) to enable playback highlighting.
+                          </div>
+                        );
+                      }
+                      const activeIndex = timedLines.reduce((active, line, index) => {
+                        if (line.time <= playbackCurrentTime) return index;
+                        return active;
+                      }, -1);
+                      return (
+                        <>
+                          <div className="synced-lyrics-list">
+                            {timedLines.map((line, index) => (
+                              <div
+                                key={`synced-lyric-${line.index}`}
+                                className={`synced-lyric-line${index === activeIndex ? " is-active" : ""}`}
+                              >
+                                <span className="synced-lyric-time">{formatTime(line.time)}</span>
+                                <span>{line.text}</span>
+                              </div>
+                            ))}
+                          </div>
+                          <p className="synced-lyrics-footnote">This is timestamp-based line highlighting, not automatic word-level alignment. Pause or seek the audio to check timing.</p>
+                        </>
+                      );
+                    })()}
+                  </div>
+                )}
               </div>
             )}
 
