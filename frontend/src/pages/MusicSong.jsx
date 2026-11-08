@@ -1887,6 +1887,10 @@ export default function MusicSong() {
           objectUrl,
       });
 
+      // Move directly to voice practice once the reference song is analysed,
+      // so the live-singing and upload controls are immediately visible.
+      setActivePracticeView("practice");
+
 
     } catch (err) {
 
@@ -2847,7 +2851,7 @@ export default function MusicSong() {
                     }
                   >
                     <Mic2 size={21} />
-                    Record Live
+                    Sing Live
                   </button>
                 ) : (
                   <button
