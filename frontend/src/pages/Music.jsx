@@ -1268,31 +1268,27 @@ function Music() {
                 <span>FINAL STEP</span>
                 <p>
                   {completedLessons.includes(selectedLesson.id)
-                    ? "This lesson is complete. Choose the next unlocked lesson from your learning path."
-                    : !quizSubmitted || quizScore !== selectedLesson.quiz.length
-                      ? "Finish the lesson quiz with every answer correct. The completion action will appear when you are ready."
-                      : !practiceAttempted
-                        ? "Great quiz result! Record or upload one practice attempt to unlock lesson completion."
-                        : "You have completed the required steps. You can now finish this lesson and earn XP."}
+                    ? "This lesson is complete."
+                    : "Pass the quiz and submit one practice attempt to complete this lesson."}
                 </p>
               </div>
 
-              {(completedLessons.includes(selectedLesson.id) ||
-                (quizSubmitted &&
-                  quizScore === selectedLesson.quiz.length &&
-                  practiceAttempted)) && (
-                <button
-                  className="practice-button"
-                  style={{ marginTop: "0" }}
-                  onClick={handleCompleteLesson}
-                  disabled={completedLessons.includes(selectedLesson.id)}
-                >
-                  <CheckCircle2 size={18} />
-                  {completedLessons.includes(selectedLesson.id)
-                    ? "Lesson Completed"
-                    : "Complete Lesson +50 XP"}
-                </button>
-              )}
+              <button
+                className="practice-button"
+                style={{ marginTop: "0" }}
+                onClick={handleCompleteLesson}
+                disabled={completedLessons.includes(
+                  selectedLesson.id
+                )}
+              >
+              <CheckCircle2 size={18} />
+
+                {completedLessons.includes(
+                  selectedLesson.id
+                )
+                  ? "Lesson Completed"
+                  : "Complete Lesson +50 XP"}
+              </button>
             </div>
           </section>
 
