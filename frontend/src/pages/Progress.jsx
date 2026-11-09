@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Activity, ArrowRight, CalendarDays, Music2, RefreshCw, Target, Trophy } from "lucide-react";
-import { getLessonsLearned, getCompletedLessons } from "../utils/progress";
+import { getLessonsLearned, getCompletedLessons, getMartialTrainingStreak } from "../utils/progress";
 import "./WorkspacePages.css";
 
 function readHistory() {
@@ -16,12 +16,16 @@ export default function Progress() {
   const [lessons, setLessons] = useState(() => { try { return getLessonsLearned(); } catch { return 0; } });
   const [boxingLessons, setBoxingLessons] = useState(() => { try { return getCompletedLessons().length; } catch { return 0; } });
   const [history, setHistory] = useState(readHistory);
+  const [martialXP, setMartialXP] = useState(() => Number(localStorage.getItem("skillsensai_martial_xp") || 0));
+  const [martialStreak, setMartialStreak] = useState(() => getMartialTrainingStreak());
 
   useEffect(() => {
     const refresh = () => {
       try { setLessons(getLessonsLearned()); } catch { setLessons(0); }
       try { setBoxingLessons(getCompletedLessons().length); } catch { setBoxingLessons(0); }
       setHistory(readHistory());
+      setMartialXP(Number(localStorage.getItem("skillsensai_martial_xp") || 0));
+      setMartialStreak(getMartialTrainingStreak());
     };
     window.addEventListener("skillsensai-progress-updated", refresh);
     window.addEventListener("storage", refresh);
@@ -37,7 +41,7 @@ export default function Progress() {
       <div className="workspace-hero">
         <div className="workspace-eyebrow"><Activity size={14} /> YOUR LEARNING OVERVIEW</div>
         <h1>Progress that <span>moves with you.</span></h1>
-        <p>See your completed lessons and saved singing assessments in one place. Keep practising to build your personal learning streak.</p>
+        <p>See your completed lessons, martial arts XP, training streak, and saved singing assessments in one place. Keep practising to build your progress.</p>
         <button className="workspace-primary" onClick={() => navigate("/music")}>Continue learning <ArrowRight size={17} /></button>
       </div>
 
@@ -45,6 +49,7 @@ export default function Progress() {
         <article className="workspace-stat-card"><span className="workspace-stat-icon violet"><Music2 size={19} /></span><small>Music lessons completed</small><strong>{lessons}<em> / 6</em></strong><div className="workspace-progress-track"><span style={{ width: `${Math.min(100, lessons / 6 * 100)}%` }} /></div></article>
         <article className="workspace-stat-card"><span className="workspace-stat-icon blue"><Target size={19} /></span><small>Martial arts lessons</small><strong>{boxingLessons}<em> completed</em></strong><p>Boxing lesson progress saved on this device.</p></article>
         <article className="workspace-stat-card"><span className="workspace-stat-icon gold"><Trophy size={19} /></span><small>Saved singing sessions</small><strong>{validHistory.length}</strong><p>{average === null ? "Your first saved score will appear here." : `Average score: ${average}/100`}</p></article>
+        <article className="workspace-stat-card"><span className="workspace-stat-icon gold"><Trophy size={19} /></span><small>Martial arts XP</small><strong>{martialXP}</strong><p>{martialStreak} day training streak · XP and streak are saved on this device.</p></article>
       </section>
 
       <section className="workspace-section">
