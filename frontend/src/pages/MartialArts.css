@@ -602,3 +602,15 @@
     min-height: 215px;
   }
 }
+
+
+/* Persistent theme switch for Martial Arts and its lesson pages */
+.martial-page{position:relative;transition:background .2s,color .2s}
+.martial-theme-toggle{position:absolute;top:22px;right:clamp(18px,4vw,64px);z-index:3;display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;border:1px solid rgba(148,163,184,.35);background:rgba(15,23,42,.88);color:#f8fafc;font-weight:800;cursor:pointer}
+.martial-theme-light{background:#f5f7ff!important;color:#17213a!important}
+.martial-theme-light .martial-header p,.martial-theme-light .selection-heading p,.martial-theme-light .martial-card-content p,.martial-theme-light .martial-ai-info p{color:#596780!important}
+.martial-theme-light .martial-card,.martial-theme-light .martial-ai-info{background:#fff!important;color:#17213a!important;border-color:rgba(51,65,100,.17)!important;box-shadow:0 10px 30px rgba(34,50,90,.07)}
+.martial-theme-light .martial-card h3,.martial-theme-light .martial-ai-info h3,.martial-theme-light .selection-heading h2,.martial-theme-light .martial-header h1{color:#17213a!important}
+.martial-theme-light .martial-back-button{background:#fff!important;color:#17213a!important;border-color:#d8deed!important}
+.martial-theme-light .martial-theme-toggle{background:#fff;color:#17213a;border-color:#d8deed}
+@media(max-width:600px){.martial-theme-toggle{position:relative;top:auto;right:auto;margin:12px 18px 0 auto;display:flex;width:max-content}}
