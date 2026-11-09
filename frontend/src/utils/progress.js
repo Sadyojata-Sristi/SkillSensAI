@@ -1,13 +1,9 @@
 
-/*
- * SkillSensAI — Progress System
- * Music progress, martial arts lessons, and daily streaks.
- */
-
 const MUSIC_LESSONS_KEY = "skillsensai_music_lessons_completed";
 const MUSIC_CHARACTER_KEY = "skillsensai_music_character";
 const COMPLETED_LESSONS_KEY = "skillsensai_completed_lessons";
 const MARTIAL_ACTIVITY_DATES_KEY = "skillsensai_martial_activity_dates";
+const MARTIAL_XP_KEY = "skillsensai_martial_xp";
 
 function notifyProgressUpdated() {
   if (typeof window !== "undefined") {
@@ -17,44 +13,35 @@ function notifyProgressUpdated() {
 
 function readJSON(key, fallback) {
   try {
-    const saved = localStorage.getItem(key);
-    return saved === null ? fallback : JSON.parse(saved);
+    const value = localStorage.getItem(key);
+    return value === null ? fallback : JSON.parse(value);
   } catch {
     return fallback;
   }
 }
 
-function localDayKey(date) {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-}
-
-/* MUSIC LESSONS */
+// MUSIC PROGRESS
 
 export function getLessonsLearned() {
-  const number = Number(localStorage.getItem(MUSIC_LESSONS_KEY));
-  if (!Number.isFinite(number)) return 0;
-  return Math.min(Math.max(number, 0), 6);
+  const value = Number(localStorage.getItem(MUSIC_LESSONS_KEY));
+  return Number.isFinite(value) ? Math.max(0, Math.min(6, value)) : 0;
 }
 
-export function setLessonsLearned(number) {
-  const safeNumber = Math.min(Math.max(Number(number) || 0, 0), 6);
-  localStorage.setItem(MUSIC_LESSONS_KEY, String(safeNumber));
+export function setLessonsLearned(value) {
+  const count = Math.max(0, Math.min(6, Number(value) || 0));
+  localStorage.setItem(MUSIC_LESSONS_KEY, String(count));
   notifyProgressUpdated();
-  return safeNumber;
+  return count;
 }
 
 export function completeNextLesson() {
-  const current = getLessonsLearned();
-  if (current >= 6) return 6;
-  return setLessonsLearned(current + 1);
+  return setLessonsLearned(getLessonsLearned() + 1);
 }
 
 export function resetMusicProgress() {
   localStorage.setItem(MUSIC_LESSONS_KEY, "0");
   notifyProgressUpdated();
 }
-
-/* MUSIC CHARACTER */
 
 export function getSelectedMusicCharacter() {
   return localStorage.getItem(MUSIC_CHARACTER_KEY) || "singer";
@@ -65,11 +52,11 @@ export function setSelectedMusicCharacter(characterId) {
   notifyProgressUpdated();
 }
 
-/* MARTIAL ARTS LESSON COMPLETION */
+// MARTIAL ARTS LESSONS
 
 export function getCompletedLessons() {
-  const parsed = readJSON(COMPLETED_LESSONS_KEY, []);
-  return Array.isArray(parsed) ? parsed : [];
+  const lessons = readJSON(COMPLETED_LESSONS_KEY, []);
+  return Array.isArray(lessons) ? lessons : [];
 }
 
 export function isLessonCompleted(lessonId) {
@@ -78,7 +65,10 @@ export function isLessonCompleted(lessonId) {
 
 export function completeLesson(lessonId) {
   const completed = getCompletedLessons();
-  if (completed.includes(lessonId)) return false;
+
+  if (completed.includes(lessonId)) {
+    return false;
+  }
 
   completed.push(lessonId);
   localStorage.setItem(COMPLETED_LESSONS_KEY, JSON.stringify(completed));
@@ -86,64 +76,80 @@ export function completeLesson(lessonId) {
   return true;
 }
 
-/* MARTIAL ARTS DAILY STREAK */
+// MARTIAL ARTS XP
+
+export function getMartialXP() {
+  const xp = Number(localStorage.getItem(MARTIAL_XP_KEY));
+  return Number.isFinite(xp) ? Math.max(0, xp) : 0;
+}
+
+export function addMartialXP(amount) {
+  const safeAmount = Math.max(0, Number(amount) || 0);
+  const total = getMartialXP() + safeAmount;
+
+  localStorage.setItem(MARTIAL_XP_KEY, String(total));
+  notifyProgressUpdated();
+
+  return total;
+}
+
+// DAILY TRAINING STREAK
+
+function dayKey(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
 
 export function recordMartialTrainingActivity(date = new Date()) {
-  const savedDates = readJSON(MARTIAL_ACTIVITY_DATES_KEY, []);
-  const dates = Array.isArray(savedDates)
-    ? savedDates.filter(value => typeof value === "string")
-    : [];
+  const dates = readJSON(MARTIAL_ACTIVITY_DATES_KEY, []);
+  const validDates = Array.isArray(dates) ? dates : [];
+  const key = dayKey(date);
 
-  const day = localDayKey(date);
-  if (!dates.includes(day)) dates.push(day);
+  if (!validDates.includes(key)) {
+    validDates.push(key);
+  }
 
-  dates.sort();
-  const recentDates = [...new Set(dates)].slice(-90);
+  validDates.sort();
+  localStorage.setItem(
+    MARTIAL_ACTIVITY_DATES_KEY,
+    JSON.stringify(validDates.slice(-365))
+  );
 
-  localStorage.setItem(MARTIAL_ACTIVITY_DATES_KEY, JSON.stringify(recentDates));
   notifyProgressUpdated();
-  return recentDates;
+  return validDates;
 }
 
 export function getMartialTrainingStreak(date = new Date()) {
-  const savedDates = readJSON(MARTIAL_ACTIVITY_DATES_KEY, []);
-  const activeDays = new Set(
-    Array.isArray(savedDates)
-      ? savedDates.filter(value => typeof value === "string")
-      : []
-  );
-
+  const dates = new Set(readJSON(MARTIAL_ACTIVITY_DATES_KEY, []));
   const today = new Date(date);
   today.setHours(0, 0, 0, 0);
 
-  const todayKey = localDayKey(today);
+  const todayKey = dayKey(today);
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayKey = localDayKey(yesterday);
 
-  if (!activeDays.has(todayKey) && !activeDays.has(yesterdayKey)) {
+  if (!dates.has(todayKey) && !dates.has(dayKey(yesterday))) {
     return 0;
   }
 
-  const cursor = activeDays.has(todayKey) ? today : yesterday;
+  const cursor = dates.has(todayKey) ? today : yesterday;
   let streak = 0;
 
-  while (activeDays.has(localDayKey(cursor))) {
-    streak += 1;
+  while (dates.has(dayKey(cursor))) {
+    streak++;
     cursor.setDate(cursor.getDate() - 1);
   }
 
   return streak;
 }
 
-/* RESET MARTIAL ARTS PROGRESS */
+// RESET HELPERS
 
 export function resetBoxingProgress() {
   localStorage.removeItem(COMPLETED_LESSONS_KEY);
+  localStorage.removeItem(MARTIAL_XP_KEY);
+  localStorage.removeItem(MARTIAL_ACTIVITY_DATES_KEY);
   notifyProgressUpdated();
 }
-
-/* RESET MUSIC DATA */
 
 export function resetMusicData() {
   localStorage.removeItem(MUSIC_LESSONS_KEY);
