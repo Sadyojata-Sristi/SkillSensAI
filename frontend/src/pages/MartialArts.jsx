@@ -8,14 +8,19 @@ import {
   Footprints,
   Flame,
   Trophy,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 import "./MartialArts.css";
 
 function MartialArts() {
   const navigate = useNavigate();
+  const [theme, setTheme] = useState(() => localStorage.getItem("skillsensai_martial_theme") || "dark");
+  useEffect(() => { localStorage.setItem("skillsensai_martial_theme", theme); }, [theme]);
 
   const martialArts = [
     {
@@ -102,13 +107,18 @@ function MartialArts() {
   };
 
   return (
-    <div className="martial-page">
+    <div className={`martial-page ${theme === "light" ? "martial-theme-light" : "martial-theme-dark"}`}>
       <button
         className="martial-back-button"
         onClick={() => navigate("/")}
       >
         <ArrowLeft size={20} />
         Back to Home
+      </button>
+
+      <button className="martial-theme-toggle" onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Toggle Martial Arts theme">
+        {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+        {theme === "dark" ? "Light mode" : "Dark mode"}
       </button>
 
       <section className="martial-header">
