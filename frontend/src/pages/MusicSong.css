@@ -2101,3 +2101,130 @@
 .music-song-page.music-song-dark-mode .music-song-page button:disabled { opacity: .48; }
 .music-song-page.music-song-dark-mode .music-step-card *,
 .music-song-page.music-song-dark-mode .song-search-box * { color-scheme: dark; }
+
+
+/* Practice-time lyric correction controls. */
+.music-song-page .synced-lyrics-heading-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.music-song-page .synced-lyrics-edit-button,
+.music-song-page .synced-lyrics-editor-actions button {
+  border: 1px solid rgba(124, 92, 252, .4);
+  border-radius: 9px;
+  padding: 8px 12px;
+  background: rgba(124, 92, 252, .1);
+  color: #6245d8;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.music-song-page .synced-lyrics-editor {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 14px;
+  padding: 13px;
+  border: 1px solid rgba(124, 92, 252, .24);
+  border-radius: 12px;
+  background: rgba(124, 92, 252, .05);
+}
+.music-song-page .synced-lyrics-editor > label { font-weight: 750; font-size: 13px; }
+.music-song-page .synced-lyrics-editor > p { margin: 0; font-size: 12px; line-height: 1.5; opacity: .8; }
+.music-song-page .synced-lyrics-editor textarea {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 120px;
+  padding: 11px;
+  border: 1px solid rgba(124, 92, 252, .3);
+  border-radius: 9px;
+  background: #fff;
+  color: #302747;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.55;
+  resize: vertical;
+}
+.music-song-page .synced-lyrics-editor-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.music-song-page .synced-lyrics-editor-actions button:first-child { background: #6245d8; color: #fff; }
+.music-song-page .synced-lyrics-editor-notice { margin: 0; font-size: 12px; }
+.music-song-page.music-song-dark-mode .synced-lyrics-panel,
+.music-song-page.music-song-dark-mode .synced-lyrics-editor { background: #171326; border-color: rgba(160, 137, 255, .3); }
+.music-song-page.music-song-dark-mode .synced-lyrics-heading h4,
+.music-song-page.music-song-dark-mode .synced-lyric-line,
+.music-song-page.music-song-dark-mode .synced-lyrics-empty { color: #eee8ff; }
+.music-song-page.music-song-dark-mode .synced-lyrics-heading p,
+.music-song-page.music-song-dark-mode .synced-lyrics-footnote,
+.music-song-page.music-song-dark-mode .synced-lyrics-editor > p { color: #bdb3d5; }
+.music-song-page.music-song-dark-mode .synced-lyrics-editor textarea { background: #100d1d; border-color: #4a3b70; color: #f4efff; }
+.music-song-page.music-song-dark-mode .synced-lyrics-edit-button { color: #d5caff; background: #2a2144; border-color: #5d4a8b; }
+@media (max-width: 600px) {
+  .music-song-page .synced-lyrics-heading-actions { justify-content: flex-start; }
+  .music-song-page .synced-lyrics-editor-actions button { flex: 1; }
+}
+
+
+/* Consolidated AI report export actions */
+.music-song-page .report-export-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0 2px;
+}
+
+.music-song-page .report-export-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 11px 17px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.music-song-page .report-export-primary {
+  color: #fff;
+  background: linear-gradient(135deg, #8064ff, #6245d8);
+  box-shadow: 0 8px 18px rgba(98, 69, 216, .2);
+}
+
+.music-song-page .report-export-secondary {
+  color: #6245d8;
+  background: #fff;
+  border-color: #d9d0ff !important;
+}
+
+.music-song-page .report-export-actions button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(98, 69, 216, .18);
+}
+
+.music-song-page .report-export-actions button:focus-visible {
+  outline: 3px solid rgba(124, 92, 252, .35);
+  outline-offset: 3px;
+}
+
+.music-song-page .report-export-actions button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 560px) {
+  .music-song-page .report-export-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .music-song-page .report-export-actions button {
+    width: 100%;
+  }
+}
