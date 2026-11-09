@@ -2228,3 +2228,33 @@
     width: 100%;
   }
 }
+
+
+/* Free lyrics lookup controls */
+.music-song-page .lyrics-lookup-fields {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+  align-items: end; gap: 10px; margin: 12px 0 4px;
+}
+.music-song-page .lyrics-lookup-fields label { display: grid; gap: 6px; min-width: 0; font-size: 13px; font-weight: 700; }
+.music-song-page .lyrics-lookup-fields input {
+  width: 100%; min-width: 0; box-sizing: border-box; min-height: 43px; padding: 10px 12px;
+  border: 1px solid rgba(124,92,252,.35); border-radius: 10px; background: rgba(255,255,255,.82);
+  color: #30294a; font: inherit; font-weight: 450;
+}
+.music-song-page .lyrics-lookup-button {
+  min-height: 43px; padding: 10px 16px; border: 0; border-radius: 10px;
+  background: linear-gradient(135deg, #8565ff, #6245d8); color: white; font: inherit;
+  font-weight: 750; cursor: pointer; box-shadow: 0 4px 12px rgba(98,69,216,.2);
+}
+.music-song-page .lyrics-lookup-button:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.04); }
+.music-song-page .lyrics-lookup-button:disabled { opacity: .65; cursor: wait; }
+.music-song-page .lyrics-lookup-message { margin: 8px 0 0; font-size: 13px; line-height: 1.6; color: #5d45c6; overflow-wrap: anywhere; }
+.music-song-page.music-song-dark-mode .lyrics-lookup-fields input {
+  background: #171326; color: #f4efff; border-color: #51417f;
+}
+.music-song-page.music-song-dark-mode .lyrics-lookup-fields input::placeholder { color: #a69bbf; }
+.music-song-page.music-song-dark-mode .lyrics-lookup-message { color: #c8baff; }
+@media (max-width: 700px) {
+  .music-song-page .lyrics-lookup-fields { grid-template-columns: 1fr; }
+  .music-song-page .lyrics-lookup-button { width: 100%; }
+}
