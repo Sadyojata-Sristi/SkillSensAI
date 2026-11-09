@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, BookOpen, CheckCircle2, Circle, Camera, Upload, Sun, Moon, Trophy, Flame, LockKeyhole, Play, X, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { completeLesson, getCompletedLessons } from "../utils/progress";
+import { completeLesson, getCompletedLessons, getMartialTrainingStreak } from "../utils/progress";
 import "./MartialArtsTraining.css";
 
 const THEME_KEY = "skillsensai_martial_theme";
@@ -30,6 +30,7 @@ export default function MartialArtsTraining({ discipline }) {
   const [completed, setCompleted] = useState(() => getCompletedLessons());
   const [xp, setXp] = useState(() => Number(localStorage.getItem(XP_KEY) || 0));
   const [quizPassed, setQuizPassed] = useState(() => { try { return JSON.parse(localStorage.getItem(QUIZ_KEY) || "{}"); } catch { return {}; } });
+  const [streak, setStreak] = useState(() => getMartialTrainingStreak());
   const [active, setActive] = useState(null);
   const [answer, setAnswer] = useState(null);
   const [checked, setChecked] = useState({});
@@ -47,13 +48,24 @@ export default function MartialArtsTraining({ discipline }) {
   useEffect(() => { localStorage.setItem(THEME_KEY, theme); }, [theme]);
   useEffect(() => { if (recording && stream && liveVideoRef.current) liveVideoRef.current.srcObject = stream; }, [recording, stream]);
   useEffect(() => {
-    const refresh = () => setCompleted(getCompletedLessons());
+    const refresh = () => { setCompleted(getCompletedLessons()); setStreak(getMartialTrainingStreak()); };
     window.addEventListener("skillsensai-progress-updated", refresh);
     return () => window.removeEventListener("skillsensai-progress-updated", refresh);
   }, []);
   useEffect(() => () => { if (stream) stream.getTracks().forEach(t => t.stop()); if (practiceUrl.startsWith("blob:")) URL.revokeObjectURL(practiceUrl); }, [stream, practiceUrl]);
 
   const doneCount = lessons.filter(l => completed.includes(l.id)).length;
+  const allCompleted = getCompletedLessons();
+  const totalLessonsDone = allCompleted.length;
+  const boxingDone = allCompleted.filter(id => id.startsWith("boxing-")).length;
+  const karateDone = allCompleted.filter(id => id.startsWith("karate-")).length;
+  const badges = [
+    { id: "first", icon: "🥇", title: "First Move", detail: "Complete your first lesson", earned: totalLessonsDone >= 1 },
+    { id: "focus", icon: "🎯", title: "Focused Learner", detail: "Complete all 3 lessons in one discipline", earned: boxingDone >= 3 || karateDone >= 3 },
+    { id: "cross", icon: "🥊", title: "Cross-Trainer", detail: "Try both boxing and karate", earned: boxingDone > 0 && karateDone > 0 },
+    { id: "xp", icon: "⚡", title: "XP Collector", detail: "Earn 100 XP", earned: xp >= 100 },
+  ];
+  const earnedBadges = badges.filter(badge => badge.earned).length;
   const currentIndex = active ? lessons.findIndex(l => l.id === active.id) : -1;
   const isUnlocked = index => index === 0 || lessons.slice(0, index).every(l => completed.includes(l.id));
   const selectLesson = lesson => { setActive(lesson); setAnswer(null); setChecked({}); setFeedback(""); setQuizMessage(""); setPracticeUrl(""); setPracticeName(""); setReviewChecks([false,false,false]); };
@@ -86,10 +98,10 @@ export default function MartialArtsTraining({ discipline }) {
   const reviewPractice = () => { const count = reviewChecks.filter(Boolean).length; setFeedback(`Self-review: ${count}/3 checkpoints marked. ${count === 3 ? "Great job checking stance, control and guard recovery." : "Rewatch your clip and focus on the unchecked checkpoints."} This is a guided self-review, not an automated AI movement score.`); };
 
   return <div className={`martial-training ${theme === "light" ? "theme-light" : "theme-dark"} ${prefix}-training`}>
-    <header className="mt-header"><button className="mt-ghost" onClick={() => navigate("/martial-arts")}><ArrowLeft size={18}/> Martial Arts</button><div className="mt-brand"><span className="mt-brand-icon">{isBoxing ? "🥊" : "🥋"}</span><span>SkillSensAI <small>{isBoxing ? "BOXING DOJO" : "KARATE DOJO"}</small></span></div><div className="mt-stats"><span className="mt-xp"><Sparkles size={16}/> {xp} XP</span><span className="mt-streak"><Flame size={16}/> {doneCount} / 3</span><button className="mt-theme" aria-label="Toggle theme" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>{theme === "dark" ? <Sun size={18}/> : <Moon size={18}/>}</button></div></header>
-    <main className="mt-layout"><section className="mt-main"><div className="mt-welcome"><div className="mt-eyebrow">YOUR TRAINING PATH</div><h1>Level up your <span>{isBoxing ? "boxing" : "karate"}</span></h1><p>Watch a demo, learn the technique, answer a quick question, then practise and earn XP.</p><div className="mt-progress-head"><strong>Beginner journey</strong><span>{doneCount} of {lessons.length} lessons</span></div><div className="mt-progress-track"><div style={{width: `${doneCount / lessons.length * 100}%`}}/></div></div>
+    <header className="mt-header"><button className="mt-ghost" onClick={() => navigate("/martial-arts")}><ArrowLeft size={18}/> Martial Arts</button><div className="mt-brand"><span className="mt-brand-icon">{isBoxing ? "🥊" : "🥋"}</span><span>SkillSensAI <small>{isBoxing ? "BOXING DOJO" : "KARATE DOJO"}</small></span></div><div className="mt-stats"><span className="mt-xp"><Sparkles size={16}/> {xp} XP</span><span className="mt-streak"><Flame size={16}/> {streak} day{streak === 1 ? "" : "s"}</span><button className="mt-theme" aria-label="Toggle theme" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>{theme === "dark" ? <Sun size={18}/> : <Moon size={18}/>}</button></div></header>
+    <main className="mt-layout"><section className="mt-main"><div className="mt-welcome"><div className="mt-eyebrow">YOUR TRAINING PATH</div><h1>Level up your <span>{isBoxing ? "boxing" : "karate"}</span></h1><p>Watch a demo, learn the technique, answer a quick question, then practise and earn XP.</p><div className="mt-progress-head"><strong>Beginner journey</strong><span>{doneCount} of {lessons.length} lessons</span></div><div className="mt-progress-track"><div style={{width: `${doneCount / lessons.length * 100}%`}}/></div><div className="mt-dashboard-stats"><div><strong>{Math.round(doneCount / lessons.length * 100)}%</strong><span>{isBoxing ? "Boxing" : "Karate"} progress</span></div><div><strong>{totalLessonsDone}/6</strong><span>All martial arts lessons</span></div><div><strong>{earnedBadges}/{badges.length}</strong><span>Badges earned</span></div></div></div>
     <div className="mt-path">{lessons.map((lesson, i) => { const done = completed.includes(lesson.id); const unlocked = isUnlocked(i); return <div className={`mt-path-row ${i % 2 ? "offset" : ""}`} key={lesson.id}><div className="mt-path-node-wrap"><button className={`mt-path-node ${done ? "done" : ""} ${active?.id === lesson.id ? "selected" : ""}`} disabled={!unlocked} onClick={() => navigate(`/martial-arts/${discipline}/lesson/${lesson.id}`)} aria-label={lesson.title}>{done ? <CheckCircle2/> : unlocked ? <span>{i + 1}</span> : <LockKeyhole/>}</button><span className="mt-node-label">{done ? "COMPLETED" : unlocked ? `+${35} XP` : "LOCKED"}</span></div><button className={`mt-path-card ${active?.id === lesson.id ? "active" : ""}`} disabled={!unlocked} onClick={() => navigate(`/martial-arts/${discipline}/lesson/${lesson.id}`)}><div><span className="mt-card-kicker">LESSON {i + 1}</span><h3>{lesson.title}</h3><p>{lesson.description}</p></div><span className="mt-card-play">{done ? "Review" : unlocked ? "Start lesson →" : <LockKeyhole size={16}/>}</span></button></div>; })}</div>
-    </section><aside className="mt-sidebar"><section className="mt-side-card mt-reward-card"><div className="mt-reward-icon"><Trophy size={25}/></div><div><span className="mt-card-kicker">YOUR REWARDS</span><h3>{xp} XP</h3><p>10 XP for each correct quiz · 25 XP per completed lesson</p></div></section><section className="mt-side-card"><h3><Flame size={18}/> Training rules</h3><ul><li>Warm up before practising.</li><li>Use an open, clear space.</li><li>Move slowly before adding speed.</li><li>Stop if you feel pain or dizziness.</li></ul></section><section className="mt-side-card"><h3><Camera size={18}/> Practice studio</h3><p>Record yourself with a stance guide overlay or upload a saved clip for self-review.</p><button className="mt-primary mt-full" onClick={()=>navigate(`/martial-arts/${discipline}/lesson/${lessons.find(l => isUnlocked(lessons.indexOf(l)))?.id}`)}>Open practice studio</button></section></aside>
+    </section><aside className="mt-sidebar"><section className="mt-side-card mt-badges-card"><div className="mt-badges-heading"><h3><Trophy size={18}/> Achievement badges</h3><span>{earnedBadges}/{badges.length}</span></div><div className="mt-badge-grid">{badges.map(badge => <div key={badge.id} className={`mt-badge ${badge.earned ? "earned" : "locked"}`} title={badge.detail}><span className="mt-badge-icon">{badge.earned ? badge.icon : "🔒"}</span><strong>{badge.title}</strong><small>{badge.detail}</small></div>)}</div></section><section className="mt-side-card mt-reward-card"><div className="mt-reward-icon"><Trophy size={25}/></div><div><span className="mt-card-kicker">YOUR REWARDS</span><h3>{xp} XP</h3><p>10 XP for each correct quiz · 25 XP per completed lesson</p></div></section><section className="mt-side-card"><h3><Flame size={18}/> Training rules</h3><ul><li>Warm up before practising.</li><li>Use an open, clear space.</li><li>Move slowly before adding speed.</li><li>Stop if you feel pain or dizziness.</li></ul></section><section className="mt-side-card"><h3><Camera size={18}/> Practice studio</h3><p>Record yourself with a stance guide overlay or upload a saved clip for self-review.</p><button className="mt-primary mt-full" onClick={()=>navigate(`/martial-arts/${discipline}/lesson/${lessons.find(l => isUnlocked(lessons.indexOf(l)))?.id}`)}>Open first lesson</button></section></aside>
     </main>
   </div>;
 }
