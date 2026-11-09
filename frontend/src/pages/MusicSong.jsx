@@ -1726,71 +1726,97 @@ export default function MusicSong() {
 
 
       recorder.onstop =
-        () => {
+        async () => {
 
-          const blob =
+          const recordedBlob =
             new Blob(
               audioChunksRef.current,
               {
                 type:
+                  recorder.mimeType ||
                   mimeType ||
                   "audio/webm",
               }
             );
 
+          try {
+            if (!recordedBlob.size) {
+              throw new Error("The microphone recording is empty. Please record again.");
+            }
 
-          const extension =
-            mimeType.includes(
-              "mp4"
-            )
-              ? "m4a"
-              : "webm";
+            // MediaRecorder WebM files can have an unknown duration in their
+            // container metadata. The backend validates duration with FFmpeg,
+            // so convert the recording to a standard PCM WAV before uploading.
+            const AudioContextClass =
+              window.AudioContext || window.webkitAudioContext;
+            if (!AudioContextClass) {
+              throw new Error("Audio conversion is not supported by this browser. Please try an updated Chrome or Edge browser.");
+            }
 
-
-          const file =
-            new File(
-              [
-                blob,
-              ],
-              `voice-recording.${extension}`,
-              {
-                type:
-                  mimeType ||
-                  "audio/webm",
+            const decodeContext = new AudioContextClass();
+            let decoded;
+            try {
+              const audioData = await recordedBlob.arrayBuffer();
+              decoded = await decodeContext.decodeAudioData(audioData.slice(0));
+            } finally {
+              if (decodeContext.state !== "closed") {
+                await decodeContext.close().catch(() => {});
               }
-            );
+            }
 
+            if (!decoded || !decoded.length || !decoded.sampleRate) {
+              throw new Error("Could not decode the live recording. Please record again.");
+            }
 
-          setVoiceFile(file);
-          setComparisonStatus("Live recording saved. Click Compare My Voice to run the analysis.");
+            // Downmix to mono PCM16 WAV. WAV carries an explicit duration,
+            // avoiding FFmpeg's Duration: N/A response for some WebM recordings.
+            const sampleRate = decoded.sampleRate;
+            const frameCount = decoded.length;
+            const channelCount = decoded.numberOfChannels;
+            const channels = Array.from({ length: channelCount }, (_, i) => decoded.getChannelData(i));
+            const wavBuffer = new ArrayBuffer(44 + frameCount * 2);
+            const view = new DataView(wavBuffer);
+            const writeString = (offset, value) => {
+              for (let i = 0; i < value.length; i++) view.setUint8(offset + i, value.charCodeAt(i));
+            };
+            writeString(0, "RIFF");
+            view.setUint32(4, 36 + frameCount * 2, true);
+            writeString(8, "WAVE");
+            writeString(12, "fmt ");
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, 1, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true);
+            view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true);
+            writeString(36, "data");
+            view.setUint32(40, frameCount * 2, true);
+            for (let i = 0; i < frameCount; i++) {
+              let sample = 0;
+              for (let channel = 0; channel < channelCount; channel++) sample += channels[channel][i] || 0;
+              sample /= channelCount;
+              sample = Math.max(-1, Math.min(1, sample));
+              view.setInt16(44 + i * 2, sample < 0 ? sample * 0x8000 : sample * 0x7fff, true);
+            }
 
+            const wavBlob = new Blob([wavBuffer], { type: "audio/wav" });
+            const file = new File([wavBlob], "voice-recording.wav", { type: "audio/wav", lastModified: Date.now() });
+            setVoiceFile(file);
+            setComparisonStatus("Live recording saved as WAV. Click Compare My Voice to run the analysis.");
 
-          if (
-            voicePreview
-          ) {
-
-            URL.revokeObjectURL(
-              voicePreview
-            );
+            if (voicePreview) URL.revokeObjectURL(voicePreview);
+            setVoicePreview(URL.createObjectURL(wavBlob));
+          } catch (conversionError) {
+            console.error("SkillSensAI live recording conversion failed:", conversionError);
+            setVoiceFile(null);
+            setError(conversionError?.message || "Could not prepare the live recording. Please record again.");
+            setComparisonStatus("Could not prepare the live recording. Please record again.");
+          } finally {
+            stopLiveAudio();
+            setLivePitch(null);
+            setLiveReferencePitch(null);
           }
-
-
-          setVoicePreview(
-            URL.createObjectURL(
-              blob
-            )
-          );
-
-
-          /* ---------------------------------------------
-             Also stop live pitch system.
-          --------------------------------------------- */
-
-          stopLiveAudio();
-
-
-          setLivePitch(null);
-          setLiveReferencePitch(null);
         };
 
 
