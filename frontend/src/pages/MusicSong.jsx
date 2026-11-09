@@ -2705,6 +2705,31 @@ export default function MusicSong() {
               </div>
             )}
 
+            {/* Lyrics lookup is deliberately available before song analysis, not hidden below the results. */}
+            <div className="manual-lyrics-fallback lyrics-lookup-top-panel" style={{ marginTop: 22, padding: 16, borderRadius: 14, border: "1px solid rgba(124,92,252,.28)", background: "rgba(124,92,252,.07)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 6 }}>
+                <Search size={20} />
+                <strong style={{ fontSize: 17 }}>Find lyrics for your song</strong>
+              </div>
+              <p style={{ margin: "0 0 12px", fontSize: 13, lineHeight: 1.6, opacity: 0.85 }}>
+                Enter the song title and artist to try a free lyrics lookup. If no match is found, you can paste lyrics manually below the analysis. This does not use paid AI tokens.
+              </p>
+              <div className="lyrics-lookup-fields">
+                <label>
+                  <span>Artist</span>
+                  <input value={lyricsArtist} onChange={(event) => setLyricsArtist(event.target.value)} placeholder="e.g. A. R. Rahman" aria-label="Artist name for lyrics lookup" />
+                </label>
+                <label>
+                  <span>Song title</span>
+                  <input value={lyricsTitle} onChange={(event) => setLyricsTitle(event.target.value)} placeholder="Enter song title" aria-label="Song title for lyrics lookup" />
+                </label>
+                <button type="button" className="lyrics-lookup-button" onClick={handleLyricsLookup} disabled={lyricsLookupLoading}>
+                  {lyricsLookupLoading ? "Searching…" : "Find lyrics"}
+                </button>
+              </div>
+              {lyricsLookupMessage && <p className="lyrics-lookup-message" role="status">{lyricsLookupMessage}</p>}
+            </div>
+
           </div>
 
         </section>
@@ -2743,6 +2768,31 @@ export default function MusicSong() {
                 <span>{songAnalysis.warning}</span>
               </div>
             )}
+
+            {/* Lyrics lookup remains visible after analysis, when the upload form may be hidden. */}
+            <div className="manual-lyrics-fallback lyrics-lookup-top-panel" style={{ marginTop: 18, marginBottom: 18, padding: 16, borderRadius: 14, border: "1px solid rgba(124,92,252,.28)", background: "rgba(124,92,252,.07)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 6 }}>
+                <Search size={20} />
+                <strong style={{ fontSize: 17 }}>Find lyrics for your song</strong>
+              </div>
+              <p style={{ margin: "0 0 12px", fontSize: 13, lineHeight: 1.6, opacity: 0.85 }}>
+                Enter the song title and artist to try a free lyrics lookup. If no match is found, you can paste lyrics manually below. This does not use paid AI tokens.
+              </p>
+              <div className="lyrics-lookup-fields">
+                <label>
+                  <span>Artist</span>
+                  <input value={lyricsArtist} onChange={(event) => setLyricsArtist(event.target.value)} placeholder="e.g. A. R. Rahman" aria-label="Artist name for lyrics lookup" />
+                </label>
+                <label>
+                  <span>Song title</span>
+                  <input value={lyricsTitle} onChange={(event) => setLyricsTitle(event.target.value)} placeholder="Enter song title" aria-label="Song title for lyrics lookup" />
+                </label>
+                <button type="button" className="lyrics-lookup-button" onClick={handleLyricsLookup} disabled={lyricsLookupLoading}>
+                  {lyricsLookupLoading ? "Searching…" : "Find lyrics"}
+                </button>
+              </div>
+              {lyricsLookupMessage && <p className="lyrics-lookup-message" role="status">{lyricsLookupMessage}</p>}
+            </div>
 
             {/* Keep the reference-song analysis visible while making both practice choices available. */}
             <div className="analysis-practice-actions" style={{ margin: "18px 0 22px", padding: 16, borderRadius: 14, background: "rgba(124,92,252,.08)", border: "1px solid rgba(124,92,252,.2)" }}>
@@ -2796,24 +2846,10 @@ export default function MusicSong() {
                 );
               })()}
               <div className="manual-lyrics-fallback" style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(124,92,252,.18)" }}>
-                <strong style={{ display: "block", marginBottom: 6 }}>Find lyrics or add them manually</strong>
+                <strong style={{ display: "block", marginBottom: 6 }}>Add or correct lyrics</strong>
                 <p style={{ margin: "0 0 10px", fontSize: 13, lineHeight: 1.6, opacity: 0.82 }}>
-                  Try a free lyrics lookup using the song title and artist. If the song is not in the provider’s catalogue or the service is unavailable, you can still paste lyrics below. This does not use paid AI tokens and does not transcribe audio.
+                  Paste or correct lyrics here if the lookup did not find your song. Lyrics lookup is available above in the Song &amp; lyrics step.
                 </p>
-                <div className="lyrics-lookup-fields">
-                  <label>
-                    <span>Artist</span>
-                    <input value={lyricsArtist} onChange={(event) => setLyricsArtist(event.target.value)} placeholder="e.g. A. R. Rahman" aria-label="Artist name for lyrics lookup" />
-                  </label>
-                  <label>
-                    <span>Song title</span>
-                    <input value={lyricsTitle} onChange={(event) => setLyricsTitle(event.target.value)} placeholder="Enter song title" aria-label="Song title for lyrics lookup" />
-                  </label>
-                  <button type="button" className="lyrics-lookup-button" onClick={handleLyricsLookup} disabled={lyricsLookupLoading}>
-                    {lyricsLookupLoading ? "Searching…" : "Find lyrics"}
-                  </button>
-                </div>
-                {lyricsLookupMessage && <p className="lyrics-lookup-message" role="status">{lyricsLookupMessage}</p>}
                 <p style={{ margin: "10px 0", fontSize: 13, lineHeight: 1.6, opacity: 0.82 }}>
                   For better alignment, add a timestamp before each line in mm:ss format (for example, 00:12 First lyric phrase). Timestamped lines are matched to section time ranges; lines without timestamps are estimates.
                 </p>
