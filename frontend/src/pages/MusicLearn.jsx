@@ -526,6 +526,11 @@ function MusicLearn() {
       (lesson) => lesson.id === selectedLesson.id
     );
 
+    if (currentIndex < 0) {
+      setError("Unable to find the current lesson. Please select a lesson and try again.");
+      return;
+    }
+
     const nextLesson = lessons[currentIndex + 1];
 
     if (!nextLesson) {
@@ -533,12 +538,30 @@ function MusicLearn() {
       return;
     }
 
+    // Clear the previous lesson's recording and analysis.
     resetPractice();
+
+    // Select the next lesson so its title, video, and practice
+    // section render from the same existing lessons array.
     setSelectedLesson(nextLesson);
 
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
+    // Bring the new lesson content into view.
+    window.requestAnimationFrame(() => {
+      const lessonSection = document.querySelector(
+        ".selected-lesson-section"
+      );
+
+      if (lessonSection) {
+        lessonSection.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      } else {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      }
     });
   };
 
