@@ -9,6 +9,7 @@ import MusicSong from "./pages/MusicSong";
 import MartialArts from "./pages/MartialArts";
 import Boxing from "./pages/Boxing";
 import Karate from "./pages/Karate";
+import MartialArtsLesson from "./pages/MartialArtsLesson";
 import Progress from "./pages/Progress";
 import Settings from "./pages/Settings";
 import AppLayout from "./components/AppLayout";
@@ -28,7 +29,9 @@ function App() {
           <Route path="/music/upload-song" element={<MusicSong />} />
           <Route path="/martial-arts" element={<MartialArts />} />
           <Route path="/martial-arts/boxing" element={<Boxing />} />
+          <Route path="/martial-arts/boxing/lesson/:lessonId" element={<MartialArtsLesson discipline="boxing" />} />
           <Route path="/martial-arts/karate" element={<Karate />} />
+          <Route path="/martial-arts/karate/lesson/:lessonId" element={<MartialArtsLesson discipline="karate" />} />
           <Route path="/progress" element={<Progress />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
