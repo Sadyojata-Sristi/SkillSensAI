@@ -949,6 +949,10 @@ export default function MusicSong() {
   const [manualLyrics, setManualLyrics] = useState("");
   const [savedManualLyrics, setSavedManualLyrics] = useState("");
   const [manualLyricsNotice, setManualLyricsNotice] = useState("");
+  const [lyricsArtist, setLyricsArtist] = useState("");
+  const [lyricsTitle, setLyricsTitle] = useState("");
+  const [lyricsLookupLoading, setLyricsLookupLoading] = useState(false);
+  const [lyricsLookupMessage, setLyricsLookupMessage] = useState("");
   const [isEditingPracticeLyrics, setIsEditingPracticeLyrics] = useState(false);
   const [practiceLyricsDraft, setPracticeLyricsDraft] = useState("");
   const [practiceLyricsNotice, setPracticeLyricsNotice] = useState("");
@@ -991,6 +995,36 @@ export default function MusicSong() {
     } else {
       setInstrumentalPracticeTrack(null);
       if (playbackMode === "instrumental") setPlaybackMode("original");
+    }
+  }
+
+  async function handleLyricsLookup() {
+    const artist = lyricsArtist.trim();
+    const title = lyricsTitle.trim();
+    if (!artist || !title) {
+      setLyricsLookupMessage("Enter both the artist and song title to search.");
+      return;
+    }
+
+    setLyricsLookupLoading(true);
+    setLyricsLookupMessage("Searching a free lyrics source…");
+    try {
+      // lyrics.ovh is a no-key lookup service. Availability and catalogue coverage
+      // depend on the provider; a lookup failure never blocks song analysis.
+      const url = `https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`;
+      const response = await fetch(url);
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || typeof data.lyrics !== "string" || !data.lyrics.trim()) {
+        throw new Error("No lyrics match was found. Check the spelling or paste lyrics manually.");
+      }
+      const cleaned = data.lyrics.replace(/\r/g, "").trim();
+      setManualLyrics(cleaned);
+      setManualLyricsNotice("");
+      setLyricsLookupMessage("Lyrics found. Review or correct them below, then select ‘Use these lyrics’ to add them to this practice session.");
+    } catch (lookupError) {
+      setLyricsLookupMessage(lookupError?.message || "Lyrics lookup failed. You can still paste lyrics manually.");
+    } finally {
+      setLyricsLookupLoading(false);
     }
   }
 
@@ -2762,9 +2796,26 @@ export default function MusicSong() {
                 );
               })()}
               <div className="manual-lyrics-fallback" style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(124,92,252,.18)" }}>
-                <strong style={{ display: "block", marginBottom: 6 }}>Free option: add lyrics manually</strong>
+                <strong style={{ display: "block", marginBottom: 6 }}>Find lyrics or add them manually</strong>
                 <p style={{ margin: "0 0 10px", fontSize: 13, lineHeight: 1.6, opacity: 0.82 }}>
-                  Automatic transcription is disabled to avoid paid API calls. For better alignment, add a timestamp before each line in mm:ss format (for example, 00:12 First lyric phrase). Timestamped lines are matched to section time ranges; lines without timestamps are spread across sections as estimates.
+                  Try a free lyrics lookup using the song title and artist. If the song is not in the provider’s catalogue or the service is unavailable, you can still paste lyrics below. This does not use paid AI tokens and does not transcribe audio.
+                </p>
+                <div className="lyrics-lookup-fields">
+                  <label>
+                    <span>Artist</span>
+                    <input value={lyricsArtist} onChange={(event) => setLyricsArtist(event.target.value)} placeholder="e.g. A. R. Rahman" aria-label="Artist name for lyrics lookup" />
+                  </label>
+                  <label>
+                    <span>Song title</span>
+                    <input value={lyricsTitle} onChange={(event) => setLyricsTitle(event.target.value)} placeholder="Enter song title" aria-label="Song title for lyrics lookup" />
+                  </label>
+                  <button type="button" className="lyrics-lookup-button" onClick={handleLyricsLookup} disabled={lyricsLookupLoading}>
+                    {lyricsLookupLoading ? "Searching…" : "Find lyrics"}
+                  </button>
+                </div>
+                {lyricsLookupMessage && <p className="lyrics-lookup-message" role="status">{lyricsLookupMessage}</p>}
+                <p style={{ margin: "10px 0", fontSize: 13, lineHeight: 1.6, opacity: 0.82 }}>
+                  For better alignment, add a timestamp before each line in mm:ss format (for example, 00:12 First lyric phrase). Timestamped lines are matched to section time ranges; lines without timestamps are estimates.
                 </p>
                 <textarea
                   value={manualLyrics}
