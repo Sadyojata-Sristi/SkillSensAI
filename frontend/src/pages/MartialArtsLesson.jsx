@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, BookOpen, Camera, CheckCircle2, Play, Sparkles, Upload, X } from "lucide-react";
-import { completeLesson, getCompletedLessons } from "../utils/progress";
+import { completeLesson, getCompletedLessons, recordMartialTrainingActivity } from "../utils/progress";
 import { MARTIAL_ARTS_LESSONS } from "./MartialArtsTraining";
 import "./MartialArtsLesson.css";
 
@@ -40,6 +40,7 @@ export default function MartialArtsLesson({ discipline }) {
   const submitQuiz = () => {
     if (answer === null) { setQuizMessage("Choose an answer first."); return; }
     if (answer === lesson.correct) {
+      recordMartialTrainingActivity();
       if (!quizPassed[lesson.id]) { const next = { ...quizPassed, [lesson.id]: true }; setQuizPassed(next); localStorage.setItem(QUIZ_KEY, JSON.stringify(next)); addXP(10); }
       setQuizMessage("Correct! +10 XP. Continue to the practice checkpoints.");
     } else setQuizMessage("Not quite. Review the lesson steps and try again.");
