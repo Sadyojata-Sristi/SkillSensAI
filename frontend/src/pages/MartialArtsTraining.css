@@ -23,3 +23,14 @@
 .mt-badge strong{font-size:11px;color:var(--mt-text)}
 .mt-badge small{font-size:10px;line-height:1.4;color:var(--mt-muted)}
 @media(max-width:650px){.mt-dashboard-stats{grid-template-columns:1fr 1fr}.mt-dashboard-stats>div:last-child{grid-column:1/-1}.mt-badge-grid{grid-template-columns:1fr 1fr}}
+
+
+/* Rank progression */
+.mt-rank-card{overflow:hidden}
+.mt-rank-top{display:flex;align-items:center;gap:13px}
+.mt-rank-emblem{display:grid;place-items:center;width:54px;height:54px;flex-shrink:0;border-radius:17px;background:color-mix(in srgb,var(--mt-accent) 14%,var(--mt-surface2));font-size:29px}
+.mt-rank-top h3{margin:5px 0 3px;font-size:18px}
+.mt-rank-top p{margin:0;font-size:12px}
+.mt-rank-track{height:9px;margin-top:18px;background:var(--mt-bg);border-radius:99px;overflow:hidden}
+.mt-rank-track>div{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--mt-accent2),var(--mt-accent));transition:width .25s ease}
+.mt-rank-foot{margin-top:8px;font-size:11px;color:var(--mt-muted)}
