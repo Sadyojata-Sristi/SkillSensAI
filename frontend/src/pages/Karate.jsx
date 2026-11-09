@@ -24,36 +24,23 @@ const KARATE_LESSONS = [
     title: "Karate Stance",
     description:
       "Learn the basic karate stance, balance and body positioning.",
-    video: "/lessons/karate/karate-lesson-1.mp4",
+    video: "https://res.cloudinary.com/r5v9dk9w/video/upload/v1794246003/k1.mp4",
   },
   {
     id: "karate-lesson-2",
     title: "Basic Guard",
     description:
       "Learn the correct guard position and how to protect your body.",
-    video: "/lessons/karate/karate-lesson-2.mp4",
+    video: "https://res.cloudinary.com/r5v9dk9w/video/upload/v1794246016/k2.mp4",
   },
   {
     id: "karate-lesson-3",
     title: "Basic Punch",
     description:
       "Learn the basic karate punch with correct technique and control.",
-    video: "/lessons/karate/karate-lesson-3.mp4",
+    video: "https://res.cloudinary.com/r5v9dk9w/video/upload/v1794245673/k3.mp4",
   },
-  {
-    id: "karate-lesson-4",
-    title: "Front Kick",
-    description:
-      "Learn the basic front kick and practice balance and control.",
-    video: "/lessons/karate/karate-lesson-4.mp4",
-  },
-  {
-    id: "karate-lesson-5",
-    title: "Punch + Kick Combination",
-    description:
-      "Combine your basic punch and front kick into a simple combination.",
-    video: "/lessons/karate/karate-lesson-5.mp4",
-  },
+
 ];
 
 function Karate() {
