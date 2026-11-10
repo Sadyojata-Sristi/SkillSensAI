@@ -4,3 +4,35 @@
 .pose-studio-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}.pose-studio-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 15px;border-radius:11px;border:1px solid transparent;font-weight:750;cursor:pointer;font:inherit;font-weight:750}.pose-primary{background:#2563eb;color:#fff}.pose-secondary{background:rgba(148,163,184,.12);color:inherit;border-color:var(--ml-border,rgba(255,255,255,.18))}.pose-stop{background:#b91c1c;color:white}.pose-exit{flex-shrink:0;background:rgba(148,163,184,.12);border-color:var(--ml-border,rgba(255,255,255,.18));color:inherit}.pose-studio-button:hover,.pose-expand-button:hover{filter:brightness(1.12)}.pose-status{margin:10px 0 0;font-size:.86rem;line-height:1.5;color:#38bdf8}.pose-file-name{overflow-wrap:anywhere;font-size:.86rem;opacity:.8}.pose-legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:13px;font-size:.8rem;opacity:.86}.pose-legend span{display:flex;align-items:center;gap:7px}.pose-dot-blue,.pose-dot-yellow{display:inline-block;width:10px;height:10px;border-radius:50%}.pose-dot-blue{background:#38bdf8}.pose-dot-yellow{background:#fbbf24}.pose-line-green{display:inline-block;width:18px;height:3px;border-radius:3px;background:#34d399}.pose-stats{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px}.pose-stats span{display:flex;flex-direction:column;gap:3px;min-width:125px;padding:10px 12px;border-radius:10px;background:rgba(148,163,184,.1)}.pose-stats b{font-size:1.15rem}.pose-stats small{font-size:.75rem;opacity:.75}.pose-feedback{margin-top:15px;padding:14px 16px;border:1px solid rgba(56,189,248,.3);border-radius:12px;background:rgba(14,165,233,.08);line-height:1.6}.pose-feedback p{margin:6px 0 0}.pose-disclaimer{font-size:.76rem;line-height:1.5;opacity:.64;margin:13px 0 0}
 .pose-studio-expanded{position:fixed!important;inset:0!important;z-index:99999!important;overflow:auto!important;border-radius:0!important;margin:0!important;padding:clamp(12px,2vw,26px)!important;background:#060912!important;color:#f8fafc!important;display:flex;flex-direction:column}.pose-studio-expanded .pose-studio-heading{flex:0 0 auto}.pose-studio-expanded .pose-video-shell{flex:1 1 auto;height:auto;min-height:0;max-height:none}.pose-studio-expanded .pose-video{object-fit:contain}.pose-studio-expanded .pose-overlay{object-fit:contain}.pose-studio-expanded .pose-studio-actions{flex:0 0 auto}.pose-studio-expanded .pose-disclaimer{flex:0 0 auto}
 @media(max-width:640px){.pose-studio{padding:13px;border-radius:15px}.pose-studio-heading{gap:8px}.pose-studio-heading h3{font-size:1.05rem}.pose-video-shell{height:55vh;min-height:260px;max-height:500px}.pose-studio-button{flex:1 1 140px}.pose-studio-expanded{padding:10px!important}.pose-studio-expanded .pose-video-shell{min-height:45vh}}
+
+
+/* Score shown with the posture feedback */
+.pose-score-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 12px 0;
+  padding: 14px 16px;
+  border: 1px solid var(--pose-border, rgba(148, 163, 184, .35));
+  border-radius: 14px;
+  background: var(--pose-card, rgba(148, 163, 184, .08));
+}
+.pose-score-number {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+  flex-shrink: 0;
+  font-size: 2rem;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+.pose-score-number span {
+  font-size: .9rem;
+  font-weight: 600;
+  opacity: .65;
+  letter-spacing: 0;
+}
+.pose-score-copy { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.pose-score-copy b { font-size: .95rem; }
+.pose-score-copy small { font-size: .82rem; line-height: 1.4; opacity: .8; }
