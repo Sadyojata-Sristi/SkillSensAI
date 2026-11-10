@@ -2,50 +2,43 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Camera, Upload, X, Maximize2, Minimize2, ScanLine } from "lucide-react";
 import "./PosePracticeStudio.css";
 
-// Pin the legacy MediaPipe Pose package so the JS and WASM/model assets match.
-const POSE_CDNS = [
-  "https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1675469404/",
-  "https://unpkg.com/@mediapipe/pose@0.5.1675469404/",
-];
-const JOINTS = [0, 11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32];
-const CONNECTIONS = [[11,12],[11,13],[13,15],[12,14],[14,16],[11,23],[12,24],[23,24],[23,25],[25,27],[24,26],[26,28],[27,29],[27,31],[28,30],[28,32]];
+// Modern MediaPipe Tasks Vision runtime (avoids the legacy Emscripten Module.arguments error).
+const VISION_VERSION = "0.10.22";
+const VISION_CDN = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${VISION_VERSION}`;
+const POSE_MODEL_URL = "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task";
 
-async function loadPoseScript() {
-  if (window.Pose) return window.__skillsensaiPoseBase || POSE_CDNS[0];
-  if (window.__skillsensaiPoseScript) return window.__skillsensaiPoseScript;
-
-  window.__skillsensaiPoseScript = (async () => {
-    let lastError;
-    for (const base of POSE_CDNS) {
-      try {
-        await new Promise((resolve, reject) => {
-          const script = document.createElement("script");
-          script.src = `${base}pose.js`;
-          script.async = true;
-          script.crossOrigin = "anonymous";
-          script.onload = () => window.Pose
-            ? resolve()
-            : reject(new Error("The script loaded but did not expose the Pose model"));
-          script.onerror = () => reject(new Error(`Could not load ${base}pose.js`));
-          document.head.appendChild(script);
-        });
-        window.__skillsensaiPoseBase = base;
-        return base;
-      } catch (error) {
-        lastError = error;
-      }
-    }
-    window.__skillsensaiPoseScript = null;
-    throw lastError || new Error("Both pose CDNs failed to load");
+async function loadPoseRuntime() {
+  if (window.__skillsensaiPoseRuntime) return window.__skillsensaiPoseRuntime;
+  window.__skillsensaiPoseRuntime = (async () => {
+    const vision = await import(/* @vite-ignore */ `${VISION_CDN}/vision_bundle.mjs`);
+    const fileset = await vision.FilesetResolver.forVisionTasks(`${VISION_CDN}/wasm`);
+    const landmarker = await vision.PoseLandmarker.createFromOptions(fileset, {
+      baseOptions: { modelAssetPath: POSE_MODEL_URL, delegate: "GPU" },
+      runningMode: "VIDEO",
+      numPoses: 1,
+      minPoseDetectionConfidence: 0.5,
+      minPosePresenceConfidence: 0.5,
+      minTrackingConfidence: 0.5,
+    }).catch(async () => vision.PoseLandmarker.createFromOptions(fileset, {
+      baseOptions: { modelAssetPath: POSE_MODEL_URL, delegate: "CPU" },
+      runningMode: "VIDEO",
+      numPoses: 1,
+      minPoseDetectionConfidence: 0.5,
+      minPosePresenceConfidence: 0.5,
+      minTrackingConfidence: 0.5,
+    }));
+    return landmarker;
   })();
-
   try {
-    return await window.__skillsensaiPoseScript;
+    return await window.__skillsensaiPoseRuntime;
   } catch (error) {
-    window.__skillsensaiPoseScript = null;
+    window.__skillsensaiPoseRuntime = null;
     throw error;
   }
 }
+
+const JOINTS = [0, 11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32];
+const CONNECTIONS = [[11,12],[11,13],[13,15],[12,14],[14,16],[11,23],[12,24],[23,24],[23,25],[25,27],[24,26],[26,28],[27,29],[27,31],[28,30],[28,32]];
 
 export default function PosePracticeStudio({ discipline = "boxing" }) {
   const videoRef = useRef(null);
@@ -108,7 +101,7 @@ export default function PosePracticeStudio({ discipline = "boxing" }) {
 
   const handlePoseResults = useCallback((results) => {
     const video = videoRef.current;
-    const landmarks = results?.poseLandmarks || null;
+    const landmarks = results?.landmarks?.[0] || null;
     drawPose(landmarks, video?.videoWidth, video?.videoHeight);
     if (!landmarks) {
       setPoseStatus("No full-body pose detected yet — step back and keep your head, shoulders, hips and feet visible.");
@@ -132,11 +125,7 @@ export default function PosePracticeStudio({ discipline = "boxing" }) {
     if (poseRef.current) return poseRef.current;
     setLoadingPose(true);
     try {
-      const assetBase = await loadPoseScript();
-      const pose = new window.Pose({ locateFile: (file) => `${assetBase}${file}` });
-      pose.setOptions({ modelComplexity: 1, smoothLandmarks: true, enableSegmentation: false, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
-      pose.onResults(handlePoseResults);
-      await pose.initialize();
+      const pose = await loadPoseRuntime();
       poseRef.current = pose;
       return pose;
     } finally { setLoadingPose(false); }
@@ -153,7 +142,7 @@ export default function PosePracticeStudio({ discipline = "boxing" }) {
         }
         if (!busyRef.current) {
           busyRef.current = true;
-          try { await pose.send({ image: video }); } catch { /* wait for next frame */ }
+          try { handlePoseResults(pose.detectForVideo(video, performance.now())); } catch (error) { console.warn("Pose frame skipped:", error); }
           busyRef.current = false;
         }
         rafRef.current = requestAnimationFrame(tick);
@@ -164,7 +153,7 @@ export default function PosePracticeStudio({ discipline = "boxing" }) {
       console.error("SkillSensAI pose model failed to initialize:", error);
       setPoseStatus(`Pose model could not load (${error?.message || "network or model error"}). Check your connection, then refresh the page. Recording and upload still work.`);
     }
-  }, [ensurePose, stopLoop]);
+  }, [ensurePose, stopLoop, handlePoseResults]);
 
   useEffect(() => {
     const video = videoRef.current;
