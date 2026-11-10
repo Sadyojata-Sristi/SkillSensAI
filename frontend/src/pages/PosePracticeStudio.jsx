@@ -62,6 +62,7 @@ export default function PosePracticeStudio({ discipline = "boxing" }) {
   const [loadingPose, setLoadingPose] = useState(false);
   const [poseStatus, setPoseStatus] = useState("Ready — start recording or upload a video.");
   const [feedback, setFeedback] = useState("");
+  const [feedbackScore, setFeedbackScore] = useState(null);
   const [poseStats, setPoseStats] = useState({ visible: 0, frames: 0, shoulderTilt: null, torsoLean: null });
   const isBoxing = discipline === "boxing";
 
@@ -191,7 +192,7 @@ export default function PosePracticeStudio({ discipline = "boxing" }) {
     }
     try {
       if (videoUrl.startsWith("blob:")) URL.revokeObjectURL(videoUrl);
-      setVideoUrl(""); setVideoName(""); setFeedback(""); setPoseStats({ visible: 0, frames: 0, shoulderTilt: null, torsoLean: null }); lastLandmarksRef.current = null;
+      setVideoUrl(""); setVideoName(""); setFeedback(""); setFeedbackScore(null); setPoseStats({ visible: 0, frames: 0, shoulderTilt: null, torsoLean: null }); lastLandmarksRef.current = null;
       const media = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } }, audio: true });
       streamRef.current = media; setStream(media);
       const options = MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus") ? { mimeType: "video/webm;codecs=vp9,opus" } : {};
@@ -227,28 +228,41 @@ export default function PosePracticeStudio({ discipline = "boxing" }) {
     if (videoUrl.startsWith("blob:")) URL.revokeObjectURL(videoUrl);
     stopLoop(); setStream(null); setVideoUrl(URL.createObjectURL(file)); setVideoName(file.name); setRecording(false); setExpanded(false);
     setPoseStats({ visible: 0, frames: 0, shoulderTilt: null, torsoLean: null }); lastLandmarksRef.current = null;
-    setFeedback("Video loaded. Press play to track joints, then select ‘Give me feedback’ for a basic posture review.");
+    setFeedbackScore(null); setFeedback("Video loaded. Press play to track joints, then select ‘Give me feedback’ for a basic posture review and score out of 100.");
   };
 
   const giveFeedback = () => {
     const p = lastLandmarksRef.current;
     if (!p) {
+      setFeedbackScore(null);
       setFeedback("I couldn't detect a clear body pose yet. Play the video and make sure your head, shoulders, hips and legs are visible with good lighting. This local model works best with one person in frame."); return;
     }
     const visible = JOINTS.filter(i => (p[i]?.visibility ?? 1) > 0.35).length;
     const shoulderTilt = Math.abs((p[11]?.y ?? 0) - (p[12]?.y ?? 0));
+    const hipTilt = Math.abs((p[23]?.y ?? 0) - (p[24]?.y ?? 0));
     const shoulderMid = ((p[11]?.x ?? 0) + (p[12]?.x ?? 0)) / 2;
     const hipMid = ((p[23]?.x ?? 0) + (p[24]?.x ?? 0)) / 2;
     const torsoOffset = Math.abs(shoulderMid - hipMid);
+
+    // A transparent, heuristic snapshot score; it is not a trained technique assessment.
+    const visibilityPoints = Math.round((visible / JOINTS.length) * 25);
+    const shoulderPoints = shoulderTilt < 0.03 ? 25 : shoulderTilt < 0.07 ? 17 : shoulderTilt < 0.12 ? 9 : 3;
+    const hipPoints = hipTilt < 0.03 ? 20 : hipTilt < 0.07 ? 14 : hipTilt < 0.12 ? 7 : 2;
+    const alignmentPoints = torsoOffset < 0.05 ? 30 : torsoOffset < 0.09 ? 24 : torsoOffset < 0.12 ? 16 : torsoOffset < 0.18 ? 9 : 3;
+    const score = Math.max(0, Math.min(100, visibilityPoints + shoulderPoints + hipPoints + alignmentPoints));
+    setFeedbackScore(score);
+
     const tips = [];
     if (visible < 13) tips.push("Step farther back and keep your full body, including feet, inside the frame.");
     else tips.push("Most key joints are visible — good camera positioning.");
     if (shoulderTilt > 0.07) tips.push("Your shoulders look uneven in this frame; relax them and recheck your stance.");
     else tips.push("Your shoulders look fairly level in this frame.");
+    if (hipTilt > 0.07) tips.push("Your hips look uneven in this frame; check your balance and stance.");
+    else tips.push("Your hips look fairly level in this frame.");
     if (torsoOffset > 0.12) tips.push("Your torso appears shifted sideways in this frame; check balance and weight distribution.");
     else tips.push("Your shoulder and hip centres look reasonably aligned in this frame.");
     tips.push(isBoxing ? "Boxing reminder: keep your hands near guard and return to guard after each punch." : "Karate reminder: keep a stable base and return to a balanced ready position after each technique.");
-    tips.push("This is basic single-frame pose feedback, not a reliable technique score. Different camera angles and movement phases can change these estimates.");
+    tips.push("Score basis: visible joints (25), shoulder level (25), hip level (20), and shoulder-to-hip alignment (30). This is a basic single-frame posture estimate, not a coach-certified technique score. Camera angle and movement phase can affect it.");
     setFeedback(tips.join(" "));
   };
 
@@ -273,7 +287,14 @@ export default function PosePracticeStudio({ discipline = "boxing" }) {
       {videoName && <p className="pose-file-name">Selected: {videoName}</p>}
       <div className="pose-legend"><span><i className="pose-dot-blue"/> Detected joints</span><span><i className="pose-line-green"/> Body alignment</span><span><i className="pose-dot-yellow"/> Head</span></div>
       {videoUrl && !recording && <div className="pose-stats"><span><b>{poseStats.visible}/17</b><small>key points visible in latest frame</small></span><span><b>{poseStats.frames}</b><small>frames checked this playback</small></span></div>}
-      {feedback && <div className="pose-feedback"><strong>SkillSensAI practice feedback</strong><p>{feedback}</p></div>}
+      {feedback && <div className="pose-feedback">
+        <strong>SkillSensAI practice feedback</strong>
+        {feedbackScore !== null && <div className="pose-score-card" aria-label={`Posture snapshot score ${feedbackScore} out of 100`}>
+          <div className="pose-score-number">{feedbackScore}<span>/100</span></div>
+          <div className="pose-score-copy"><b>Posture snapshot score</b><small>{feedbackScore >= 85 ? "Strong snapshot — keep practising consistently." : feedbackScore >= 70 ? "Good start — review the tips below." : feedbackScore >= 50 ? "Developing — adjust your stance and camera position." : "Needs another try — check visibility and body alignment."}</small></div>
+        </div>}
+        <p>{feedback}</p>
+      </div>}
       <p className="pose-disclaimer">Early prototype: joint tracking and feedback are approximate. It does not certify technique, detect injury risk, or replace an instructor. Use a clear space and practise slowly.</p>
     </section>
   );
