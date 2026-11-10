@@ -10,34 +10,27 @@ const POSE_MODEL_PATH =
   "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task";
 
 async function loadPoseRuntime() {
-  if (window.__skillsensaiPoseRuntime) return window.__skillsensaiPoseRuntime;
-  window.__skillsensaiPoseRuntime = (async () => {
-    const fileset = await FilesetResolver.forVisionTasks(VISION_WASM_PATH);
-    const options = {
-      runningMode: "VIDEO",
-      numPoses: 1,
-      minPoseDetectionConfidence: 0.5,
-      minPosePresenceConfidence: 0.5,
-      minTrackingConfidence: 0.5,
-    };
-    try {
-      return await PoseLandmarker.createFromOptions(fileset, {
-        ...options,
-        baseOptions: { modelAssetPath: POSE_MODEL_PATH, delegate: "GPU" },
-      });
-    } catch (gpuError) {
-      console.warn("GPU pose initialization failed; retrying on CPU.", gpuError);
-      return await PoseLandmarker.createFromOptions(fileset, {
-        ...options,
-        baseOptions: { modelAssetPath: POSE_MODEL_PATH, delegate: "CPU" },
-      });
-    }
-  })();
+  // Use the same Tasks Vision version as package.json and avoid sharing a
+  // closed WASM instance across React remounts.
+  const fileset = await FilesetResolver.forVisionTasks(VISION_WASM_PATH);
+  const options = {
+    runningMode: "VIDEO",
+    numPoses: 1,
+    minPoseDetectionConfidence: 0.5,
+    minPosePresenceConfidence: 0.5,
+    minTrackingConfidence: 0.5,
+  };
   try {
-    return await window.__skillsensaiPoseRuntime;
-  } catch (error) {
-    window.__skillsensaiPoseRuntime = null;
-    throw error;
+    return await PoseLandmarker.createFromOptions(fileset, {
+      ...options,
+      baseOptions: { modelAssetPath: POSE_MODEL_PATH, delegate: "GPU" },
+    });
+  } catch (gpuError) {
+    console.warn("GPU pose initialization failed; retrying on CPU.", gpuError);
+    return await PoseLandmarker.createFromOptions(fileset, {
+      ...options,
+      baseOptions: { modelAssetPath: POSE_MODEL_PATH, delegate: "CPU" },
+    });
   }
 }
 
@@ -53,6 +46,9 @@ export default function PosePracticeStudio({ discipline = "boxing" }) {
   const chunksRef = useRef([]);
   const rafRef = useRef(0);
   const busyRef = useRef(false);
+  const posePromiseRef = useRef(null);
+  const loopTokenRef = useRef(0);
+  const lastInferenceAtRef = useRef(0);
   const lastLandmarksRef = useRef(null);
   const [recording, setRecording] = useState(false);
   const [stream, setStream] = useState(null);
@@ -67,6 +63,7 @@ export default function PosePracticeStudio({ discipline = "boxing" }) {
   const isBoxing = discipline === "boxing";
 
   const stopLoop = useCallback(() => {
+    loopTokenRef.current += 1;
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     rafRef.current = 0;
     busyRef.current = false;
@@ -173,34 +170,50 @@ export default function PosePracticeStudio({ discipline = "boxing" }) {
 
   const ensurePose = useCallback(async () => {
     if (poseRef.current) return poseRef.current;
+    if (posePromiseRef.current) return posePromiseRef.current;
     setLoadingPose(true);
-    try {
-      const pose = await loadPoseRuntime();
-      poseRef.current = pose;
-      return pose;
-    } finally { setLoadingPose(false); }
-  }, [handlePoseResults]);
+    posePromiseRef.current = loadPoseRuntime()
+      .then((pose) => {
+        poseRef.current = pose;
+        return pose;
+      })
+      .catch((error) => {
+        posePromiseRef.current = null;
+        throw error;
+      })
+      .finally(() => setLoadingPose(false));
+    return posePromiseRef.current;
+  }, []);
 
   const startLoop = useCallback(async () => {
     stopLoop();
+    const loopToken = loopTokenRef.current;
     try {
       const pose = await ensurePose();
-      const tick = async () => {
+      // A second start request may have superseded this one while the model loaded.
+      if (loopToken !== loopTokenRef.current) return;
+      const tick = () => {
+        if (loopToken !== loopTokenRef.current) return;
         const video = videoRef.current;
-        if (!video || video.readyState < 2 || video.paused || video.ended) {
+        if (!video || video.readyState < 2 || video.videoWidth < 2 || video.videoHeight < 2 || video.paused || video.ended) {
           if (video && video.paused && videoUrl && !stream) {
             setPoseStatus("Video is paused — press play to detect joints.");
           }
-          rafRef.current = requestAnimationFrame(tick); return;
+          rafRef.current = requestAnimationFrame(tick);
+          return;
         }
-        if (!busyRef.current) {
+        const now = performance.now();
+        // Limit WASM inference to about 10 FPS to avoid overlapping/overloading
+        // inference on slower devices. The animation overlay still redraws smoothly.
+        if (!busyRef.current && now - lastInferenceAtRef.current >= 100) {
           busyRef.current = true;
+          lastInferenceAtRef.current = now;
           try {
-            const results = pose.detectForVideo(video, performance.now());
+            const results = pose.detectForVideo(video, now);
             handlePoseResults(results);
           } catch (error) {
             console.warn("Pose frame detection failed:", error);
-            setPoseStatus(`Pose tracking frame failed: ${error?.message || "unknown detection error"}. Check the browser console and camera/video permissions.`);
+            setPoseStatus(`Pose tracking frame failed: ${error?.message || "unknown detection error"}. Try refreshing the page. If it continues, the model runtime may be incompatible with the deployed package.`);
           } finally {
             busyRef.current = false;
           }
@@ -213,7 +226,7 @@ export default function PosePracticeStudio({ discipline = "boxing" }) {
       console.error("SkillSensAI pose model failed to initialize:", error);
       setPoseStatus(`Pose model could not load (${error?.message || "network or model error"}). Check your connection, then refresh the page. Recording and upload still work.`);
     }
-  }, [ensurePose, stopLoop, handlePoseResults]);
+  }, [ensurePose, stopLoop, handlePoseResults, videoUrl, stream]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -259,7 +272,7 @@ export default function PosePracticeStudio({ discipline = "boxing" }) {
     try {
       if (videoUrl.startsWith("blob:")) URL.revokeObjectURL(videoUrl);
       setVideoUrl(""); setVideoName(""); setFeedback(""); setFeedbackScore(null); setPoseStats({ visible: 0, frames: 0, shoulderTilt: null, torsoLean: null }); lastLandmarksRef.current = null;
-      const media = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } }, audio: true });
+      const media = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 640, max: 960 }, height: { ideal: 480, max: 720 }, frameRate: { ideal: 24, max: 30 } }, audio: true });
       streamRef.current = media; setStream(media);
       const options = MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus") ? { mimeType: "video/webm;codecs=vp9,opus" } : {};
       const recorder = new MediaRecorder(media, options); chunksRef.current = [];
