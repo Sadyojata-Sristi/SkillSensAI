@@ -40,7 +40,7 @@ import {
 } from "firebase/auth";
 
 import { auth } from "../firebase";
-import { getLessonsLearned } from "../utils/progress";
+import { getLessonsLearned, getCompletedLessons } from "../utils/progress";
 
 import "./Home.css";
 
@@ -68,7 +68,7 @@ const skills = [
     path: "/martial-arts",
     description:
       "Build discipline, technique, movement and confidence.",
-    lessons: 10,
+    lessons: 6,
   },
   {
     name: "Dance",
@@ -238,6 +238,9 @@ export default function Home() {
   const [lessonsLearned, setLessonsLearned] =
     useState(0);
 
+  const [martialLessonsLearned, setMartialLessonsLearned] =
+    useState(0);
+
 
   /* -------------------------------------------------------
      BULB
@@ -382,6 +385,10 @@ export default function Home() {
     try {
       const completed =
         getLessonsLearned();
+      const martialCompleted = getCompletedLessons().filter((id) =>
+        id.startsWith("boxing-") || id.startsWith("karate-")
+      ).length;
+      setMartialLessonsLearned(martialCompleted);
 
       const numericValue =
         Number(completed);
@@ -1116,9 +1123,11 @@ export default function Home() {
         "Martial Arts"
       ) {
         return {
-          completed: 0,
+          completed: martialLessonsLearned,
           total: skill.lessons,
-          percentage: 0,
+          percentage: skill.lessons > 0
+            ? Math.min(100, Math.round((martialLessonsLearned / skill.lessons) * 100))
+            : 0,
         };
       }
 
