@@ -1,33 +1,37 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { FilesetResolver, PoseLandmarker } from "@mediapipe/tasks-vision";
 import { Camera, Upload, X, Maximize2, Minimize2, ScanLine } from "lucide-react";
 import "./PosePracticeStudio.css";
 
-// Modern MediaPipe Tasks Vision runtime (avoids the legacy Emscripten Module.arguments error).
-const VISION_VERSION = "0.10.22";
-const VISION_CDN = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${VISION_VERSION}`;
-const POSE_MODEL_URL = "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task";
+// Load MediaPipe from the locally installed npm package and local public assets.
+// Copy the package WASM files to frontend/public/mediapipe/wasm and put the model at
+// frontend/public/mediapipe/pose_landmarker_lite.task (see SETUP-Pose-Practice.txt).
+const VISION_WASM_PATH = "/mediapipe/wasm";
+const POSE_MODEL_PATH = "/mediapipe/pose_landmarker_lite.task";
 
 async function loadPoseRuntime() {
   if (window.__skillsensaiPoseRuntime) return window.__skillsensaiPoseRuntime;
   window.__skillsensaiPoseRuntime = (async () => {
-    const vision = await import(/* @vite-ignore */ `${VISION_CDN}/vision_bundle.mjs`);
-    const fileset = await vision.FilesetResolver.forVisionTasks(`${VISION_CDN}/wasm`);
-    const landmarker = await vision.PoseLandmarker.createFromOptions(fileset, {
-      baseOptions: { modelAssetPath: POSE_MODEL_URL, delegate: "GPU" },
+    const fileset = await FilesetResolver.forVisionTasks(VISION_WASM_PATH);
+    const options = {
       runningMode: "VIDEO",
       numPoses: 1,
       minPoseDetectionConfidence: 0.5,
       minPosePresenceConfidence: 0.5,
       minTrackingConfidence: 0.5,
-    }).catch(async () => vision.PoseLandmarker.createFromOptions(fileset, {
-      baseOptions: { modelAssetPath: POSE_MODEL_URL, delegate: "CPU" },
-      runningMode: "VIDEO",
-      numPoses: 1,
-      minPoseDetectionConfidence: 0.5,
-      minPosePresenceConfidence: 0.5,
-      minTrackingConfidence: 0.5,
-    }));
-    return landmarker;
+    };
+    try {
+      return await PoseLandmarker.createFromOptions(fileset, {
+        ...options,
+        baseOptions: { modelAssetPath: POSE_MODEL_PATH, delegate: "GPU" },
+      });
+    } catch (gpuError) {
+      console.warn("GPU pose initialization failed; retrying on CPU.", gpuError);
+      return await PoseLandmarker.createFromOptions(fileset, {
+        ...options,
+        baseOptions: { modelAssetPath: POSE_MODEL_PATH, delegate: "CPU" },
+      });
+    }
   })();
   try {
     return await window.__skillsensaiPoseRuntime;
