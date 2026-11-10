@@ -1,3 +1,4 @@
+
 {
   "name": "skillsensai-frontend",
   "private": true,
@@ -9,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mediapipe/tasks-vision": "0.10.22",
     "axios": "^1.12.2",
     "firebase": "^12.19.0",
     "lucide-react": "^0.468.0",
