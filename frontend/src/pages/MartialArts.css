@@ -766,3 +766,53 @@
     margin: 12px 0 0 auto;
   }
 }
+
+/* Theme toggle: make it look like a real button (only this control) */
+.martial-page .martial-theme-toggle {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 9px !important;
+  min-height: 42px !important;
+  padding: 10px 16px !important;
+  border: 1px solid #475569 !important;
+  border-radius: 12px !important;
+  background: #172033 !important;
+  color: #ffffff !important;
+  font: inherit !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.14) !important;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease !important;
+}
+
+.martial-page .martial-theme-toggle:hover {
+  background: #2b3a55 !important;
+  border-color: #64748b !important;
+  transform: translateY(-1px);
+  box-shadow: 0 7px 18px rgba(15, 23, 42, 0.18) !important;
+}
+
+.martial-page .martial-theme-toggle:focus-visible {
+  outline: 3px solid rgba(91, 141, 239, 0.45) !important;
+  outline-offset: 3px !important;
+}
+
+.martial-page.martial-theme-light .martial-theme-toggle {
+  background: #ffffff !important;
+  color: #17213a !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 4px 12px rgba(34, 50, 90, 0.10) !important;
+}
+
+.martial-page.martial-theme-light .martial-theme-toggle:hover {
+  background: #edf3ff !important;
+  border-color: #9bb8f5 !important;
+  box-shadow: 0 7px 18px rgba(34, 50, 90, 0.14) !important;
+}
