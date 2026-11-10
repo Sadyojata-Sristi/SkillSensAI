@@ -603,14 +603,166 @@
   }
 }
 
+/* =========================================
+   DARK THEME
+   Overrides the light defaults while preserving
+   each martial art's individual accent colors.
+========================================= */
 
-/* Persistent theme switch for Martial Arts and its lesson pages */
-.martial-page{position:relative;transition:background .2s,color .2s}
-.martial-theme-toggle{position:absolute;top:22px;right:clamp(18px,4vw,64px);z-index:3;display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;border:1px solid rgba(148,163,184,.35);background:rgba(15,23,42,.88);color:#f8fafc;font-weight:800;cursor:pointer}
-.martial-theme-light{background:#f5f7ff!important;color:#17213a!important}
-.martial-theme-light .martial-header p,.martial-theme-light .selection-heading p,.martial-theme-light .martial-card-content p,.martial-theme-light .martial-ai-info p{color:#596780!important}
-.martial-theme-light .martial-card,.martial-theme-light .martial-ai-info{background:#fff!important;color:#17213a!important;border-color:rgba(51,65,100,.17)!important;box-shadow:0 10px 30px rgba(34,50,90,.07)}
-.martial-theme-light .martial-card h3,.martial-theme-light .martial-ai-info h3,.martial-theme-light .selection-heading h2,.martial-theme-light .martial-header h1{color:#17213a!important}
-.martial-theme-light .martial-back-button{background:#fff!important;color:#17213a!important;border-color:#d8deed!important}
-.martial-theme-light .martial-theme-toggle{background:#fff;color:#17213a;border-color:#d8deed}
-@media(max-width:600px){.martial-theme-toggle{position:relative;top:auto;right:auto;margin:12px 18px 0 auto;display:flex;width:max-content}}
+.martial-theme-dark {
+  --skill-color: #8db4ff;
+  --skill-dark: #a8c5ff;
+  --skill-light: #1c2b46;
+  --skill-lighter: #172338;
+  --skill-border: #30476b;
+  --skill-glow: rgba(91, 141, 239, 0.16);
+
+  background:
+    radial-gradient(circle at 50% 0%, rgba(91, 141, 239, 0.15), transparent 42%),
+    #0b1220 !important;
+  color: #e8eef9 !important;
+  color-scheme: dark;
+}
+
+.martial-theme-dark .martial-back-button {
+  background: #151f31;
+  color: #e3ebf8;
+  border-color: #334155;
+}
+
+.martial-theme-dark .martial-back-button:hover {
+  color: #a8c5ff;
+  border-color: #526f9d;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.22);
+}
+
+.martial-theme-dark .martial-header-icon {
+  background: linear-gradient(145deg, #1a263b, #172338);
+  color: #8db4ff;
+  border-color: #30476b;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2), 0 0 35px var(--skill-glow);
+}
+
+.martial-theme-dark .martial-label {
+  color: #a8c5ff;
+}
+
+.martial-theme-dark .martial-header h1,
+.martial-theme-dark .selection-heading h2 {
+  color: #f1f5fb;
+}
+
+.martial-theme-dark .martial-header p,
+.martial-theme-dark .selection-heading p {
+  color: #a4b0c4;
+}
+
+.martial-theme-dark .martial-card {
+  background: #151f31;
+  color: #e8eef9;
+  border-color: #2d3b51;
+  box-shadow: 0 7px 25px rgba(0, 0, 0, 0.18);
+}
+
+.martial-theme-dark .martial-card:hover {
+  border-color: var(--card-color, #8db4ff);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.3);
+}
+
+.martial-theme-dark .martial-card::before {
+  opacity: 0.18;
+}
+
+.martial-theme-dark .martial-card:hover::before {
+  opacity: 0.3;
+}
+
+.martial-theme-dark .martial-card-icon {
+  background: #202b3d;
+  border-color: #3a4960;
+  color: var(--card-color, #8db4ff);
+}
+
+.martial-theme-dark .martial-card-content h3 {
+  color: #f1f5fb;
+}
+
+.martial-theme-dark .martial-card-content p {
+  color: #a4b0c4;
+}
+
+.martial-theme-dark .martial-card-footer span {
+  color: var(--card-color, #a8c5ff);
+}
+
+/* Keep coming-soon cards dark too */
+.martial-theme-dark .coming-soon-card {
+  background: linear-gradient(145deg, #151f31, #111a29);
+}
+
+.martial-theme-dark .coming-soon-card .martial-card-content h3 {
+  color: #c2ccdc;
+}
+
+.martial-theme-dark .coming-soon-card .martial-card-content p {
+  color: #8794a9;
+}
+
+.martial-theme-dark .coming-soon-card .martial-card-footer span {
+  color: #8794a9;
+}
+
+.martial-theme-dark .martial-ai-info {
+  background: linear-gradient(135deg, #151f31, #172338);
+  border-color: #30476b;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18);
+}
+
+.martial-theme-dark .ai-info-icon {
+  color: #8db4ff;
+  background: #1c2b46;
+  border-color: #30476b;
+}
+
+.martial-theme-dark .martial-ai-info h3 {
+  color: #f1f5fb;
+}
+
+.martial-theme-dark .martial-ai-info p {
+  color: #a4b0c4;
+}
+
+.martial-theme-dark .martial-theme-toggle {
+  background: #e8eef9;
+  color: #17213a;
+  border-color: #52627a;
+}
+
+/* Ensure light mode remains consistently light */
+.martial-theme-light {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(91, 141, 239, 0.08), transparent 38%),
+    #f5f7ff !important;
+  color: #17213a !important;
+  color-scheme: light;
+}
+
+.martial-theme-light .martial-card-icon {
+  color: var(--card-color, var(--skill-color));
+}
+
+.martial-theme-light .martial-theme-toggle {
+  background: #ffffff;
+  color: #17213a;
+  border-color: #d8deed;
+}
+
+/* Prevent the theme toggle from overlapping the back button on small screens */
+@media (max-width: 600px) {
+  .martial-theme-toggle {
+    position: relative;
+    top: auto;
+    right: auto;
+    margin: 12px 0 0 auto;
+  }
+}
