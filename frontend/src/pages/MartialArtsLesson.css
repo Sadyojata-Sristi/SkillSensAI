@@ -1,1 +1,39 @@
 .martial-lesson-page{--ml-bg:#0b1020;--ml-card:#131c30;--ml-card2:#19253d;--ml-text:#f8fafc;--ml-muted:#a8b4ca;--ml-border:rgba(148,163,184,.2);--ml-accent:#a78bfa;--ml-accent-dark:#7c3aed;min-height:100vh;background:radial-gradient(ellipse at 12% 0%,color-mix(in srgb,var(--ml-accent) 14%,transparent),transparent 38%),var(--ml-bg);color:var(--ml-text);padding-bottom:44px}.martial-lesson-page *{box-sizing:border-box}.martial-lesson-page.theme-light{--ml-bg:#f5f7ff;--ml-card:#fff;--ml-card2:#eef1ff;--ml-text:#18213a;--ml-muted:#596780;--ml-border:rgba(51,65,100,.18)}.ml-boxing{--ml-accent:#ef4444;--ml-accent-dark:#dc2626}.ml-karate{--ml-accent:#38bdf8;--ml-accent-dark:#0284c7}.ml-header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px clamp(14px,4vw,52px);border-bottom:1px solid var(--ml-border);background:color-mix(in srgb,var(--ml-bg) 88%,transparent);position:sticky;top:0;z-index:4;backdrop-filter:blur(14px)}.ml-button,.ml-primary,.ml-secondary,.ml-danger{border:1px solid var(--ml-border);border-radius:12px;padding:10px 14px;display:inline-flex;align-items:center;justify-content:center;gap:8px;font:inherit;font-weight:800;cursor:pointer;text-decoration:none}.ml-button,.ml-secondary{background:var(--ml-card2);color:var(--ml-text)}.ml-primary{background:var(--ml-accent-dark);color:#fff;border-color:transparent}.ml-danger{background:#dc2626;color:white;border-color:transparent}.ml-primary:disabled{opacity:.65;cursor:default}.ml-brand{font-weight:950;letter-spacing:1.3px}.ml-header-right{display:flex;align-items:center;gap:10px}.ml-xp{display:flex;align-items:center;gap:6px;color:#e9a23b;font-weight:900}.ml-content{width:min(900px,calc(100% - 28px));margin:28px auto}.ml-lesson-heading{padding:25px clamp(18px,4vw,36px);background:linear-gradient(125deg,var(--ml-card),var(--ml-card2));border:1px solid var(--ml-border);border-radius:22px;margin-bottom:18px}.ml-eyebrow{color:var(--ml-accent);font-weight:900;font-size:11px;letter-spacing:1.8px}.ml-lesson-heading h1{font-size:clamp(30px,5vw,44px);margin:10px 0}.ml-lesson-heading p,.ml-muted{color:var(--ml-muted);line-height:1.65}.ml-section{padding:clamp(18px,3vw,28px);background:var(--ml-card);border:1px solid var(--ml-border);border-radius:20px;margin:16px 0}.ml-section h2{display:flex;align-items:center;gap:9px;font-size:20px;margin:0 0 18px}.ml-demo{width:100%;max-height:460px;aspect-ratio:16/9;object-fit:contain;background:#05070d;border-radius:15px}.ml-check{display:flex;align-items:flex-start;gap:10px;color:var(--ml-muted);line-height:1.6;margin:13px 0;cursor:pointer}.ml-check input{accent-color:var(--ml-accent-dark);width:17px;height:17px;flex-shrink:0;margin-top:3px}.ml-quiz-title{display:flex;align-items:center;justify-content:space-between;gap:12px}.ml-quiz-title span{color:#e9a23b;font-weight:900}.ml-section h3{margin:12px 0}.ml-answers{display:grid;gap:10px;margin:16px 0}.ml-answer{text-align:left;border:1px solid var(--ml-border);border-radius:12px;padding:13px;background:var(--ml-card2);color:var(--ml-text);cursor:pointer}.ml-answer.selected{border-color:var(--ml-accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--ml-accent) 18%,transparent)}.ml-feedback{color:var(--ml-accent);font-weight:700;line-height:1.6}.ml-practice-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.85fr);gap:20px}.ml-camera{position:relative;aspect-ratio:4/3;min-height:280px;overflow:hidden;border-radius:16px;background:#070b15;border:1px solid var(--ml-border);display:grid;place-items:center}.ml-camera-video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#070b15}.ml-camera-empty{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:24px;color:#cbd5e1}.ml-camera-empty span{font-size:12px;line-height:1.5}.ml-guide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;pointer-events:none;color:rgba(255,255,255,.8)}.ml-guide svg{height:82%;max-width:75%;fill:none;stroke:color-mix(in srgb,var(--ml-accent) 80%,white);stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:7 7}.ml-guide span{font-size:9px;letter-spacing:2px;font-weight:900;text-shadow:0 1px 4px #000}.ml-practice-controls{min-width:0}.ml-actions{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}.ml-secondary{position:relative}.ml-file{overflow-wrap:anywhere;color:var(--ml-accent);font-size:12px}.ml-disclaimer{border-top:1px solid var(--ml-border);padding-top:14px;color:var(--ml-muted);font-size:12px;line-height:1.6}.ml-footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:20px}@media(max-width:700px){.ml-header{flex-wrap:wrap}.ml-brand{order:-1;width:100%;text-align:center}.ml-header-right{margin-left:auto}.ml-practice-grid{grid-template-columns:1fr}.ml-camera{min-height:250px}.ml-content{margin-top:16px}.ml-footer>*{flex:1}}
+
+
+.ml-recording-status {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0;
+  padding: 11px 14px;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: 12px;
+  background: rgba(239, 68, 68, 0.08);
+  font-size: 0.9rem;
+}
+
+.ml-recording-status strong {
+  font-variant-numeric: tabular-nums;
+  font-size: 1.05rem;
+}
+
+.ml-recording-dot {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 9px;
+  border-radius: 50%;
+  background: #ef4444;
+  animation: ml-recording-pulse 1.2s infinite;
+}
+
+.ml-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@keyframes ml-recording-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
