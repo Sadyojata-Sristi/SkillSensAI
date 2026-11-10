@@ -81,26 +81,71 @@ export default function PosePracticeStudio({ discipline = "boxing" }) {
 
   const drawPose = useCallback((landmarks, width, height) => {
     const canvas = canvasRef.current;
+    const video = videoRef.current;
     if (!canvas) return;
-    const w = Math.max(1, width || videoRef.current?.videoWidth || 640);
-    const h = Math.max(1, height || videoRef.current?.videoHeight || 360);
-    if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+
+    // Match the overlay to the visible video area (object-fit: contain), not
+    // the video's raw pixel dimensions. This keeps joints aligned on desktop/mobile.
+    const shell = canvas.parentElement;
+    const cssWidth = Math.max(1, shell?.clientWidth || width || 640);
+    const cssHeight = Math.max(1, shell?.clientHeight || height || 360);
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    const pixelWidth = Math.round(cssWidth * dpr);
+    const pixelHeight = Math.round(cssHeight * dpr);
+    if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+      canvas.width = pixelWidth;
+      canvas.height = pixelHeight;
+    }
     const ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, w, h);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, cssWidth, cssHeight);
     if (!landmarks) return;
-    const visible = (i) => landmarks[i] && (landmarks[i].visibility ?? 1) > 0.35;
-    ctx.lineWidth = Math.max(2, w / 260);
-    ctx.strokeStyle = "rgba(52, 211, 153, .9)";
-    CONNECTIONS.forEach(([a,b]) => {
+
+    const videoWidth = width || video?.videoWidth || 640;
+    const videoHeight = height || video?.videoHeight || 360;
+    const videoAspect = videoWidth / videoHeight;
+    const shellAspect = cssWidth / cssHeight;
+    let renderWidth, renderHeight, offsetX, offsetY;
+    if (videoAspect > shellAspect) {
+      renderWidth = cssWidth;
+      renderHeight = cssWidth / videoAspect;
+      offsetX = 0;
+      offsetY = (cssHeight - renderHeight) / 2;
+    } else {
+      renderHeight = cssHeight;
+      renderWidth = cssHeight * videoAspect;
+      offsetX = (cssWidth - renderWidth) / 2;
+      offsetY = 0;
+    }
+    const point = (i) => ({
+      x: offsetX + landmarks[i].x * renderWidth,
+      y: offsetY + landmarks[i].y * renderHeight,
+    });
+    const visible = (i) => landmarks[i] && (landmarks[i].visibility ?? 1) > 0.25;
+
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.lineWidth = Math.max(2, cssWidth / 260);
+    ctx.strokeStyle = "rgba(52, 211, 153, .95)";
+    CONNECTIONS.forEach(([a, b]) => {
       if (!visible(a) || !visible(b)) return;
-      ctx.beginPath(); ctx.moveTo(landmarks[a].x*w, landmarks[a].y*h); ctx.lineTo(landmarks[b].x*w, landmarks[b].y*h); ctx.stroke();
+      const pa = point(a), pb = point(b);
+      ctx.beginPath();
+      ctx.moveTo(pa.x, pa.y);
+      ctx.lineTo(pb.x, pb.y);
+      ctx.stroke();
     });
     JOINTS.forEach((i) => {
       if (!visible(i)) return;
-      const p = landmarks[i]; const r = i === 0 ? Math.max(5, w/100) : Math.max(4, w/125);
-      ctx.beginPath(); ctx.arc(p.x*w, p.y*h, r, 0, Math.PI*2);
-      ctx.fillStyle = i === 0 ? "#fbbf24" : "#38bdf8"; ctx.fill();
-      ctx.lineWidth = 2; ctx.strokeStyle = "rgba(255,255,255,.95)"; ctx.stroke();
+      const p = point(i);
+      const r = i === 0 ? Math.max(5, cssWidth / 100) : Math.max(4, cssWidth / 125);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+      ctx.fillStyle = i === 0 ? "#fbbf24" : "#38bdf8";
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "rgba(255,255,255,.98)";
+      ctx.stroke();
     });
   }, []);
 
@@ -143,17 +188,27 @@ export default function PosePracticeStudio({ discipline = "boxing" }) {
       const tick = async () => {
         const video = videoRef.current;
         if (!video || video.readyState < 2 || video.paused || video.ended) {
+          if (video && video.paused && videoUrl && !stream) {
+            setPoseStatus("Video is paused — press play to detect joints.");
+          }
           rafRef.current = requestAnimationFrame(tick); return;
         }
         if (!busyRef.current) {
           busyRef.current = true;
-          try { handlePoseResults(pose.detectForVideo(video, performance.now())); } catch (error) { console.warn("Pose frame skipped:", error); }
-          busyRef.current = false;
+          try {
+            const results = pose.detectForVideo(video, performance.now());
+            handlePoseResults(results);
+          } catch (error) {
+            console.warn("Pose frame detection failed:", error);
+            setPoseStatus(`Pose tracking frame failed: ${error?.message || "unknown detection error"}. Check the browser console and camera/video permissions.`);
+          } finally {
+            busyRef.current = false;
+          }
         }
         rafRef.current = requestAnimationFrame(tick);
       };
+      setPoseStatus("Pose model ready — checking video frames for your body.");
       rafRef.current = requestAnimationFrame(tick);
-      setPoseStatus("Pose model ready — looking for your body position.");
     } catch (error) {
       console.error("SkillSensAI pose model failed to initialize:", error);
       setPoseStatus(`Pose model could not load (${error?.message || "network or model error"}). Check your connection, then refresh the page. Recording and upload still work.`);
@@ -181,6 +236,17 @@ export default function PosePracticeStudio({ discipline = "boxing" }) {
     if (streamRef.current) streamRef.current.getTracks().forEach(track => track.stop());
     if (poseRef.current) poseRef.current.close?.();
   }, [stopLoop]);
+
+  useEffect(() => {
+    const redraw = () => {
+      const video = videoRef.current;
+      if (video && lastLandmarksRef.current) {
+        drawPose(lastLandmarksRef.current, video.videoWidth, video.videoHeight);
+      }
+    };
+    window.addEventListener("resize", redraw);
+    return () => window.removeEventListener("resize", redraw);
+  }, [drawPose]);
 
   useEffect(() => () => {
     if (videoUrl.startsWith("blob:")) URL.revokeObjectURL(videoUrl);
