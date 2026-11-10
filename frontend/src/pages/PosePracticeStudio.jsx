@@ -3,11 +3,11 @@ import { FilesetResolver, PoseLandmarker } from "@mediapipe/tasks-vision";
 import { Camera, Upload, X, Maximize2, Minimize2, ScanLine } from "lucide-react";
 import "./PosePracticeStudio.css";
 
-// Load MediaPipe from the locally installed npm package and local public assets.
-// Copy the package WASM files to frontend/public/mediapipe/wasm and put the model at
-// frontend/public/mediapipe/pose_landmarker_lite.task (see SETUP-Pose-Practice.txt).
-const VISION_WASM_PATH = "/mediapipe/wasm";
-const POSE_MODEL_PATH = "/mediapipe/pose_landmarker_lite.task";
+// The JavaScript package is bundled locally by Vite. WASM and the model are fetched
+// from public CDNs so the repository does not need extra binary model/WASM files.
+const VISION_WASM_PATH = "https://unpkg.com/@mediapipe/tasks-vision@1.2.2/wasm";
+const POSE_MODEL_PATH =
+  "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task";
 
 async function loadPoseRuntime() {
   if (window.__skillsensaiPoseRuntime) return window.__skillsensaiPoseRuntime;
