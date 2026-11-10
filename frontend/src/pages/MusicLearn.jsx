@@ -67,6 +67,80 @@ const lessons = [
   },
 ];
 
+// A lightweight browser-only fallback. This is a practice estimate, not an AI
+// comparison against the lesson reference. It lets learners get useful feedback
+// even when the hosted backend is sleeping or temporarily unreachable.
+async function createLocalPracticeEstimate(audioBlob) {
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) {
+    throw new Error("Your browser does not support local audio analysis.");
+  }
+
+  const context = new AudioContextClass();
+  try {
+    const decoded = await context.decodeAudioData(await audioBlob.arrayBuffer());
+    const channel = decoded.getChannelData(0);
+    const sampleRate = decoded.sampleRate;
+    const duration = decoded.duration || 0;
+    const frameSize = Math.max(1024, Math.floor(sampleRate * 0.05));
+    const hopSize = Math.max(512, Math.floor(sampleRate * 0.025));
+    const rmsValues = [];
+    let activeFrames = 0;
+
+    for (let start = 0; start + frameSize < channel.length; start += hopSize) {
+      let sum = 0;
+      for (let i = 0; i < frameSize; i++) {
+        const value = channel[start + i];
+        sum += value * value;
+      }
+      const rms = Math.sqrt(sum / frameSize);
+      rmsValues.push(rms);
+      if (rms > 0.012) activeFrames++;
+    }
+
+    if (!rmsValues.length) {
+      throw new Error("The recording was too short to analyse. Please record for at least 2–3 seconds.");
+    }
+
+    const voicedRatio = activeFrames / rmsValues.length;
+    const activeRms = rmsValues.filter((value) => value > 0.012);
+    const mean = activeRms.length
+      ? activeRms.reduce((sum, value) => sum + value, 0) / activeRms.length
+      : 0;
+    const variance = activeRms.length
+      ? activeRms.reduce((sum, value) => sum + ((value - mean) ** 2), 0) / activeRms.length
+      : 0;
+    const coefficientOfVariation = mean > 0 ? Math.sqrt(variance) / mean : 1;
+    const volumeConsistency = Math.max(0, Math.min(100, 100 - coefficientOfVariation * 55));
+    const voiceActivity = Math.max(0, Math.min(100, voicedRatio * 100));
+    const score = Math.round(Math.max(0, Math.min(100, voiceActivity * 0.65 + volumeConsistency * 0.35)));
+
+    const feedback = [];
+    if (duration < 3) feedback.push("Try recording for at least 5–10 seconds so there is more audio to review.");
+    if (voiceActivity < 20) feedback.push("Your recording sounds very quiet or contains long pauses. Move closer to the microphone and check its input level.");
+    else feedback.push("Your recording contains audible voice activity. Keep the microphone at a consistent distance.");
+    if (volumeConsistency < 55) feedback.push("Try keeping your voice volume steadier from beginning to end.");
+    else feedback.push("Your volume was reasonably consistent in this recording.");
+    feedback.push("This is a local recording check only. Reference pitch and note matching require the SkillSensAI backend.");
+
+    return {
+      success: true,
+      isLocalEstimate: true,
+      overall_score: score,
+      pitch_accuracy: null,
+      note_match: null,
+      stability: Math.round(volumeConsistency * 10) / 10,
+      average_pitch_error_cents: null,
+      voice_activity: Math.round(voiceActivity * 10) / 10,
+      volume_consistency: Math.round(volumeConsistency * 10) / 10,
+      duration_seconds: Math.round(duration * 10) / 10,
+      feedback,
+    };
+  } finally {
+    await context.close().catch(() => {});
+  }
+}
+
 function MusicLearn() {
   const navigate = useNavigate();
 
@@ -457,10 +531,22 @@ function MusicLearn() {
         err
       );
 
-      setError(
-        err?.message ||
-          "Unable to analyse the recording. Please try again."
-      );
+      // If the hosted backend is unavailable, still give the learner a useful
+      // browser-only result instead of ending with an error-only screen.
+      try {
+        const localEstimate = await createLocalPracticeEstimate(audio);
+        setAnalysis(localEstimate);
+        setError(
+          "Backend analysis was unavailable, so this is a local practice estimate. It does not compare your voice with the lesson reference."
+        );
+      } catch (localErr) {
+        console.error("Local recording estimate failed:", localErr);
+        setError(
+          localErr?.message ||
+            err?.message ||
+            "Unable to analyse the recording. Please try again."
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -976,11 +1062,15 @@ function MusicLearn() {
 
                   <div>
                     <span>
-                      AI PRACTICE RESULT
+                      {analysis.isLocalEstimate
+                        ? "LOCAL PRACTICE ESTIMATE"
+                        : "AI PRACTICE RESULT"}
                     </span>
 
                     <h3>
-                      Analysis Complete
+                      {analysis.isLocalEstimate
+                        ? "Recording Check Complete"
+                        : "Analysis Complete"}
                     </h3>
                   </div>
                 </div>
@@ -1013,70 +1103,53 @@ function MusicLearn() {
                     </h3>
 
                     <p>
-                      Your performance was
-                      compared with the
-                      pitch extracted from
-                      the selected lesson.
+                      {analysis.isLocalEstimate
+                        ? "The backend could not be reached, so this estimate checks voice activity and volume consistency in your recording. It is not a pitch or note-match score."
+                        : "Your performance was compared with the pitch extracted from the selected lesson."}
                     </p>
                   </div>
                 </div>
 
                 <div className="learn-stats-grid">
-                  <div className="learn-stat">
-                    <span>
-                      Pitch Accuracy
-                    </span>
-
-                    <strong>
-                      {Number(
-                        analysis.pitch_accuracy ||
-                          0
-                      ).toFixed(1)}
-                      %
-                    </strong>
-                  </div>
-
-                  <div className="learn-stat">
-                    <span>
-                      Note Match
-                    </span>
-
-                    <strong>
-                      {Number(
-                        analysis.note_match ||
-                          0
-                      ).toFixed(1)}
-                      %
-                    </strong>
-                  </div>
-
-                  <div className="learn-stat">
-                    <span>
-                      Stability
-                    </span>
-
-                    <strong>
-                      {Number(
-                        analysis.stability ||
-                          0
-                      ).toFixed(1)}
-                      %
-                    </strong>
-                  </div>
-
-                  <div className="learn-stat">
-                    <span>
-                      Pitch Error
-                    </span>
-
-                    <strong>
-                      {Number(
-                        analysis.average_pitch_error_cents ||
-                          0
-                      ).toFixed(1)}
-                      ¢
-                    </strong>
-                  </div>
+                  {analysis.isLocalEstimate ? (
+                    <>
+                      <div className="learn-stat">
+                        <span>Voice Activity</span>
+                        <strong>{Number(analysis.voice_activity || 0).toFixed(1)}%</strong>
+                      </div>
+                      <div className="learn-stat">
+                        <span>Volume Consistency</span>
+                        <strong>{Number(analysis.volume_consistency || 0).toFixed(1)}%</strong>
+                      </div>
+                      <div className="learn-stat">
+                        <span>Recording Length</span>
+                        <strong>{Number(analysis.duration_seconds || 0).toFixed(1)}s</strong>
+                      </div>
+                      <div className="learn-stat">
+                        <span>Analysis Type</span>
+                        <strong>Local</strong>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="learn-stat">
+                        <span>Pitch Accuracy</span>
+                        <strong>{Number(analysis.pitch_accuracy || 0).toFixed(1)}%</strong>
+                      </div>
+                      <div className="learn-stat">
+                        <span>Note Match</span>
+                        <strong>{Number(analysis.note_match || 0).toFixed(1)}%</strong>
+                      </div>
+                      <div className="learn-stat">
+                        <span>Stability</span>
+                        <strong>{Number(analysis.stability || 0).toFixed(1)}%</strong>
+                      </div>
+                      <div className="learn-stat">
+                        <span>Pitch Error</span>
+                        <strong>{Number(analysis.average_pitch_error_cents || 0).toFixed(1)}¢</strong>
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 <div className="learn-feedback">
