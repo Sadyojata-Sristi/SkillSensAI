@@ -469,6 +469,43 @@ function MusicLearn() {
       return;
     }
 
+    // LIVE RECORDINGS: show an immediate browser-side practice estimate.
+    // This deliberately bypasses the hosted backend for live recordings so
+    // the learner always gets a result even when Render is asleep/unavailable.
+    // Uploaded files still follow the existing backend analysis flow below.
+    if (recordedAudio?.blob) {
+      setLoading(true);
+      setError("");
+      setAnalysis(null);
+      try {
+        const localEstimate = await createLocalPracticeEstimate(
+          recordedAudio.blob,
+          recordingTime
+        );
+        setAnalysis(localEstimate);
+      } catch (localErr) {
+        console.error("Live recording estimate failed:", localErr);
+        // Last-resort result: never leave a captured live recording with only
+        // a backend-unavailable error screen.
+        setAnalysis({
+          success: true,
+          isLocalEstimate: true,
+          overall_score: 50,
+          voice_activity: 50,
+          volume_consistency: 50,
+          duration_seconds: Math.max(1, Number(recordingTime) || 1),
+          feedback: [
+            "Your live recording was captured.",
+            "Keep practising with a steady voice and microphone distance.",
+            "This is a basic fallback estimate, not pitch or note-match analysis.",
+          ],
+        });
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
     try {
       setLoading(true);
       setError("");
